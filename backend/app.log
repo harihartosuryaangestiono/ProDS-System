@@ -1,0 +1,1029 @@
+2025-09-25 22:00:43,716 - __main__ - ERROR - Database connection error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  password authentication failed for user "rayhanadjisantoso"
+
+2025-09-25 22:00:43,718 - __main__ - ERROR - Cannot initialize database - connection failed
+2025-09-25 22:00:43,720 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-25 22:00:43,720 - __main__ - INFO - Database: database_proDS@localhost:5432
+2025-09-25 22:00:43,721 - __main__ - INFO - Environment: development
+2025-09-25 22:13:57,446 - __main__ - ERROR - Database connection error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  password authentication failed for user "rayhanadjisantoso"
+
+2025-09-25 22:13:57,447 - __main__ - ERROR - Cannot initialize database - connection failed
+2025-09-25 22:13:57,448 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-25 22:13:57,449 - __main__ - INFO - Database: database_proDS@localhost:5432
+2025-09-25 22:13:57,449 - __main__ - INFO - Environment: development
+2025-09-25 22:13:57,478 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.10.73:5000
+2025-09-25 22:13:57,479 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-25 22:14:44,950 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-25 22:14:44,951 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-25 22:14:44,952 - __main__ - INFO - Environment: development
+2025-09-25 22:14:44,976 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.10.73:5000
+2025-09-25 22:14:44,977 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-25 22:22:14,396 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-25 22:22:14,398 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-25 22:22:14,398 - __main__ - INFO - Environment: development
+2025-09-25 22:22:14,426 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.10.73:5000
+2025-09-25 22:22:14,427 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-25 22:26:00,359 - werkzeug - INFO - 127.0.0.1 - - [25/Sep/2025 22:26:00] "[33mOPTIONS /auth/login HTTP/1.1[0m" 404 -
+2025-09-25 22:26:19,694 - werkzeug - INFO - 127.0.0.1 - - [25/Sep/2025 22:26:19] "[33mOPTIONS /auth/login HTTP/1.1[0m" 404 -
+2025-09-25 22:28:12,439 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-25 22:28:12,442 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-25 22:28:12,443 - __main__ - INFO - Environment: development
+2025-09-25 22:28:12,465 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.10.73:5000
+2025-09-25 22:28:12,466 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-25 22:28:42,517 - werkzeug - INFO - 127.0.0.1 - - [25/Sep/2025 22:28:42] "[33mOPTIONS /auth/register HTTP/1.1[0m" 404 -
+2025-09-25 22:29:57,565 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-25 22:29:57,568 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-25 22:29:57,568 - __main__ - INFO - Environment: development
+2025-09-25 22:29:57,597 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.10.73:5000
+2025-09-25 22:29:57,598 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-25 22:30:33,097 - werkzeug - INFO - 127.0.0.1 - - [25/Sep/2025 22:30:33] "[33mOPTIONS /auth/register HTTP/1.1[0m" 404 -
+2025-09-25 22:31:31,614 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-25 22:31:31,615 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-25 22:31:31,615 - __main__ - INFO - Environment: development
+2025-09-25 22:31:31,635 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.10.73:5000
+2025-09-25 22:31:31,635 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-25 22:31:56,248 - werkzeug - INFO - 127.0.0.1 - - [25/Sep/2025 22:31:56] "[33mOPTIONS /auth/register HTTP/1.1[0m" 404 -
+2025-09-25 23:04:53,951 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-25 23:04:53,954 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-25 23:04:53,955 - __main__ - INFO - Environment: development
+2025-09-25 23:04:53,990 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.10.73:5000
+2025-09-25 23:04:53,991 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-25 23:06:59,928 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-25 23:06:59,929 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-25 23:06:59,929 - __main__ - INFO - Environment: development
+2025-09-25 23:06:59,945 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.10.73:5000
+2025-09-25 23:06:59,946 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-25 23:07:25,126 - werkzeug - INFO - 127.0.0.1 - - [25/Sep/2025 23:07:25] "[33mOPTIONS /auth/login HTTP/1.1[0m" 404 -
+2025-09-25 23:09:10,002 - werkzeug - INFO - 127.0.0.1 - - [25/Sep/2025 23:09:10] "[33mOPTIONS /auth/register HTTP/1.1[0m" 404 -
+2025-09-25 23:09:32,453 - werkzeug - INFO - 127.0.0.1 - - [25/Sep/2025 23:09:32] "[33mOPTIONS /auth/register HTTP/1.1[0m" 404 -
+2025-09-25 23:13:08,652 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-25 23:13:08,653 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-25 23:13:08,653 - __main__ - INFO - Environment: development
+2025-09-25 23:13:08,667 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.10.73:5000
+2025-09-25 23:13:08,667 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-25 23:13:32,324 - werkzeug - INFO - 127.0.0.1 - - [25/Sep/2025 23:13:32] "[33mOPTIONS /auth/register HTTP/1.1[0m" 404 -
+2025-09-25 23:15:28,358 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-25 23:15:28,358 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-25 23:15:28,359 - __main__ - INFO - Environment: development
+2025-09-25 23:15:28,381 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.10.73:5000
+2025-09-25 23:15:28,381 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-25 23:16:02,944 - werkzeug - INFO - 127.0.0.1 - - [25/Sep/2025 23:16:02] "[33mOPTIONS /auth/register HTTP/1.1[0m" 404 -
+2025-09-25 23:28:39,247 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-25 23:28:39,248 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-25 23:28:39,249 - __main__ - INFO - Environment: development
+2025-09-25 23:28:39,269 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.10.73:5000
+2025-09-25 23:28:39,270 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-25 23:29:00,228 - werkzeug - INFO - 127.0.0.1 - - [25/Sep/2025 23:29:00] "OPTIONS /auth/register HTTP/1.1" 200 -
+2025-09-25 23:29:00,494 - werkzeug - INFO - 127.0.0.1 - - [25/Sep/2025 23:29:00] "[31m[1mPOST /auth/register HTTP/1.1[0m" 400 -
+2025-09-25 23:45:47,416 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-25 23:45:47,417 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-25 23:45:47,417 - __main__ - INFO - Environment: development
+2025-09-25 23:45:47,435 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.10.73:5000
+2025-09-25 23:45:47,435 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-25 23:47:05,906 - werkzeug - INFO - 127.0.0.1 - - [25/Sep/2025 23:47:05] "OPTIONS /auth/register HTTP/1.1" 200 -
+2025-09-25 23:47:06,800 - routes.auth - ERROR - Registration error: column "v_id_user" does not exist
+LINE 1: SELECT v_id_user FROM users WHERE v_email = 'hariharto.surya...
+               ^
+HINT:  Perhaps you meant to reference the column "users.v_id_users".
+
+2025-09-25 23:47:06,801 - werkzeug - INFO - 127.0.0.1 - - [25/Sep/2025 23:47:06] "[35m[1mPOST /auth/register HTTP/1.1[0m" 500 -
+2025-09-26 00:53:01,161 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 00:53:01,161 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 00:53:01,162 - __main__ - INFO - Environment: development
+2025-09-26 00:53:01,179 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.10.73:5000
+2025-09-26 00:53:01,179 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 00:53:38,637 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 00:53:38] "OPTIONS /auth/register HTTP/1.1" 200 -
+2025-09-26 00:53:38,950 - routes.auth - INFO - Received registration data: {'v_username': 'hari', 'v_email': 'hariharto.surya@gmail.com', 'v_password_hash': 'hari123'}
+2025-09-26 00:53:39,514 - routes.auth - ERROR - Registration error: column "v_id_user" does not exist
+LINE 1: SELECT v_id_user FROM users WHERE v_email = 'hariharto.surya...
+               ^
+HINT:  Perhaps you meant to reference the column "users.v_id_users".
+
+2025-09-26 00:53:39,515 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 00:53:39] "[35m[1mPOST /auth/register HTTP/1.1[0m" 500 -
+2025-09-26 00:55:57,708 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 00:55:57] "OPTIONS /auth/register HTTP/1.1" 200 -
+2025-09-26 00:55:58,020 - routes.auth - INFO - Received registration data: {'v_username': 'hari', 'v_email': 'hariharto.surya@gmail.com', 'v_password_hash': 'hari123'}
+2025-09-26 00:55:58,494 - routes.auth - INFO - New user registered: hari (ID: 1)
+2025-09-26 00:55:58,495 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 00:55:58] "[35m[1mPOST /auth/register HTTP/1.1[0m" 201 -
+2025-09-26 00:56:10,828 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 00:56:10] "OPTIONS /auth/login HTTP/1.1" 200 -
+2025-09-26 00:56:11,697 - routes.auth - INFO - User logged in: hari (ID: 1)
+2025-09-26 00:56:11,698 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 00:56:11] "POST /auth/login HTTP/1.1" 200 -
+2025-09-26 00:56:12,097 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 00:56:12] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 00:56:12,099 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 00:56:12] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 00:56:12,677 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 00:56:12] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 00:56:12,814 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 00:56:12] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 00:56:28,935 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 00:56:28] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 00:56:29,270 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 00:56:29] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 00:56:54,224 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 00:56:54] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 00:56:54,629 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 00:56:54] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 00:59:30,594 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 00:59:30] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 00:59:30,812 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 00:59:30] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 01:00:28,717 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 01:00:28] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 01:00:29,126 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 01:00:29] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 01:24:31,574 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 01:24:31] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 01:24:31,577 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 01:24:31] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 01:24:32,070 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 01:24:32] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 01:24:32,253 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 01:24:32] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 06:47:59,162 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 06:47:59,163 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 06:47:59,163 - __main__ - INFO - Environment: development
+2025-09-26 06:47:59,187 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.10.73:5000
+2025-09-26 06:47:59,187 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 06:51:29,523 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 06:51:29,524 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 06:51:29,524 - __main__ - INFO - Environment: development
+2025-09-26 06:51:29,542 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.10.73:5000
+2025-09-26 06:51:29,543 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 07:05:27,186 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 07:05:27,187 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 07:05:27,189 - __main__ - INFO - Environment: development
+2025-09-26 07:05:27,213 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.99:5000
+2025-09-26 07:05:27,213 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 07:16:17,639 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:16:17] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:16:17,640 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:16:17] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:16:17,983 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:16:17] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:16:18,112 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:16:18] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:16:24,759 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:16:24] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:16:24,980 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:16:24] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:17:05,037 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:17:05] "OPTIONS /auth/login HTTP/1.1" 200 -
+2025-09-26 07:17:06,100 - routes.auth - INFO - User logged in: hari (ID: 1)
+2025-09-26 07:17:06,101 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:17:06] "POST /auth/login HTTP/1.1" 200 -
+2025-09-26 07:17:06,244 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:17:06] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:17:06,682 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:17:06] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:17:22,386 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:17:22] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:17:22,894 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:17:22] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:20:49,223 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:20:49] "OPTIONS /auth/register HTTP/1.1" 200 -
+2025-09-26 07:20:49,493 - routes.auth - INFO - Received registration data: {'v_username': 'adjie', 'v_email': 'rayhanadjieSantosooo@gmail.com', 'v_password_hash': 'adjie123'}
+2025-09-26 07:20:50,213 - routes.auth - INFO - New user registered: adjie (ID: 2)
+2025-09-26 07:20:50,214 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:20:50] "[35m[1mPOST /auth/register HTTP/1.1[0m" 201 -
+2025-09-26 07:20:57,708 - routes.auth - INFO - User logged in: adjie (ID: 2)
+2025-09-26 07:20:57,709 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:20:57] "POST /auth/login HTTP/1.1" 200 -
+2025-09-26 07:20:58,257 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:20:58] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:20:58,545 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:20:58] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:24:46,645 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:24:46] "[33mOPTIONS /dashboard/stats HTTP/1.1[0m" 404 -
+2025-09-26 07:24:46,646 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:24:46] "[33mOPTIONS /dashboard/stats HTTP/1.1[0m" 404 -
+2025-09-26 07:24:48,105 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:24:48] "[33mOPTIONS /sinta/dosen?page=1&per_page=20&search= HTTP/1.1[0m" 404 -
+2025-09-26 07:24:48,421 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:24:48] "[33mOPTIONS /sinta/dosen?page=1&per_page=20&search= HTTP/1.1[0m" 404 -
+2025-09-26 07:24:49,603 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:24:49] "[33mOPTIONS /dashboard/stats HTTP/1.1[0m" 404 -
+2025-09-26 07:24:49,607 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:24:49] "[33mOPTIONS /dashboard/stats HTTP/1.1[0m" 404 -
+2025-09-26 07:24:54,831 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:24:54] "[33mOPTIONS /dashboard/stats HTTP/1.1[0m" 404 -
+2025-09-26 07:24:55,144 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:24:55] "[33mOPTIONS /dashboard/stats HTTP/1.1[0m" 404 -
+2025-09-26 07:25:12,239 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:25:12] "[33mOPTIONS /sinta/dosen?page=1&per_page=20&search= HTTP/1.1[0m" 404 -
+2025-09-26 07:25:12,240 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:25:12] "[33mOPTIONS /sinta/dosen?page=1&per_page=20&search= HTTP/1.1[0m" 404 -
+2025-09-26 07:25:16,192 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:25:16] "[33mOPTIONS /sinta/dosen?page=1&per_page=20&search= HTTP/1.1[0m" 404 -
+2025-09-26 07:25:16,500 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:25:16] "[33mOPTIONS /sinta/dosen?page=1&per_page=20&search= HTTP/1.1[0m" 404 -
+2025-09-26 07:29:45,072 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:29:45] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:29:45,573 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:29:45] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:29:51,399 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 07:29:51,415 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 07:29:51,416 - __main__ - INFO - Environment: development
+2025-09-26 07:29:51,586 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.99:5000
+2025-09-26 07:29:51,586 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 07:30:18,768 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:30:18] "OPTIONS /auth/login HTTP/1.1" 200 -
+2025-09-26 07:30:19,765 - routes.auth - INFO - User logged in: hari (ID: 1)
+2025-09-26 07:30:19,766 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:30:19] "POST /auth/login HTTP/1.1" 200 -
+2025-09-26 07:30:19,841 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:30:19] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:30:19,961 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:30:19] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:30:20,408 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:30:20] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:30:38,213 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:30:38] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:30:38,216 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:30:38] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:30:38,437 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:30:38] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:30:38,825 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:30:38] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:31:14,565 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:31:14] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:31:14,759 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:31:14] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:34:48,256 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:34:48] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:34:48,459 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:34:48] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:35:15,294 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:35:15] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:35:16,432 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:35:16] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:35:21,743 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:35:21] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search=K HTTP/1.1" 200 -
+2025-09-26 07:35:21,886 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:35:21] "GET /api/sinta/dosen?page=1&per_page=20&search=K HTTP/1.1" 200 -
+2025-09-26 07:35:21,943 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:35:21] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search=Kr HTTP/1.1" 200 -
+2025-09-26 07:35:22,009 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:35:22] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search=Kri HTTP/1.1" 200 -
+2025-09-26 07:35:22,129 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:35:22] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search=Kris HTTP/1.1" 200 -
+2025-09-26 07:35:22,382 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:35:22] "GET /api/sinta/dosen?page=1&per_page=20&search=Kr HTTP/1.1" 200 -
+2025-09-26 07:35:22,437 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:35:22] "GET /api/sinta/dosen?page=1&per_page=20&search=Kri HTTP/1.1" 200 -
+2025-09-26 07:35:22,531 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:35:22] "GET /api/sinta/dosen?page=1&per_page=20&search=Kris HTTP/1.1" 200 -
+2025-09-26 07:35:27,249 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:35:27] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:35:54,274 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:35:54] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:35:54,418 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:35:54] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:37:14,397 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:37:14] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:37:14,624 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:37:14] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 07:38:23,915 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:38:23] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:38:24,098 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:38:24] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:39:24,002 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:39:24] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:39:26,388 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:39:26] "OPTIONS /api/sinta/dosen?page=2&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:39:26,610 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:39:26] "GET /api/sinta/dosen?page=2&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:39:29,401 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:39:29] "OPTIONS /api/sinta/dosen?page=3&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:39:29,820 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:39:29] "GET /api/sinta/dosen?page=3&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:39:32,898 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:39:32] "OPTIONS /api/sinta/dosen?page=4&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:39:33,006 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:39:33] "GET /api/sinta/dosen?page=4&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:39:35,658 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:39:35] "GET /api/sinta/dosen?page=3&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:39:37,762 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:39:37] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:39:39,487 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:39:39] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:39:44,897 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:39:44] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:39:45,336 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:39:45] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:41:54,946 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:41:54] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:41:55,480 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:41:55] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:44:12,648 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:44:12] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:44:12,654 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:44:12] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:44:13,058 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 07:44:13,060 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:44:13] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 07:44:13,309 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 07:44:13,310 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:44:13] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 07:44:20,971 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 07:44:20,973 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:44:20] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 07:44:21,376 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 07:44:21,377 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:44:21] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 07:46:11,498 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 07:46:11,498 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 07:46:11,499 - __main__ - INFO - Environment: development
+2025-09-26 07:46:11,516 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.99:5000
+2025-09-26 07:46:11,516 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 07:46:35,768 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 07:46:35,771 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:46:35] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 07:46:36,023 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 07:46:36,024 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:46:36] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 07:51:57,476 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 07:51:57,476 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 07:51:57,477 - __main__ - INFO - Environment: development
+2025-09-26 07:51:57,493 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.99:5000
+2025-09-26 07:51:57,493 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 07:52:19,901 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 07:52:19,903 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:52:19] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 07:52:20,090 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 07:52:20,092 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:52:20] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 07:54:48,696 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 07:54:48,697 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 07:54:48,697 - __main__ - INFO - Environment: development
+2025-09-26 07:54:48,720 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.99:5000
+2025-09-26 07:54:48,720 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 07:55:07,527 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:55:07] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:55:07,530 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:55:07] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 07:55:07,993 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 07:55:07,994 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:55:07] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 07:55:08,236 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 07:55:08,237 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:55:08] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 07:56:25,536 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 07:56:25,538 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:56:25] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 07:56:25,783 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 07:56:25,784 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 07:56:25] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 08:07:33,722 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:07:33] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 08:07:33,724 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:07:33] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 08:07:34,157 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 08:07:34,158 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:07:34] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 08:07:34,397 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 08:07:34,399 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:07:34] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 08:07:49,736 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:07:49] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 08:07:49,962 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:07:49] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 08:07:50,042 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:07:50] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 08:07:50,522 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:07:50] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 08:15:23,000 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 08:15:23,001 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 08:15:23,001 - __main__ - INFO - Environment: development
+2025-09-26 08:15:23,020 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.99:5000
+2025-09-26 08:15:23,022 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 08:15:35,709 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:15:35] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 08:15:35,916 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:15:35] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 08:15:39,547 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:15:39] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 08:15:39,549 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:15:39] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 08:15:39,967 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:15:39] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 08:15:40,207 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:15:40] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 08:15:41,883 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 08:15:41,885 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:15:41] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 08:15:42,294 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 08:15:42,295 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:15:42] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 08:15:43,829 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:15:43] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 08:15:44,419 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:15:44] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 08:15:57,606 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:15:57] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 08:22:25,215 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:22:25] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 08:22:29,121 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:22:29] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 08:22:29,122 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:22:29] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 08:22:29,193 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:22:29] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 08:22:29,577 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 08:22:29] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 09:05:20,206 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 09:05:20] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 09:05:20,349 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 09:05:20] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 09:05:23,403 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 09:05:23] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 09:05:24,398 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 09:05:24] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 09:27:13,650 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 09:27:13] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 09:27:13,652 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 09:27:13] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 09:27:14,388 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 09:27:14] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 09:27:14,690 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 09:27:14] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 09:27:18,818 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 09:27:18] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 09:27:19,135 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 09:27:19] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 09:27:19,442 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 09:27:19] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 09:27:19,809 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 09:27:19] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 12:37:46,823 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:46] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 12:37:46,827 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:46] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 12:37:47,353 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:47] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 12:37:47,527 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:47] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 12:37:50,768 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:50] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 12:37:50,924 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:50] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 12:37:51,083 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:51] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 12:37:51,576 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:51] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 12:37:56,461 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:56] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search=s HTTP/1.1" 200 -
+2025-09-26 12:37:56,617 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:56] "GET /api/sinta/dosen?page=1&per_page=20&search=s HTTP/1.1" 200 -
+2025-09-26 12:37:56,647 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:56] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search=sd HTTP/1.1" 200 -
+2025-09-26 12:37:56,709 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:56] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search=sds HTTP/1.1" 200 -
+2025-09-26 12:37:56,740 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:56] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search=sdsa HTTP/1.1" 200 -
+2025-09-26 12:37:56,803 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:56] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search=sdsad HTTP/1.1" 200 -
+2025-09-26 12:37:57,107 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:57] "GET /api/sinta/dosen?page=1&per_page=20&search=sd HTTP/1.1" 200 -
+2025-09-26 12:37:57,171 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:57] "GET /api/sinta/dosen?page=1&per_page=20&search=sds HTTP/1.1" 200 -
+2025-09-26 12:37:57,214 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:57] "GET /api/sinta/dosen?page=1&per_page=20&search=sdsa HTTP/1.1" 200 -
+2025-09-26 12:37:57,303 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:57] "GET /api/sinta/dosen?page=1&per_page=20&search=sdsad HTTP/1.1" 200 -
+2025-09-26 12:37:57,402 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:57] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 12:37:58,675 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:37:58] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 12:38:32,135 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:38:32] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 12:38:32,352 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:38:32] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 12:39:19,503 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:39:19] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 12:39:19,925 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:39:19] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 12:39:34,989 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:39:34] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 12:39:39,490 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:39:39] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 12:39:39,494 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:39:39] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 12:39:39,691 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 12:39:39,693 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:39:39] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 12:39:40,139 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 12:39:40,140 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:39:40] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 12:57:46,864 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 12:57:46,865 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 12:57:46,865 - __main__ - INFO - Environment: development
+2025-09-26 12:57:46,884 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.215:5000
+2025-09-26 12:57:46,884 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 12:58:48,364 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:58:48] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 12:58:48,368 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:58:48] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 12:58:48,824 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 12:58:48,825 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:58:48] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 12:58:49,042 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 12:58:49,043 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:58:49] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 12:58:54,886 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:58:54] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 12:58:55,171 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:58:55] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 12:58:55,204 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:58:55] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 12:58:55,630 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:58:55] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 12:58:56,637 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 12:58:56,638 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:58:56] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 12:58:57,064 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 12:58:57,066 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:58:57] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 12:59:01,613 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 12:59:01,614 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:59:01] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 12:59:02,044 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 12:59:02,046 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 12:59:02] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 13:00:48,831 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:00:48] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 13:00:48,833 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:00:48] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 13:00:49,402 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:00:49] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 13:00:49,557 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:00:49] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 13:00:56,699 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:00:56] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 13:00:56,807 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:00:56] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 13:01:01,641 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 13:01:01,642 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:01:01] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 13:01:01,862 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 13:01:01,863 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:01:01] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 13:01:04,619 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 13:01:04,621 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:01:04] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 13:01:05,086 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 13:01:05,088 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:01:05] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 13:19:40,566 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 13:19:40,567 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 13:19:40,567 - __main__ - INFO - Environment: development
+2025-09-26 13:19:40,586 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.215:5000
+2025-09-26 13:19:40,587 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 13:20:14,253 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:20:14] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 13:20:14,259 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:20:14] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 13:20:14,693 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 13:20:14,695 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:20:14] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 13:20:14,927 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 13:20:14,928 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:20:14] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 13:26:43,574 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 13:26:43,575 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 13:26:43,576 - __main__ - INFO - Environment: development
+2025-09-26 13:26:43,604 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.215:5000
+2025-09-26 13:26:43,606 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 13:26:58,240 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 13:26:58,241 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:26:58] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 13:26:58,500 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 13:26:58,503 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:26:58] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 13:27:01,770 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:27:01] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 13:27:01,771 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:27:01] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 13:27:02,047 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:27:02] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 13:27:02,526 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:27:02] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 13:27:04,489 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 13:27:04,490 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:27:04] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 13:27:04,737 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 13:27:04,738 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:27:04] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 13:27:06,912 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 13:27:06,917 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:27:06] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 13:27:07,339 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 13:27:07,342 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:27:07] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 13:29:20,191 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:29:20] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 13:29:20,194 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:29:20] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 13:29:20,704 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:29:20] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 13:29:20,902 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:29:20] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 13:47:26,390 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:47:26] "OPTIONS /auth/login HTTP/1.1" 200 -
+2025-09-26 13:47:27,487 - routes.auth - INFO - User logged in: hari (ID: 1)
+2025-09-26 13:47:27,487 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:47:27] "POST /auth/login HTTP/1.1" 200 -
+2025-09-26 13:47:27,556 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:47:27] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 13:47:27,728 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:47:27] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 13:47:27,862 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:47:27] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 13:47:28,299 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:47:28] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 13:53:29,992 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:53:29] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 13:53:30,518 - __main__ - ERROR - Get Scholar publikasi error: list index out of range
+2025-09-26 13:53:30,519 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:53:30] "[35m[1mGET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 13:53:30,551 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:53:30] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 13:53:35,848 - __main__ - ERROR - Get Scholar publikasi error: list index out of range
+2025-09-26 13:53:35,850 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:53:35] "[35m[1mGET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 13:53:35,962 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:53:35] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 13:53:40,072 - __main__ - ERROR - Get Scholar publikasi error: list index out of range
+2025-09-26 13:53:40,074 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:53:40] "[35m[1mGET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 13:53:40,294 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:53:40] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 13:53:43,977 - __main__ - ERROR - Get Scholar publikasi error: list index out of range
+2025-09-26 13:53:43,979 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:53:43] "[35m[1mGET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 13:53:44,384 - __main__ - ERROR - Get Scholar publikasi error: list index out of range
+2025-09-26 13:53:44,386 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 13:53:44] "[35m[1mGET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 14:17:46,798 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 14:17:46,798 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 14:17:46,799 - __main__ - INFO - Environment: development
+2025-09-26 14:17:46,823 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.215:5000
+2025-09-26 14:17:46,824 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 14:17:57,655 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 14:17:57] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 14:17:57,664 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 14:17:57] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 14:17:58,179 - __main__ - ERROR - Get Scholar publikasi error: list index out of range
+2025-09-26 14:17:58,180 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 14:17:58] "[35m[1mGET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 14:17:58,420 - __main__ - ERROR - Get Scholar publikasi error: list index out of range
+2025-09-26 14:17:58,421 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 14:17:58] "[35m[1mGET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 14:18:00,568 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 14:18:00] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 14:18:00,768 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 14:18:00,769 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 14:18:00] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 14:18:00,881 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 14:18:00] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 14:18:01,418 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 14:18:01,419 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 14:18:01] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 14:18:02,978 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 14:18:02,980 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 14:18:02] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 14:18:03,412 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 14:18:03,413 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 14:18:03] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 14:40:22,156 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 14:40:22,157 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 14:40:22,157 - __main__ - INFO - Environment: development
+2025-09-26 14:40:22,177 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.215:5000
+2025-09-26 14:40:22,177 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 14:40:42,401 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 14:40:42] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 14:40:42,406 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 14:40:42] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 14:40:42,841 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 14:40:42,841 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 14:40:42] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 14:40:43,071 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 14:40:43,072 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 14:40:43] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 15:02:43,034 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 15:02:43,035 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 15:02:43,036 - __main__ - INFO - Environment: development
+2025-09-26 15:02:43,061 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.215:5000
+2025-09-26 15:02:43,062 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 15:04:15,882 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 15:04:15] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 15:04:15,887 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 15:04:15] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 15:04:16,465 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 15:04:16,466 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 15:04:16] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 15:04:16,620 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 15:04:16,622 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 15:04:16] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 15:13:40,470 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 15:13:40,470 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 15:13:40,472 - __main__ - INFO - Environment: development
+2025-09-26 15:13:40,490 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.215:5000
+2025-09-26 15:13:40,490 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 15:13:51,702 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 15:13:51,704 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 15:13:51] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 15:13:52,020 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 15:13:52,020 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 15:13:52] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 16:22:48,849 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 16:22:48,877 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 16:22:48,899 - __main__ - INFO - Environment: development
+2025-09-26 16:22:49,067 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.215:5000
+2025-09-26 16:22:49,102 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 16:23:32,381 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:32] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 16:23:32,385 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:32] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 16:23:32,868 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 16:23:32,869 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:32] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 16:23:33,123 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 16:23:33,126 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:33] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 16:23:42,754 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:42] "[33mGET /api/sinta/publikasi-simple HTTP/1.1[0m" 404 -
+2025-09-26 16:23:42,801 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:42] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-09-26 16:23:48,292 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:48] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 16:23:48,293 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:48] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 16:23:48,464 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:48] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 16:23:48,916 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:48] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 16:23:50,342 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:50] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 16:23:50,644 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:50] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 16:23:50,777 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:50] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 16:23:51,058 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:51] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 16:23:53,729 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:53] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 16:23:53,730 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:53] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 16:23:53,837 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 16:23:53,838 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:53] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 16:23:54,345 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 16:23:54,346 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:23:54] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 16:24:45,741 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:24:45] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 16:24:45,972 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 16:24:45] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 18:45:31,134 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 18:45:31] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 18:45:31,140 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 18:45:31] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 18:45:32,051 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 18:45:32] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 18:45:32,347 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 18:45:32] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 18:54:36,450 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 18:54:36] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 18:54:36,692 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 18:54:36] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 18:54:40,611 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 18:54:40] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 18:54:40,613 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 18:54:40] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 18:54:40,721 - __main__ - ERROR - Get Scholar publikasi error: list index out of range
+2025-09-26 18:54:40,722 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 18:54:40] "[35m[1mGET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 18:54:41,193 - __main__ - ERROR - Get Scholar publikasi error: list index out of range
+2025-09-26 18:54:41,194 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 18:54:41] "[35m[1mGET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 18:54:42,377 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 18:54:42] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 18:54:42,585 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 18:54:42] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 19:08:59,324 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 19:08:59,324 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 19:08:59,324 - __main__ - INFO - Environment: development
+2025-09-26 19:08:59,353 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.215:5000
+2025-09-26 19:08:59,353 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 19:09:17,241 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:09:17] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 19:09:17,269 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:09:17] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 19:09:17,844 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:09:17] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 19:09:18,055 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:09:18] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 19:09:20,407 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:09:20] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 19:09:20,572 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:09:20] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 19:09:20,715 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:09:20] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 19:09:21,127 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:09:21] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 19:09:22,568 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:09:22] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 19:09:22,570 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:09:22] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 19:09:22,698 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 19:09:22,699 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:09:22] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 19:09:23,125 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 19:09:23,127 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:09:23] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 19:10:19,623 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:10:19] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 19:10:19,628 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:10:19] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 19:10:20,175 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 19:10:20,176 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:10:20] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 19:10:20,325 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 19:10:20,326 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:10:20] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 19:15:50,890 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 19:15:50,890 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 19:15:50,890 - __main__ - INFO - Environment: development
+2025-09-26 19:15:50,908 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.215:5000
+2025-09-26 19:15:50,908 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 19:16:43,974 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 19:16:43,977 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:16:43] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 19:16:44,182 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 19:16:44,186 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 19:16:44] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 22:28:19,734 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 22:28:19] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 22:28:19,742 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 22:28:19] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 22:28:20,236 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 22:28:20,237 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 22:28:20] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 22:28:20,428 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 22:28:20,430 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 22:28:20] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 22:28:26,441 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 22:28:26,442 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 22:28:26] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 22:28:26,947 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 22:28:26,948 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 22:28:26] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 22:29:28,165 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 22:29:28,165 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 22:29:28,165 - __main__ - INFO - Environment: development
+2025-09-26 22:29:28,192 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.10.73:5000
+2025-09-26 22:29:28,192 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 22:29:43,699 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 22:29:43,701 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 22:29:43] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 22:29:43,960 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 22:29:43,962 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 22:29:43] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 23:40:26,380 - __main__ - INFO - Starting ProDS Flask Application
+2025-09-26 23:40:26,383 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-09-26 23:40:26,385 - __main__ - INFO - Environment: development
+2025-09-26 23:40:26,417 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.10.73:5000
+2025-09-26 23:40:26,420 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 23:40:36,789 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:40:36] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 23:40:36,797 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:40:36] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 23:40:37,339 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 23:40:37,340 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:40:37] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 23:40:37,521 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-09-26 23:40:37,528 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:40:37] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-09-26 23:40:40,195 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:40:40] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 23:40:40,376 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:40:40] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 23:40:40,505 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:40:40] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 23:40:40,970 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:40:40] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 23:41:17,711 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:41:17] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 23:41:18,306 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:41:18] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 23:41:41,105 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:41:41] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 23:41:41,107 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:41:41] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 23:41:41,644 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:41:41] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 23:41:41,781 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:41:41] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 23:41:43,929 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:41:43] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 23:41:44,651 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:41:44] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 23:41:48,104 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:41:48] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 23:41:48,369 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:41:48] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 23:41:48,943 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:41:48] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 23:41:49,510 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:41:49] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-09-26 23:41:51,528 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:41:51] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-26 23:41:51,784 - werkzeug - INFO - 127.0.0.1 - - [26/Sep/2025 23:41:51] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-30 21:48:19,035 - werkzeug - INFO - 127.0.0.1 - - [30/Sep/2025 21:48:19] "OPTIONS /auth/login HTTP/1.1" 200 -
+2025-09-30 21:48:22,814 - routes.auth - INFO - User logged in: hari (ID: 1)
+2025-09-30 21:48:22,883 - werkzeug - INFO - 127.0.0.1 - - [30/Sep/2025 21:48:22] "POST /auth/login HTTP/1.1" 200 -
+2025-09-30 21:48:24,465 - werkzeug - INFO - 127.0.0.1 - - [30/Sep/2025 21:48:24] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-30 21:48:24,488 - werkzeug - INFO - 127.0.0.1 - - [30/Sep/2025 21:48:24] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-30 21:48:29,102 - werkzeug - INFO - 127.0.0.1 - - [30/Sep/2025 21:48:29] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-30 21:48:34,506 - werkzeug - INFO - 127.0.0.1 - - [30/Sep/2025 21:48:34] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-30 21:48:45,053 - werkzeug - INFO - 127.0.0.1 - - [30/Sep/2025 21:48:45] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-30 21:48:48,037 - werkzeug - INFO - 127.0.0.1 - - [30/Sep/2025 21:48:48] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-30 21:49:14,212 - werkzeug - INFO - 127.0.0.1 - - [30/Sep/2025 21:49:14] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-09-30 21:49:15,638 - werkzeug - INFO - 127.0.0.1 - - [30/Sep/2025 21:49:15] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:20:29,429 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-01 07:20:29,436 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-01 07:20:29,440 - __main__ - INFO - Environment: development
+2025-10-01 07:20:29,513 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.28:5000
+2025-10-01 07:20:29,519 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-01 07:21:54,653 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:21:54] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:21:54,661 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:21:54] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:21:55,791 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:21:55] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:21:56,304 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:21:56] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:23:51,661 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:23:51] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:23:51,663 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:23:51] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:23:52,283 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:23:52] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:23:52,614 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:23:52] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:24:25,632 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:24:25] "OPTIONS /api/sinta/dosen?page=5&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:24:26,154 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:24:26] "GET /api/sinta/dosen?page=5&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:24:31,399 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:24:31] "OPTIONS /api/sinta/dosen?page=7&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:24:31,602 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:24:31] "GET /api/sinta/dosen?page=7&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:24:37,168 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:24:37] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:24:37,546 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:24:37] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:24:40,147 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:24:40] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:24:40,565 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:24:40] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:25:11,163 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:25:11] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:25:11,483 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:25:11] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:25:11,721 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 07:25:11,722 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:25:11] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 07:25:11,932 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 07:25:11,934 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:25:11] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 07:25:18,765 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:25:18] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:25:19,240 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:25:19] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:25:46,144 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:25:46] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:32:59,918 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 07:32:59,920 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:32:59] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 07:33:00,176 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 07:33:00,181 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:33:00] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 07:33:53,875 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 07:33:53,879 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:33:53] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 07:34:01,590 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 07:34:01,592 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:34:01] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 07:34:01,922 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 07:34:01,924 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:34:01] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 07:38:40,039 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:38:40] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:38:40,043 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:38:40] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:38:40,530 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:38:40] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:38:40,846 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:38:40] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:39:13,754 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:13] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:39:14,277 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:14] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:39:27,571 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:27] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:39:27,883 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:27] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:39:28,138 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:28] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:39:28,347 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:28] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:39:31,949 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:31] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:39:32,344 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:32] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:39:35,093 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:35] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:39:35,395 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:35] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:39:36,665 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:36] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:39:37,131 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:37] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:39:42,559 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:42] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search=g HTTP/1.1" 200 -
+2025-10-01 07:39:43,043 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:43] "GET /api/sinta/dosen?page=1&per_page=20&search=g HTTP/1.1" 200 -
+2025-10-01 07:39:43,513 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:43] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:39:45,226 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:45] "GET /api/sinta/dosen?page=1&per_page=20&search=g HTTP/1.1" 200 -
+2025-10-01 07:39:47,621 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:47] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:39:48,673 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:48] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search=v HTTP/1.1" 200 -
+2025-10-01 07:39:49,046 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:49] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search=ve HTTP/1.1" 200 -
+2025-10-01 07:39:49,123 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:49] "GET /api/sinta/dosen?page=1&per_page=20&search=v HTTP/1.1" 200 -
+2025-10-01 07:39:49,181 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:49] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search=ver HTTP/1.1" 200 -
+2025-10-01 07:39:49,319 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:49] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search=vero HTTP/1.1" 200 -
+2025-10-01 07:39:49,418 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:49] "GET /api/sinta/dosen?page=1&per_page=20&search=ve HTTP/1.1" 200 -
+2025-10-01 07:39:49,539 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:49] "GET /api/sinta/dosen?page=1&per_page=20&search=ver HTTP/1.1" 200 -
+2025-10-01 07:39:49,700 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:49] "GET /api/sinta/dosen?page=1&per_page=20&search=vero HTTP/1.1" 200 -
+2025-10-01 07:39:49,865 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:49] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search=veron HTTP/1.1" 200 -
+2025-10-01 07:39:50,168 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:50] "GET /api/sinta/dosen?page=1&per_page=20&search=veron HTTP/1.1" 200 -
+2025-10-01 07:39:50,883 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:50] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search=veroni HTTP/1.1" 200 -
+2025-10-01 07:39:51,390 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:51] "GET /api/sinta/dosen?page=1&per_page=20&search=veroni HTTP/1.1" 200 -
+2025-10-01 07:39:52,842 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:39:52] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:40:36,578 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-01 07:40:36,603 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-01 07:40:36,603 - __main__ - INFO - Environment: development
+2025-10-01 07:40:36,702 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.28:5000
+2025-10-01 07:40:36,703 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-01 07:40:54,378 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:40:54] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:40:54,617 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:40:54] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:40:58,086 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:40:58] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:40:58,284 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:40:58] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:41:00,834 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:41:00] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:41:00,838 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:41:00] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:41:01,089 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 07:41:01,090 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:41:01] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 07:41:01,583 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 07:41:01,584 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:41:01] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 07:53:19,439 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:53:19] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:53:19,441 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:53:19] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:53:19,947 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:53:19] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:53:20,191 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:53:20] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:54:16,222 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:54:16] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:54:16,413 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 07:54:16,414 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:54:16] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 07:54:16,538 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:54:16] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 07:54:17,091 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 07:54:17,093 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:54:17] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 07:54:35,974 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:54:35] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:54:36,537 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:54:36] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:55:02,745 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:55:02] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 07:55:02,982 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 07:55:02] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 08:15:51,426 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-01 08:15:51,427 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-01 08:15:51,428 - __main__ - INFO - Environment: development
+2025-10-01 08:15:51,486 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.28:5000
+2025-10-01 08:15:51,487 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-01 08:16:28,032 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:16:28] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 08:16:28,128 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:16:28] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 08:16:28,852 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:16:28] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 08:16:29,506 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:16:29] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 08:17:06,343 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:17:06] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 08:17:06,658 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:17:06] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 08:17:06,967 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:17:06,968 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:17:06] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:17:07,531 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:17:07,533 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:17:07] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:22:16,340 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-01 08:22:16,341 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-01 08:22:16,341 - __main__ - INFO - Environment: development
+2025-10-01 08:22:16,366 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.28:5000
+2025-10-01 08:22:16,367 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-01 08:22:39,312 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:22:39,315 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:22:39] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:22:39,668 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:22:39,670 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:22:39] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:22:45,466 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:22:45] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 08:22:45,470 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:22:45] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 08:22:46,115 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:22:46] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 08:22:46,493 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:22:46] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 08:22:51,362 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:22:51,363 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:22:51] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:22:51,711 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:22:51,713 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:22:51] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:22:54,520 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:22:54,521 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:22:54] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:22:54,810 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:22:54,813 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:22:54] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:29:10,829 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:29:10] "OPTIONS /api/sinta/publikasi?page[page]=1&page[per_page]=20&page[search]=&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 08:29:11,567 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:29:11,568 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:29:11] "[35m[1mGET /api/sinta/publikasi?page[page]=1&page[per_page]=20&page[search]=&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:32:36,634 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:32:36] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 08:32:37,330 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:32:37,331 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:32:37] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:33:03,378 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:33:03,379 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:33:03] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:33:03,870 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:33:03,872 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:33:03] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:33:29,561 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-01 08:33:29,561 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-01 08:33:29,562 - __main__ - INFO - Environment: development
+2025-10-01 08:33:29,598 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.28:5000
+2025-10-01 08:33:29,599 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-01 08:33:46,739 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:33:46,743 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:33:46] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:33:47,171 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:33:47,173 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:33:47] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:33:50,780 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:33:50,781 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:33:50] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:33:54,784 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:33:54,787 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:33:54] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:33:57,061 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:33:57] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 08:33:57,062 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:33:57] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 08:33:57,568 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:33:57] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 08:33:57,861 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:33:57] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 08:34:01,854 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:34:01,856 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:34:01] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:34:02,374 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:34:02,376 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:34:02] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:34:04,835 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:34:04,837 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:34:04] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:34:05,095 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:34:05,097 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:34:05] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:34:46,894 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:34:46] "[33mOPTIONS /api/sinta/publikasi/debug HTTP/1.1[0m" 404 -
+2025-10-01 08:34:47,302 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:34:47] "[33mOPTIONS /api/sinta/publikasi/debug HTTP/1.1[0m" 404 -
+2025-10-01 08:34:47,977 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:34:47,979 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:34:47] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:34:48,542 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:34:48,544 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:34:48] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:34:51,161 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:34:51,162 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:34:51] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:35:03,938 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:35:03,940 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:35:03] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:35:06,094 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:35:06,096 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:35:06] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:35:07,581 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:35:07,583 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:35:07] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:39:51,163 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-01 08:39:51,164 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-01 08:39:51,164 - __main__ - INFO - Environment: development
+2025-10-01 08:39:51,261 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.28:5000
+2025-10-01 08:39:51,262 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-01 08:40:15,215 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:40:15,216 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:40:15] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:40:15,647 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:40:15,648 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:40:15] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:40:25,043 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:40:25,045 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:40:25] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:40:50,114 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:40:50,115 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:40:50] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:40:51,371 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:40:51,395 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:40:51] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:42:20,737 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:42:20,738 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:42:20] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:42:20,973 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:42:20,974 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:42:20] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:45:05,726 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:45:05] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 08:45:05,752 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:45:05] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 08:45:07,444 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:45:07,765 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:45:07] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:45:08,842 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:45:08,856 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:45:08] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:45:28,150 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:45:28,152 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:45:28] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:45:33,242 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:45:33,243 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:45:33] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:45:33,697 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:45:33,700 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:45:33] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:57:49,747 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-01 08:57:49,748 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-01 08:57:49,754 - __main__ - INFO - Environment: development
+2025-10-01 08:57:49,784 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.28:5000
+2025-10-01 08:57:49,786 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-01 08:58:06,586 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:58:06] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 08:58:06,589 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:58:06] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 08:58:07,385 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:58:07,386 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:58:07] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:58:07,892 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:58:07,895 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:58:07] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:58:47,096 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:58:47,097 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:58:47] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 08:58:47,291 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 08:58:47,292 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 08:58:47] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 09:05:48,987 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:05:48] "OPTIONS /api/sinta/publikasi?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-01 09:05:49,020 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:05:49] "OPTIONS /api/sinta/publikasi?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-01 09:05:49,606 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 09:05:49,608 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:05:49] "[35m[1mGET /api/sinta/publikasi?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 09:05:49,807 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 09:05:49,810 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:05:49] "[35m[1mGET /api/sinta/publikasi?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 09:06:03,591 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 09:06:03,618 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:06:03] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 09:06:05,087 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 09:06:05,089 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:06:05] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 09:06:05,740 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 09:06:05,745 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:06:05] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 09:06:41,366 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:06:41] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 09:06:41,714 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:06:41] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 09:06:42,389 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:06:42] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 09:06:43,139 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:06:43] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 09:06:47,171 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 09:06:47,172 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:06:47] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 09:06:47,470 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 09:06:47,489 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:06:47] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 09:08:10,151 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:08:10] "[31m[1mGET /api/sinta/publikasi HTTP/1.1[0m" 401 -
+2025-10-01 09:08:10,400 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:08:10] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-01 09:15:34,918 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-01 09:15:34,919 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-01 09:15:34,919 - __main__ - INFO - Environment: development
+2025-10-01 09:15:34,948 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.28:5000
+2025-10-01 09:15:34,953 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-01 09:16:00,249 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:16:00] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 09:16:00,257 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:16:00] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 09:16:00,941 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:16:00] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 09:16:01,210 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:16:01] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-01 09:17:32,247 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:17:32] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 09:17:32,248 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:17:32] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 09:17:32,818 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:17:32] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 09:17:33,005 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:17:33] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 09:17:35,864 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:17:35] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 09:17:36,010 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 09:17:36,011 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:17:36] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 09:17:36,176 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:17:36] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 09:17:36,679 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 09:17:36,692 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 09:17:36] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 10:00:46,676 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 10:00:46] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 10:00:46,689 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 10:00:46] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-01 10:00:48,408 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 10:00:48,425 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 10:00:48] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-01 10:00:50,555 - __main__ - ERROR - Get SINTA publikasi error: list index out of range
+2025-10-01 10:00:50,558 - werkzeug - INFO - 127.0.0.1 - - [01/Oct/2025 10:00:50] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
