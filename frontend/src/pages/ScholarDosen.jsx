@@ -19,24 +19,25 @@ const ScholarDosen = () => {
   const fetchDosenData = async () => {
     try {
       setLoading(true);
-      
-      const params = apiService.buildPaginationParams(currentPage, perPage, searchTerm);
+      const params = { page: currentPage, per_page: perPage, search: searchTerm };
       const response = await apiService.getScholarDosen(params);
 
       if (response.success) {
         setDosenData(response.data.data || []);
-        setPagination(response.data.pagination || null);
+        setPagination(response.data.pagination || {});
       } else {
+        setError(response.error);
         toast.error('Gagal mengambil data dosen Google Scholar');
-        console.error('Error fetching Scholar dosen data:', response.error);
       }
     } catch (error) {
-      toast.error('Terjadi kesalahan saat mengambil data');
       console.error('Error fetching Scholar dosen data:', error);
+      setError(error.message);
+      toast.error('Terjadi kesalahan saat mengambil data');
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleSearchChange = (value) => {
     setSearchTerm(value);

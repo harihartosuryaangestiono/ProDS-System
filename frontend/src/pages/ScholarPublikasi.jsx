@@ -1,16 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FileText, Award, Calendar, ExternalLink, Users } from 'lucide-react';
 import apiService from '../services/apiService';
 import DataTable from '../components/DataTable';
 import { toast } from 'react-hot-toast';
 
 const ScholarPublikasi = () => {
+  const navigate = useNavigate();
   const [publikasiData, setPublikasiData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState(null);
   const perPage = 20;
+
+  useEffect(() => {
+    // Check if user is authenticated
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    
+    fetchPublikasiData();
+  }, []);
 
   useEffect(() => {
     fetchPublikasiData();

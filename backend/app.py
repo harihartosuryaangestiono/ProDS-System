@@ -36,9 +36,9 @@ app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-chan
 
 # Database configuration
 DB_CONFIG = {
-    'dbname': os.environ.get('DB_NAME', 'ProDSGabungan'),
-    'user': os.environ.get('DB_USER', 'postgres'), 
-    'password': os.environ.get('DB_PASSWORD', 'hari123'),
+    'dbname': os.environ.get('DB_NAME', 'SKM_PUBLIKASI'),
+    'user': os.environ.get('DB_USER', 'rayhanadjisantoso'), 
+    'password': os.environ.get('DB_PASSWORD', 'rayhan123'),
     'host': os.environ.get('DB_HOST', 'localhost'),
     'port': os.environ.get('DB_PORT', '5432')
 }
@@ -384,11 +384,15 @@ def get_scholar_dosen(current_user_id):
 @token_required
 def get_scholar_publikasi(current_user_id):
     """Get Google Scholar publikasi data"""
+    conn = None
+    cur = None
+    
+    print(f"🔑 Authenticated user ID: {current_user_id}")
+    
     try:
         page = int(request.args.get('page', 1))
         per_page = int(request.args.get('per_page', 20))
         search = request.args.get('search', '').strip()
-        
         offset = (page - 1) * per_page
         
         conn = get_db_connection()
@@ -397,31 +401,42 @@ def get_scholar_publikasi(current_user_id):
         
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         
-        # Build query for Google Scholar publications
-        where_clause = "WHERE p.v_sumber LIKE '%Scholar%'"
-        params = []
+        # Build base query
+        where_clause = "WHERE p.v_sumber ILIKE %s"
+        params = ['%Scholar%']
         
         if search:
             where_clause += " AND LOWER(p.v_judul) LIKE LOWER(%s)"
-            params.append(f'%{search}%')
+            params.append(f"%{search}%")
         
-        # Get total count
+        # ======== Hitung total data ========
         count_query = f"""
-            SELECT COUNT(*) as total 
+            SELECT COUNT(*) AS total
             FROM stg_publikasi_tr p
             {where_clause}
         """
-        cur.execute(count_query, params)
-        total = cur.fetchone()['total']
         
-        # Get data with artikel details
+        #print("🟢 COUNT QUERY:", count_query)
+        #print("🟢 COUNT PARAMS:", params)
+        
+        cur.execute(count_query, params)
+        count_result = cur.fetchone()
+        
+        # Tangani jika count_result None atau tidak ada key 'total'
+        total = 0
+        if count_result:
+            total = count_result.get('total', 0) or 0
+        
+        #print(f"📊 Total records found: {total}")
+        
+        # ======== Ambil data publikasi ========
         data_query = f"""
-            SELECT 
+            SELECT
                 p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
                 p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
                 a.v_volume, a.v_issue, a.v_pages,
-                j.v_nama_jurnal as venue,
-                STRING_AGG(d.v_nama_dosen, ', ') as authors
+                j.v_nama_jurnal AS venue,
+                COALESCE(STRING_AGG(DISTINCT d.v_nama_dosen, ', '), '') AS authors
             FROM stg_publikasi_tr p
             LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
             LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
@@ -435,26 +450,73 @@ def get_scholar_publikasi(current_user_id):
             LIMIT %s OFFSET %s
         """
         
-        params.extend([per_page, offset])
-        cur.execute(data_query, params)
-        publikasi_data = [dict(row) for row in cur.fetchall()]
+        final_params = params + [per_page, offset]
         
-        return jsonify({
-            'data': publikasi_data,
-            'pagination': {
-                'page': page,
-                'per_page': per_page,
-                'total': total,
-                'pages': (total + per_page - 1) // per_page
+        #print("🟢 DATA QUERY:", data_query)
+        #print("🟢 FINAL PARAMS:", final_params)
+        
+        cur.execute(data_query, final_params)
+        rows = cur.fetchall()
+        
+        #print(f"✅ Retrieved {len(rows)} rows from publikasi")
+        
+        # Pastikan rows adalah list
+        publikasi_data = []
+        if rows:
+            publikasi_data = [dict(row) for row in rows]
+        
+        # Hitung total pages dengan aman
+        total_pages = 0
+        if total > 0 and per_page > 0:
+            total_pages = (total + per_page - 1) // per_page
+        
+        response_data = {
+            "data": publikasi_data,
+            "pagination": {
+                "page": page,
+                "per_page": per_page,
+                "total": total,
+                "pages": total_pages
             }
-        }), 200
+        }
+        
+        #print(f"✅ Response: {len(publikasi_data)} items, page {page}/{total_pages}")
+        
+        return jsonify(response_data), 200
+        
+    except psycopg2.Error as db_error:
+        error_details = traceback.format_exc()
+        print("❌ Database error:\n", error_details)
+        logger.error(f"Database error in Scholar publikasi: {db_error}\n{error_details}")
+        return jsonify({
+            "error": "Database query failed",
+            "details": str(db_error)
+        }), 500
+        
+    except ValueError as val_error:
+        print("❌ Value error:", str(val_error))
+        logger.error(f"Invalid parameter value: {val_error}")
+        return jsonify({
+            "error": "Invalid parameter value",
+            "details": str(val_error)
+        }), 400
         
     except Exception as e:
-        logger.error(f"Get Scholar publikasi error: {e}")
-        return jsonify({'error': 'Failed to fetch Scholar publikasi data'}), 500
+        import traceback
+        error_details = traceback.format_exc()
+        print("❌ Full error traceback:\n", error_details)
+        logger.error(f"Get Scholar publikasi error: {e}\n{error_details}")
+        return jsonify({
+            "error": "Failed to fetch Scholar publikasi data",
+            "details": str(e)
+        }), 500
+        
     finally:
-        if 'conn' in locals():
+        if cur:
+            cur.close()
+        if conn:
             conn.close()
+            print("🔌 Database connection closed")
 
 # Scraping Routes
 @app.route('/api/scraping/sinta', methods=['POST'])

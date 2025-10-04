@@ -72,6 +72,14 @@ CREATE TABLE stg_jurnal_mt (
     v_nama_jurnal VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE temp_dosenGS_scraping (
+    v_id_GS VARCHAR(50) NOT NULL,
+    v_nama VARCHAR(255) NOT NULL,
+    v_affiliation VARCHAR (100),
+    n_citations INT DEFAULT 0,
+    v_link VARCHAR (255)
+);
+
 -- ========================
 -- 4. Tabel Publikasi (Superclass) dengan timestamp
 -- ========================
@@ -85,10 +93,6 @@ CREATE TABLE stg_publikasi_tr (
     v_link_url VARCHAR(255),
     t_tanggal_unduh TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-SELECT *
-FROM stg_artikel_dr
-WHERE v_sumber = ''
 
 -- ========================
 -- 5. Subclass Publikasi dengan timestamp

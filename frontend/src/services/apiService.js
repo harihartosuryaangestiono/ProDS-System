@@ -19,12 +19,19 @@ apiService.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`; // Ensure Bearer prefix
+    } else {
+      // Redirect to login if token is missing
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+        return Promise.reject('Authentication required');
+      }
     }
     
     if (import.meta.env.DEV) {
       console.log(`API Request: ${config.method.toUpperCase()} ${config.url}`, {
         params: config.params,
+        headers: config.headers, // Log headers for debugging
       });
     }
     
@@ -159,6 +166,14 @@ apiService.debugSintaPublikasi = async () => {
 // Scholar API Functions
 // ===================================
 
+apiService.getScholarDosen = async (params) => {
+  const queryParams = apiService.buildPaginationParams(params);
+  return handleResponse(
+    () => apiService.get('/api/scholar/dosen', { params: queryParams }),
+    'Error fetching Scholar dosen'
+  );
+};
+
 /**
  * Get Google Scholar Publikasi data with pagination and search
  * @param {object} params - The parameters object
@@ -188,7 +203,14 @@ apiService.getDashboardStats = async () => {
 
 apiService.login = async (username, password) => {
   return handleResponse(
-    () => apiService.post('/api/auth/login', { username, password }),
+    async () => {
+      const response = await apiService.post('/api/auth/login', { username, password });
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      }
+      return response;
+    },
     'Error during login'
   );
 };
