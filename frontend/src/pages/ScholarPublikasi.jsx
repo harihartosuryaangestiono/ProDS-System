@@ -63,22 +63,52 @@ const ScholarPublikasi = () => {
 
   const columns = [
     {
+      key: 'authors',
+      title: 'Author',
+      render: (value) => (
+        <div className="max-w-xs">
+          <p className="text-sm text-gray-900 truncate" title={value}>
+            {value || 'N/A'}
+          </p>
+        </div>
+      )
+    },
+    {
       key: 'v_judul',
       title: 'Judul Publikasi',
-      render: (value, row) => (
+      render: (value) => (
         <div className="max-w-lg">
           <p className="font-medium text-gray-900 line-clamp-2" title={value}>
             {value || 'N/A'}
           </p>
-          {row.authors && (
-            <div className="mt-1 flex items-center text-sm text-gray-500">
-              <Users className="w-3 h-3 mr-1" />
-              <p className="truncate" title={row.authors}>
-                {row.authors}
-              </p>
-            </div>
-          )}
         </div>
+      )
+    },
+    {
+      key: 'tipe',
+      title: 'Tipe',
+      render: (value) => (
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+          value === 'Artikel' ? 'bg-green-100 text-green-800' :
+          value === 'Prosiding' ? 'bg-yellow-100 text-yellow-800' :
+          value === 'Buku' ? 'bg-purple-100 text-purple-800' :
+          value === 'Penelitian' ? 'bg-blue-100 text-blue-800' :
+          'bg-gray-100 text-gray-800'
+        }`}>
+          {value || 'N/A'}
+        </span>
+      )
+    },
+    {
+      key: 'v_tahun_publikasi',
+      title: 'Tahun',
+      type: 'number',
+      className: 'text-center',
+      cellClassName: 'text-center',
+      render: (value) => (
+        <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
+          {value || 'N/A'}
+        </span>
       )
     },
     {
@@ -93,14 +123,37 @@ const ScholarPublikasi = () => {
       )
     },
     {
-      key: 'v_tahun_publikasi',
-      title: 'Tahun',
-      type: 'number',
+      key: 'publisher',
+      title: 'Publisher',
+      render: (value) => (
+        <div className="max-w-xs">
+          <p className="text-sm text-gray-700 truncate" title={value}>
+            {value || '-'}
+          </p>
+        </div>
+      )
+    },
+    {
+      key: 'vol_issue',
+      title: 'Vol/Issue',
+      sortable: false,
       className: 'text-center',
       cellClassName: 'text-center',
       render: (value) => (
-        <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
-          {value || 'N/A'}
+        <span className="text-sm text-gray-600">
+          {value || '-'}
+        </span>
+      )
+    },
+    {
+      key: 'pages',
+      title: 'Pages',
+      sortable: false,
+      className: 'text-center',
+      cellClassName: 'text-center',
+      render: (value) => (
+        <span className="text-sm text-gray-600">
+          {value ? `pp. ${value}` : '-'}
         </span>
       )
     },
@@ -119,43 +172,6 @@ const ScholarPublikasi = () => {
         }`}>
           {(value || 0).toLocaleString()}
         </span>
-      )
-    },
-    {
-      key: 'publication_type',
-      title: 'Tipe',
-      render: (value) => (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          value === 'artikel' || value === 'journal' ? 'bg-green-100 text-green-800' :
-          value === 'conference' || value === 'prosiding' ? 'bg-yellow-100 text-yellow-800' :
-          value === 'book' || value === 'buku' ? 'bg-purple-100 text-purple-800' :
-          'bg-gray-100 text-gray-800'
-        }`}>
-          {value || 'N/A'}
-        </span>
-      )
-    },
-    {
-      key: 'volume_issue',
-      title: 'Vol/Issue',
-      sortable: false,
-      render: (_, row) => (
-        <div className="text-sm text-gray-600">
-          {row.volume && row.issue ? (
-            <span>Vol. {row.volume}, No. {row.issue}</span>
-          ) : row.volume ? (
-            <span>Vol. {row.volume}</span>
-          ) : row.issue ? (
-            <span>No. {row.issue}</span>
-          ) : (
-            <span className="text-gray-400">-</span>
-          )}
-          {row.pages && (
-            <div className="text-xs text-gray-500">
-              pp. {row.pages}
-            </div>
-          )}
-        </div>
       )
     },
     {

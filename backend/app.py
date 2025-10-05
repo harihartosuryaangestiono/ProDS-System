@@ -248,11 +248,13 @@ def get_sinta_dosen(current_user_id):
 @token_required
 def get_sinta_publikasi(current_user_id):
     """Get SINTA publikasi data with pagination and search"""
+    conn = None
+    cur = None
+    
     try:
         page = int(request.args.get('page', 1))
         per_page = int(request.args.get('per_page', 20))
         search = request.args.get('search', '').strip()
-        
         offset = (page - 1) * per_page
         
         conn = get_db_connection()
@@ -261,9 +263,9 @@ def get_sinta_publikasi(current_user_id):
         
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         
-        # Build query
-        where_clause = "WHERE p.v_sumber LIKE '%SINTA%' OR p.v_sumber IS NULL"
-        params = []
+        # Build query - filter untuk SINTA
+        where_clause = "WHERE (p.v_sumber ILIKE %s OR p.v_sumber IS NULL)"
+        params = ['%SINTA%']
         
         if search:
             where_clause += " AND LOWER(p.v_judul) LIKE LOWER(%s)"
@@ -271,32 +273,95 @@ def get_sinta_publikasi(current_user_id):
         
         # Get total count
         count_query = f"""
-            SELECT COUNT(*) as total 
+            SELECT COUNT(*) as total
             FROM stg_publikasi_tr p
             {where_clause}
         """
+        
         cur.execute(count_query, params)
         total = cur.fetchone()['total']
         
-        # Get data
+        # Get data dengan kolom lengkap seperti Scholar
         data_query = f"""
-            SELECT 
-                p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
-                p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
-                STRING_AGG(d.v_nama_dosen, ', ') as authors
+            SELECT
+                p.v_id_publikasi,
+                COALESCE(STRING_AGG(DISTINCT d.v_nama_dosen, ', '), '') AS authors,
+                p.v_judul,
+                p.v_jenis AS tipe,
+                p.v_tahun_publikasi,
+                COALESCE(
+                    j.v_nama_jurnal,
+                    pr.v_nama_konferensi,
+                    'N/A'
+                ) AS venue,
+                CASE 
+                    WHEN b.v_penerbit IS NOT NULL AND b.v_penerbit != '' THEN b.v_penerbit
+                    ELSE ''
+                END AS publisher,
+                COALESCE(a.v_volume, '') AS volume,
+                COALESCE(a.v_issue, '') AS issue,
+                COALESCE(a.v_pages, '') AS pages,
+                p.n_total_sitasi,
+                p.v_sumber,
+                p.t_tanggal_unduh,
+                p.v_link_url
             FROM stg_publikasi_tr p
+            LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+            LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
+            LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
+            LEFT JOIN stg_buku_dr b ON p.v_id_publikasi = b.v_id_publikasi
+            LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
             LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
             LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
             {where_clause}
-            GROUP BY p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
-                     p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url
+            GROUP BY 
+                p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
+                p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
+                j.v_nama_jurnal, pr.v_nama_konferensi, b.v_penerbit,
+                a.v_volume, a.v_issue, a.v_pages
             ORDER BY p.n_total_sitasi DESC NULLS LAST
             LIMIT %s OFFSET %s
         """
         
         params.extend([per_page, offset])
         cur.execute(data_query, params)
-        publikasi_data = [dict(row) for row in cur.fetchall()]
+        rows = cur.fetchall()
+        
+        # Format data untuk response
+        publikasi_data = []
+        if rows:
+            for row in rows:
+                row_dict = dict(row)
+                
+                # Format vol/issue
+                vol = row_dict.get('volume', '').strip()
+                issue = row_dict.get('issue', '').strip()
+                
+                if vol and issue:
+                    row_dict['vol_issue'] = f"{vol}({issue})"
+                elif vol:
+                    row_dict['vol_issue'] = vol
+                elif issue:
+                    row_dict['vol_issue'] = f"({issue})"
+                else:
+                    row_dict['vol_issue'] = "-"
+                
+                # Format tipe publikasi
+                tipe_value = row_dict.get('tipe', '').strip() if row_dict.get('tipe') else ''
+                
+                tipe_mapping = {
+                    'artikel': 'Artikel',
+                    'buku': 'Buku',
+                    'prosiding': 'Prosiding',
+                    'penelitian': 'Penelitian'
+                }
+                
+                if tipe_value:
+                    row_dict['tipe'] = tipe_mapping.get(tipe_value.lower(), tipe_value.capitalize())
+                else:
+                    row_dict['tipe'] = 'N/A'
+                
+                publikasi_data.append(row_dict)
         
         return jsonify({
             'data': publikasi_data,
@@ -304,15 +369,24 @@ def get_sinta_publikasi(current_user_id):
                 'page': page,
                 'per_page': per_page,
                 'total': total,
-                'pages': (total + per_page - 1) // per_page
+                'pages': (total + per_page - 1) // per_page if total > 0 else 0
             }
         }), 200
         
     except Exception as e:
-        logger.error(f"Get SINTA publikasi error: {e}")
-        return jsonify({'error': 'Failed to fetch SINTA publikasi data'}), 500
+        import traceback
+        error_details = traceback.format_exc()
+        print("❌ Full error traceback:\n", error_details)
+        logger.error(f"Get SINTA publikasi error: {e}\n{error_details}")
+        return jsonify({
+            'error': 'Failed to fetch SINTA publikasi data',
+            'details': str(e)
+        }), 500
+        
     finally:
-        if 'conn' in locals():
+        if cur:
+            cur.close()
+        if conn:
             conn.close()
 
 # Google Scholar Routes
@@ -416,54 +490,93 @@ def get_scholar_publikasi(current_user_id):
             {where_clause}
         """
         
-        #print("🟢 COUNT QUERY:", count_query)
-        #print("🟢 COUNT PARAMS:", params)
-        
         cur.execute(count_query, params)
         count_result = cur.fetchone()
         
-        # Tangani jika count_result None atau tidak ada key 'total'
         total = 0
         if count_result:
             total = count_result.get('total', 0) or 0
         
-        #print(f"📊 Total records found: {total}")
-        
         # ======== Ambil data publikasi ========
         data_query = f"""
-            SELECT
-                p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
-                p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
-                a.v_volume, a.v_issue, a.v_pages,
-                j.v_nama_jurnal AS venue,
-                COALESCE(STRING_AGG(DISTINCT d.v_nama_dosen, ', '), '') AS authors
-            FROM stg_publikasi_tr p
-            LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
-            LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
-            LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
-            LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-            {where_clause}
-            GROUP BY p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
-                     p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
-                     a.v_volume, a.v_issue, a.v_pages, j.v_nama_jurnal
-            ORDER BY p.n_total_sitasi DESC NULLS LAST
-            LIMIT %s OFFSET %s
-        """
-        
+        SELECT
+            p.v_id_publikasi,
+            COALESCE(STRING_AGG(DISTINCT d.v_nama_dosen, ', '), '') AS authors,
+            p.v_judul,
+            p.v_jenis AS tipe,
+            p.v_tahun_publikasi,
+            COALESCE(
+                j.v_nama_jurnal,
+                pr.v_nama_konferensi,
+                'N/A'
+            ) AS venue,
+            COALESCE(b.v_penerbit, '') AS publisher,  -- Tambahkan kolom publisher
+            COALESCE(a.v_volume, '') AS volume,
+            COALESCE(a.v_issue, '') AS issue,
+            COALESCE(a.v_pages, '') AS pages,
+            p.n_total_sitasi,
+            p.v_sumber,
+            p.t_tanggal_unduh,
+            p.v_link_url
+        FROM stg_publikasi_tr p
+        LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+        LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
+        LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
+        LEFT JOIN stg_buku_dr b ON p.v_id_publikasi = b.v_id_publikasi
+        LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
+        LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
+        LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
+        {where_clause}
+        GROUP BY 
+            p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
+            p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
+            j.v_nama_jurnal, pr.v_nama_konferensi, b.v_penerbit,
+            a.v_volume, a.v_issue, a.v_pages
+        ORDER BY p.n_total_sitasi DESC NULLS LAST
+        LIMIT %s OFFSET %s
+    """
+
         final_params = params + [per_page, offset]
-        
-        #print("🟢 DATA QUERY:", data_query)
-        #print("🟢 FINAL PARAMS:", final_params)
         
         cur.execute(data_query, final_params)
         rows = cur.fetchall()
         
-        #print(f"✅ Retrieved {len(rows)} rows from publikasi")
-        
-        # Pastikan rows adalah list
+        # Format data untuk response
         publikasi_data = []
         if rows:
-            publikasi_data = [dict(row) for row in rows]
+            for row in rows:
+                row_dict = dict(row)
+                
+                # Format vol/issue
+                vol = row_dict.get('volume', '').strip()
+                issue = row_dict.get('issue', '').strip()
+                
+                if vol and issue:
+                    row_dict['vol_issue'] = f"{vol}({issue})"
+                elif vol:
+                    row_dict['vol_issue'] = vol
+                elif issue:
+                    row_dict['vol_issue'] = f"({issue})"
+                else:
+                    row_dict['vol_issue'] = "-"
+                
+                # Format tipe publikasi - PERBAIKAN DI SINI
+                tipe_value = row_dict.get('tipe', '').strip() if row_dict.get('tipe') else ''
+                
+                tipe_mapping = {
+                    'artikel': 'Artikel',
+                    'buku': 'Buku',
+                    'prosiding': 'Prosiding',
+                    'penelitian': 'Penelitian'
+                }
+                
+                # Jika tipe_value ada dan tidak kosong, gunakan mapping
+                if tipe_value:
+                    row_dict['tipe'] = tipe_mapping.get(tipe_value.lower(), tipe_value.capitalize())
+                else:
+                    row_dict['tipe'] = 'N/A'
+                
+                publikasi_data.append(row_dict)
         
         # Hitung total pages dengan aman
         total_pages = 0
@@ -479,8 +592,6 @@ def get_scholar_publikasi(current_user_id):
                 "pages": total_pages
             }
         }
-        
-        #print(f"✅ Response: {len(publikasi_data)} items, page {page}/{total_pages}")
         
         return jsonify(response_data), 200
         
