@@ -281,11 +281,14 @@ def get_sinta_publikasi(current_user_id):
         cur.execute(count_query, params)
         total = cur.fetchone()['total']
         
-        # Get data dengan kolom lengkap seperti Scholar
+        # Get data - gunakan p.v_publisher bukan b.v_penerbit
         data_query = f"""
             SELECT
                 p.v_id_publikasi,
-                COALESCE(STRING_AGG(DISTINCT d.v_nama_dosen, ', '), '') AS authors,
+                COALESCE(
+                    NULLIF(p.v_authors, ''),
+                    STRING_AGG(DISTINCT d.v_nama_dosen, ', ')
+                ) AS authors,
                 p.v_judul,
                 p.v_jenis AS tipe,
                 p.v_tahun_publikasi,
@@ -294,10 +297,7 @@ def get_sinta_publikasi(current_user_id):
                     pr.v_nama_konferensi,
                     'N/A'
                 ) AS venue,
-                CASE 
-                    WHEN b.v_penerbit IS NOT NULL AND b.v_penerbit != '' THEN b.v_penerbit
-                    ELSE ''
-                END AS publisher,
+                COALESCE(p.v_publisher, '') AS publisher,
                 COALESCE(a.v_volume, '') AS volume,
                 COALESCE(a.v_issue, '') AS issue,
                 COALESCE(a.v_pages, '') AS pages,
@@ -317,7 +317,8 @@ def get_sinta_publikasi(current_user_id):
             GROUP BY 
                 p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
                 p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
-                j.v_nama_jurnal, pr.v_nama_konferensi, b.v_penerbit,
+                p.v_authors, p.v_publisher,
+                j.v_nama_jurnal, pr.v_nama_konferensi,
                 a.v_volume, a.v_issue, a.v_pages
             ORDER BY p.n_total_sitasi DESC NULLS LAST
             LIMIT %s OFFSET %s
@@ -499,42 +500,46 @@ def get_scholar_publikasi(current_user_id):
         
         # ======== Ambil data publikasi ========
         data_query = f"""
-        SELECT
-            p.v_id_publikasi,
-            COALESCE(STRING_AGG(DISTINCT d.v_nama_dosen, ', '), '') AS authors,
-            p.v_judul,
-            p.v_jenis AS tipe,
-            p.v_tahun_publikasi,
-            COALESCE(
-                j.v_nama_jurnal,
-                pr.v_nama_konferensi,
-                'N/A'
-            ) AS venue,
-            COALESCE(b.v_penerbit, '') AS publisher,  -- Tambahkan kolom publisher
-            COALESCE(a.v_volume, '') AS volume,
-            COALESCE(a.v_issue, '') AS issue,
-            COALESCE(a.v_pages, '') AS pages,
-            p.n_total_sitasi,
-            p.v_sumber,
-            p.t_tanggal_unduh,
-            p.v_link_url
-        FROM stg_publikasi_tr p
-        LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
-        LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
-        LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
-        LEFT JOIN stg_buku_dr b ON p.v_id_publikasi = b.v_id_publikasi
-        LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
-        LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
-        LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-        {where_clause}
-        GROUP BY 
-            p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
-            p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
-            j.v_nama_jurnal, pr.v_nama_konferensi, b.v_penerbit,
-            a.v_volume, a.v_issue, a.v_pages
-        ORDER BY p.n_total_sitasi DESC NULLS LAST
-        LIMIT %s OFFSET %s
-    """
+            SELECT
+                p.v_id_publikasi,
+                COALESCE(
+                    NULLIF(p.v_authors, ''),
+                    STRING_AGG(DISTINCT d.v_nama_dosen, ', ')
+                ) AS authors,
+                p.v_judul,
+                p.v_jenis AS tipe,
+                p.v_tahun_publikasi,
+                COALESCE(
+                    j.v_nama_jurnal,
+                    pr.v_nama_konferensi,
+                    'N/A'
+                ) AS venue,
+                COALESCE(p.v_publisher, '') AS publisher,
+                COALESCE(a.v_volume, '') AS volume,
+                COALESCE(a.v_issue, '') AS issue,
+                COALESCE(a.v_pages, '') AS pages,
+                p.n_total_sitasi,
+                p.v_sumber,
+                p.t_tanggal_unduh,
+                p.v_link_url
+            FROM stg_publikasi_tr p
+            LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+            LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
+            LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
+            LEFT JOIN stg_buku_dr b ON p.v_id_publikasi = b.v_id_publikasi
+            LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
+            LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
+            LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
+            {where_clause}
+            GROUP BY
+                p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
+                p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
+                p.v_authors, p.v_publisher,
+                j.v_nama_jurnal, pr.v_nama_konferensi,
+                a.v_volume, a.v_issue, a.v_pages
+            ORDER BY p.n_total_sitasi DESC NULLS LAST
+            LIMIT %s OFFSET %s
+        """
 
         final_params = params + [per_page, offset]
         
@@ -902,5 +907,5 @@ if __name__ == '__main__':
     app.run(
         debug=debug_mode, 
         host='0.0.0.0', 
-        port=int(os.environ.get('PORT', 5000))
+        port=int(os.environ.get('PORT', 5005))
     )

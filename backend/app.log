@@ -1661,3 +1661,206 @@ IndexError: list index out of range
 2025-10-05 23:14:30,901 - werkzeug - INFO - 127.0.0.1 - - [05/Oct/2025 23:14:30] "GET /api/dashboard/stats HTTP/1.1" 200 -
 2025-10-05 23:14:33,287 - werkzeug - INFO - 127.0.0.1 - - [05/Oct/2025 23:14:33] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
 2025-10-05 23:14:33,321 - werkzeug - INFO - 127.0.0.1 - - [05/Oct/2025 23:14:33] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 10:26:28,979 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-06 10:26:28,980 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-06 10:26:28,980 - __main__ - INFO - Environment: development
+2025-10-06 10:28:15,603 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-06 10:28:15,603 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-06 10:28:15,603 - __main__ - INFO - Environment: development
+2025-10-06 10:28:15,613 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://10.101.59.191:5005
+2025-10-06 10:28:15,613 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-06 10:28:21,447 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 10:28:21] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 10:28:21,468 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 10:28:21] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 10:28:24,102 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 10:28:24] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 10:28:24,114 - __main__ - ERROR - Unhandled exception: cannot access local variable 'traceback' where it is not associated with a value
+2025-10-06 10:28:24,115 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 10:28:24] "[35m[1mGET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-06 10:28:43,930 - __main__ - ERROR - Unhandled exception: cannot access local variable 'traceback' where it is not associated with a value
+2025-10-06 10:28:43,930 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 10:28:43] "[35m[1mGET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-06 10:28:46,479 - __main__ - ERROR - Unhandled exception: cannot access local variable 'traceback' where it is not associated with a value
+2025-10-06 10:28:46,479 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 10:28:46] "[35m[1mGET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-06 10:32:06,259 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-06 10:32:06,259 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-06 10:32:06,259 - __main__ - INFO - Environment: development
+2025-10-06 10:32:06,269 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://10.101.59.191:5005
+2025-10-06 10:32:06,269 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-06 10:32:12,007 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 10:32:12] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 10:32:14,950 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 10:32:14] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 11:04:07,966 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-06 11:04:07,966 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-06 11:04:07,966 - __main__ - INFO - Environment: development
+2025-10-06 11:04:07,976 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://10.101.59.191:5005
+2025-10-06 11:04:07,976 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-06 11:04:13,692 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 11:04:13] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 11:04:13,855 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 11:04:13] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 11:04:17,611 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 11:04:17] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 11:04:17,632 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 11:04:17] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 11:04:20,044 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 11:04:20] "OPTIONS /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 11:04:20,056 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 11:04:20] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 11:04:23,852 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 11:04:23] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 11:04:25,019 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 11:04:25] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 11:04:26,165 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 11:04:26] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 11:05:36,383 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 11:05:36] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:09:51,002 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-06 15:09:51,002 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-06 15:09:51,002 - __main__ - INFO - Environment: development
+2025-10-06 15:09:51,081 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-06 15:09:51,081 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-06 15:09:56,576 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:09:56] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 15:09:56,589 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:09:56] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 15:09:59,258 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:09:59] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:09:59,278 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:09:59] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:10:16,313 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:10:16] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:10:16,385 - __main__ - ERROR - Get SINTA publikasi error: column b.v_penerbit does not exist
+LINE 14:                     WHEN b.v_penerbit IS NOT NULL AND b.v_pe...
+                                  ^
+
+Traceback (most recent call last):
+  File "/Users/rayhanadjisantoso/Desktop/ProDS-System/backend/app.py", line 327, in get_sinta_publikasi
+    cur.execute(data_query, params)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/site-packages/psycopg2/extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.UndefinedColumn: column b.v_penerbit does not exist
+LINE 14:                     WHEN b.v_penerbit IS NOT NULL AND b.v_pe...
+                                  ^
+
+
+2025-10-06 15:10:16,385 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:10:16] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-06 15:10:33,382 - __main__ - ERROR - Get SINTA publikasi error: column b.v_penerbit does not exist
+LINE 14:                     WHEN b.v_penerbit IS NOT NULL AND b.v_pe...
+                                  ^
+
+Traceback (most recent call last):
+  File "/Users/rayhanadjisantoso/Desktop/ProDS-System/backend/app.py", line 327, in get_sinta_publikasi
+    cur.execute(data_query, params)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/site-packages/psycopg2/extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.UndefinedColumn: column b.v_penerbit does not exist
+LINE 14:                     WHEN b.v_penerbit IS NOT NULL AND b.v_pe...
+                                  ^
+
+
+2025-10-06 15:10:33,383 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:10:33] "[35m[1mGET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-06 15:12:55,309 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-06 15:12:55,309 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-06 15:12:55,309 - __main__ - INFO - Environment: development
+2025-10-06 15:12:55,319 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-06 15:12:55,320 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-06 15:13:00,323 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:13:00] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 15:13:02,967 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:13:02] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:13:14,509 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:13:14] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:13:14,583 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:13:14] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:18:24,574 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-06 15:18:24,575 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-06 15:18:24,575 - __main__ - INFO - Environment: development
+2025-10-06 15:18:24,583 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-06 15:18:24,583 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-06 15:18:30,451 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:30] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 15:18:34,318 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:34] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:18:36,777 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:36] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:18:39,617 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:39] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:18:44,195 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:44] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:18:47,284 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:47] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:18:52,271 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:52] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:18:56,916 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:56] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:18:57,164 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:57] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:18:57,254 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:57] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:18:57,928 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:57] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:18:58,425 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:58] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:18:58,573 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:58] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:18:58,664 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:58] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:18:59,419 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:59] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:18:59,620 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:59] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:18:59,780 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:59] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:18:59,876 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:18:59] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:19:02,396 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:02] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:19:50,197 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:50] "OPTIONS /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:19:50,214 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:50] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:19:51,690 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:51] "OPTIONS /api/scholar/dosen?page=1&per_page=20&search=u HTTP/1.1" 200 -
+2025-10-06 15:19:51,763 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:51] "GET /api/scholar/dosen?page=1&per_page=20&search=u HTTP/1.1" 200 -
+2025-10-06 15:19:51,935 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:51] "OPTIONS /api/scholar/dosen?page=1&per_page=20&search=ul HTTP/1.1" 200 -
+2025-10-06 15:19:51,948 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:51] "GET /api/scholar/dosen?page=1&per_page=20&search=ul HTTP/1.1" 200 -
+2025-10-06 15:19:52,140 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:52] "OPTIONS /api/scholar/dosen?page=1&per_page=20&search=ulb HTTP/1.1" 200 -
+2025-10-06 15:19:52,152 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:52] "GET /api/scholar/dosen?page=1&per_page=20&search=ulb HTTP/1.1" 200 -
+2025-10-06 15:19:52,242 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:52] "OPTIONS /api/scholar/dosen?page=1&per_page=20&search=ulbe HTTP/1.1" 200 -
+2025-10-06 15:19:52,255 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:52] "GET /api/scholar/dosen?page=1&per_page=20&search=ulbe HTTP/1.1" 200 -
+2025-10-06 15:19:52,382 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:52] "OPTIONS /api/scholar/dosen?page=1&per_page=20&search=ulber HTTP/1.1" 200 -
+2025-10-06 15:19:52,394 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:52] "GET /api/scholar/dosen?page=1&per_page=20&search=ulber HTTP/1.1" 200 -
+2025-10-06 15:19:54,596 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:54] "GET /api/scholar/dosen?page=1&per_page=20&search=ulber HTTP/1.1" 200 -
+2025-10-06 15:19:55,779 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:55] "GET /api/scholar/dosen?page=1&per_page=20&search=ulber HTTP/1.1" 200 -
+2025-10-06 15:19:58,349 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:58] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:19:59,389 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:59] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:19:59,411 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:19:59] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:20:02,278 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:20:02] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:20:02,578 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:20:02] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:20:02,750 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:20:02] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:20:02,881 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:20:02] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:20:03,116 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:20:03] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:20:04,898 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:20:04] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:20:05,505 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:20:05] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:20:05,687 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:20:05] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:20:07,736 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:20:07] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:23:57,694 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-06 15:23:57,695 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-06 15:23:57,695 - __main__ - INFO - Environment: development
+2025-10-06 15:23:57,705 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-06 15:23:57,705 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-06 15:24:34,501 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-06 15:24:34,501 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-06 15:24:34,502 - __main__ - INFO - Environment: development
+2025-10-06 15:24:34,509 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-06 15:24:34,510 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-06 15:24:41,210 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:24:41] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 15:24:41,298 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:24:41] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 15:24:41,760 - __main__ - ERROR - Get Scholar publikasi error: name 'math' is not defined
+2025-10-06 15:24:41,760 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:24:41] "[35m[1mGET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-06 15:24:44,842 - __main__ - ERROR - Get Scholar publikasi error: name 'math' is not defined
+2025-10-06 15:24:44,843 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:24:44] "[35m[1mGET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1[0m" 500 -
+2025-10-06 15:24:58,898 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-06 15:24:58,899 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-06 15:24:58,899 - __main__ - INFO - Environment: development
+2025-10-06 15:24:58,907 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-06 15:24:58,907 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-06 15:25:01,176 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:25:01] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:25:04,053 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:25:04] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:25:04,147 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:25:04] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:25:04,391 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:25:04] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:25:06,080 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:25:06] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:25:06,574 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:25:06] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:25:06,729 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:25:06] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:25:08,641 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:25:08] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:25:08,844 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:25:08] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:25:09,063 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:25:09] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:25:09,523 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:25:09] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:25:09,621 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:25:09] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:25:11,780 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:25:11] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -

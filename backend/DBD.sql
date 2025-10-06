@@ -86,10 +86,12 @@ CREATE TABLE temp_dosenGS_scraping (
 CREATE TABLE stg_publikasi_tr (
     v_id_publikasi SERIAL PRIMARY KEY,
     v_judul TEXT NOT NULL,
+    v_authors TEXT,
     v_jenis VARCHAR(20) NOT NULL CHECK (v_jenis IN ('artikel','buku','penelitian','prosiding')),
     v_tahun_publikasi INT,
     n_total_sitasi INT DEFAULT 0,
     v_sumber VARCHAR(50),
+    v_publisher VARCHAR(200),
     v_link_url VARCHAR(255),
     t_tanggal_unduh TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
