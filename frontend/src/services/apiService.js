@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5005';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 // Create axios instance
 const apiService = axios.create({
@@ -85,7 +85,7 @@ apiService.interceptors.response.use(
  * @param {string} params.search - Search term
  * @returns {Object} Formatted parameters
  */
-apiService.buildPaginationParams = ({ page = 1, perPage = 20, search = '' }) => {
+apiService.buildPaginationParams = (page = 1, perPage = 20, search = '') => {
   return {
     page,
     per_page: perPage,
@@ -133,9 +133,8 @@ const handleResponse = async (apiCall, errorMessage = 'API request failed') => {
  * @param {object} params - The parameters object
  */
 apiService.getSintaDosen = async (params) => {
-  const queryParams = apiService.buildPaginationParams(params);
   return handleResponse(
-    () => apiService.get('/api/sinta/dosen', { params: queryParams }),
+    () => apiService.get('/api/sinta/dosen', { params }),
     'Error fetching SINTA dosen'
   );
 };
@@ -145,9 +144,8 @@ apiService.getSintaDosen = async (params) => {
  * @param {object} params - The parameters object
  */
 apiService.getSintaPublikasi = async (params) => {
-  const queryParams = apiService.buildPaginationParams(params);
   return handleResponse(
-    () => apiService.get('/api/sinta/publikasi', { params: queryParams }),
+    () => apiService.get('/api/sinta/publikasi', { params }),
     'Error fetching SINTA publikasi'
   );
 };
@@ -167,9 +165,8 @@ apiService.debugSintaPublikasi = async () => {
 // ===================================
 
 apiService.getScholarDosen = async (params) => {
-  const queryParams = apiService.buildPaginationParams(params);
   return handleResponse(
-    () => apiService.get('/api/scholar/dosen', { params: queryParams }),
+    () => apiService.get('/api/scholar/dosen', { params }),
     'Error fetching Scholar dosen'
   );
 };
@@ -179,9 +176,8 @@ apiService.getScholarDosen = async (params) => {
  * @param {object} params - The parameters object
  */
 apiService.getScholarPublikasi = async (params) => {
-  const queryParams = apiService.buildPaginationParams(params);
   return handleResponse(
-    () => apiService.get('/api/scholar/publikasi', { params: queryParams }),
+    () => apiService.get('/api/scholar/publikasi', { params }),
     'Error fetching Scholar publikasi'
   );
 };

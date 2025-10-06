@@ -1864,3 +1864,299 @@ LINE 14:                     WHEN b.v_penerbit IS NOT NULL AND b.v_pe...
 2025-10-06 15:25:09,523 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:25:09] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
 2025-10-06 15:25:09,621 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:25:09] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
 2025-10-06 15:25:11,780 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:25:11] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:38:27,254 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-06 15:38:27,254 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-06 15:38:27,254 - __main__ - INFO - Environment: development
+2025-10-06 15:38:27,309 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-06 15:38:27,309 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-06 15:38:33,311 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:33] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 15:38:33,337 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:33] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 15:38:35,892 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:35] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:38:35,911 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:35] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:38:38,005 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:38] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:38:38,233 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:38] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:38:38,877 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:38] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:38:39,253 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:39] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:38:39,365 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:39] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:38:39,482 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:39] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:38:39,723 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:39] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:38:40,905 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:40] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:38:44,476 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:44] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:38:49,830 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:49] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:38:49,902 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:49] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:38:52,074 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:52] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:38:52,087 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:52] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 15:38:54,771 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 15:38:54] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:55:51,220 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-06 20:55:51,221 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-06 20:55:51,221 - __main__ - INFO - Environment: development
+2025-10-06 20:55:51,281 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-06 20:55:51,282 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-06 20:55:57,003 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:55:57] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 20:55:57,006 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:55:57] "[31m[1mGET /api/dashboard/stats HTTP/1.1[0m" 401 -
+2025-10-06 20:55:59,459 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:55:59] "OPTIONS /auth/login HTTP/1.1" 200 -
+2025-10-06 20:55:59,586 - routes.auth - INFO - User logged in: adji (ID: 1)
+2025-10-06 20:55:59,586 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:55:59] "POST /auth/login HTTP/1.1" 200 -
+2025-10-06 20:55:59,691 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:55:59] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 20:56:02,834 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:02] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:02,854 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:02] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:06,492 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:06] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=u&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:06,566 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:06] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=u&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:06,667 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:06] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ul&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:06,686 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:06] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ul&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:06,902 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:06] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulb&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:06,920 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:06] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulb&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:07,009 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:07] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulbe&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:07,079 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:07] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:07,085 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:07] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulbe&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:07,101 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:07] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:08,217 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:08] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:08,300 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:08] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+s&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:08,377 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:08] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+s&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:08,441 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:08] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+si&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:08,520 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:08] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+si&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:08,729 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:08] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+sil&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:08,802 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:08] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+sill&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:08,810 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:08] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+sil&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:08,818 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:08] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+sill&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:09,397 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:09] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+sil&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:09,551 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:09] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+sila&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:09,568 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:09] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+sila&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:10,047 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:10] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+silal&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:10,064 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:10] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+silal&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:10,325 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:10] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+silala&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:10,342 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:10] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+silala&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:10,508 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:10] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+silalah&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:10,529 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:10] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+silalah&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:10,608 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:10] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+silalahi&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:10,635 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:10] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+silalahi&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:19,596 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:19] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+silalah&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:22,802 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:22] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=ulber+silalahi&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:34,201 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:34] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=m&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:34,279 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:34] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=m&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:34,344 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:34] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=me&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:34,359 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:34] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=me&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:34,447 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:34] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=met&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:34,467 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:34] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=met&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:34,607 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:34] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=meto&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:34,627 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:34] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=meto&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:34,789 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:34] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=metod&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:34,808 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:34] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=metod&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:34,921 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:34] "OPTIONS /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=metode&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 20:56:34,999 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 20:56:34] "GET /api/scholar/publikasi?page[page]=1&page[per_page]=20&page[search]=metode&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:01:39,736 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-06 21:01:39,736 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-06 21:01:39,736 - __main__ - INFO - Environment: development
+2025-10-06 21:01:39,748 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-06 21:01:39,748 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-06 21:01:45,332 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:45] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 21:01:47,946 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:47] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:01:47,968 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:47] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:01:50,498 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:50] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=n HTTP/1.1" 200 -
+2025-10-06 21:01:50,521 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:50] "GET /api/scholar/publikasi?page=1&per_page=20&search=n HTTP/1.1" 200 -
+2025-10-06 21:01:50,911 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:50] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=nu HTTP/1.1" 200 -
+2025-10-06 21:01:50,972 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:50] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=nur HTTP/1.1" 200 -
+2025-10-06 21:01:50,985 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:50] "GET /api/scholar/publikasi?page=1&per_page=20&search=nu HTTP/1.1" 200 -
+2025-10-06 21:01:50,988 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:50] "GET /api/scholar/publikasi?page=1&per_page=20&search=nur HTTP/1.1" 200 -
+2025-10-06 21:01:51,144 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:51] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=nuru HTTP/1.1" 200 -
+2025-10-06 21:01:51,159 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:51] "GET /api/scholar/publikasi?page=1&per_page=20&search=nuru HTTP/1.1" 200 -
+2025-10-06 21:01:51,433 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:51] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=nurul HTTP/1.1" 200 -
+2025-10-06 21:01:51,450 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:51] "GET /api/scholar/publikasi?page=1&per_page=20&search=nurul HTTP/1.1" 200 -
+2025-10-06 21:01:54,946 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:54] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:01:56,318 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:56] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=u HTTP/1.1" 200 -
+2025-10-06 21:01:56,335 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:56] "GET /api/scholar/publikasi?page=1&per_page=20&search=u HTTP/1.1" 200 -
+2025-10-06 21:01:56,524 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:56] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=ul HTTP/1.1" 200 -
+2025-10-06 21:01:56,600 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:56] "GET /api/scholar/publikasi?page=1&per_page=20&search=ul HTTP/1.1" 200 -
+2025-10-06 21:01:56,834 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:56] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=ulb HTTP/1.1" 200 -
+2025-10-06 21:01:56,849 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:56] "GET /api/scholar/publikasi?page=1&per_page=20&search=ulb HTTP/1.1" 200 -
+2025-10-06 21:01:56,955 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:56] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=ulbe HTTP/1.1" 200 -
+2025-10-06 21:01:56,971 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:56] "GET /api/scholar/publikasi?page=1&per_page=20&search=ulbe HTTP/1.1" 200 -
+2025-10-06 21:01:57,091 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:57] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=ulber HTTP/1.1" 200 -
+2025-10-06 21:01:57,112 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:57] "GET /api/scholar/publikasi?page=1&per_page=20&search=ulber HTTP/1.1" 200 -
+2025-10-06 21:01:57,805 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:57] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:01:58,721 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:58] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=m HTTP/1.1" 200 -
+2025-10-06 21:01:58,784 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:58] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=me HTTP/1.1" 200 -
+2025-10-06 21:01:58,792 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:58] "GET /api/scholar/publikasi?page=1&per_page=20&search=m HTTP/1.1" 200 -
+2025-10-06 21:01:58,801 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:58] "GET /api/scholar/publikasi?page=1&per_page=20&search=me HTTP/1.1" 200 -
+2025-10-06 21:01:59,101 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:59] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=met HTTP/1.1" 200 -
+2025-10-06 21:01:59,120 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:59] "GET /api/scholar/publikasi?page=1&per_page=20&search=met HTTP/1.1" 200 -
+2025-10-06 21:01:59,262 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:59] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=meto HTTP/1.1" 200 -
+2025-10-06 21:01:59,280 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:59] "GET /api/scholar/publikasi?page=1&per_page=20&search=meto HTTP/1.1" 200 -
+2025-10-06 21:01:59,391 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:59] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=metod HTTP/1.1" 200 -
+2025-10-06 21:01:59,409 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:59] "GET /api/scholar/publikasi?page=1&per_page=20&search=metod HTTP/1.1" 200 -
+2025-10-06 21:01:59,805 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:59] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=metode HTTP/1.1" 200 -
+2025-10-06 21:01:59,820 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:01:59] "GET /api/scholar/publikasi?page=1&per_page=20&search=metode HTTP/1.1" 200 -
+2025-10-06 21:02:11,035 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:11] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:02:15,558 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:15] "OPTIONS /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:02:15,570 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:15] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:02:16,660 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:16] "OPTIONS /api/scholar/dosen?page=1&per_page=20&search=u HTTP/1.1" 200 -
+2025-10-06 21:02:16,672 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:16] "GET /api/scholar/dosen?page=1&per_page=20&search=u HTTP/1.1" 200 -
+2025-10-06 21:02:16,904 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:16] "OPTIONS /api/scholar/dosen?page=1&per_page=20&search=ul HTTP/1.1" 200 -
+2025-10-06 21:02:16,916 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:16] "GET /api/scholar/dosen?page=1&per_page=20&search=ul HTTP/1.1" 200 -
+2025-10-06 21:02:17,091 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:17] "OPTIONS /api/scholar/dosen?page=1&per_page=20&search=ulb HTTP/1.1" 200 -
+2025-10-06 21:02:17,099 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:17] "GET /api/scholar/dosen?page=1&per_page=20&search=ulb HTTP/1.1" 200 -
+2025-10-06 21:02:17,182 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:17] "OPTIONS /api/scholar/dosen?page=1&per_page=20&search=ulbe HTTP/1.1" 200 -
+2025-10-06 21:02:17,190 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:17] "GET /api/scholar/dosen?page=1&per_page=20&search=ulbe HTTP/1.1" 200 -
+2025-10-06 21:02:17,291 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:17] "OPTIONS /api/scholar/dosen?page=1&per_page=20&search=ulber HTTP/1.1" 200 -
+2025-10-06 21:02:17,302 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:17] "GET /api/scholar/dosen?page=1&per_page=20&search=ulber HTTP/1.1" 200 -
+2025-10-06 21:02:18,789 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:18] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:02:32,638 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:32] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:02:35,057 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:35] "GET /api/scholar/publikasi?page=1&per_page=20&search=m HTTP/1.1" 200 -
+2025-10-06 21:02:35,212 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:35] "GET /api/scholar/publikasi?page=1&per_page=20&search=me HTTP/1.1" 200 -
+2025-10-06 21:02:35,394 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:35] "GET /api/scholar/publikasi?page=1&per_page=20&search=met HTTP/1.1" 200 -
+2025-10-06 21:02:35,539 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:35] "GET /api/scholar/publikasi?page=1&per_page=20&search=meto HTTP/1.1" 200 -
+2025-10-06 21:02:35,708 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:35] "GET /api/scholar/publikasi?page=1&per_page=20&search=metod HTTP/1.1" 200 -
+2025-10-06 21:02:35,812 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:35] "GET /api/scholar/publikasi?page=1&per_page=20&search=metode HTTP/1.1" 200 -
+2025-10-06 21:02:38,209 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:38] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:02:39,636 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:39] "GET /api/scholar/publikasi?page=1&per_page=20&search=u HTTP/1.1" 200 -
+2025-10-06 21:02:39,926 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:39] "GET /api/scholar/publikasi?page=1&per_page=20&search=u HTTP/1.1" 200 -
+2025-10-06 21:02:40,051 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:40] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=u+s HTTP/1.1" 200 -
+2025-10-06 21:02:40,067 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:40] "GET /api/scholar/publikasi?page=1&per_page=20&search=u+s HTTP/1.1" 200 -
+2025-10-06 21:02:40,193 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:40] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=u+si HTTP/1.1" 200 -
+2025-10-06 21:02:40,273 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:40] "GET /api/scholar/publikasi?page=1&per_page=20&search=u+si HTTP/1.1" 200 -
+2025-10-06 21:02:40,483 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:40] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=u+sil HTTP/1.1" 200 -
+2025-10-06 21:02:40,500 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:40] "GET /api/scholar/publikasi?page=1&per_page=20&search=u+sil HTTP/1.1" 200 -
+2025-10-06 21:02:40,686 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:40] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=u+sila HTTP/1.1" 200 -
+2025-10-06 21:02:40,706 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:40] "GET /api/scholar/publikasi?page=1&per_page=20&search=u+sila HTTP/1.1" 200 -
+2025-10-06 21:02:41,746 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:41] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=u+silal HTTP/1.1" 200 -
+2025-10-06 21:02:41,764 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:41] "GET /api/scholar/publikasi?page=1&per_page=20&search=u+silal HTTP/1.1" 200 -
+2025-10-06 21:02:41,835 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:41] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=u+silala HTTP/1.1" 200 -
+2025-10-06 21:02:41,854 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:41] "GET /api/scholar/publikasi?page=1&per_page=20&search=u+silala HTTP/1.1" 200 -
+2025-10-06 21:02:42,066 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:42] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=u+silalah HTTP/1.1" 200 -
+2025-10-06 21:02:42,126 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:42] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=u+silalahi HTTP/1.1" 200 -
+2025-10-06 21:02:42,140 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:42] "GET /api/scholar/publikasi?page=1&per_page=20&search=u+silalah HTTP/1.1" 200 -
+2025-10-06 21:02:42,141 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:02:42] "GET /api/scholar/publikasi?page=1&per_page=20&search=u+silalahi HTTP/1.1" 200 -
+2025-10-06 21:03:21,265 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:03:21] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:03:24,141 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:03:24] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=b HTTP/1.1" 200 -
+2025-10-06 21:03:24,217 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:03:24] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=bu HTTP/1.1" 200 -
+2025-10-06 21:03:24,219 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:03:24] "GET /api/scholar/publikasi?page=1&per_page=20&search=b HTTP/1.1" 200 -
+2025-10-06 21:03:24,233 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:03:24] "GET /api/scholar/publikasi?page=1&per_page=20&search=bu HTTP/1.1" 200 -
+2025-10-06 21:03:24,500 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:03:24] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=buk HTTP/1.1" 200 -
+2025-10-06 21:03:24,517 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:03:24] "GET /api/scholar/publikasi?page=1&per_page=20&search=buk HTTP/1.1" 200 -
+2025-10-06 21:03:24,611 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:03:24] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=buku HTTP/1.1" 200 -
+2025-10-06 21:03:24,627 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:03:24] "GET /api/scholar/publikasi?page=1&per_page=20&search=buku HTTP/1.1" 200 -
+2025-10-06 21:03:26,614 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:03:26] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:04:01,434 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:04:01] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:04:01,993 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:04:01] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:04:02,152 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:04:02] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:04:02,325 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:04:02] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:04:03,394 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:04:03] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:07:08,680 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-06 21:07:08,681 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-06 21:07:08,681 - __main__ - INFO - Environment: development
+2025-10-06 21:07:08,690 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-06 21:07:08,690 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-06 21:07:13,824 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:13] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 21:07:13,844 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:13] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 21:07:16,897 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:16] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:07:18,227 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:18] "GET /api/scholar/publikasi?page=1&per_page=20&search=u HTTP/1.1" 200 -
+2025-10-06 21:07:18,450 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:18] "GET /api/scholar/publikasi?page=1&per_page=20&search=ul HTTP/1.1" 200 -
+2025-10-06 21:07:18,762 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:18] "GET /api/scholar/publikasi?page=1&per_page=20&search=ulb HTTP/1.1" 200 -
+2025-10-06 21:07:18,888 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:18] "GET /api/scholar/publikasi?page=1&per_page=20&search=ulbe HTTP/1.1" 200 -
+2025-10-06 21:07:19,014 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:19] "GET /api/scholar/publikasi?page=1&per_page=20&search=ulber HTTP/1.1" 200 -
+2025-10-06 21:07:20,812 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:20] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:07:21,218 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:21] "GET /api/scholar/publikasi?page=1&per_page=20&search=n HTTP/1.1" 200 -
+2025-10-06 21:07:21,463 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:21] "GET /api/scholar/publikasi?page=1&per_page=20&search=nu HTTP/1.1" 200 -
+2025-10-06 21:07:21,568 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:21] "GET /api/scholar/publikasi?page=1&per_page=20&search=nur HTTP/1.1" 200 -
+2025-10-06 21:07:21,701 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:21] "GET /api/scholar/publikasi?page=1&per_page=20&search=nuru HTTP/1.1" 200 -
+2025-10-06 21:07:21,933 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:21] "GET /api/scholar/publikasi?page=1&per_page=20&search=nurul HTTP/1.1" 200 -
+2025-10-06 21:07:23,267 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:23] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:07:26,178 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:26] "GET /api/scholar/publikasi?page=1&per_page=20&search=u HTTP/1.1" 200 -
+2025-10-06 21:07:26,259 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:26] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=un HTTP/1.1" 200 -
+2025-10-06 21:07:26,337 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:26] "GET /api/scholar/publikasi?page=1&per_page=20&search=un HTTP/1.1" 200 -
+2025-10-06 21:07:26,511 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:26] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=unp HTTP/1.1" 200 -
+2025-10-06 21:07:26,586 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:26] "GET /api/scholar/publikasi?page=1&per_page=20&search=unp HTTP/1.1" 200 -
+2025-10-06 21:07:26,663 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:26] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=unpa HTTP/1.1" 200 -
+2025-10-06 21:07:26,723 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:26] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=unpar HTTP/1.1" 200 -
+2025-10-06 21:07:26,733 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:26] "GET /api/scholar/publikasi?page=1&per_page=20&search=unpa HTTP/1.1" 200 -
+2025-10-06 21:07:26,736 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:26] "GET /api/scholar/publikasi?page=1&per_page=20&search=unpar HTTP/1.1" 200 -
+2025-10-06 21:07:27,069 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:27] "GET /api/scholar/publikasi?page=1&per_page=20&search=unpar HTTP/1.1" 200 -
+2025-10-06 21:07:27,225 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:27] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=unpar+p HTTP/1.1" 200 -
+2025-10-06 21:07:27,239 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:27] "GET /api/scholar/publikasi?page=1&per_page=20&search=unpar+p HTTP/1.1" 200 -
+2025-10-06 21:07:27,346 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:27] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=unpar+pr HTTP/1.1" 200 -
+2025-10-06 21:07:27,405 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:27] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=unpar+pre HTTP/1.1" 200 -
+2025-10-06 21:07:27,416 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:27] "GET /api/scholar/publikasi?page=1&per_page=20&search=unpar+pr HTTP/1.1" 200 -
+2025-10-06 21:07:27,418 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:27] "GET /api/scholar/publikasi?page=1&per_page=20&search=unpar+pre HTTP/1.1" 200 -
+2025-10-06 21:07:27,652 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:27] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=unpar+pres HTTP/1.1" 200 -
+2025-10-06 21:07:27,667 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:27] "GET /api/scholar/publikasi?page=1&per_page=20&search=unpar+pres HTTP/1.1" 200 -
+2025-10-06 21:07:27,836 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:27] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=unpar+press HTTP/1.1" 200 -
+2025-10-06 21:07:27,853 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:27] "GET /api/scholar/publikasi?page=1&per_page=20&search=unpar+press HTTP/1.1" 200 -
+2025-10-06 21:07:28,879 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:28] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:07:37,841 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:07:37] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:09:39,975 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:09:39] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:09:40,000 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:09:40] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:09:42,021 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:09:42] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:09:42,100 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:09:42] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:09:45,309 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:09:45] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:09:49,690 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:09:49] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:11:37,649 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:11:37] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:11:38,208 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:11:38] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:11:38,390 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:11:38] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:11:38,563 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:11:38] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:11:38,725 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:11:38] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:11:38,878 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:11:38] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:11:39,043 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:11:39] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:11:39,211 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:11:39] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:11:53,471 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:11:53] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 21:12:38,665 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:38] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:12:38,744 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:38] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:12:42,891 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:42] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=s HTTP/1.1" 200 -
+2025-10-06 21:12:42,949 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:42] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=sa HTTP/1.1" 200 -
+2025-10-06 21:12:42,961 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:42] "GET /api/scholar/publikasi?page=1&per_page=20&search=s HTTP/1.1" 200 -
+2025-10-06 21:12:42,963 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:42] "GET /api/scholar/publikasi?page=1&per_page=20&search=sa HTTP/1.1" 200 -
+2025-10-06 21:12:43,341 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:43] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=sab HTTP/1.1" 200 -
+2025-10-06 21:12:43,417 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:43] "GET /api/scholar/publikasi?page=1&per_page=20&search=sab HTTP/1.1" 200 -
+2025-10-06 21:12:43,558 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:43] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=sabd HTTP/1.1" 200 -
+2025-10-06 21:12:43,559 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:43] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=sabda HTTP/1.1" 200 -
+2025-10-06 21:12:43,590 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:43] "GET /api/scholar/publikasi?page=1&per_page=20&search=sabda HTTP/1.1" 200 -
+2025-10-06 21:12:43,590 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:43] "GET /api/scholar/publikasi?page=1&per_page=20&search=sabd HTTP/1.1" 200 -
+2025-10-06 21:12:45,619 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:45] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:12:46,904 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:46] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=a HTTP/1.1" 200 -
+2025-10-06 21:12:46,964 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:46] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=as HTTP/1.1" 200 -
+2025-10-06 21:12:46,979 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:46] "GET /api/scholar/publikasi?page=1&per_page=20&search=a HTTP/1.1" 200 -
+2025-10-06 21:12:46,981 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:46] "GET /api/scholar/publikasi?page=1&per_page=20&search=as HTTP/1.1" 200 -
+2025-10-06 21:12:47,150 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:47] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=asa HTTP/1.1" 200 -
+2025-10-06 21:12:47,223 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:47] "GET /api/scholar/publikasi?page=1&per_page=20&search=asa HTTP/1.1" 200 -
+2025-10-06 21:12:47,781 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:47] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=asas HTTP/1.1" 200 -
+2025-10-06 21:12:47,798 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:47] "GET /api/scholar/publikasi?page=1&per_page=20&search=asas HTTP/1.1" 200 -
+2025-10-06 21:12:51,564 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:12:51] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:18:45,494 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-06 21:18:45,494 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-06 21:18:45,494 - __main__ - INFO - Environment: development
+2025-10-06 21:18:45,576 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-06 21:18:45,576 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-06 21:18:50,818 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:18:50] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 21:18:50,841 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:18:50] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 21:18:51,147 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:18:51] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:18:54,444 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:18:54] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:19:02,432 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:19:02] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:19:11,844 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:19:11] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 21:19:13,971 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:19:13] "OPTIONS /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:19:13,982 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:19:13] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:19:24,151 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:19:24] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:19:36,164 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:19:36] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-06 21:19:36,462 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:19:36] "GET /api/scholar/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:19:38,723 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:19:38] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:19:54,500 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:19:54] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:19:54,588 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:19:54] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:20:01,878 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:20:01] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:20:03,078 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:20:03] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:20:04,609 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:20:04] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:20:48,258 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:20:48] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:20:49,303 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:20:49] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-06 21:20:50,442 - werkzeug - INFO - 127.0.0.1 - - [06/Oct/2025 21:20:50] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -

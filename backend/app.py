@@ -268,8 +268,13 @@ def get_sinta_publikasi(current_user_id):
         params = ['%SINTA%']
         
         if search:
-            where_clause += " AND LOWER(p.v_judul) LIKE LOWER(%s)"
-            params.append(f'%{search}%')
+            where_clause += """ AND (
+                LOWER(p.v_judul) LIKE LOWER(%s) OR
+                LOWER(p.v_authors) LIKE LOWER(%s) OR
+                LOWER(p.v_publisher) LIKE LOWER(%s)
+            )"""
+            search_param = f"%{search}%"
+            params.extend([search_param, search_param, search_param])
         
         # Get total count
         count_query = f"""
@@ -480,9 +485,15 @@ def get_scholar_publikasi(current_user_id):
         where_clause = "WHERE p.v_sumber ILIKE %s"
         params = ['%Scholar%']
         
+        # Expand search to include author, title, and publisher
         if search:
-            where_clause += " AND LOWER(p.v_judul) LIKE LOWER(%s)"
-            params.append(f"%{search}%")
+            where_clause += """ AND (
+                LOWER(p.v_judul) LIKE LOWER(%s) OR
+                LOWER(p.v_authors) LIKE LOWER(%s) OR
+                LOWER(p.v_publisher) LIKE LOWER(%s)
+            )"""
+            search_param = f"%{search}%"
+            params.extend([search_param, search_param, search_param])
         
         # ======== Hitung total data ========
         count_query = f"""
@@ -531,7 +542,7 @@ def get_scholar_publikasi(current_user_id):
             LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
             LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
             {where_clause}
-            GROUP BY
+            GROUP BY 
                 p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
                 p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
                 p.v_authors, p.v_publisher,
@@ -540,7 +551,7 @@ def get_scholar_publikasi(current_user_id):
             ORDER BY p.n_total_sitasi DESC NULLS LAST
             LIMIT %s OFFSET %s
         """
-
+        
         final_params = params + [per_page, offset]
         
         cur.execute(data_query, final_params)
@@ -565,7 +576,7 @@ def get_scholar_publikasi(current_user_id):
                 else:
                     row_dict['vol_issue'] = "-"
                 
-                # Format tipe publikasi - PERBAIKAN DI SINI
+                # Format tipe publikasi
                 tipe_value = row_dict.get('tipe', '').strip() if row_dict.get('tipe') else ''
                 
                 tipe_mapping = {
@@ -575,7 +586,6 @@ def get_scholar_publikasi(current_user_id):
                     'penelitian': 'Penelitian'
                 }
                 
-                # Jika tipe_value ada dan tidak kosong, gunakan mapping
                 if tipe_value:
                     row_dict['tipe'] = tipe_mapping.get(tipe_value.lower(), tipe_value.capitalize())
                 else:
@@ -583,7 +593,7 @@ def get_scholar_publikasi(current_user_id):
                 
                 publikasi_data.append(row_dict)
         
-        # Hitung total pages dengan aman
+        # Hitung total pages
         total_pages = 0
         if total > 0 and per_page > 0:
             total_pages = (total + per_page - 1) // per_page
@@ -609,14 +619,6 @@ def get_scholar_publikasi(current_user_id):
             "details": str(db_error)
         }), 500
         
-    except ValueError as val_error:
-        print("❌ Value error:", str(val_error))
-        logger.error(f"Invalid parameter value: {val_error}")
-        return jsonify({
-            "error": "Invalid parameter value",
-            "details": str(val_error)
-        }), 400
-        
     except Exception as e:
         import traceback
         error_details = traceback.format_exc()
@@ -632,7 +634,6 @@ def get_scholar_publikasi(current_user_id):
             cur.close()
         if conn:
             conn.close()
-            print("🔌 Database connection closed")
 
 # Scraping Routes
 @app.route('/api/scraping/sinta', methods=['POST'])
@@ -907,5 +908,5 @@ if __name__ == '__main__':
     app.run(
         debug=debug_mode, 
         host='0.0.0.0', 
-        port=int(os.environ.get('PORT', 5005))
+        port=int(os.environ.get('PORT', 5000))
     )

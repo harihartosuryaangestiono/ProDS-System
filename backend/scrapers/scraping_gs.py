@@ -1008,8 +1008,9 @@ def import_publications_data(conn, publications_df, dosen_ids, jurnal_ids):
                 cursor.execute("""
                     INSERT INTO stg_publikasi_tr (
                         v_judul, v_jenis, v_tahun_publikasi, 
-                        n_total_sitasi, v_sumber, v_link_url, t_tanggal_unduh
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+                        n_total_sitasi, v_sumber, v_link_url, 
+                        t_tanggal_unduh, v_authors, v_publisher
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING v_id_publikasi
                 """, (
                     row['judul'],
@@ -1018,7 +1019,9 @@ def import_publications_data(conn, publications_df, dosen_ids, jurnal_ids):
                     row.get('total_sitasi_seluruhnya', 0),
                     'Google Scholar',
                     row.get('Publication URL', ''),
-                    datetime.datetime.now()
+                    datetime.datetime.now(),
+                    row.get('author', ''),
+                    row.get('publisher', '')  # Simpan di superclass
                 ))
                 pub_id = cursor.fetchone()[0]
                 
@@ -1047,12 +1050,10 @@ def import_publications_data(conn, publications_df, dosen_ids, jurnal_ids):
                 elif pub_type == 'buku':
                     cursor.execute("""
                         INSERT INTO stg_buku_dr (
-                            v_id_publikasi, v_penerbit
-                        ) VALUES (%s, %s)
+                            v_id_publikasi
+                        ) VALUES (%s)
                     """, (
-                        pub_id,
-                        row.get('publisher', '')  # ✅ Harus mengambil dari kolom 'publisher'
-                    ))
+                        pub_id,))
                 else:
                     cursor.execute("""
                         INSERT INTO stg_penelitian_dr (

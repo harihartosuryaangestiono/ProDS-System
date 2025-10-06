@@ -111,7 +111,6 @@ CREATE TABLE stg_artikel_dr (
 
 CREATE TABLE stg_buku_dr (
     v_id_publikasi INT PRIMARY KEY, -- hanya kolom, tanpa FK
-    v_penerbit VARCHAR(200),
     v_isbn VARCHAR(50)
 );
 
