@@ -18,6 +18,15 @@ DROP TABLE IF EXISTS users;
 -- Jika ingin drop database juga (hati-hati!)
 -- DROP DATABASE IF EXISTS "SKM_PUBLIKASI";
 
+ALTER TABLE stg_publikasi_tr
+ADD COLUMN v_publisher VARCHAR(200);
+
+ALTER TABLE stg_publikasi_tr
+ADD COLUMN v_authors TEXT;
+
+ALTER TABLE stg_buku_dr 
+DROP COLUMN IF EXISTS v_penerbit;
+
 -- ========================
 -- RECREATE DATABASE DAN TABLES DENGAN TIMESTAMP TRACKING
 -- ========================

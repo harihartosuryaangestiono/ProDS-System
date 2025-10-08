@@ -43,31 +43,31 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8">
-        {/* Header */}
-        <div className="text-center">
-          <div className="mx-auto h-16 w-16 bg-blue-600 rounded-full flex items-center justify-center">
-            <User className="h-8 w-8 text-white" />
+        {/* Header dengan animasi */}
+        <div className="text-center transform hover:scale-105 transition-transform duration-300">
+          <div className="mx-auto h-20 w-20 bg-white rounded-full flex items-center justify-center shadow-lg">
+            <User className="h-10 w-10 text-blue-600" />
           </div>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Masuk ke Sistem ProDS
+          <h2 className="mt-6 text-4xl font-extrabold text-white">
+            Masuk ke ProDS
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-lg text-blue-100">
             Sistem Publikasi Dosen SINTA & Google Scholar
           </p>
         </div>
 
-        {/* Login Form */}
+        {/* Form dengan efek hover dan animasi */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="bg-white p-8 rounded-lg shadow-lg">
-            <div className="space-y-4">
-              {/* Email Field */}
-              <div>
-                <label htmlFor="email" className="sr-only">Email</label>
+          <div className="bg-white/95 backdrop-blur-sm p-8 rounded-xl shadow-2xl space-y-6 transform hover:translate-y-[-2px] transition-all duration-300">
+            <div className="space-y-5">
+              {/* Email Field dengan animasi focus */}
+              <div className="group">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400" />
+                    <User className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
                   </div>
                   <input
                     id="email"
@@ -75,7 +75,7 @@ const Login = ({ onLogin }) => {
                     type="email"
                     autoComplete="email"
                     required
-                    className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="appearance-none relative block w-full px-3 py-3 pl-10 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900"
                     placeholder="Alamat Email"
                     value={formData.email}
                     onChange={handleChange}
@@ -83,12 +83,12 @@ const Login = ({ onLogin }) => {
                 </div>
               </div>
 
-              {/* Password Field */}
-              <div>
-                <label htmlFor="password" className="sr-only">Password</label>
+              {/* Password Field dengan animasi focus */}
+              <div className="group">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
+                    <Lock className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
                   </div>
                   <input
                     id="password"
@@ -96,48 +96,46 @@ const Login = ({ onLogin }) => {
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="current-password"
                     required
-                    className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="appearance-none relative block w-full px-3 py-3 pl-10 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900"
                     placeholder="Kata Sandi"
                     value={formData.password}
                     onChange={handleChange}
                   />
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="text-gray-400 hover:text-gray-600 focus:outline-none"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-5 w-5" />
-                      ) : (
-                        <Eye className="h-5 w-5" />
-                      )}
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-blue-500 transition-colors duration-200"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
                 </div>
               </div>
             </div>
 
-            {/* Forgot Password / Remember Me (Optional) */}
-            <div className="flex items-center justify-between mt-4">
+            {/* Remember Me dengan style baru */}
+            <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <input
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-colors duration-200"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                   Ingat saya
                 </label>
               </div>
             </div>
 
-            {/* Submit Button */}
+            {/* Submit Button dengan animasi */}
             <div>
               <button
                 type="submit"
-                className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:translate-y-[-1px] transition-all duration-200 ${
                   loading ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
                 disabled={loading}
@@ -148,7 +146,7 @@ const Login = ({ onLogin }) => {
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                 ) : (
-                  <LogIn className="h-5 w-5 mr-2" />
+                  <LogIn className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform duration-200" />
                 )}
                 {loading ? 'Memuat...' : 'Masuk'}
               </button>
@@ -156,16 +154,19 @@ const Login = ({ onLogin }) => {
           </div>
         </form>
 
-        {/* Register Link */}
-        <div className="text-center text-sm text-gray-600">
-          Belum punya akun?{' '}
-          <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
-            Daftar sekarang
-          </Link>
+        {/* Register Link dengan animasi */}
+        <div className="text-center">
+          <p className="text-sm text-blue-100">
+            Belum punya akun?{' '}
+            <Link to="/register" className="font-medium text-white hover:text-blue-200 underline decoration-2 decoration-blue-400 hover:decoration-blue-200 transition-all duration-200">
+              Daftar sekarang
+            </Link>
+          </p>
         </div>
       </div>
     </div>
   );
-};
+}
+
 
 export default Login;

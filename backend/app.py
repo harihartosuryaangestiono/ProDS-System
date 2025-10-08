@@ -13,11 +13,48 @@ import logging
 from functools import wraps
 import json
 from dotenv import load_dotenv
+from flask_cors import CORS
+from flask_socketio import SocketIO
+from routes.scraping_routes import scraping_bp
+import os
+
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
+CORS(app, resources={r"/*": {"origins": "*"}})
+
+# Initialize SocketIO for real-time updates
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+
+# Register blueprints
+app.register_blueprint(scraping_bp)
+@app.route('/health', methods=['GET'])
+def basic_health_check():  # Changed function name
+    return {'status': 'healthy', 'message': 'Server is running'}, 200
+
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    """Health check endpoint"""
+    try:
+        conn = get_db_connection()
+        if conn:
+            conn.close()
+            return jsonify({'status': 'healthy', 'database': 'connected'}), 200
+        else:
+            return jsonify({'status': 'unhealthy', 'database': 'disconnected'}), 503
+    except Exception as e:
+        return jsonify({'status': 'unhealthy', 'error': str(e)}), 503
+
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected')
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected')
 
 # Konfigurasi CORS yang benar
 CORS(app, 
@@ -36,9 +73,9 @@ app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-chan
 
 # Database configuration
 DB_CONFIG = {
-    'dbname': os.environ.get('DB_NAME', 'SKM_PUBLIKASI'),
-    'user': os.environ.get('DB_USER', 'rayhanadjisantoso'), 
-    'password': os.environ.get('DB_PASSWORD', 'rayhan123'),
+    'dbname': os.environ.get('DB_NAME', 'ProDSGabungan'),
+    'user': os.environ.get('DB_USER', 'postgres'), 
+    'password': os.environ.get('DB_PASSWORD', 'password123'),
     'host': os.environ.get('DB_HOST', 'localhost'),
     'port': os.environ.get('DB_PORT', '5432')
 }
@@ -93,9 +130,7 @@ def token_required(f):
 from routes.auth import auth_bp
 app.register_blueprint(auth_bp, url_prefix='/auth')  # Changed from '/api' to '/auth'
 
-# Authentication Routes (These have been moved to auth.py and are now removed from app.py)
-
-# Dashboard Routes
+# Authentication Routes
 @app.route('/api/dashboard/stats', methods=['GET'])
 @token_required
 def dashboard_stats(current_user_id):
@@ -760,20 +795,6 @@ def run_scraper_script(script_path, params=None):
             'error': str(e)
         }
 
-# Health check endpoint
-@app.route('/api/health', methods=['GET'])
-def health_check():
-    """Health check endpoint"""
-    try:
-        conn = get_db_connection()
-        if conn:
-            conn.close()
-            return jsonify({'status': 'healthy', 'database': 'connected'}), 200
-        else:
-            return jsonify({'status': 'unhealthy', 'database': 'disconnected'}), 503
-    except Exception as e:
-        return jsonify({'status': 'unhealthy', 'error': str(e)}), 503
-
 # Database info endpoint
 @app.route('/api/database/info', methods=['GET'])
 @token_required
@@ -892,21 +913,15 @@ def init_database():
         return False
 
 if __name__ == '__main__':
-    # Initialize database
+    # Initialize database and create necessary directories
     init_database()
-    
-    # Create scrapers directory if it doesn't exist
     os.makedirs('scrapers', exist_ok=True)
-    
+
     # Log startup information
     logger.info("Starting ProDS Flask Application")
     logger.info(f"Database: {DB_CONFIG['dbname']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}")
     logger.info(f"Environment: {os.environ.get('FLASK_ENV', 'development')}")
-    
-    # Run the Flask app
+
+    # Run the Flask app with SocketIO
     debug_mode = os.environ.get('FLASK_ENV') == 'development'
-    app.run(
-        debug=debug_mode, 
-        host='0.0.0.0', 
-        port=int(os.environ.get('PORT', 5000))
-    )
+    socketio.run(app, debug=debug_mode, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
