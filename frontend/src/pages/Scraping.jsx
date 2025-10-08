@@ -13,6 +13,9 @@ const ScrapingDashboard = () => {
     maxPages: 50,
     maxCycles: 20
   });
+  const [gsConfig, setGsConfig] = useState({
+    maxAuthors: 10
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [scrapingProgress, setScrapingProgress] = useState(null);
   const [scrapingResults, setScrapingResults] = useState(null);
@@ -75,6 +78,13 @@ const ScrapingDashboard = () => {
     }));
   };
 
+  const handleGsConfigChange = (e) => {
+    setGsConfig(prev => ({
+      ...prev,
+      [e.target.name]: parseInt(e.target.value)
+    }));
+  };
+
   const startScraping = async (endpoint, payload) => {
     setIsLoading(true);
     setScrapingResults(null);
@@ -82,7 +92,7 @@ const ScrapingDashboard = () => {
       status: 'starting',
       message: 'Memulai scraping...',
       currentCount: 0,
-      targetCount: payload.target_dosen || 100
+      targetCount: payload.target_dosen || payload.max_authors || 100
     });
 
     try {
@@ -182,6 +192,12 @@ const ScrapingDashboard = () => {
     });
   };
 
+  const handleGoogleScholar = async () => {
+    await startScraping('googlescholar/scrape', {
+      max_authors: gsConfig.maxAuthors
+    });
+  };
+
   const getProgressPercentage = () => {
     if (!scrapingProgress) return 0;
     const percentage = (scrapingProgress.currentCount / scrapingProgress.targetCount) * 100;
@@ -262,50 +278,59 @@ const ScrapingDashboard = () => {
               isActive={activeTab === 'sinta-garuda'}
               onClick={() => setActiveTab('sinta-garuda')}
             />
+            <TabButton
+              id="google-scholar"
+              label="Google Scholar"
+              icon={Globe}
+              isActive={activeTab === 'google-scholar'}
+              onClick={() => setActiveTab('google-scholar')}
+            />
           </div>
         </div>
 
-        {/* SINTA Credentials (Common for all tabs) */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Kredensial SINTA</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Username/Email SINTA
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="text"
-                  name="username"
-                  value={credentials.username}
-                  onChange={handleCredentialChange}
-                  disabled={isLoading}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                  placeholder="Masukkan username atau email SINTA"
-                />
+        {/* SINTA Credentials (Common for SINTA tabs) */}
+        {activeTab !== 'google-scholar' && (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Kredensial SINTA</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Username/Email SINTA
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    name="username"
+                    value={credentials.username}
+                    onChange={handleCredentialChange}
+                    disabled={isLoading}
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                    placeholder="Masukkan username atau email SINTA"
+                  />
+                </div>
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Password SINTA
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="password"
-                  name="password"
-                  value={credentials.password}
-                  onChange={handleCredentialChange}
-                  disabled={isLoading}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                  placeholder="Masukkan password SINTA"
-                />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Password SINTA
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="password"
+                    name="password"
+                    value={credentials.password}
+                    onChange={handleCredentialChange}
+                    disabled={isLoading}
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                    placeholder="Masukkan password SINTA"
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Tab Content */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -504,6 +529,72 @@ const ScrapingDashboard = () => {
                   <>
                     <Play className="-ml-1 mr-3 h-5 w-5" />
                     Mulai Scraping Garuda
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+
+          {activeTab === 'google-scholar' && (
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Scraping Google Scholar</h3>
+              
+              <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+                <div className="flex">
+                  <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0" />
+                  <div className="ml-3">
+                    <p className="text-sm text-red-700 font-semibold mb-2">
+                      ⚠️ Perhatian: Login Manual Diperlukan
+                    </p>
+                    <p className="text-sm text-red-700">
+                      Setelah memulai scraping, browser Chrome akan terbuka. Anda perlu login secara manual ke Google Scholar untuk menghindari CAPTCHA. Setelah login berhasil, scraping akan dilanjutkan secara otomatis.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                <div className="flex">
+                  <AlertCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                  <div className="ml-3">
+                    <p className="text-sm text-blue-700">
+                      Scraping akan mengambil profil dan publikasi dosen dari database yang memiliki URL Google Scholar. Data akan disimpan ke database dan file CSV secara otomatis.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <Target className="w-4 h-4 inline mr-1" />
+                  Maksimum Authors
+                </label>
+                <input
+                  type="number"
+                  name="maxAuthors"
+                  value={gsConfig.maxAuthors}
+                  onChange={handleGsConfigChange}
+                  disabled={isLoading}
+                  min="1"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                />
+                <p className="mt-1 text-xs text-gray-500">Jumlah maksimum author yang akan di-scrape dari database</p>
+              </div>
+
+              <button
+                onClick={handleGoogleScholar}
+                disabled={isLoading}
+                className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader className="animate-spin -ml-1 mr-3 h-5 w-5" />
+                    Sedang Scraping...
+                  </>
+                ) : (
+                  <>
+                    <Play className="-ml-1 mr-3 h-5 w-5" />
+                    Mulai Scraping Google Scholar
                   </>
                 )}
               </button>
