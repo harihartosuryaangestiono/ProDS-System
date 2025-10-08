@@ -5,6 +5,7 @@
 -- Drop tables dalam urutan terbalik dari pembuatan untuk menghindari masalah dependencies
 DROP TABLE IF EXISTS stg_publikasi_sitasi_tahunan_dr;
 DROP TABLE IF EXISTS stg_publikasi_dosen_dt;
+DROP TABLE IF EXISTS stg_lainnya_dr;  -- Tambahan: tabel lainnya
 DROP TABLE IF EXISTS stg_prosiding_dr;
 DROP TABLE IF EXISTS stg_penelitian_dr;
 DROP TABLE IF EXISTS stg_buku_dr;
@@ -17,6 +18,15 @@ DROP TABLE IF EXISTS users;
 
 -- Jika ingin drop database juga (hati-hati!)
 -- DROP DATABASE IF EXISTS "SKM_PUBLIKASI";
+
+ALTER TABLE stg_publikasi_tr
+ADD COLUMN v_publisher VARCHAR(200);
+
+ALTER TABLE stg_publikasi_tr
+ADD COLUMN v_authors TEXT;
+
+ALTER TABLE stg_buku_dr 
+DROP COLUMN IF EXISTS v_penerbit;
 
 -- ========================
 -- RECREATE DATABASE DAN TABLES DENGAN TIMESTAMP TRACKING
@@ -63,7 +73,8 @@ CREATE TABLE tmp_dosen_dt (
 );
 
 SELECT *
-FROM tmp_dosen_dt
+FROM stg_artikel_dr
+where  v_terindeks = ''
 -- ========================
 -- 3. Tabel Jurnal dengan timestamp
 -- ========================
@@ -71,6 +82,8 @@ CREATE TABLE stg_jurnal_mt (
     v_id_jurnal SERIAL PRIMARY KEY,
     v_nama_jurnal VARCHAR(255) NOT NULL
 );
+
+DROP TABLE IF EXISTS temp_dosenGS_scraping;
 
 CREATE TABLE temp_dosenGS_scraping (
     v_id_gs VARCHAR(50) NOT NULL,
@@ -80,8 +93,9 @@ CREATE TABLE temp_dosenGS_scraping (
     v_link VARCHAR (255),
     v_status VARCHAR(200) DEFAULT 'pending',
     v_error_message TEXT,
-    t_last_updated TIMESTAMP;
+    t_last_updated TIMESTAMP
 );
+
 
 -- ========================
 -- 4. Tabel Publikasi (Superclass) dengan timestamp
@@ -89,10 +103,12 @@ CREATE TABLE temp_dosenGS_scraping (
 CREATE TABLE stg_publikasi_tr (
     v_id_publikasi SERIAL PRIMARY KEY,
     v_judul TEXT NOT NULL,
+    v_authors TEXT,
     v_jenis VARCHAR(20) NOT NULL CHECK (v_jenis IN ('artikel','buku','penelitian','prosiding')),
     v_tahun_publikasi INT,
     n_total_sitasi INT DEFAULT 0,
     v_sumber VARCHAR(50),
+    v_publisher VARCHAR(200),
     v_link_url VARCHAR(255),
     t_tanggal_unduh TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -112,7 +128,6 @@ CREATE TABLE stg_artikel_dr (
 
 CREATE TABLE stg_buku_dr (
     v_id_publikasi INT PRIMARY KEY, -- hanya kolom, tanpa FK
-    v_penerbit VARCHAR(200),
     v_isbn VARCHAR(50)
 );
 
@@ -127,6 +142,13 @@ CREATE TABLE stg_prosiding_dr (
     f_terindeks_scopus BOOLEAN DEFAULT FALSE -- publikasi terindeks scopus atau tidak
 );
 
+-- ========================
+-- TAMBAHAN: Tabel untuk publikasi kategori "Lainnya"
+-- ========================
+CREATE TABLE stg_lainnya_dr (
+    v_id_publikasi INT PRIMARY KEY,
+    v_keterangan TEXT  -- Untuk catatan tambahan tentang publikasi ini
+);
 -- ========================
 -- 6. Relasi Many-to-Many Publikasi - Dosen dengan timestamp
 -- ========================

@@ -23,7 +23,7 @@ const SintaPublikasi = () => {
     }
     
     fetchPublikasiData();
-  }, []);
+  }, [searchTerm]);
 
   useEffect(() => {
     fetchPublikasiData();

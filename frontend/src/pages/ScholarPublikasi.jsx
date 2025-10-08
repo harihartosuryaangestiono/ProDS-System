@@ -69,6 +69,11 @@ const ScholarPublikasi = () => {
     }
   };
 
+  const handleRefresh = async () => {
+    await fetchPublikasiData();
+    toast.success('Data berhasil diperbarui');
+  };
+
   const handleSearchChange = (value) => {
     setSearchTerm(value);
     setCurrentPage(1);
@@ -297,7 +302,7 @@ const ScholarPublikasi = () => {
           loading={loading}
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
-          onRefresh={fetchPublikasiData}
+          onRefresh={handleRefresh}
           pagination={pagination}
           onPageChange={handlePageChange}
           emptyMessage="Tidak ada data publikasi Google Scholar ditemukan"

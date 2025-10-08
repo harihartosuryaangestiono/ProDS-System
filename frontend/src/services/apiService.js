@@ -85,7 +85,7 @@ apiService.interceptors.response.use(
  * @param {string} params.search - Search term
  * @returns {Object} Formatted parameters
  */
-apiService.buildPaginationParams = ({ page = 1, perPage = 20, search = '' }) => {
+apiService.buildPaginationParams = (page = 1, perPage = 20, search = '') => {
   return {
     page,
     per_page: perPage,
@@ -136,9 +136,8 @@ const handleResponse = async (apiCall, errorMessage = 'API request failed') => {
  * @param {string} params.search - Search term
  */
 apiService.getSintaDosen = async (params) => {
-  const queryParams = apiService.buildPaginationParams(params);
   return handleResponse(
-    () => apiService.get('/api/sinta/dosen', { params: queryParams }),
+    () => apiService.get('/api/sinta/dosen', { params }),
     'Error fetching SINTA dosen'
   );
 };
@@ -168,9 +167,8 @@ apiService.getSintaDosenStats = async (params = {}) => {
  * @param {string} params.search - Search term
  */
 apiService.getSintaPublikasi = async (params) => {
-  const queryParams = apiService.buildPaginationParams(params);
   return handleResponse(
-    () => apiService.get('/api/sinta/publikasi', { params: queryParams }),
+    () => apiService.get('/api/sinta/publikasi', { params }),
     'Error fetching SINTA publikasi'
   );
 };
@@ -197,9 +195,8 @@ apiService.debugSintaPublikasi = async () => {
  * @param {string} params.search - Search term
  */
 apiService.getScholarDosen = async (params) => {
-  const queryParams = apiService.buildPaginationParams(params);
   return handleResponse(
-    () => apiService.get('/api/scholar/dosen', { params: queryParams }),
+    () => apiService.get('/api/scholar/dosen', { params }),
     'Error fetching Scholar dosen'
   );
 };
@@ -227,9 +224,8 @@ apiService.getScholarDosenStats = async (params = {}) => {
  * @param {string} params.search - Search term
  */
 apiService.getScholarPublikasi = async (params) => {
-  const queryParams = apiService.buildPaginationParams(params);
   return handleResponse(
-    () => apiService.get('/api/scholar/publikasi', { params: queryParams }),
+    () => apiService.get('/api/scholar/publikasi', { params }),
     'Error fetching Scholar publikasi'
   );
 };

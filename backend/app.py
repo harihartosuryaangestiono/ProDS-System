@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
+from flask_socketio import SocketIO, emit
 from werkzeug.security import generate_password_hash, check_password_hash
 import psycopg2
 import psycopg2.extras
@@ -31,14 +32,21 @@ CORS(app,
      }},
      allow_credentials=True)  # Tambahkan ini
 
+# Initialize SocketIO
+socketio = SocketIO(app, 
+                   cors_allowed_origins=["http://localhost:5173"],
+                   async_mode='threading',
+                   logger=True,
+                   engineio_logger=True)
+
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-this')
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-change-this')
 
 # Database configuration
 DB_CONFIG = {
-    'dbname': os.environ.get('DB_NAME', 'SKM_PUBLIKASI'),
-    'user': os.environ.get('DB_USER', 'rayhanadjisantoso'), 
-    'password': os.environ.get('DB_PASSWORD', 'rayhan123'),
+    'dbname': os.environ.get('DB_NAME', 'ProDSGabungan'),
+    'user': os.environ.get('DB_USER', 'postgres'), 
+    'password': os.environ.get('DB_PASSWORD', 'password123'),
     'host': os.environ.get('DB_HOST', 'localhost'),
     'port': os.environ.get('DB_PORT', '5432')
 }
@@ -74,7 +82,6 @@ def token_required(f):
             return jsonify({'message': 'Token is missing'}), 401
         
         try:
-            # Remove 'Bearer ' prefix
             if token.startswith('Bearer '):
                 token = token[7:]
             
@@ -91,11 +98,130 @@ def token_required(f):
 
 # Import and register blueprints
 from routes.auth import auth_bp
-app.register_blueprint(auth_bp, url_prefix='/auth')  # Changed from '/api' to '/auth'
+from routes.scraping_routes import scraping_bp
 
+app.register_blueprint(auth_bp, url_prefix='/auth')
+app.register_blueprint(scraping_bp, url_prefix='')
 # Authentication Routes (These have been moved to auth.py and are now removed from app.py)
 
+from flask import Flask, request, jsonify, session
+from flask_cors import CORS
+from flask_socketio import SocketIO, emit
+from werkzeug.security import generate_password_hash, check_password_hash
+import psycopg2
+import psycopg2.extras
+from datetime import datetime, timedelta
+import jwt
+import os
+import subprocess
+import sys
+import importlib.util
+import logging
+from functools import wraps
+import json
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+app = Flask(__name__)
+
+# Konfigurasi CORS
+CORS(app, 
+     resources={r"/*": {
+         "origins": ["http://localhost:5173"],
+         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+         "allow_headers": ["Content-Type", "Authorization"],
+         "supports_credentials": True,
+         "expose_headers": ["Content-Type", "Authorization"],
+         "max_age": 600
+     }},
+     allow_credentials=True)
+
+# Initialize SocketIO
+socketio = SocketIO(app, 
+                   cors_allowed_origins=["http://localhost:5173"],
+                   async_mode='eventlet',
+                   logger=True,
+                   engineio_logger=True)
+
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-this')
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-change-this')
+
+# Database configuration
+DB_CONFIG = {
+    'dbname': os.environ.get('DB_NAME', 'ProDSGabungan'),
+    'user': os.environ.get('DB_USER', 'postgres'), 
+    'password': os.environ.get('DB_PASSWORD', 'password123'),
+    'host': os.environ.get('DB_HOST', 'localhost'),
+    'port': os.environ.get('DB_PORT', '5432')
+}
+app.config['DB_CONFIG'] = DB_CONFIG
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('app.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+def get_db_connection():
+    """Get database connection"""
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        return conn
+    except Exception as e:
+        logger.error(f"Database connection error: {e}")
+        return None
+
+def token_required(f):
+    """JWT token decorator"""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        
+        if not token:
+            return jsonify({'message': 'Token is missing'}), 401
+        
+        try:
+            if token.startswith('Bearer '):
+                token = token[7:]
+            
+            data = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
+            current_user_id = data['user_id']
+        except jwt.ExpiredSignatureError:
+            return jsonify({'message': 'Token has expired'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'message': 'Token is invalid'}), 401
+        
+        return f(current_user_id, *args, **kwargs)
+    
+    return decorated
+
+# Import and register blueprints
+from routes.auth import auth_bp
+from routes.scraping_routes import scraping_bp
+
+app.register_blueprint(auth_bp, url_prefix='/auth')
+app.register_blueprint(scraping_bp, url_prefix='')
+
+# SocketIO event handlers
+@socketio.on('connect')
+def handle_connect():
+    logger.info('Client connected')
+    emit('connection_response', {'status': 'connected'})
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    logger.info('Client disconnected')
+
+
 # Dashboard Routes
+# Dashboard Routes (keep existing routes from your app.py)
 @app.route('/api/dashboard/stats', methods=['GET'])
 @token_required
 def dashboard_stats(current_user_id):
@@ -107,19 +233,15 @@ def dashboard_stats(current_user_id):
         
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         
-        # Get total dosen
         cur.execute("SELECT COUNT(*) as total FROM tmp_dosen_dt")
         total_dosen = cur.fetchone()['total']
         
-        # Get total publikasi
         cur.execute("SELECT COUNT(*) as total FROM stg_publikasi_tr")
         total_publikasi = cur.fetchone()['total']
         
-        # Get total sitasi
         cur.execute("SELECT COALESCE(SUM(n_total_sitasi_gs), 0) as total FROM tmp_dosen_dt")
         total_sitasi = cur.fetchone()['total']
         
-        # Get publikasi by year
         cur.execute("""
             SELECT v_tahun_publikasi, COUNT(*) as count 
             FROM stg_publikasi_tr 
@@ -130,7 +252,6 @@ def dashboard_stats(current_user_id):
         """)
         publikasi_by_year = [dict(row) for row in cur.fetchall()]
         
-        # Get top authors by citations
         cur.execute("""
             SELECT v_nama_dosen, COALESCE(n_total_sitasi_gs, 0) as n_total_sitasi_gs
             FROM tmp_dosen_dt 
@@ -139,7 +260,6 @@ def dashboard_stats(current_user_id):
         """)
         top_authors = [dict(row) for row in cur.fetchall()]
         
-        # Get publication by type
         cur.execute("""
             SELECT v_jenis, COUNT(*) as count
             FROM stg_publikasi_tr
@@ -148,7 +268,6 @@ def dashboard_stats(current_user_id):
         """)
         publikasi_by_type = [dict(row) for row in cur.fetchall()]
         
-        # Get recent activities (publications added in last 30 days)
         cur.execute("""
             SELECT COUNT(*) as count
             FROM stg_publikasi_tr
@@ -172,6 +291,7 @@ def dashboard_stats(current_user_id):
     finally:
         if 'conn' in locals():
             conn.close()
+
 
 # SINTA Routes
 @app.route('/api/sinta/dosen', methods=['GET'])
@@ -907,7 +1027,7 @@ def init_database():
         
         cur = conn.cursor()
         
-        # Check if users table exists, create if not
+        # Check if users table exists
         cur.execute("""
             SELECT EXISTS (
                 SELECT FROM information_schema.tables 
@@ -930,9 +1050,34 @@ def init_database():
                 CREATE UNIQUE INDEX idx_users_email ON users(v_email);
                 CREATE UNIQUE INDEX idx_users_username ON users(v_username);
             """)
-            
             conn.commit()
             logger.info("Users table created successfully")
+        
+        # Check if temp_dosenGS_scraping table exists
+        cur.execute("""
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_name = 'temp_dosengs_scraping'
+            );
+        """)
+        
+        if not cur.fetchone()[0]:
+            logger.info("Creating temp_dosenGS_scraping table...")
+            cur.execute("""
+                CREATE TABLE temp_dosenGS_scraping (
+                    v_id_dosen SERIAL PRIMARY KEY,
+                    v_nama VARCHAR(255) NOT NULL,
+                    v_link TEXT,
+                    v_status VARCHAR(50) DEFAULT 'pending',
+                    v_error_message TEXT,
+                    t_last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+                
+                CREATE INDEX idx_dosengs_status ON temp_dosenGS_scraping(v_status);
+                CREATE INDEX idx_dosengs_nama ON temp_dosenGS_scraping(v_nama);
+            """)
+            conn.commit()
+            logger.info("temp_dosenGS_scraping table created successfully")
         
         conn.close()
         return True
@@ -949,14 +1094,20 @@ if __name__ == '__main__':
     os.makedirs('scrapers', exist_ok=True)
     
     # Log startup information
-    logger.info("Starting ProDS Flask Application")
+    logger.info("Starting ProDS Flask Application with SocketIO")
     logger.info(f"Database: {DB_CONFIG['dbname']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}")
     logger.info(f"Environment: {os.environ.get('FLASK_ENV', 'development')}")
     
-    # Run the Flask app
+    # Run with SocketIO
     debug_mode = os.environ.get('FLASK_ENV') == 'development'
     app.run(
         debug=debug_mode, 
         host='0.0.0.0', 
         port=int(os.environ.get('PORT', 5005))
+    socketio.run(
+        app,
+        debug=debug_mode,
+        host='0.0.0.0',
+        port=int(os.environ.get('PORT', 5000)),
+        allow_unsafe_werkzeug=True
     )
