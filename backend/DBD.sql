@@ -86,7 +86,7 @@ CREATE TABLE stg_jurnal_mt (
 DROP TABLE IF EXISTS temp_dosenGS_scraping;
 
 CREATE TABLE temp_dosenGS_scraping (
-    v_id_GS VARCHAR(50) NOT NULL,
+    v_id_gs VARCHAR(50) NOT NULL,
     v_nama VARCHAR(255) NOT NULL,
     v_affiliation VARCHAR (100),
     n_citations INT DEFAULT 0,

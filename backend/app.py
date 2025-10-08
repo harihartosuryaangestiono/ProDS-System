@@ -329,17 +329,17 @@ def get_sinta_dosen(current_user_id):
         cur.execute(count_query, params)
         total = cur.fetchone()['total']
         
-        # Get data
+        # Get data - TAMBAHKAN n_sitasi_scopus
         data_query = f"""
             SELECT 
                 d.v_id_dosen, d.v_nama_dosen, d.v_id_sinta, d.v_id_googleScholar,
-                d.n_total_publikasi, d.n_total_sitasi_gs, d.n_h_index_gs, 
-                d.n_i10_index_gs, d.n_skor_sinta, d.n_skor_sinta_3yr,
+                d.n_total_publikasi, d.n_total_sitasi_gs, d.n_sitasi_scopus,
+                d.n_h_index_gs, d.n_i10_index_gs, d.n_skor_sinta, d.n_skor_sinta_3yr,
                 j.v_nama_jurusan, d.t_tanggal_unduh, d.v_link_url
             FROM tmp_dosen_dt d
             LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
             {where_clause}
-            ORDER BY d.n_total_sitasi_gs DESC NULLS LAST
+            ORDER BY (COALESCE(d.n_total_sitasi_gs, 0) + COALESCE(d.n_sitasi_scopus, 0)) DESC
             LIMIT %s OFFSET %s
         """
         
@@ -360,6 +360,56 @@ def get_sinta_dosen(current_user_id):
     except Exception as e:
         logger.error(f"Get SINTA dosen error: {e}")
         return jsonify({'error': 'Failed to fetch SINTA dosen data'}), 500
+    finally:
+        if 'conn' in locals():
+            conn.close()
+
+@app.route('/api/sinta/dosen/stats', methods=['GET'])
+@token_required
+def get_sinta_dosen_stats(current_user_id):
+    """Get SINTA dosen aggregate statistics"""
+    try:
+        search = request.args.get('search', '').strip()
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        # Build query with proper table names
+        where_clause = "WHERE d.v_sumber = 'SINTA' OR d.v_sumber IS NULL"
+        params = []
+        
+        if search:
+            where_clause += " AND LOWER(d.v_nama_dosen) LIKE LOWER(%s)"
+            params.append(f'%{search}%')
+        
+        # Get aggregate statistics
+        stats_query = f"""
+            SELECT 
+                COUNT(*) as total_dosen,
+                COALESCE(SUM(COALESCE(d.n_total_sitasi_gs, 0) + COALESCE(d.n_sitasi_scopus, 0)), 0) as total_sitasi,
+                COALESCE(AVG(d.n_h_index_gs), 0) as avg_h_index,
+                COALESCE(SUM(d.n_total_publikasi), 0) as total_publikasi
+            FROM tmp_dosen_dt d
+            LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
+            {where_clause}
+        """
+        
+        cur.execute(stats_query, params)
+        stats = cur.fetchone()
+        
+        return jsonify({
+            'totalDosen': stats['total_dosen'] or 0,
+            'totalSitasi': int(stats['total_sitasi']) if stats['total_sitasi'] else 0,
+            'avgHIndex': round(float(stats['avg_h_index']), 1) if stats['avg_h_index'] else 0,
+            'totalPublikasi': stats['total_publikasi'] or 0
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Get SINTA dosen stats error: {e}")
+        return jsonify({'error': 'Failed to fetch SINTA dosen statistics'}), 500
     finally:
         if 'conn' in locals():
             conn.close()
@@ -1050,6 +1100,10 @@ if __name__ == '__main__':
     
     # Run with SocketIO
     debug_mode = os.environ.get('FLASK_ENV') == 'development'
+    app.run(
+        debug=debug_mode, 
+        host='0.0.0.0', 
+        port=int(os.environ.get('PORT', 5005))
     socketio.run(
         app,
         debug=debug_mode,

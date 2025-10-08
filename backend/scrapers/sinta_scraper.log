@@ -9469,3 +9469,225 @@ Processing author 473/473: HANDOKO SUTANTO (ID: 6833853)
 2025-09-26 17:04:08,396 - INFO - Driver downloading response is 200
 2025-09-26 17:04:09,833 - INFO - Get LATEST chromedriver version for google-chrome
 2025-09-26 17:04:10,281 - INFO - Driver has been saved in cache [C:\Users\harih\.wdm\drivers\chromedriver\win64\140.0.7339.207]
+2025-10-08 09:31:58,934 - INFO - Connected to PostgreSQL Database
+2025-10-08 09:31:58,935 - INFO - Starting SINTA Scraper - Database Edition
+2025-10-08 09:31:58,935 - INFO - Logging in to SINTA with username: 6182101045@student.unpar.ac.id
+2025-10-08 09:31:58,935 - INFO - Attempting login at: https://sinta.kemdikbud.go.id/logins
+2025-10-08 09:31:59,149 - INFO - Found 2 input fields on login form
+2025-10-08 09:31:59,149 - INFO - Found form action URL: https://sinta.kemdiktisaintek.go.id/logins/do_login
+2025-10-08 09:31:59,149 - INFO - Using username field: username
+2025-10-08 09:31:59,149 - INFO - Login data prepared: {'username': '6182101045@student.unpar.ac.id', 'password': 'PAPAganteng1_', 'remember': 'on', 'login': 'Login'}
+2025-10-08 09:31:59,149 - INFO - Posting to: https://sinta.kemdiktisaintek.go.id/logins/do_login
+2025-10-08 09:31:59,811 - INFO - Login successful! Redirected to: https://sinta.kemdiktisaintek.go.id
+2025-10-08 09:32:35,428 - INFO - Processing author: VERA INTANIE DEWI (ID: 5974884)
+2025-10-08 09:32:35,431 - INFO - Checking pagination for VERA INTANIE DEWI (ID: 5974884)
+2025-10-08 09:32:35,641 - INFO - Found 2 page(s) of publications for VERA INTANIE DEWI
+2025-10-08 09:32:35,641 - INFO - Scraping page 1/2 for VERA INTANIE DEWI (ID: 5974884)
+2025-10-08 09:32:35,642 - WARNING - Main content area not found on page 1 - possible site structure change
+2025-10-08 09:32:35,650 - INFO - Found 10 publications on page 1
+2025-10-08 09:32:35,651 - INFO - Waiting 2.69 seconds before next page...
+2025-10-08 09:32:38,341 - INFO - Scraping page 2/2 for VERA INTANIE DEWI (ID: 5974884)
+2025-10-08 09:32:38,440 - WARNING - Main content area not found on page 2 - possible site structure change
+2025-10-08 09:32:38,442 - INFO - Found 4 publications on page 2
+2025-10-08 09:32:38,442 - INFO - Finished scraping for VERA INTANIE DEWI. Total publications: 14
+2025-10-08 09:32:38,469 - INFO - Created new jurnal: Risk Governance and Control Financial Markets and Institutions with ID: 27
+2025-10-08 09:32:38,475 - INFO - Created new publikasi: THE EFFECT OF COUNTRY RISK, INFLATION RATE, AND GR... with ID: 60
+2025-10-08 09:32:38,481 - INFO - Created new jurnal: Polish Journal of Management Studies with ID: 28
+2025-10-08 09:32:38,482 - INFO - Created new publikasi: AI-DRIVEN DIGITAL FINANCE ADOPTION IN THE INSURANC... with ID: 61
+2025-10-08 09:32:38,484 - INFO - Created new jurnal: Gadjah Mada International Journal of Business with ID: 29
+2025-10-08 09:32:38,484 - INFO - Created new publikasi: Do Financial Knowledge and e-Payment Awareness Aff... with ID: 62
+2025-10-08 09:32:38,487 - INFO - Created new jurnal: Cogent Business and Management with ID: 30
+2025-10-08 09:32:38,488 - INFO - Created new publikasi: The nexus of digital financial inclusion, digital ... with ID: 63
+2025-10-08 09:32:38,491 - INFO - Created new jurnal: Australasian Accounting Business and Finance Journal with ID: 31
+2025-10-08 09:32:38,491 - INFO - Created new publikasi: Do Shadow Banking Depositors Discipline the Market... with ID: 64
+2025-10-08 09:32:38,494 - INFO - Created new publikasi: Determinants of Consumer Confidence Index to Predi... with ID: 65
+2025-10-08 09:32:38,497 - INFO - Created new publikasi: How do demographic and socioeconomic factors affec... with ID: 66
+2025-10-08 09:32:38,499 - INFO - Created new jurnal: Economics of Innovation and New Technology with ID: 32
+2025-10-08 09:32:38,499 - INFO - Created new publikasi: Digital financial literacy, current behavior of sa... with ID: 67
+2025-10-08 09:32:38,501 - INFO - Created new jurnal: Managerial Finance with ID: 33
+2025-10-08 09:32:38,501 - INFO - Created new publikasi: The nexus of financial literacy and depositor disc... with ID: 68
+2025-10-08 09:32:38,503 - INFO - Created new jurnal: Economics and Sociology with ID: 34
+2025-10-08 09:32:38,504 - INFO - Created new publikasi: Financial literacy and its variables: The evidence... with ID: 69
+2025-10-08 09:32:38,537 - ERROR - Error creating/updating sitasi tahunan: record "new" has no field "t_updated_at"
+CONTEXT:  PL/pgSQL assignment "NEW.t_updated_at = CURRENT_TIMESTAMP"
+PL/pgSQL function update_updated_at_column() line 3 at assignment
+
+2025-10-08 09:32:38,538 - ERROR - Error creating/updating sitasi tahunan: record "new" has no field "t_updated_at"
+CONTEXT:  PL/pgSQL assignment "NEW.t_updated_at = CURRENT_TIMESTAMP"
+PL/pgSQL function update_updated_at_column() line 3 at assignment
+
+2025-10-08 09:32:38,539 - INFO - Created new publikasi: Financial literacy among the millennial generation... with ID: 70
+2025-10-08 09:32:38,541 - INFO - Created new jurnal: Academy of Accounting and Financial Studies Journal with ID: 35
+2025-10-08 09:32:38,542 - INFO - Created new publikasi: The impact of macroeconomic factors on firms' prof... with ID: 71
+2025-10-08 09:32:38,545 - INFO - Created new jurnal: Pertanika Journal of Social Sciences and Humanities with ID: 36
+2025-10-08 09:32:38,545 - INFO - Created new publikasi: The adaptability of company’s strategy in managing... with ID: 72
+2025-10-08 09:32:38,547 - INFO - Successfully processed 14 publications to database
+2025-10-08 09:32:38,547 - INFO - Saved 14 publications for VERA INTANIE DEWI
+2025-10-08 09:32:38,548 - ERROR - Error updating dosen stats for Sinta ID 5974884: record "new" has no field "t_updated_at"
+CONTEXT:  PL/pgSQL assignment "NEW.t_updated_at = CURRENT_TIMESTAMP"
+PL/pgSQL function update_updated_at_column() line 3 at assignment
+
+2025-10-08 09:32:38,549 - INFO - Scraping completed successfully!
+2025-10-08 09:32:38,550 - INFO - Disconnected from database
+2025-10-08 09:33:00,942 - INFO - Connected to PostgreSQL Database
+2025-10-08 09:33:00,942 - INFO - Starting SINTA Scraper - Database Edition
+2025-10-08 09:33:00,942 - INFO - Logging in to SINTA with username: 6182101045@student.unpar.ac.id
+2025-10-08 09:33:00,942 - INFO - Attempting login at: https://sinta.kemdikbud.go.id/logins
+2025-10-08 09:33:01,204 - INFO - Found 2 input fields on login form
+2025-10-08 09:33:01,205 - INFO - Found form action URL: https://sinta.kemdiktisaintek.go.id/logins/do_login
+2025-10-08 09:33:01,205 - INFO - Using username field: username
+2025-10-08 09:33:01,205 - INFO - Login data prepared: {'username': '6182101045@student.unpar.ac.id', 'password': 'PAPAganteng1_', 'remember': 'on', 'login': 'Login'}
+2025-10-08 09:33:01,205 - INFO - Posting to: https://sinta.kemdiktisaintek.go.id/logins/do_login
+2025-10-08 09:33:03,291 - INFO - Login successful! Redirected to: https://sinta.kemdiktisaintek.go.id
+2025-10-08 09:33:20,981 - INFO - Processing author: HANS KRISTIANTO (ID: 130417)
+2025-10-08 09:33:20,982 - INFO - Checking pagination for HANS KRISTIANTO (ID: 130417)
+2025-10-08 09:33:21,181 - INFO - Found 5 page(s) of publications for HANS KRISTIANTO
+2025-10-08 09:33:21,181 - INFO - Scraping page 1/5 for HANS KRISTIANTO (ID: 130417)
+2025-10-08 09:33:21,182 - WARNING - Main content area not found on page 1 - possible site structure change
+2025-10-08 09:33:21,190 - INFO - Found 10 publications on page 1
+2025-10-08 09:33:21,190 - INFO - Waiting 2.69 seconds before next page...
+2025-10-08 09:33:23,886 - INFO - Scraping page 2/5 for HANS KRISTIANTO (ID: 130417)
+2025-10-08 09:33:24,091 - WARNING - Main content area not found on page 2 - possible site structure change
+2025-10-08 09:33:24,099 - INFO - Found 10 publications on page 2
+2025-10-08 09:33:24,099 - INFO - Waiting 2.84 seconds before next page...
+2025-10-08 09:33:26,944 - INFO - Scraping page 3/5 for HANS KRISTIANTO (ID: 130417)
+2025-10-08 09:33:27,678 - WARNING - Main content area not found on page 3 - possible site structure change
+2025-10-08 09:33:27,682 - INFO - Found 10 publications on page 3
+2025-10-08 09:33:27,682 - INFO - Waiting 2.43 seconds before next page...
+2025-10-08 09:33:30,122 - INFO - Scraping page 4/5 for HANS KRISTIANTO (ID: 130417)
+2025-10-08 09:33:30,376 - WARNING - Main content area not found on page 4 - possible site structure change
+2025-10-08 09:33:30,385 - INFO - Found 10 publications on page 4
+2025-10-08 09:33:30,385 - INFO - Waiting 3.70 seconds before next page...
+2025-10-08 09:33:34,090 - INFO - Scraping page 5/5 for HANS KRISTIANTO (ID: 130417)
+2025-10-08 09:33:34,248 - WARNING - Main content area not found on page 5 - possible site structure change
+2025-10-08 09:33:34,256 - INFO - Found 10 publications on page 5
+2025-10-08 09:33:34,256 - INFO - Finished scraping for HANS KRISTIANTO. Total publications: 50
+2025-10-08 09:33:34,261 - INFO - Created new jurnal: International Journal of Environmental Science and Technology with ID: 37
+2025-10-08 09:33:34,263 - INFO - Created new publikasi: Novel developments in magnetic coagulation: enhanc... with ID: 73
+2025-10-08 09:33:34,269 - INFO - Created new jurnal: Methodsx with ID: 38
+2025-10-08 09:33:34,270 - INFO - Created new publikasi: Small-scale protocol for magnetic coagulation test... with ID: 74
+2025-10-08 09:33:34,273 - INFO - Created new jurnal: Indonesian Journal of Urban and Environmental Technology with ID: 39
+2025-10-08 09:33:34,274 - INFO - Created new publikasi: COMBINATION OF FeCl3 AND Fe3O4 AS A MAGNETIC COAGU... with ID: 75
+2025-10-08 09:33:34,277 - INFO - Created new jurnal: Quality Assurance in Education with ID: 40
+2025-10-08 09:33:34,278 - INFO - Created new publikasi: Evaluating student learning outcomes: a comparativ... with ID: 76
+2025-10-08 09:33:34,304 - INFO - Created new jurnal: Sustainable Chemistry for the Environment with ID: 41
+2025-10-08 09:33:34,308 - INFO - Created new publikasi: Utilization of chitosan as a natural coagulant for... with ID: 77
+2025-10-08 09:33:34,343 - INFO - Created new jurnal: Journal of Multidisciplinary Applied Natural Science with ID: 42
+2025-10-08 09:33:34,344 - INFO - Created new publikasi: Alginate as A Natural Coagulant-Aid: Advances, Cha... with ID: 78
+2025-10-08 09:33:34,345 - INFO - Created new jurnal: Iop Conference Series Earth and Environmental Science with ID: 43
+2025-10-08 09:33:34,346 - INFO - Created new publikasi: Removal of Congo red and tartrazine binary mixture... with ID: 79
+2025-10-08 09:33:34,353 - INFO - Created new jurnal: Chemical Papers with ID: 44
+2025-10-08 09:33:34,357 - INFO - Created new publikasi: Harnessing NaNH2 as a dual-function activator for ... with ID: 80
+2025-10-08 09:33:34,361 - INFO - Created new publikasi: Enhancing water–wastewater treatment efficiency: s... with ID: 81
+2025-10-08 09:33:34,364 - INFO - Created new publikasi: The Utilization of Pectin as Natural Coagulant-Aid... with ID: 82
+2025-10-08 09:33:34,370 - ERROR - Error creating/updating sitasi tahunan: record "new" has no field "t_updated_at"
+CONTEXT:  PL/pgSQL assignment "NEW.t_updated_at = CURRENT_TIMESTAMP"
+PL/pgSQL function update_updated_at_column() line 3 at assignment
+
+2025-10-08 09:33:34,371 - INFO - Created new jurnal: Environment Development and Sustainability with ID: 45
+2025-10-08 09:33:34,371 - INFO - Created new publikasi: The utilization of galactomannan from spent coffee... with ID: 83
+2025-10-08 09:33:34,373 - INFO - Created new jurnal: Heliyon with ID: 46
+2025-10-08 09:33:34,374 - INFO - Created new publikasi: Application of xanthan gum as coagulant-aid for de... with ID: 84
+2025-10-08 09:33:34,376 - INFO - Created new jurnal: Interactive Technology and Smart Education with ID: 47
+2025-10-08 09:33:34,377 - INFO - Created new publikasi: Offline vs online problem-based learning: a case s... with ID: 85
+2025-10-08 09:33:34,378 - INFO - Created new jurnal: Aip Conference Proceedings with ID: 48
+2025-10-08 09:33:34,378 - INFO - Created new publikasi: A preliminary study on the utilization of gelatini... with ID: 86
+2025-10-08 09:33:34,380 - INFO - Created new jurnal: Materials Today Proceedings with ID: 49
+2025-10-08 09:33:34,381 - INFO - Created new publikasi: Synthesis of high surface area activated carbon de... with ID: 87
+2025-10-08 09:33:34,383 - INFO - Created new publikasi: Green synthesized iron nanoparticles using Leucaen... with ID: 88
+2025-10-08 09:33:34,384 - INFO - Created new jurnal: Molekul with ID: 50
+2025-10-08 09:33:34,385 - INFO - Created new publikasi: Tannic acid modified iron oxide nanoparticles and ... with ID: 89
+2025-10-08 09:33:34,386 - INFO - Created new jurnal: Water Air and Soil Pollution with ID: 51
+2025-10-08 09:33:34,387 - INFO - Created new publikasi: A Synthesis of Magnetic Natural Coagulant and Its ... with ID: 90
+2025-10-08 09:33:34,389 - INFO - Created new jurnal: Water Practice and Technology with ID: 52
+2025-10-08 09:33:34,389 - INFO - Created new publikasi: A kinetic, isotherm adsorption, and thermodynamic ... with ID: 91
+2025-10-08 09:33:34,391 - INFO - Created new publikasi: Comparison of FeCl3and leucaena seeds FeCl3extract... with ID: 92
+2025-10-08 09:33:34,393 - INFO - Created new jurnal: Journal of Applied Electrochemistry with ID: 53
+2025-10-08 09:33:34,393 - INFO - Created new publikasi: Cerium chloride-assisted subcritical water carboni... with ID: 93
+2025-10-08 09:33:34,394 - INFO - Created new jurnal: SN Applied Sciences with ID: 54
+2025-10-08 09:33:34,394 - INFO - Created new publikasi: Rambutan peel derived porous carbons for lithium s... with ID: 94
+2025-10-08 09:33:34,395 - INFO - Created new jurnal: Arabian Journal for Science and Engineering with ID: 55
+2025-10-08 09:33:34,396 - INFO - Created new publikasi: Optimization Study of Leucaena leucocephala Seed E... with ID: 95
+2025-10-08 09:33:34,397 - INFO - Created new jurnal: Environmental Technology Reviews with ID: 56
+2025-10-08 09:33:34,397 - INFO - Created new publikasi: Recent advances on magnetic natural coagulant: a m... with ID: 96
+2025-10-08 09:33:34,398 - INFO - Created new jurnal: Iop Conference Series Materials Science and Engineering with ID: 57
+2025-10-08 09:33:34,398 - INFO - Created new publikasi: Microwave Assisted KOH Activation of Salacca Peel ... with ID: 97
+2025-10-08 09:33:34,399 - INFO - Created new jurnal: Sustainable Environment Research with ID: 58
+2025-10-08 09:33:34,400 - INFO - Created new publikasi: Adsorbed leucaena protein on citrate modified Fe3O... with ID: 98
+2025-10-08 09:33:34,401 - INFO - Created new publikasi: Synthesis and Characterization of Activated Carbon... with ID: 99
+2025-10-08 09:33:34,402 - INFO - Created new jurnal: Ecs Transactions with ID: 59
+2025-10-08 09:33:34,402 - INFO - Created new publikasi: Onion Peel Based Porous Carbons As Cathode Compone... with ID: 100
+2025-10-08 09:33:34,403 - INFO - Created new jurnal: Carbon Letters with ID: 60
+2025-10-08 09:33:34,404 - INFO - Created new publikasi: Preparation of salacca peel-based porous carbons b... with ID: 101
+2025-10-08 09:33:34,405 - ERROR - Error creating/updating sitasi tahunan: record "new" has no field "t_updated_at"
+CONTEXT:  PL/pgSQL assignment "NEW.t_updated_at = CURRENT_TIMESTAMP"
+PL/pgSQL function update_updated_at_column() line 3 at assignment
+
+2025-10-08 09:33:34,406 - ERROR - Error creating/updating sitasi tahunan: record "new" has no field "t_updated_at"
+CONTEXT:  PL/pgSQL assignment "NEW.t_updated_at = CURRENT_TIMESTAMP"
+PL/pgSQL function update_updated_at_column() line 3 at assignment
+
+2025-10-08 09:33:34,406 - ERROR - Error creating/updating sitasi tahunan: record "new" has no field "t_updated_at"
+CONTEXT:  PL/pgSQL assignment "NEW.t_updated_at = CURRENT_TIMESTAMP"
+PL/pgSQL function update_updated_at_column() line 3 at assignment
+
+2025-10-08 09:33:34,407 - ERROR - Error creating/updating sitasi tahunan: record "new" has no field "t_updated_at"
+CONTEXT:  PL/pgSQL assignment "NEW.t_updated_at = CURRENT_TIMESTAMP"
+PL/pgSQL function update_updated_at_column() line 3 at assignment
+
+2025-10-08 09:33:34,408 - ERROR - Error creating/updating sitasi tahunan: record "new" has no field "t_updated_at"
+CONTEXT:  PL/pgSQL assignment "NEW.t_updated_at = CURRENT_TIMESTAMP"
+PL/pgSQL function update_updated_at_column() line 3 at assignment
+
+2025-10-08 09:33:34,408 - ERROR - Error creating/updating sitasi tahunan: record "new" has no field "t_updated_at"
+CONTEXT:  PL/pgSQL assignment "NEW.t_updated_at = CURRENT_TIMESTAMP"
+PL/pgSQL function update_updated_at_column() line 3 at assignment
+
+2025-10-08 09:33:34,409 - ERROR - Error creating/updating sitasi tahunan: record "new" has no field "t_updated_at"
+CONTEXT:  PL/pgSQL assignment "NEW.t_updated_at = CURRENT_TIMESTAMP"
+PL/pgSQL function update_updated_at_column() line 3 at assignment
+
+2025-10-08 09:33:34,409 - ERROR - Error creating/updating sitasi tahunan: record "new" has no field "t_updated_at"
+CONTEXT:  PL/pgSQL assignment "NEW.t_updated_at = CURRENT_TIMESTAMP"
+PL/pgSQL function update_updated_at_column() line 3 at assignment
+
+2025-10-08 09:33:34,409 - INFO - Created new jurnal: Ionics with ID: 61
+2025-10-08 09:33:34,410 - INFO - Created new publikasi: Activated porous carbons originated from the Indon... with ID: 102
+2025-10-08 09:33:34,412 - INFO - Created new publikasi: Activated carbon from citric acid catalyzed hydrot... with ID: 103
+2025-10-08 09:33:34,413 - INFO - Created new jurnal: Icsecc 2019 International Conference on Sustainable Engineering and Creative Computing New Idea New with ID: 62
+2025-10-08 09:33:34,413 - INFO - Created new publikasi: Preliminary Study on Tamarindus Indica Seeds Kerne... with ID: 104
+2025-10-08 09:33:34,414 - INFO - Created new jurnal: Indonesian Journal of Chemistry with ID: 63
+2025-10-08 09:33:34,415 - INFO - Created new publikasi: Adsorption of Ni(II) Ion onto calcined eggshells: ... with ID: 105
+2025-10-08 09:33:34,415 - INFO - Created new publikasi: Microwave assisted ZnCl2 activation of salacca pee... with ID: 106
+2025-10-08 09:33:34,416 - INFO - Created new jurnal: Applied Water Science with ID: 64
+2025-10-08 09:33:34,416 - INFO - Created new publikasi: Removal of Congo red aqueous solution using Leucae... with ID: 107
+2025-10-08 09:33:34,417 - INFO - Created new publikasi: Effect of different types of phosphorylating reage... with ID: 108
+2025-10-08 09:33:34,419 - ERROR - Error creating/updating sitasi tahunan: record "new" has no field "t_updated_at"
+CONTEXT:  PL/pgSQL assignment "NEW.t_updated_at = CURRENT_TIMESTAMP"
+PL/pgSQL function update_updated_at_column() line 3 at assignment
+
+2025-10-08 09:33:34,419 - ERROR - Error creating/updating sitasi tahunan: record "new" has no field "t_updated_at"
+CONTEXT:  PL/pgSQL assignment "NEW.t_updated_at = CURRENT_TIMESTAMP"
+PL/pgSQL function update_updated_at_column() line 3 at assignment
+
+2025-10-08 09:33:34,420 - INFO - Created new jurnal: Materials Chemistry and Physics with ID: 65
+2025-10-08 09:33:34,420 - INFO - Created new publikasi: Activated porous carbons derived from the Indonesi... with ID: 109
+2025-10-08 09:33:34,421 - INFO - Created new jurnal: International Journal of Technology with ID: 66
+2025-10-08 09:33:34,421 - INFO - Created new publikasi: Exploration of various indonesian indigenous plant... with ID: 110
+2025-10-08 09:33:34,422 - INFO - Created new jurnal: International Journal on Advanced Science Engineering and Information Technology with ID: 67
+2025-10-08 09:33:34,422 - INFO - Created new publikasi: Utilization of Papaya Seeds as natural coagulant f... with ID: 111
+2025-10-08 09:33:34,424 - INFO - Created new publikasi: The simultaneous removal of cyanide and cadmium io... with ID: 112
+2025-10-08 09:33:34,425 - INFO - Created new jurnal: Water Conservation Science and Engineering with ID: 68
+2025-10-08 09:33:34,425 - INFO - Created new publikasi: The Potency of Indonesia Native Plants as Natural ... with ID: 113
+2025-10-08 09:33:34,426 - INFO - Created new jurnal: Journal of Solid State Electrochemistry with ID: 69
+2025-10-08 09:33:34,427 - INFO - Created new publikasi: Synthesis and modification of activated carbon ori... with ID: 114
+2025-10-08 09:33:34,428 - INFO - Created new publikasi: Structural and preliminary electrochemical charact... with ID: 115
+2025-10-08 09:33:34,429 - INFO - Created new publikasi: The effect of activated carbon support surface mod... with ID: 116
+2025-10-08 09:33:34,429 - INFO - Successfully processed 50 publications to database
+2025-10-08 09:33:34,429 - INFO - Saved 50 publications for HANS KRISTIANTO
+2025-10-08 09:33:34,430 - ERROR - Error updating dosen stats for Sinta ID 130417: record "new" has no field "t_updated_at"
+CONTEXT:  PL/pgSQL assignment "NEW.t_updated_at = CURRENT_TIMESTAMP"
+PL/pgSQL function update_updated_at_column() line 3 at assignment
+
+2025-10-08 09:33:34,430 - INFO - Scraping completed successfully!
+2025-10-08 09:33:34,431 - INFO - Disconnected from database

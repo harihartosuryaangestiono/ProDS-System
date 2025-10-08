@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Award, Calendar, ExternalLink, Users } from 'lucide-react';
+import { FileText, Award, Calendar, ExternalLink } from 'lucide-react';
 import apiService from '../services/apiService';
 import DataTable from '../components/DataTable';
 import { toast } from 'react-hot-toast';
@@ -33,12 +33,30 @@ const ScholarPublikasi = () => {
     try {
       setLoading(true);
       
-      const params = apiService.buildPaginationParams(currentPage, perPage, searchTerm);
+      // ✅ FIX: Pass parameters as an object
+      const params = {
+        page: currentPage,
+        perPage: perPage,
+        search: searchTerm
+      };
+      
       const response = await apiService.getScholarPublikasi(params);
 
       if (response.success) {
         setPublikasiData(response.data.data || []);
-        setPagination(response.data.pagination || null);
+        
+        // Transform pagination data to match DataTable expectations
+        const paginationData = response.data.pagination;
+        if (paginationData) {
+          setPagination({
+            currentPage: paginationData.page,
+            totalPages: paginationData.pages,
+            totalRecords: paginationData.total,
+            perPage: paginationData.per_page
+          });
+        } else {
+          setPagination(null);
+        }
       } else {
         toast.error('Gagal mengambil data publikasi Google Scholar');
         console.error('Error fetching Scholar publikasi data:', response.error);

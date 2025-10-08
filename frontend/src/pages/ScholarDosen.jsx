@@ -10,7 +10,7 @@ const ScholarDosen = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState(null);
-  const perPage = 20;
+  const perPage = 50; // ✅ Changed from 20 to 50
 
   useEffect(() => {
     fetchDosenData();
@@ -19,25 +19,42 @@ const ScholarDosen = () => {
   const fetchDosenData = async () => {
     try {
       setLoading(true);
-      const params = { page: currentPage, per_page: perPage, search: searchTerm };
+      
+      // ✅ FIX: Pass parameters as an object
+      const params = {
+        page: currentPage,
+        perPage: perPage,
+        search: searchTerm
+      };
+      
       const response = await apiService.getScholarDosen(params);
 
       if (response.success) {
         setDosenData(response.data.data || []);
-        setPagination(response.data.pagination || {});
+        
+        // ✅ FIX: Transform pagination data to match DataTable expectations
+        const paginationData = response.data.pagination;
+        if (paginationData) {
+          setPagination({
+            currentPage: paginationData.page,
+            totalPages: paginationData.pages,
+            totalRecords: paginationData.total,
+            perPage: paginationData.per_page
+          });
+        } else {
+          setPagination(null);
+        }
       } else {
-        setError(response.error);
         toast.error('Gagal mengambil data dosen Google Scholar');
+        console.error('Error fetching Scholar dosen data:', response.error);
       }
     } catch (error) {
       console.error('Error fetching Scholar dosen data:', error);
-      setError(error.message);
       toast.error('Terjadi kesalahan saat mengambil data');
     } finally {
       setLoading(false);
     }
   };
-
 
   const handleSearchChange = (value) => {
     setSearchTerm(value);
@@ -159,8 +176,8 @@ const ScholarDosen = () => {
     }
   ];
 
-  const totalDosen = pagination?.total || 0;
-  const totalSitasi = dosenData.reduce((sum, dosen) => sum + (dosen.n_total_sitasi_gs || 0), 0);
+  const totalDosen = pagination?.totalRecords || 0;
+  const totalSitasi = dosenData.reduce((sum, dosen) => sum + (dosen.n_sitasi_gs || 0), 0);
   const totalPublikasi = dosenData.reduce((sum, dosen) => sum + (dosen.n_total_publikasi || 0), 0);
   const avgHIndex = dosenData.length > 0 ? (dosenData.reduce((sum, dosen) => sum + (dosen.n_h_index_gs || 0), 0) / dosenData.length).toFixed(1) : 0;
 

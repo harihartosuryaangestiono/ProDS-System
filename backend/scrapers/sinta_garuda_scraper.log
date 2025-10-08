@@ -1,0 +1,76 @@
+2025-10-08 10:20:31,632 - INFO - Connected to PostgreSQL database successfully
+2025-10-08 10:21:43,332 - INFO - Attempting to login to SINTA...
+2025-10-08 10:21:43,332 - INFO - Attempting login at: https://sinta.kemdikbud.go.id/logins
+2025-10-08 10:21:43,597 - INFO - Found form action URL: https://sinta.kemdiktisaintek.go.id/logins/do_login
+2025-10-08 10:21:43,597 - INFO - Posting to: https://sinta.kemdiktisaintek.go.id/logins/do_login
+2025-10-08 10:21:43,641 - WARNING - Login attempt failed. Current URL: https://sinta.kemdiktisaintek.go.id/logins
+2025-10-08 10:21:43,642 - ERROR - All login attempts failed
+2025-10-08 10:21:43,642 - WARNING - Login failed. Continuing without login (limited access).
+2025-10-08 10:22:19,972 - INFO - Generated new batch ID: 1759893739971
+2025-10-08 10:22:19,974 - INFO - Processing author: HANS KRISTIANTO (SINTA: 130417)
+2025-10-08 10:22:19,974 - INFO - Scraping publications for HANS KRISTIANTO (SINTA: 130417)
+2025-10-08 10:22:19,974 - INFO - Trying URL: https://sinta.kemdikbud.go.id/authors/profile/130417?view=garuda
+2025-10-08 10:22:20,173 - INFO - Found 10 publications using selector: div.ar-list-item
+2025-10-08 10:22:20,191 - WARNING - Nama jurnal tidak ditemukan untuk publikasi: 'COMBINATION OF FeCl3 AND Fe3O4 AS A MAGNETIC COAGU...'
+2025-10-08 10:22:20,198 - INFO - Created new publikasi: COMBINATION OF FeCl3 AND Fe3O4 AS A MAGNETIC COAGU... (artikel, 2025)
+2025-10-08 10:22:20,199 - INFO - Created artikel details for publikasi ID: 117
+2025-10-08 10:22:20,202 - INFO - Linked publikasi 117 with dosen 9
+2025-10-08 10:22:20,204 - INFO - Added sitasi tahunan for publikasi 117, tahun 2025
+2025-10-08 10:22:20,204 - INFO - Saved publication: COMBINATION OF FeCl3 AND Fe3O4 AS A MAGNETIC COAGU... (2025) - Citations: 10
+2025-10-08 10:22:20,205 - WARNING - Nama jurnal tidak ditemukan untuk publikasi: 'Alginate as A Natural Coagulant-Aid: Advances, Cha...'
+2025-10-08 10:22:20,206 - INFO - Created new publikasi: Alginate as A Natural Coagulant-Aid: Advances, Cha... (artikel, 2025)
+2025-10-08 10:22:20,207 - INFO - Created artikel details for publikasi ID: 118
+2025-10-08 10:22:20,207 - INFO - Linked publikasi 118 with dosen 9
+2025-10-08 10:22:20,208 - INFO - Added sitasi tahunan for publikasi 118, tahun 2025
+2025-10-08 10:22:20,208 - INFO - Saved publication: Alginate as A Natural Coagulant-Aid: Advances, Cha... (2025) - Citations: 10
+2025-10-08 10:22:20,209 - WARNING - Nama jurnal tidak ditemukan untuk publikasi: 'The Utilization of Pectin as Natural Coagulant-Aid...'
+2025-10-08 10:22:20,210 - INFO - Created new publikasi: The Utilization of Pectin as Natural Coagulant-Aid... (artikel, 2024)
+2025-10-08 10:22:20,211 - INFO - Created artikel details for publikasi ID: 119
+2025-10-08 10:22:20,212 - INFO - Linked publikasi 119 with dosen 9
+2025-10-08 10:22:20,212 - INFO - Added sitasi tahunan for publikasi 119, tahun 2024
+2025-10-08 10:22:20,213 - INFO - Saved publication: The Utilization of Pectin as Natural Coagulant-Aid... (2024) - Citations: 10
+2025-10-08 10:22:20,213 - WARNING - Nama jurnal tidak ditemukan untuk publikasi: 'An offline Practicum Workshop as An Aid for Studen...'
+2025-10-08 10:22:20,214 - INFO - Created new publikasi: An offline Practicum Workshop as An Aid for Studen... (artikel, 2023)
+2025-10-08 10:22:20,215 - INFO - Created artikel details for publikasi ID: 120
+2025-10-08 10:22:20,216 - INFO - Linked publikasi 120 with dosen 9
+2025-10-08 10:22:20,216 - INFO - Added sitasi tahunan for publikasi 120, tahun 2023
+2025-10-08 10:22:20,216 - INFO - Saved publication: An offline Practicum Workshop as An Aid for Studen... (2023) - Citations: 10
+2025-10-08 10:22:20,217 - WARNING - Nama jurnal tidak ditemukan untuk publikasi: 'Carbon composite of NiO hydrothermal impregnation ...'
+2025-10-08 10:22:20,218 - INFO - Created new publikasi: Carbon composite of NiO hydrothermal impregnation ... (artikel, 2023)
+2025-10-08 10:22:20,219 - INFO - Created artikel details for publikasi ID: 121
+2025-10-08 10:22:20,219 - INFO - Linked publikasi 121 with dosen 9
+2025-10-08 10:22:20,220 - INFO - Added sitasi tahunan for publikasi 121, tahun 2023
+2025-10-08 10:22:20,220 - INFO - Saved publication: Carbon composite of NiO hydrothermal impregnation ... (2023) - Citations: 10
+2025-10-08 10:22:20,221 - WARNING - Nama jurnal tidak ditemukan untuk publikasi: 'Carbon composite of NiO hydrothermal impregnation ...'
+2025-10-08 10:22:20,221 - INFO - Created new publikasi: Carbon composite of NiO hydrothermal impregnation ... (artikel, 2023)
+2025-10-08 10:22:20,222 - INFO - Created artikel details for publikasi ID: 122
+2025-10-08 10:22:20,222 - INFO - Linked publikasi 122 with dosen 9
+2025-10-08 10:22:20,223 - INFO - Added sitasi tahunan for publikasi 122, tahun 2023
+2025-10-08 10:22:20,223 - INFO - Saved publication: Carbon composite of NiO hydrothermal impregnation ... (2023) - Citations: 10
+2025-10-08 10:22:20,224 - WARNING - Nama jurnal tidak ditemukan untuk publikasi: 'Synthesis and Electrochemical Properties of SnO2 C...'
+2025-10-08 10:22:20,225 - INFO - Created new publikasi: Synthesis and Electrochemical Properties of SnO2 C... (artikel, 2023)
+2025-10-08 10:22:20,225 - INFO - Created artikel details for publikasi ID: 123
+2025-10-08 10:22:20,226 - INFO - Linked publikasi 123 with dosen 9
+2025-10-08 10:22:20,226 - INFO - Added sitasi tahunan for publikasi 123, tahun 2023
+2025-10-08 10:22:20,226 - INFO - Saved publication: Synthesis and Electrochemical Properties of SnO2 C... (2023) - Citations: 10
+2025-10-08 10:22:20,227 - WARNING - Nama jurnal tidak ditemukan untuk publikasi: 'Carbon composite of NiO hydrothermal impregnation ...'
+2025-10-08 10:22:20,228 - INFO - Created new publikasi: Carbon composite of NiO hydrothermal impregnation ... (artikel, 2023)
+2025-10-08 10:22:20,228 - INFO - Created artikel details for publikasi ID: 124
+2025-10-08 10:22:20,229 - INFO - Linked publikasi 124 with dosen 9
+2025-10-08 10:22:20,229 - INFO - Added sitasi tahunan for publikasi 124, tahun 2023
+2025-10-08 10:22:20,229 - INFO - Saved publication: Carbon composite of NiO hydrothermal impregnation ... (2023) - Citations: 10
+2025-10-08 10:22:20,230 - WARNING - Nama jurnal tidak ditemukan untuk publikasi: 'Design of Student and Course Learning Outcomes Mea...'
+2025-10-08 10:22:20,231 - INFO - Created new publikasi: Design of Student and Course Learning Outcomes Mea... (artikel, 2021)
+2025-10-08 10:22:20,231 - INFO - Created artikel details for publikasi ID: 125
+2025-10-08 10:22:20,232 - INFO - Linked publikasi 125 with dosen 9
+2025-10-08 10:22:20,232 - INFO - Added sitasi tahunan for publikasi 125, tahun 2021
+2025-10-08 10:22:20,232 - INFO - Saved publication: Design of Student and Course Learning Outcomes Mea... (2021) - Citations: 10
+2025-10-08 10:22:20,233 - WARNING - Nama jurnal tidak ditemukan untuk publikasi: 'Design of Student and Course Learning Outcomes Mea...'
+2025-10-08 10:22:20,234 - INFO - Created new publikasi: Design of Student and Course Learning Outcomes Mea... (artikel, 2021)
+2025-10-08 10:22:20,235 - INFO - Created artikel details for publikasi ID: 126
+2025-10-08 10:22:20,235 - INFO - Linked publikasi 126 with dosen 9
+2025-10-08 10:22:20,236 - INFO - Added sitasi tahunan for publikasi 126, tahun 2021
+2025-10-08 10:22:20,236 - INFO - Saved publication: Design of Student and Course Learning Outcomes Mea... (2021) - Citations: 10
+2025-10-08 10:22:20,236 - INFO - Saved 10 publications for HANS KRISTIANTO
+2025-10-08 10:24:57,571 - INFO - Disconnected from database
+2025-10-08 10:24:57,572 - INFO - Program terminated successfully.

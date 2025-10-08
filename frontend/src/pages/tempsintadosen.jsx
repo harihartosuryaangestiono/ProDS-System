@@ -7,92 +7,14 @@ import { toast } from 'react-hot-toast';
 const SintaDosen = () => {
   const [dosenData, setDosenData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [statsLoading, setStatsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState(null);
-  const [aggregateStats, setAggregateStats] = useState({
-    totalDosen: 0,
-    totalSitasi: 0,
-    avgHIndex: 0
-  });
-  const perPage = 5;
+  const perPage = 10;
 
   useEffect(() => {
     fetchDosenData();
   }, [currentPage, searchTerm]);
-
-  // Fetch aggregate statistics
-  useEffect(() => {
-    fetchAggregateStats();
-  }, [searchTerm]);
-
-  const fetchAggregateStats = async () => {
-    try {
-      setStatsLoading(true);
-      
-      const response = await apiService.getSintaDosenStats({ search: searchTerm });
-
-      if (response.success) {
-        // If backend provides stats endpoint
-        if (response.data.totalDosen !== undefined) {
-          setAggregateStats({
-            totalDosen: response.data.totalDosen || 0,
-            totalSitasi: response.data.totalSitasi || 0,
-            avgHIndex: response.data.avgHIndex || 0
-          });
-        } else {
-          // Fallback: fetch all data for calculation
-          await fetchAllDataForStats();
-        }
-      } else {
-        // Fallback if stats endpoint doesn't exist
-        await fetchAllDataForStats();
-      }
-    } catch (error) {
-      console.error('Error fetching aggregate stats:', error);
-      // Fallback to fetching all data
-      await fetchAllDataForStats();
-    } finally {
-      setStatsLoading(false);
-    }
-  };
-
-  const fetchAllDataForStats = async () => {
-    try {
-      const params = {
-        page: 1,
-        perPage: 10000,
-        search: searchTerm
-      };
-      
-      const response = await apiService.getSintaDosen(params);
-
-      if (response.success) {
-        const allData = response.data.data || [];
-        const totalDosen = response.data.pagination?.total || allData.length;
-        
-        // Calculate total citations from both Google Scholar and Scopus
-        const totalSitasi = allData.reduce((sum, dosen) => {
-          const gsCitations = dosen.n_total_sitasi_gs || 0;
-          const scopusCitations = dosen.n_sitasi_scopus || 0;
-          return sum + gsCitations + scopusCitations;
-        }, 0);
-        
-        const avgHIndex = allData.length > 0 
-          ? (allData.reduce((sum, dosen) => sum + (dosen.n_h_index_gs || 0), 0) / allData.length).toFixed(1) 
-          : 0;
-
-        setAggregateStats({
-          totalDosen,
-          totalSitasi,
-          avgHIndex
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching all data for stats:', error);
-    }
-  };
 
   const fetchDosenData = async () => {
     try {
@@ -185,36 +107,11 @@ const SintaDosen = () => {
       type: 'number',
       className: 'text-center',
       cellClassName: 'text-center',
-      render: (value, row) => {
-        const gsCitations = value || 0;
-        const scopusCitations = row.n_sitasi_scopus || 0;
-        const totalCitations = gsCitations + scopusCitations;
-        
-        return (
-          <div className="text-center">
-            <span className="font-semibold text-green-600 block mb-1">
-              {totalCitations.toLocaleString()}
-            </span>
-            {(gsCitations > 0 || scopusCitations > 0) && (
-              <div className="text-xs text-gray-500">
-                {gsCitations > 0 && (
-                  <span title="Google Scholar" className="inline-block">
-                    GS: {gsCitations.toLocaleString()}
-                  </span>
-                )}
-                {gsCitations > 0 && scopusCitations > 0 && (
-                  <span className="mx-1">|</span>
-                )}
-                {scopusCitations > 0 && (
-                  <span title="Scopus" className="inline-block">
-                    Scopus: {scopusCitations.toLocaleString()}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-        );
-      }
+      render: (value) => (
+        <span className="font-semibold text-green-600">
+          {(value || 0).toLocaleString()}
+        </span>
+      )
     },
     {
       key: 'n_h_index_gs',
@@ -265,23 +162,16 @@ const SintaDosen = () => {
     }
   ];
 
-  const StatCard = ({ title, value, icon: Icon, color, subtitle, loading }) => (
+  const totalDosen = pagination?.totalRecords || 0;
+  const totalSitasi = dosenData.reduce((sum, dosen) => sum + (dosen.n_total_sitasi_gs || 0), 0);
+  const avgHIndex = dosenData.length > 0 ? (dosenData.reduce((sum, dosen) => sum + (dosen.n_h_index_gs || 0), 0) / dosenData.length).toFixed(1) : 0;
+
+  const StatCard = ({ title, value, icon: Icon, color }) => (
     <div className="bg-white rounded-lg shadow-md p-6 border-l-4" style={{ borderColor: color }}>
       <div className="flex items-center justify-between">
-        <div className="flex-1">
+        <div>
           <p className="text-sm font-medium text-gray-600">{title}</p>
-          {loading ? (
-            <div className="mt-2 h-8 w-24 bg-gray-200 animate-pulse rounded"></div>
-          ) : (
-            <>
-              <p className="text-2xl font-bold text-gray-900">
-                {typeof value === 'string' ? value : value.toLocaleString()}
-              </p>
-              {subtitle && (
-                <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
-              )}
-            </>
-          )}
+          <p className="text-2xl font-bold text-gray-900">{typeof value === 'string' ? value : value.toLocaleString()}</p>
         </div>
         <div className="p-3 rounded-full" style={{ backgroundColor: `${color}20` }}>
           <Icon className="w-8 h-8" style={{ color }} />
@@ -305,33 +195,27 @@ const SintaDosen = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Dosen"
-            value={aggregateStats.totalDosen}
+            value={totalDosen}
             icon={Users}
             color="#3B82F6"
-            loading={statsLoading}
           />
           <StatCard
             title="Total Sitasi"
-            value={aggregateStats.totalSitasi}
+            value={totalSitasi}
             icon={Award}
             color="#10B981"
-            subtitle="Google Scholar + Scopus"
-            loading={statsLoading}
           />
           <StatCard
             title="Rata-rata H-Index"
-            value={aggregateStats.avgHIndex}
+            value={avgHIndex}
             icon={TrendingUp}
             color="#F59E0B"
-            subtitle="Keseluruhan"
-            loading={statsLoading}
           />
           <StatCard
             title="Data Terbaru"
             value={dosenData.length > 0 ? new Date().toLocaleDateString('id-ID') : '-'}
             icon={Calendar}
             color="#EF4444"
-            loading={false}
           />
         </div>
 
