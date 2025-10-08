@@ -709,9 +709,9 @@ class SintaDosenScraper:
 if __name__ == '__main__':
     # Konfigurasi database PostgreSQL - sesuai dengan database baru
     db_config = {
-        'dbname': 'ProDSGabungan',  # Nama database baru
-        'user': 'postgres',        
-        'password': 'hari123',    
+        'dbname': 'SKM_PUBLIKASI',  # Nama database baru
+        'user': 'rayhanadjisantoso',        
+        'password': 'rayhan123',    
         'host': 'localhost',            
         'port': '5432'                  
     }
@@ -724,8 +724,10 @@ if __name__ == '__main__':
         final_count = scraper.scrape_until_target_reached(
             affiliation_id='1397', 
             target_dosen=473,
-            max_pages=50,  # Maksimal 50 halaman per cycle
-            max_cycles=20  # Maksimal 20 cycle
+            # max_pages=50,  # Maksimal 50 halaman per cycle
+            # max_cycles=20  # Maksimal 20 cycle
+            max_pages=1,
+            max_cycles=1
         )
         
         # Tampilkan ringkasan hasil extraction

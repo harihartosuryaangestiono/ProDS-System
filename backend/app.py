@@ -209,17 +209,17 @@ def get_sinta_dosen(current_user_id):
         cur.execute(count_query, params)
         total = cur.fetchone()['total']
         
-        # Get data
+        # Get data - TAMBAHKAN n_sitasi_scopus
         data_query = f"""
             SELECT 
                 d.v_id_dosen, d.v_nama_dosen, d.v_id_sinta, d.v_id_googleScholar,
-                d.n_total_publikasi, d.n_total_sitasi_gs, d.n_h_index_gs, 
-                d.n_i10_index_gs, d.n_skor_sinta, d.n_skor_sinta_3yr,
+                d.n_total_publikasi, d.n_total_sitasi_gs, d.n_sitasi_scopus,
+                d.n_h_index_gs, d.n_i10_index_gs, d.n_skor_sinta, d.n_skor_sinta_3yr,
                 j.v_nama_jurusan, d.t_tanggal_unduh, d.v_link_url
             FROM tmp_dosen_dt d
             LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
             {where_clause}
-            ORDER BY d.n_total_sitasi_gs DESC NULLS LAST
+            ORDER BY (COALESCE(d.n_total_sitasi_gs, 0) + COALESCE(d.n_sitasi_scopus, 0)) DESC
             LIMIT %s OFFSET %s
         """
         
@@ -240,6 +240,56 @@ def get_sinta_dosen(current_user_id):
     except Exception as e:
         logger.error(f"Get SINTA dosen error: {e}")
         return jsonify({'error': 'Failed to fetch SINTA dosen data'}), 500
+    finally:
+        if 'conn' in locals():
+            conn.close()
+
+@app.route('/api/sinta/dosen/stats', methods=['GET'])
+@token_required
+def get_sinta_dosen_stats(current_user_id):
+    """Get SINTA dosen aggregate statistics"""
+    try:
+        search = request.args.get('search', '').strip()
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        # Build query with proper table names
+        where_clause = "WHERE d.v_sumber = 'SINTA' OR d.v_sumber IS NULL"
+        params = []
+        
+        if search:
+            where_clause += " AND LOWER(d.v_nama_dosen) LIKE LOWER(%s)"
+            params.append(f'%{search}%')
+        
+        # Get aggregate statistics
+        stats_query = f"""
+            SELECT 
+                COUNT(*) as total_dosen,
+                COALESCE(SUM(COALESCE(d.n_total_sitasi_gs, 0) + COALESCE(d.n_sitasi_scopus, 0)), 0) as total_sitasi,
+                COALESCE(AVG(d.n_h_index_gs), 0) as avg_h_index,
+                COALESCE(SUM(d.n_total_publikasi), 0) as total_publikasi
+            FROM tmp_dosen_dt d
+            LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
+            {where_clause}
+        """
+        
+        cur.execute(stats_query, params)
+        stats = cur.fetchone()
+        
+        return jsonify({
+            'totalDosen': stats['total_dosen'] or 0,
+            'totalSitasi': int(stats['total_sitasi']) if stats['total_sitasi'] else 0,
+            'avgHIndex': round(float(stats['avg_h_index']), 1) if stats['avg_h_index'] else 0,
+            'totalPublikasi': stats['total_publikasi'] or 0
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Get SINTA dosen stats error: {e}")
+        return jsonify({'error': 'Failed to fetch SINTA dosen statistics'}), 500
     finally:
         if 'conn' in locals():
             conn.close()
@@ -268,8 +318,13 @@ def get_sinta_publikasi(current_user_id):
         params = ['%SINTA%']
         
         if search:
-            where_clause += " AND LOWER(p.v_judul) LIKE LOWER(%s)"
-            params.append(f'%{search}%')
+            where_clause += """ AND (
+                LOWER(p.v_judul) LIKE LOWER(%s) OR
+                LOWER(p.v_authors) LIKE LOWER(%s) OR
+                LOWER(p.v_publisher) LIKE LOWER(%s)
+            )"""
+            search_param = f"%{search}%"
+            params.extend([search_param, search_param, search_param])
         
         # Get total count
         count_query = f"""
@@ -281,11 +336,14 @@ def get_sinta_publikasi(current_user_id):
         cur.execute(count_query, params)
         total = cur.fetchone()['total']
         
-        # Get data dengan kolom lengkap seperti Scholar
+        # Get data - gunakan p.v_publisher bukan b.v_penerbit
         data_query = f"""
             SELECT
                 p.v_id_publikasi,
-                COALESCE(STRING_AGG(DISTINCT d.v_nama_dosen, ', '), '') AS authors,
+                COALESCE(
+                    NULLIF(p.v_authors, ''),
+                    STRING_AGG(DISTINCT d.v_nama_dosen, ', ')
+                ) AS authors,
                 p.v_judul,
                 p.v_jenis AS tipe,
                 p.v_tahun_publikasi,
@@ -294,10 +352,7 @@ def get_sinta_publikasi(current_user_id):
                     pr.v_nama_konferensi,
                     'N/A'
                 ) AS venue,
-                CASE 
-                    WHEN b.v_penerbit IS NOT NULL AND b.v_penerbit != '' THEN b.v_penerbit
-                    ELSE ''
-                END AS publisher,
+                COALESCE(p.v_publisher, '') AS publisher,
                 COALESCE(a.v_volume, '') AS volume,
                 COALESCE(a.v_issue, '') AS issue,
                 COALESCE(a.v_pages, '') AS pages,
@@ -317,7 +372,8 @@ def get_sinta_publikasi(current_user_id):
             GROUP BY 
                 p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
                 p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
-                j.v_nama_jurnal, pr.v_nama_konferensi, b.v_penerbit,
+                p.v_authors, p.v_publisher,
+                j.v_nama_jurnal, pr.v_nama_konferensi,
                 a.v_volume, a.v_issue, a.v_pages
             ORDER BY p.n_total_sitasi DESC NULLS LAST
             LIMIT %s OFFSET %s
@@ -479,9 +535,15 @@ def get_scholar_publikasi(current_user_id):
         where_clause = "WHERE p.v_sumber ILIKE %s"
         params = ['%Scholar%']
         
+        # Expand search to include author, title, and publisher
         if search:
-            where_clause += " AND LOWER(p.v_judul) LIKE LOWER(%s)"
-            params.append(f"%{search}%")
+            where_clause += """ AND (
+                LOWER(p.v_judul) LIKE LOWER(%s) OR
+                LOWER(p.v_authors) LIKE LOWER(%s) OR
+                LOWER(p.v_publisher) LIKE LOWER(%s)
+            )"""
+            search_param = f"%{search}%"
+            params.extend([search_param, search_param, search_param])
         
         # ======== Hitung total data ========
         count_query = f"""
@@ -499,43 +561,47 @@ def get_scholar_publikasi(current_user_id):
         
         # ======== Ambil data publikasi ========
         data_query = f"""
-        SELECT
-            p.v_id_publikasi,
-            COALESCE(STRING_AGG(DISTINCT d.v_nama_dosen, ', '), '') AS authors,
-            p.v_judul,
-            p.v_jenis AS tipe,
-            p.v_tahun_publikasi,
-            COALESCE(
-                j.v_nama_jurnal,
-                pr.v_nama_konferensi,
-                'N/A'
-            ) AS venue,
-            COALESCE(b.v_penerbit, '') AS publisher,  -- Tambahkan kolom publisher
-            COALESCE(a.v_volume, '') AS volume,
-            COALESCE(a.v_issue, '') AS issue,
-            COALESCE(a.v_pages, '') AS pages,
-            p.n_total_sitasi,
-            p.v_sumber,
-            p.t_tanggal_unduh,
-            p.v_link_url
-        FROM stg_publikasi_tr p
-        LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
-        LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
-        LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
-        LEFT JOIN stg_buku_dr b ON p.v_id_publikasi = b.v_id_publikasi
-        LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
-        LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
-        LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-        {where_clause}
-        GROUP BY 
-            p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
-            p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
-            j.v_nama_jurnal, pr.v_nama_konferensi, b.v_penerbit,
-            a.v_volume, a.v_issue, a.v_pages
-        ORDER BY p.n_total_sitasi DESC NULLS LAST
-        LIMIT %s OFFSET %s
-    """
-
+            SELECT
+                p.v_id_publikasi,
+                COALESCE(
+                    NULLIF(p.v_authors, ''),
+                    STRING_AGG(DISTINCT d.v_nama_dosen, ', ')
+                ) AS authors,
+                p.v_judul,
+                p.v_jenis AS tipe,
+                p.v_tahun_publikasi,
+                COALESCE(
+                    j.v_nama_jurnal,
+                    pr.v_nama_konferensi,
+                    'N/A'
+                ) AS venue,
+                COALESCE(p.v_publisher, '') AS publisher,
+                COALESCE(a.v_volume, '') AS volume,
+                COALESCE(a.v_issue, '') AS issue,
+                COALESCE(a.v_pages, '') AS pages,
+                p.n_total_sitasi,
+                p.v_sumber,
+                p.t_tanggal_unduh,
+                p.v_link_url
+            FROM stg_publikasi_tr p
+            LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+            LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
+            LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
+            LEFT JOIN stg_buku_dr b ON p.v_id_publikasi = b.v_id_publikasi
+            LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
+            LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
+            LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
+            {where_clause}
+            GROUP BY 
+                p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
+                p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
+                p.v_authors, p.v_publisher,
+                j.v_nama_jurnal, pr.v_nama_konferensi,
+                a.v_volume, a.v_issue, a.v_pages
+            ORDER BY p.n_total_sitasi DESC NULLS LAST
+            LIMIT %s OFFSET %s
+        """
+        
         final_params = params + [per_page, offset]
         
         cur.execute(data_query, final_params)
@@ -560,7 +626,7 @@ def get_scholar_publikasi(current_user_id):
                 else:
                     row_dict['vol_issue'] = "-"
                 
-                # Format tipe publikasi - PERBAIKAN DI SINI
+                # Format tipe publikasi
                 tipe_value = row_dict.get('tipe', '').strip() if row_dict.get('tipe') else ''
                 
                 tipe_mapping = {
@@ -570,7 +636,6 @@ def get_scholar_publikasi(current_user_id):
                     'penelitian': 'Penelitian'
                 }
                 
-                # Jika tipe_value ada dan tidak kosong, gunakan mapping
                 if tipe_value:
                     row_dict['tipe'] = tipe_mapping.get(tipe_value.lower(), tipe_value.capitalize())
                 else:
@@ -578,7 +643,7 @@ def get_scholar_publikasi(current_user_id):
                 
                 publikasi_data.append(row_dict)
         
-        # Hitung total pages dengan aman
+        # Hitung total pages
         total_pages = 0
         if total > 0 and per_page > 0:
             total_pages = (total + per_page - 1) // per_page
@@ -604,14 +669,6 @@ def get_scholar_publikasi(current_user_id):
             "details": str(db_error)
         }), 500
         
-    except ValueError as val_error:
-        print("❌ Value error:", str(val_error))
-        logger.error(f"Invalid parameter value: {val_error}")
-        return jsonify({
-            "error": "Invalid parameter value",
-            "details": str(val_error)
-        }), 400
-        
     except Exception as e:
         import traceback
         error_details = traceback.format_exc()
@@ -627,7 +684,6 @@ def get_scholar_publikasi(current_user_id):
             cur.close()
         if conn:
             conn.close()
-            print("🔌 Database connection closed")
 
 # Scraping Routes
 @app.route('/api/scraping/sinta', methods=['POST'])
@@ -902,5 +958,5 @@ if __name__ == '__main__':
     app.run(
         debug=debug_mode, 
         host='0.0.0.0', 
-        port=int(os.environ.get('PORT', 5000))
+        port=int(os.environ.get('PORT', 5005))
     )

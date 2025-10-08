@@ -73,11 +73,14 @@ CREATE TABLE stg_jurnal_mt (
 );
 
 CREATE TABLE temp_dosenGS_scraping (
-    v_id_GS VARCHAR(50) NOT NULL,
+    v_id_gs VARCHAR(50) NOT NULL,
     v_nama VARCHAR(255) NOT NULL,
     v_affiliation VARCHAR (100),
     n_citations INT DEFAULT 0,
-    v_link VARCHAR (255)
+    v_link VARCHAR (255),
+    v_status VARCHAR(200) DEFAULT 'pending',
+    v_error_message TEXT,
+    t_last_updated TIMESTAMP;
 );
 
 -- ========================
