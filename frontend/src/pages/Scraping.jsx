@@ -14,54 +14,61 @@ const ScrapingDashboard = () => {
     maxCycles: 20
   });
   const [gsConfig, setGsConfig] = useState({
-    maxAuthors: 10
+    maxAuthors: 10,
+    scrapeFromBeginning: false
   });
   const [isLoading, setIsLoading] = useState(false);
   const [scrapingProgress, setScrapingProgress] = useState(null);
   const [scrapingResults, setScrapingResults] = useState(null);
-  const [ws, setWs] = useState(null);
+  const [currentJobId, setCurrentJobId] = useState(null);
 
-  // WebSocket connection for real-time updates
+  // WebSocket/Polling for progress updates
   useEffect(() => {
-    const websocket = new WebSocket('ws://localhost:5000/ws/scraping');
+    let pollInterval = null;
     
-    websocket.onopen = () => {
-      console.log('WebSocket connected');
-    };
-
-    websocket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      
-      if (data.type === 'progress') {
-        setScrapingProgress(data.progress);
-      } else if (data.type === 'result') {
-        setScrapingResults(data.result);
-        setIsLoading(false);
-      } else if (data.type === 'error') {
-        setScrapingResults({
-          success: false,
-          error: data.error
-        });
-        setIsLoading(false);
-      }
-    };
-
-    websocket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    websocket.onclose = () => {
-      console.log('WebSocket disconnected');
-    };
-
-    setWs(websocket);
-
+    if (currentJobId && isLoading) {
+      pollInterval = setInterval(async () => {
+        try {
+          const response = await fetch(`http://localhost:5000/api/scraping/jobs/${currentJobId}`);
+          const data = await response.json();
+          
+          if (data.success && data.job) {
+            const job = data.job;
+            
+            setScrapingProgress({
+              status: job.status,
+              message: job.message,
+              currentCount: job.current,
+              targetCount: job.total
+            });
+            
+            if (job.status === 'completed') {
+              setScrapingResults({
+                success: true,
+                message: job.message,
+                summary: job.result
+              });
+              setIsLoading(false);
+              setCurrentJobId(null);
+            } else if (job.status === 'failed') {
+              setScrapingResults({
+                success: false,
+                error: job.error || job.message
+              });
+              setIsLoading(false);
+              setCurrentJobId(null);
+            }
+          }
+        } catch (error) {
+          console.error('Polling error:', error);
+        }
+      }, 2000); // Poll every 2 seconds
+    }
+    
     return () => {
-      if (websocket.readyState === WebSocket.OPEN) {
-        websocket.close();
-      }
+      if (pollInterval) clearInterval(pollInterval);
     };
-  }, []);
+  }, [currentJobId, isLoading]);
 
   const handleCredentialChange = (e) => {
     setCredentials(prev => ({
@@ -79,9 +86,10 @@ const ScrapingDashboard = () => {
   };
 
   const handleGsConfigChange = (e) => {
+    const { name, type, checked, value } = e.target;
     setGsConfig(prev => ({
       ...prev,
-      [e.target.name]: parseInt(e.target.value)
+      [name]: type === 'checkbox' ? checked : parseInt(value)
     }));
   };
 
@@ -107,20 +115,18 @@ const ScrapingDashboard = () => {
       const data = await response.json();
 
       if (data.success) {
-        // Job started, will receive updates via WebSocket
         if (data.job_id) {
+          setCurrentJobId(data.job_id);
           setScrapingProgress(prev => ({
             ...prev,
             job_id: data.job_id,
-            message: 'Job dimulai, menunggu update...'
+            message: data.message || 'Job started, waiting for updates...'
           }));
         } else {
-          // Immediate result (no background job)
           setScrapingResults({
             success: true,
             message: data.message,
-            summary: data.summary,
-            details: data.details
+            summary: data.summary
           });
           setIsLoading(false);
         }
@@ -193,13 +199,27 @@ const ScrapingDashboard = () => {
   };
 
   const handleGoogleScholar = async () => {
+    // Confirmation for scrape from beginning
+    if (gsConfig.scrapeFromBeginning) {
+      const confirmed = window.confirm(
+        '⚠️ PERHATIAN: Anda akan melakukan scraping dari awal!\n\n' +
+        'Ini akan mengulang semua dosen yang sudah selesai di-scrape sebelumnya.\n\n' +
+        'Apakah Anda yakin ingin melanjutkan?'
+      );
+      
+      if (!confirmed) {
+        return;
+      }
+    }
+
     await startScraping('googlescholar/scrape', {
-      max_authors: gsConfig.maxAuthors
+      max_authors: gsConfig.maxAuthors,
+      scrape_from_beginning: gsConfig.scrapeFromBeginning
     });
   };
 
   const getProgressPercentage = () => {
-    if (!scrapingProgress) return 0;
+    if (!scrapingProgress || !scrapingProgress.targetCount) return 0;
     const percentage = (scrapingProgress.currentCount / scrapingProgress.targetCount) * 100;
     return Math.min(Math.round(percentage), 100);
   };
@@ -209,6 +229,8 @@ const ScrapingDashboard = () => {
     switch (scrapingProgress.status) {
       case 'starting':
       case 'running':
+      case 'waiting_login':
+      case 'ready':
         return 'bg-blue-500';
       case 'completed':
         return 'bg-green-500';
@@ -544,10 +566,11 @@ const ScrapingDashboard = () => {
                   <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0" />
                   <div className="ml-3">
                     <p className="text-sm text-red-700 font-semibold mb-2">
-                      ⚠️ Perhatian: Login Manual Diperlukan
+                      ⚠️ Perhatian: Browser Otomatis
                     </p>
                     <p className="text-sm text-red-700">
-                      Setelah memulai scraping, browser Chrome akan terbuka. Anda perlu login secara manual ke Google Scholar untuk menghindari CAPTCHA. Setelah login berhasil, scraping akan dilanjutkan secara otomatis.
+                      Browser Chrome akan terbuka secara otomatis. Scraping akan berjalan di server. 
+                      Jika diminta login, silakan login ke Google Scholar untuk menghindari CAPTCHA.
                     </p>
                   </div>
                 </div>
@@ -558,27 +581,53 @@ const ScrapingDashboard = () => {
                   <AlertCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
                   <div className="ml-3">
                     <p className="text-sm text-blue-700">
-                      Scraping akan mengambil profil dan publikasi dosen dari database yang memiliki URL Google Scholar. Data akan disimpan ke database dan file CSV secara otomatis.
+                      Scraping akan mengambil profil dan publikasi dosen dari database yang memiliki URL Google Scholar. 
+                      Data akan disimpan ke database dan file CSV secara otomatis.
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Target className="w-4 h-4 inline mr-1" />
-                  Maksimum Authors
-                </label>
-                <input
-                  type="number"
-                  name="maxAuthors"
-                  value={gsConfig.maxAuthors}
-                  onChange={handleGsConfigChange}
-                  disabled={isLoading}
-                  min="1"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                />
-                <p className="mt-1 text-xs text-gray-500">Jumlah maksimum author yang akan di-scrape dari database</p>
+              <div className="space-y-4 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Target className="w-4 h-4 inline mr-1" />
+                    Maksimum Authors
+                  </label>
+                  <input
+                    type="number"
+                    name="maxAuthors"
+                    value={gsConfig.maxAuthors}
+                    onChange={handleGsConfigChange}
+                    disabled={isLoading}
+                    min="1"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">Jumlah maksimum author yang akan di-scrape dari database</p>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="flex items-center h-5">
+                    <input
+                      id="scrapeFromBeginning"
+                      name="scrapeFromBeginning"
+                      type="checkbox"
+                      checked={gsConfig.scrapeFromBeginning}
+                      onChange={handleGsConfigChange}
+                      disabled={isLoading}
+                      className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500 disabled:opacity-50"
+                    />
+                  </div>
+                  <div className="ml-3">
+                    <label htmlFor="scrapeFromBeginning" className="text-sm font-medium text-gray-700">
+                      Scraping Dari Awal (Reset Status)
+                    </label>
+                    <p className="text-xs text-gray-500 mt-1">
+                      ⚠️ Centang opsi ini untuk mengulang scraping semua dosen (termasuk yang sudah selesai). 
+                      Jika tidak dicentang, hanya dosen yang belum selesai yang akan di-scrape.
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <button
@@ -610,7 +659,7 @@ const ScrapingDashboard = () => {
             <div className="mb-4">
               <div className="flex justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">
-                  {scrapingProgress.currentCount} / {scrapingProgress.targetCount} items
+                  {scrapingProgress.currentCount || 0} / {scrapingProgress.targetCount || 0} items
                 </span>
                 <span className="text-sm font-medium text-gray-700">
                   {getProgressPercentage()}%
@@ -628,10 +677,10 @@ const ScrapingDashboard = () => {
               <div className="flex items-start">
                 <Clock className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
                 <div className="ml-3 flex-1">
-                  <p className="text-sm font-medium text-blue-900">{scrapingProgress.message}</p>
-                  {scrapingProgress.cycle > 0 && (
+                  <p className="text-sm font-medium text-blue-900">{scrapingProgress.message || 'Processing...'}</p>
+                  {scrapingProgress.job_id && (
                     <p className="text-xs text-blue-700 mt-1">
-                      Cycle {scrapingProgress.cycle} dari {scrapingProgress.maxCycles}
+                      Job ID: {scrapingProgress.job_id}
                     </p>
                   )}
                 </div>
@@ -661,7 +710,7 @@ const ScrapingDashboard = () => {
                 </div>
 
                 {scrapingResults.summary && (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {Object.entries(scrapingResults.summary).map(([key, value]) => (
                       <div key={key} className="bg-gray-50 rounded-lg p-4">
                         <p className="text-xs text-gray-500 uppercase">{key.replace(/_/g, ' ')}</p>

@@ -2467,3 +2467,372 @@ LINE 5:                     NULLIF(p.v_authors, ''),
 2025-10-07 11:47:39,128 - werkzeug - INFO - 127.0.0.1 - - [07/Oct/2025 11:47:39] "GET /api/dashboard/stats HTTP/1.1" 200 -
 2025-10-07 12:01:51,651 - werkzeug - INFO - 127.0.0.1 - - [07/Oct/2025 12:01:51] "[33mGET /ws/scraping HTTP/1.1[0m" 404 -
 2025-10-07 12:01:51,678 - werkzeug - INFO - 127.0.0.1 - - [07/Oct/2025 12:01:51] "[33mGET /ws/scraping HTTP/1.1[0m" 404 -
+2025-10-08 10:28:40,958 - __main__ - ERROR - Database connection error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  password authentication failed for user "rayhanadjisantoso"
+
+2025-10-08 10:28:40,982 - __main__ - ERROR - Cannot initialize database - connection failed
+2025-10-08 10:28:40,984 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-08 10:28:40,990 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-08 10:28:40,992 - __main__ - INFO - Environment: development
+2025-10-08 10:28:41,105 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://10.101.60.199:5005
+2025-10-08 10:28:41,109 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-08 10:29:28,934 - __main__ - ERROR - Database connection error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  password authentication failed for user "rayhanadjisantoso"
+
+2025-10-08 10:29:28,934 - __main__ - ERROR - Cannot initialize database - connection failed
+2025-10-08 10:29:28,935 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-08 10:29:28,936 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-08 10:29:28,936 - __main__ - INFO - Environment: development
+2025-10-08 10:29:28,949 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.199:5000
+2025-10-08 10:29:28,949 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-08 10:29:34,253 - __main__ - ERROR - Database connection error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  password authentication failed for user "rayhanadjisantoso"
+
+2025-10-08 10:29:34,254 - __main__ - ERROR - Unhandled exception: 'NoneType' object has no attribute 'close'
+2025-10-08 10:29:34,255 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:29:34] "[35m[1mGET /api/dashboard/stats HTTP/1.1[0m" 500 -
+2025-10-08 10:29:34,432 - __main__ - ERROR - Database connection error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  password authentication failed for user "rayhanadjisantoso"
+
+2025-10-08 10:29:34,433 - __main__ - ERROR - Unhandled exception: 'NoneType' object has no attribute 'close'
+2025-10-08 10:29:34,434 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:29:34] "[35m[1mGET /api/dashboard/stats HTTP/1.1[0m" 500 -
+2025-10-08 10:30:45,966 - __main__ - INFO - Starting ProDS Flask Application
+2025-10-08 10:30:45,966 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-08 10:30:45,967 - __main__ - INFO - Environment: development
+2025-10-08 10:30:45,979 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.199:5000
+2025-10-08 10:30:45,980 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-08 10:30:50,520 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:30:50] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-08 10:30:50,868 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:30:50] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-08 10:30:56,476 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:30:56] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:30:56,478 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:30:56] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:30:56,657 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:30:56] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:30:57,156 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:30:57] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:31:02,767 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:31:02] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:31:03,089 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:31:03] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:31:03,094 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:31:03] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:31:03,098 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:31:03] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:31:03,324 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:31:03] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:31:03,470 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:31:03] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:31:04,097 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:31:04] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:31:04,683 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:31:04] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:31:15,716 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:31:15] "[33mOPTIONS /api/scraping/googlescholar/scrape HTTP/1.1[0m" 404 -
+2025-10-08 10:34:09,511 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:34:09] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-08 10:34:09,722 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:34:09] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-08 10:34:19,545 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:34:19] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:34:19,946 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:34:19] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:34:20,348 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:34:20] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:34:20,867 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:34:20] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:34:23,786 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:34:23] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:34:23,787 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:34:23] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:34:23,788 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:34:23] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:34:23,789 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:34:23] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:34:24,272 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:34:24] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:34:24,496 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:34:24] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:34:24,686 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:34:24] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:34:24,966 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:34:24] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:34:40,445 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:34:40] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:47:53,911 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:47:53] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:47:53,913 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:47:53] "OPTIONS /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:47:54,343 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:47:54] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:47:54,568 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:47:54] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:49:00,759 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:49:00] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:49:00,941 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:49:00] "GET /api/sinta/dosen?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:49:04,438 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:49:04] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:49:04,440 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:49:04] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:49:04,450 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:49:04] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:49:04,458 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:49:04] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:49:04,677 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:49:04] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:49:05,079 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:49:05] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:49:05,571 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:49:05] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:49:06,131 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:49:06] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-08 10:52:31,861 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:52:31] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-08 10:52:31,862 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:52:31] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-08 10:52:32,325 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:52:32] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-08 10:52:32,546 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 10:52:32] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-08 11:23:31,422 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 11:23:31] "[33mGET /socket.io/?EIO=4&transport=websocket HTTP/1.1[0m" 404 -
+2025-10-08 11:23:32,312 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 11:23:32] "[33mGET /socket.io/?EIO=4&transport=websocket HTTP/1.1[0m" 404 -
+2025-10-08 11:23:34,198 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 11:23:34] "[33mGET /socket.io/?EIO=4&transport=websocket HTTP/1.1[0m" 404 -
+2025-10-08 11:23:37,241 - werkzeug - INFO - 127.0.0.1 - - [08/Oct/2025 11:23:37] "[33mGET /socket.io/?EIO=4&transport=websocket HTTP/1.1[0m" 404 -
+2025-10-08 11:30:06,523 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:30:06,524 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:30:07,017 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 11:30:07,113 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-08 11:30:07,113 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-08 11:30:07,113 - __main__ - INFO - Environment: development
+2025-10-08 11:30:36,011 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:30:36,012 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:30:36,013 - engineio.server - INFO - Server initialized for threading.
+2025-10-08 11:30:36,035 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:30:36,036 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:30:36,037 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 11:30:37,536 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:30:37,679 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:30:37,680 - WDM - INFO - ====== WebDriver manager ======
+2025-10-08 11:30:42,751 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:30:42,752 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:30:42,752 - WDM - INFO - There is no [win64] chromedriver "140.0.7339.208" for browser google-chrome "140.0.7339.208" in cache
+2025-10-08 11:30:42,753 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:30:43,037 - WDM - INFO - WebDriver version 140.0.7339.207 selected
+2025-10-08 11:30:43,054 - WDM - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 11:30:43,055 - WDM - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 11:30:43,409 - WDM - INFO - Driver downloading response is 200
+2025-10-08 11:30:56,230 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:30:56,642 - WDM - INFO - Driver has been saved in cache [C:\Users\harih\.wdm\drivers\chromedriver\win64\140.0.7339.208]
+2025-10-08 11:31:17,090 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:31:43,967 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:31:43,974 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:31:48,049 - urllib3.connectionpool - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019CDCE39C60>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/67786cad28bdd0db5b928d44655f89e8/url
+2025-10-08 11:31:52,658 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:31:52,659 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:31:53,146 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 11:31:53,295 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-08 11:31:53,297 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-08 11:31:53,298 - __main__ - INFO - Environment: development
+2025-10-08 11:32:05,575 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:32:05,576 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:32:05,576 - engineio.server - INFO - Server initialized for threading.
+2025-10-08 11:32:05,597 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:32:05,598 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:32:05,599 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 11:32:06,608 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:32:06,762 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:32:06,772 - WDM - INFO - ====== WebDriver manager ======
+2025-10-08 11:32:11,637 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:32:11,638 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:32:11,639 - WDM - INFO - There is no [win64] chromedriver "140.0.7339.208" for browser google-chrome "140.0.7339.208" in cache
+2025-10-08 11:32:11,639 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:32:11,913 - WDM - INFO - WebDriver version 140.0.7339.207 selected
+2025-10-08 11:32:11,938 - WDM - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 11:32:11,939 - WDM - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 11:32:12,186 - WDM - INFO - Driver downloading response is 200
+2025-10-08 11:32:25,062 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:32:25,405 - WDM - INFO - Driver has been saved in cache [C:\Users\harih\.wdm\drivers\chromedriver\win64\140.0.7339.208]
+2025-10-08 11:32:40,742 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:33:20,835 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:33:20,836 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:34:00,861 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:52:47,819 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:52:47,820 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:52:48,096 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 11:52:48,216 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-08 11:52:48,217 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-08 11:52:48,217 - __main__ - INFO - Environment: development
+2025-10-08 11:53:03,246 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:53:03,246 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:53:03,247 - engineio.server - INFO - Server initialized for threading.
+2025-10-08 11:53:03,262 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:53:03,262 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:53:03,263 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 11:53:04,452 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:53:04,559 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:53:04,560 - WDM - INFO - ====== WebDriver manager ======
+2025-10-08 11:53:08,931 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:53:08,932 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:53:08,932 - WDM - INFO - There is no [win64] chromedriver "140.0.7339.208" for browser google-chrome "140.0.7339.208" in cache
+2025-10-08 11:53:08,933 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:53:09,139 - WDM - INFO - WebDriver version 140.0.7339.207 selected
+2025-10-08 11:53:09,147 - WDM - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 11:53:09,147 - WDM - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 11:53:09,513 - WDM - INFO - Driver downloading response is 200
+2025-10-08 11:53:22,451 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:53:22,730 - WDM - INFO - Driver has been saved in cache [C:\Users\harih\.wdm\drivers\chromedriver\win64\140.0.7339.208]
+2025-10-08 11:53:39,619 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:53:55,051 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:53:55,073 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:53:58,304 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:53:58,304 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:53:58,640 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 11:53:58,758 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-08 11:53:58,758 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-08 11:53:58,758 - __main__ - INFO - Environment: development
+2025-10-08 11:54:09,878 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:54:09,879 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:54:09,881 - engineio.server - INFO - Server initialized for threading.
+2025-10-08 11:54:09,916 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:54:09,919 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:54:09,920 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 11:54:11,134 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:54:11,298 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:54:11,298 - WDM - INFO - ====== WebDriver manager ======
+2025-10-08 11:54:17,086 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:54:17,087 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:54:17,087 - WDM - INFO - There is no [win64] chromedriver "140.0.7339.208" for browser google-chrome "140.0.7339.208" in cache
+2025-10-08 11:54:17,088 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:54:17,309 - WDM - INFO - WebDriver version 140.0.7339.207 selected
+2025-10-08 11:54:17,319 - WDM - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 11:54:17,319 - WDM - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 11:54:17,410 - WDM - INFO - Driver downloading response is 200
+2025-10-08 11:54:30,505 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:54:30,808 - WDM - INFO - Driver has been saved in cache [C:\Users\harih\.wdm\drivers\chromedriver\win64\140.0.7339.208]
+2025-10-08 11:54:40,051 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:55:14,433 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:55:14,433 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:55:14,762 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 11:55:14,880 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-08 11:55:14,881 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-08 11:55:14,881 - __main__ - INFO - Environment: development
+2025-10-08 11:55:21,497 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:55:21,497 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:55:21,498 - engineio.server - INFO - Server initialized for threading.
+2025-10-08 11:55:21,519 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:55:21,520 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:55:21,521 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 11:55:22,648 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:55:22,784 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:55:22,785 - WDM - INFO - ====== WebDriver manager ======
+2025-10-08 11:55:27,963 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:55:27,964 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:55:27,964 - WDM - INFO - There is no [win64] chromedriver "140.0.7339.208" for browser google-chrome "140.0.7339.208" in cache
+2025-10-08 11:55:27,965 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:55:28,466 - WDM - INFO - WebDriver version 140.0.7339.207 selected
+2025-10-08 11:55:28,473 - WDM - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 11:55:28,473 - WDM - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 11:55:28,567 - WDM - INFO - Driver downloading response is 200
+2025-10-08 11:55:42,318 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:55:42,653 - WDM - INFO - Driver has been saved in cache [C:\Users\harih\.wdm\drivers\chromedriver\win64\140.0.7339.208]
+2025-10-08 11:55:59,000 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:56:12,737 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:56:12,739 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:56:16,811 - urllib3.connectionpool - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001E5304BEFE0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/ccaec09812f303c7670fdc183f0c1973/url
+2025-10-08 11:56:20,893 - urllib3.connectionpool - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001E5304BF370>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/ccaec09812f303c7670fdc183f0c1973/url
+2025-10-08 11:56:24,935 - urllib3.connectionpool - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001E51FE8DDB0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/ccaec09812f303c7670fdc183f0c1973/url
+2025-10-08 11:56:33,044 - urllib3.connectionpool - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001E5304BF4F0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/ccaec09812f303c7670fdc183f0c1973
+2025-10-08 11:56:37,075 - urllib3.connectionpool - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001E5304BF5E0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/ccaec09812f303c7670fdc183f0c1973
+2025-10-08 11:56:41,132 - urllib3.connectionpool - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001E5304BEF50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/ccaec09812f303c7670fdc183f0c1973
+2025-10-08 11:56:49,215 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:57:39,755 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:57:39,756 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:57:40,102 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 11:57:40,411 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-08 11:57:40,411 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-08 11:57:40,411 - __main__ - INFO - Environment: development
+2025-10-08 11:57:52,591 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:57:52,592 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:57:52,593 - engineio.server - INFO - Server initialized for threading.
+2025-10-08 11:57:52,650 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:57:52,652 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 11:57:52,655 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 11:57:53,885 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:57:54,025 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:57:54,026 - WDM - INFO - ====== WebDriver manager ======
+2025-10-08 11:57:58,887 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:57:58,887 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:57:58,889 - WDM - INFO - There is no [win64] chromedriver "140.0.7339.208" for browser google-chrome "140.0.7339.208" in cache
+2025-10-08 11:57:58,889 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:57:59,138 - WDM - INFO - WebDriver version 140.0.7339.207 selected
+2025-10-08 11:57:59,145 - WDM - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 11:57:59,146 - WDM - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 11:57:59,246 - WDM - INFO - Driver downloading response is 200
+2025-10-08 11:58:12,391 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 11:58:12,767 - WDM - INFO - Driver has been saved in cache [C:\Users\harih\.wdm\drivers\chromedriver\win64\140.0.7339.208]
+2025-10-08 11:58:28,526 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:59:08,575 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:59:08,578 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 11:59:48,924 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:00:45,367 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:00:45,462 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:00:45,464 - WDM - INFO - ====== WebDriver manager ======
+2025-10-08 12:00:50,260 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 12:00:50,261 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 12:00:50,261 - WDM - INFO - There is no [win64] chromedriver "140.0.7339.208" for browser google-chrome "140.0.7339.208" in cache
+2025-10-08 12:00:50,262 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 12:00:50,483 - WDM - INFO - WebDriver version 140.0.7339.207 selected
+2025-10-08 12:00:50,492 - WDM - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 12:00:50,493 - WDM - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 12:00:50,578 - WDM - INFO - Driver downloading response is 200
+2025-10-08 12:01:03,395 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 12:01:03,795 - WDM - INFO - Driver has been saved in cache [C:\Users\harih\.wdm\drivers\chromedriver\win64\140.0.7339.208]
+2025-10-08 12:01:18,765 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:01:58,838 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:01:58,839 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:02:40,771 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:12:59,987 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:12:59,988 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:13:00,320 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 12:13:00,443 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-08 12:13:00,443 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-08 12:13:00,444 - __main__ - INFO - Environment: development
+2025-10-08 12:13:12,525 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:13:12,525 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:13:12,526 - engineio.server - INFO - Server initialized for threading.
+2025-10-08 12:13:12,540 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:13:12,540 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:13:12,540 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 12:13:13,744 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:13:13,940 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:13:13,942 - WDM - INFO - ====== WebDriver manager ======
+2025-10-08 12:13:18,933 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 12:13:18,934 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 12:13:18,935 - WDM - INFO - There is no [win64] chromedriver "140.0.7339.208" for browser google-chrome "140.0.7339.208" in cache
+2025-10-08 12:13:18,935 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 12:13:19,153 - WDM - INFO - WebDriver version 140.0.7339.207 selected
+2025-10-08 12:13:19,160 - WDM - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 12:13:19,161 - WDM - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 12:13:19,229 - WDM - INFO - Driver downloading response is 200
+2025-10-08 12:13:32,132 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 12:13:32,413 - WDM - INFO - Driver has been saved in cache [C:\Users\harih\.wdm\drivers\chromedriver\win64\140.0.7339.208]
+2025-10-08 12:13:48,512 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:14:14,418 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:14:14,421 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:14:17,981 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:14:17,982 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:14:18,370 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 12:14:18,531 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-08 12:14:18,531 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-08 12:14:18,531 - __main__ - INFO - Environment: development
+2025-10-08 12:14:28,070 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:14:28,070 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:14:28,070 - engineio.server - INFO - Server initialized for threading.
+2025-10-08 12:14:28,081 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:14:28,081 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:14:28,082 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 12:14:29,324 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:14:29,463 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:14:29,463 - WDM - INFO - ====== WebDriver manager ======
+2025-10-08 12:14:34,889 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 12:14:34,890 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 12:14:34,890 - WDM - INFO - There is no [win64] chromedriver "140.0.7339.208" for browser google-chrome "140.0.7339.208" in cache
+2025-10-08 12:14:34,890 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 12:14:35,359 - WDM - INFO - WebDriver version 140.0.7339.207 selected
+2025-10-08 12:14:35,370 - WDM - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 12:14:35,370 - WDM - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 12:14:35,467 - WDM - INFO - Driver downloading response is 200
+2025-10-08 12:14:48,272 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 12:14:48,564 - WDM - INFO - Driver has been saved in cache [C:\Users\harih\.wdm\drivers\chromedriver\win64\140.0.7339.208]
+2025-10-08 12:15:05,292 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:15:29,628 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:15:29,629 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:15:33,711 - urllib3.connectionpool - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001AD84D4ADA0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/8761a20610504bf45a246a2df27b79f1/url
+2025-10-08 12:15:44,021 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:15:44,021 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:15:44,326 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 12:15:44,420 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-08 12:15:44,420 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-08 12:15:44,420 - __main__ - INFO - Environment: development
+2025-10-08 12:16:05,325 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:16:05,326 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:16:05,336 - engineio.server - INFO - Server initialized for threading.
+2025-10-08 12:16:05,385 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:16:05,385 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-08 12:16:05,386 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-08 12:16:06,561 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:16:06,664 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:16:06,665 - WDM - INFO - ====== WebDriver manager ======
+2025-10-08 12:16:11,291 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 12:16:11,291 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 12:16:11,292 - WDM - INFO - There is no [win64] chromedriver "140.0.7339.208" for browser google-chrome "140.0.7339.208" in cache
+2025-10-08 12:16:11,292 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 12:16:11,509 - WDM - INFO - WebDriver version 140.0.7339.207 selected
+2025-10-08 12:16:11,533 - WDM - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 12:16:11,535 - WDM - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/140.0.7339.207/win32/chromedriver-win32.zip
+2025-10-08 12:16:11,637 - WDM - INFO - Driver downloading response is 200
+2025-10-08 12:16:24,357 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-08 12:16:24,631 - WDM - INFO - Driver has been saved in cache [C:\Users\harih\.wdm\drivers\chromedriver\win64\140.0.7339.208]
+2025-10-08 12:16:39,828 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:17:21,097 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:17:21,098 - socketio.server - INFO - emitting event "scraping_progress" to all [/]
+2025-10-08 12:17:25,154 - urllib3.connectionpool - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000022EC7AC5690>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/1fc7afc9b0001f0426855341b48f11a1/url

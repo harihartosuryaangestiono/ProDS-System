@@ -5,12 +5,15 @@ import os
 from datetime import datetime
 import threading
 import traceback
+import random
+import time
 
 # Add scrapers directory to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'scrapers'))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils.database import DB_CONFIG
-from task.scraping_tasks import (  # Fixed: changed 'tasks' to 'task'
+from task.scraping_tasks import (
     scrape_sinta_dosen_task,
     scrape_sinta_scopus_task,
     scrape_sinta_googlescholar_task,
@@ -73,6 +76,64 @@ def run_scraping_task(job_id, task_func, **kwargs):
             'status': 'failed',
             'error': error_msg
         })
+
+def run_google_scholar_scraping(job_id, max_authors, scrape_from_beginning):
+    """Run Google Scholar scraping in background thread"""
+    try:
+        from gs_scraper import GoogleScholarScraper
+        
+        active_jobs[job_id] = {
+            'status': 'running',
+            'current': 0,
+            'total': max_authors,
+            'message': 'Initializing scraper...',
+            'started_at': datetime.now().isoformat()
+        }
+        
+        emit_progress(job_id, active_jobs[job_id])
+        
+        # Create scraper instance
+        scraper = GoogleScholarScraper(
+            db_config=DB_CONFIG,
+            job_id=job_id,
+            progress_callback=lambda data: emit_progress(job_id, data)
+        )
+        
+        # Run scraping
+        result = scraper.run(max_authors=max_authors, scrape_from_beginning=scrape_from_beginning)
+        
+        active_jobs[job_id]['status'] = 'completed'
+        active_jobs[job_id]['message'] = 'Scraping completed successfully!'
+        active_jobs[job_id]['completed_at'] = datetime.now().isoformat()
+        active_jobs[job_id]['result'] = result
+        
+        emit_progress(job_id, {
+            'status': 'completed',
+            'message': result.get('message', 'Scraping completed'),
+            'summary': result.get('summary', {})
+        })
+        
+    except Exception as e:
+        import traceback
+        error_msg = str(e)
+        traceback_msg = traceback.format_exc()
+        
+        print(f"\n❌ ERROR: {error_msg}")
+        print(f"Traceback:\n{traceback_msg}")
+        
+        active_jobs[job_id]['status'] = 'failed'
+        active_jobs[job_id]['message'] = error_msg
+        active_jobs[job_id]['error'] = error_msg
+        active_jobs[job_id]['traceback'] = traceback_msg
+        active_jobs[job_id]['failed_at'] = datetime.now().isoformat()
+        
+        emit_progress(job_id, {
+            'status': 'failed',
+            'error': error_msg
+        })
+# ============================================================================
+# SINTA ROUTES
+# ============================================================================
 
 @scraping_bp.route('/api/scraping/sinta/dosen', methods=['POST'])
 def scrape_sinta_dosen():
@@ -241,9 +302,68 @@ def scrape_sinta_garuda():
             'error': str(e)
         }), 500
 
-@scraping_bp.route('/api/scraping/status/<job_id>', methods=['GET'])
-def get_scraping_status(job_id):
-    """Get status of a scraping job"""
+# ============================================================================
+# GOOGLE SCHOLAR ROUTE
+# ============================================================================
+
+@scraping_bp.route('/api/scraping/googlescholar/scrape', methods=['POST'])
+def scrape_google_scholar():
+    """
+    Endpoint to start Google Scholar scraping directly (not through SINTA)
+    """
+    try:
+        data = request.get_json() or {}
+        max_authors = data.get('max_authors', 10)
+        
+        # Validate input
+        if not isinstance(max_authors, int) or max_authors <= 0:
+            return jsonify({
+                'success': False,
+                'error': 'max_authors must be a positive integer'
+            }), 400
+        
+        # Generate job ID
+        job_id = f"gs_scrape_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        # Get socketio instance from app
+        try:
+            from app import socketio
+        except ImportError:
+            return jsonify({
+                'success': False,
+                'error': 'SocketIO not configured properly'
+            }), 500
+        
+        # Start scraping in background thread
+        thread = threading.Thread(
+            target=run_google_scholar_scraping,
+            args=(job_id, max_authors, socketio)
+        )
+        thread.daemon = True
+        thread.start()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Google Scholar scraping started. Browser will open for manual login.',
+            'job_id': job_id,
+            'instructions': 'Please login to Google Scholar in the browser window, then press Enter in the terminal.'
+        }), 200
+    
+    except Exception as e:
+        import traceback
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }), 500
+
+# ============================================================================
+# JOB MANAGEMENT ROUTES
+# ============================================================================
+
+@scraping_bp.route('/api/scraping/jobs/<job_id>', methods=['GET'])
+def get_job_status(job_id):
+    """Get status of a specific scraping job"""
     if job_id in active_jobs:
         return jsonify({
             'success': True,
@@ -260,5 +380,31 @@ def list_jobs():
     """List all scraping jobs"""
     return jsonify({
         'success': True,
-        'jobs': active_jobs
+        'jobs': active_jobs,
+        'total_jobs': len(active_jobs)
+    })
+
+@scraping_bp.route('/api/scraping/jobs/<job_id>', methods=['DELETE'])
+def delete_job(job_id):
+    """Delete/clear a job from memory"""
+    if job_id in active_jobs:
+        del active_jobs[job_id]
+        return jsonify({
+            'success': True,
+            'message': f'Job {job_id} deleted'
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'error': 'Job not found'
+        }), 404
+
+@scraping_bp.route('/api/scraping/health', methods=['GET'])
+def scraping_health():
+    """Health check for scraping service"""
+    return jsonify({
+        'success': True,
+        'status': 'healthy',
+        'active_jobs_count': len([j for j in active_jobs.values() if j.get('status') == 'running']),
+        'total_jobs': len(active_jobs)
     })
