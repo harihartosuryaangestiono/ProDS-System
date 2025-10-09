@@ -9,43 +9,127 @@ const SintaPublikasi = () => {
   const navigate = useNavigate();
   const [publikasiData, setPublikasiData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [statsLoading, setStatsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState(null);
-  const perPage = 20; // ✅ Changed from 20 to 50
+  const [filterTipe, setFilterTipe] = useState('all');
+  const [yearStart, setYearStart] = useState('');
+  const [yearEnd, setYearEnd] = useState('');
+  const [aggregateStats, setAggregateStats] = useState({
+    totalPublikasi: 0,
+    totalSitasi: 0,
+    avgSitasi: 0,
+    recentPublikasi: 0
+  });
+  const perPage = 20;
+
+  const publikasiTypes = [
+    { value: 'all', label: 'Semua Tipe' },
+    { value: 'artikel', label: 'Artikel' },
+    { value: 'prosiding', label: 'Prosiding' },
+    { value: 'buku', label: 'Buku' },
+    { value: 'penelitian', label: 'Penelitian' }
+  ];
+
+  // Generate year options (from 1990 to current year)
+  const currentYear = new Date().getFullYear();
+  const yearOptions = [];
+  for (let year = currentYear; year >= 1990; year--) {
+    yearOptions.push(year);
+  }
 
   useEffect(() => {
-    // Check if user is authenticated
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
       return;
     }
-    
     fetchPublikasiData();
-  }, [searchTerm]);
+  }, [currentPage, searchTerm, filterTipe, yearStart, yearEnd]);
 
   useEffect(() => {
-    fetchPublikasiData();
-  }, [currentPage, searchTerm]);
+    fetchAggregateStats();
+  }, [searchTerm, filterTipe, yearStart, yearEnd]);
+
+  const fetchAggregateStats = async () => {
+    try {
+      setStatsLoading(true);
+      const params = {
+        page: 1,
+        per_page: 10000,
+        search: searchTerm
+      };
+      
+      if (filterTipe !== 'all') {
+        params.tipe = filterTipe;
+      }
+      
+      if (yearStart) {
+        params.year_start = yearStart;
+      }
+      
+      if (yearEnd) {
+        params.year_end = yearEnd;
+      }
+      
+      const response = await apiService.getSintaPublikasi(params);
+
+      if (response.success) {
+        const allData = response.data.data || [];
+        const totalPublikasi = response.data.pagination?.total || allData.length;
+        const totalSitasi = allData.reduce((sum, pub) => sum + (pub.n_total_sitasi || 0), 0);
+        const avgSitasi = allData.length > 0 ? (totalSitasi / allData.length).toFixed(1) : 0;
+        const recentPublikasi = allData.filter(pub => {
+          const year = parseInt(pub.v_tahun_publikasi);
+          return year >= currentYear - 2;
+        }).length;
+
+        setAggregateStats({
+          totalPublikasi,
+          totalSitasi,
+          avgSitasi,
+          recentPublikasi
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching aggregate stats:', error);
+      setAggregateStats({
+        totalPublikasi: 0,
+        totalSitasi: 0,
+        avgSitasi: 0,
+        recentPublikasi: 0
+      });
+    } finally {
+      setStatsLoading(false);
+    }
+  };
 
   const fetchPublikasiData = async () => {
     try {
       setLoading(true);
-      
-      // ✅ FIX: Pass parameters as an object
       const params = {
         page: currentPage,
-        perPage: perPage,
+        per_page: perPage,
         search: searchTerm
       };
+      
+      if (filterTipe !== 'all') {
+        params.tipe = filterTipe;
+      }
+      
+      if (yearStart) {
+        params.year_start = yearStart;
+      }
+      
+      if (yearEnd) {
+        params.year_end = yearEnd;
+      }
       
       const response = await apiService.getSintaPublikasi(params);
 
       if (response.success) {
         setPublikasiData(response.data.data || []);
-        
-        // ✅ FIX: Transform pagination data to match DataTable expectations
         const paginationData = response.data.pagination;
         if (paginationData) {
           setPagination({
@@ -71,6 +155,28 @@ const SintaPublikasi = () => {
 
   const handleSearchChange = (value) => {
     setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  const handleFilterChange = (e) => {
+    setFilterTipe(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleYearStartChange = (e) => {
+    setYearStart(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleYearEndChange = (e) => {
+    setYearEnd(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleResetFilters = () => {
+    setYearStart('');
+    setYearEnd('');
+    setFilterTipe('all');
     setCurrentPage(1);
   };
 
@@ -224,21 +330,22 @@ const SintaPublikasi = () => {
     }
   ];
 
-  // Calculate statistics
-  const totalPublikasi = pagination?.totalRecords || 0;
-  const totalSitasi = publikasiData.reduce((sum, pub) => sum + (pub.n_total_sitasi || 0), 0);
-  const avgSitasi = publikasiData.length > 0 ? (totalSitasi / publikasiData.length).toFixed(1) : 0;
-  const currentYear = new Date().getFullYear();
-  const recentPublikasi = publikasiData.filter(pub => pub.v_tahun_publikasi >= currentYear - 2).length;
-
-  const StatCard = ({ title, value, icon: Icon, color, subtitle }) => (
+  const StatCard = ({ title, value, icon: Icon, color, subtitle, loading }) => (
     <div className="bg-white rounded-lg shadow-md p-6 border-l-4" style={{ borderColor: color }}>
       <div className="flex items-center justify-between">
-        <div>
+        <div className="flex-1">
           <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
-          {subtitle && (
-            <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+          {loading ? (
+            <div className="mt-2 h-8 w-24 bg-gray-200 animate-pulse rounded"></div>
+          ) : (
+            <>
+              <p className="text-2xl font-bold text-gray-900">
+                {typeof value === 'string' ? value : value.toLocaleString()}
+              </p>
+              {subtitle && (
+                <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+              )}
+            </>
           )}
         </div>
         <div className="p-3 rounded-full" style={{ backgroundColor: `${color}20` }}>
@@ -251,7 +358,6 @@ const SintaPublikasi = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Data Publikasi SINTA</h1>
           <p className="mt-2 text-sm text-gray-600">
@@ -259,37 +365,39 @@ const SintaPublikasi = () => {
           </p>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Publikasi"
-            value={totalPublikasi.toLocaleString()}
+            value={aggregateStats.totalPublikasi}
             icon={FileText}
             color="#6366F1"
+            loading={statsLoading}
           />
           <StatCard
             title="Total Sitasi"
-            value={totalSitasi.toLocaleString()}
+            value={aggregateStats.totalSitasi}
             icon={Award}
             color="#059669"
+            loading={statsLoading}
           />
           <StatCard
             title="Rata-rata Sitasi"
-            value={avgSitasi}
+            value={aggregateStats.avgSitasi}
             icon={Award}
             color="#D97706"
             subtitle="per publikasi"
+            loading={statsLoading}
           />
           <StatCard
             title="Publikasi Terbaru"
-            value={recentPublikasi.toLocaleString()}
+            value={aggregateStats.recentPublikasi}
             icon={Calendar}
             color="#7C3AED"
             subtitle="2 tahun terakhir"
+            loading={statsLoading}
           />
         </div>
 
-        {/* Data Table */}
         <DataTable
           title="Daftar Publikasi SINTA"
           data={publikasiData}
@@ -302,6 +410,75 @@ const SintaPublikasi = () => {
           onPageChange={handlePageChange}
           emptyMessage="Tidak ada data publikasi SINTA ditemukan"
           emptyIcon={<FileText className="h-12 w-12" />}
+          additionalFilters={
+            <div className="flex items-center gap-3">
+              <select
+                id="filter-tipe"
+                value={filterTipe}
+                onChange={handleFilterChange}
+                className="px-3 py-1.5 bg-white border-2 border-indigo-300 rounded-md shadow-sm 
+                         text-sm text-gray-800 font-semibold
+                         hover:border-indigo-400 hover:shadow-md
+                         focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none
+                         transition-all duration-200 cursor-pointer
+                         bg-gradient-to-br from-white to-indigo-50"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236366f1'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 0.5rem center',
+                  backgroundSize: '1.5em 1.5em',
+                  paddingRight: '2.5rem',
+                  appearance: 'none'
+                }}
+              >
+                {publikasiTypes.map((type) => (
+                  <option key={type.value} value={type.value}>
+                    {type.label}
+                  </option>
+                ))}
+              </select>
+
+              <div className="flex items-center gap-2 bg-white border-2 border-blue-300 rounded-md px-3 py-1.5 shadow-sm">
+                <Calendar className="w-4 h-4 text-blue-600" />
+                <span className="text-sm font-medium text-gray-700">Tahun:</span>
+                <select
+                  value={yearStart}
+                  onChange={handleYearStartChange}
+                  className="px-2 py-0.5 border border-gray-300 rounded text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
+                >
+                  <option value="">Dari</option>
+                  {yearOptions.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+                <span className="text-gray-500">-</span>
+                <select
+                  value={yearEnd}
+                  onChange={handleYearEndChange}
+                  className="px-2 py-0.5 border border-gray-300 rounded text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
+                >
+                  <option value="">Sampai</option>
+                  {yearOptions.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {(yearStart || yearEnd || filterTipe !== 'all') && (
+                <button
+                  onClick={handleResetFilters}
+                  className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-md transition-colors duration-200"
+                  title="Reset semua filter"
+                >
+                  Reset Filter
+                </button>
+              )}
+            </div>
+          }
         />
       </div>
     </div>

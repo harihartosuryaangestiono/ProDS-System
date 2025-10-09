@@ -16,7 +16,7 @@ const SintaDosen = () => {
     totalSitasi: 0,
     avgHIndex: 0
   });
-  const perPage = 5;
+  const perPage = 2;
 
   useEffect(() => {
     fetchDosenData();

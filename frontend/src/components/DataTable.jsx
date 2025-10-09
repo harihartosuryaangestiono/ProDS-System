@@ -17,13 +17,13 @@ const DataTable = ({
   emptyMessage = 'No data available',
   emptyIcon = null,
   title = '',
-  actions = null
+  actions = null,
+  additionalFilters = null // NEW PROP
 }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
   const handleSort = (key) => {
     if (!sortable) return;
-
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
@@ -33,7 +33,7 @@ const DataTable = ({
 
   const getSortedData = () => {
     if (!sortConfig.key) return data;
-
+    
     const sortedData = [...data].sort((a, b) => {
       const aValue = a[sortConfig.key];
       const bValue = b[sortConfig.key];
@@ -51,7 +51,7 @@ const DataTable = ({
       // String comparison
       const aString = String(aValue).toLowerCase();
       const bString = String(bValue).toLowerCase();
-
+      
       if (aString < bString) {
         return sortConfig.direction === 'asc' ? -1 : 1;
       }
@@ -70,7 +70,7 @@ const DataTable = ({
     }
 
     const value = row[column.key];
-    
+
     if (value == null) {
       return <span className="text-gray-400">-</span>;
     }
@@ -95,7 +95,7 @@ const DataTable = ({
   return (
     <div className={`bg-white rounded-lg shadow-md ${className}`}>
       {/* Header */}
-      {(title || onSearchChange || onRefresh || actions) && (
+      {(title || onSearchChange || onRefresh || actions || additionalFilters) && (
         <div className="p-6 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
             <div className="flex items-center space-x-4">
@@ -111,6 +111,12 @@ const DataTable = ({
                   <RefreshCw className={`h-4 w-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
                   Refresh
                 </button>
+              )}
+              {/* Additional Filters - NOW APPEARS NEXT TO REFRESH BUTTON */}
+              {additionalFilters && (
+                <div className="flex items-center">
+                  {additionalFilters}
+                </div>
               )}
             </div>
 
@@ -161,14 +167,14 @@ const DataTable = ({
                       <span>{column.title}</span>
                       {sortable && column.sortable !== false && (
                         <div className="flex flex-col">
-                          <ArrowUp 
+                          <ArrowUp
                             className={`h-3 w-3 ${
                               sortConfig.key === column.key && sortConfig.direction === 'asc'
                                 ? 'text-gray-900'
                                 : 'text-gray-400'
                             }`}
                           />
-                          <ArrowDown 
+                          <ArrowDown
                             className={`h-3 w-3 -mt-1 ${
                               sortConfig.key === column.key && sortConfig.direction === 'desc'
                                 ? 'text-gray-900'
@@ -197,7 +203,7 @@ const DataTable = ({
                       <td
                         key={column.key}
                         className={`px-6 py-4 whitespace-nowrap text-sm ${
-                          column.align === 'center' ? 'text-center' : 
+                          column.align === 'center' ? 'text-center' :
                           column.align === 'right' ? 'text-right' : 'text-left'
                         } ${column.cellClassName || ''}`}
                       >

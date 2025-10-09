@@ -10,17 +10,23 @@ const ScholarDosen = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState(null);
-  const perPage = 50; // ✅ Changed from 20 to 50
+  const [stats, setStats] = useState({
+    totalDosen: 0,
+    totalPublikasi: 0,
+    totalSitasi: 0,
+    avgHIndex: 0
+  });
+  const perPage = 20;
 
   useEffect(() => {
     fetchDosenData();
+    fetchStats();
   }, [currentPage, searchTerm]);
 
   const fetchDosenData = async () => {
     try {
       setLoading(true);
       
-      // ✅ FIX: Pass parameters as an object
       const params = {
         page: currentPage,
         perPage: perPage,
@@ -32,7 +38,6 @@ const ScholarDosen = () => {
       if (response.success) {
         setDosenData(response.data.data || []);
         
-        // ✅ FIX: Transform pagination data to match DataTable expectations
         const paginationData = response.data.pagination;
         if (paginationData) {
           setPagination({
@@ -53,6 +58,26 @@ const ScholarDosen = () => {
       toast.error('Terjadi kesalahan saat mengambil data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const params = searchTerm ? { search: searchTerm } : {};
+      const response = await apiService.getScholarDosenStats(params);
+
+      if (response.success) {
+        setStats({
+          totalDosen: response.data.totalDosen || 0,
+          totalPublikasi: response.data.totalPublikasi || 0,
+          totalSitasi: response.data.totalSitasi || 0,
+          avgHIndex: response.data.avgHIndex || 0
+        });
+      } else {
+        console.error('Error fetching Scholar dosen stats:', response.error);
+      }
+    } catch (error) {
+      console.error('Error fetching Scholar dosen stats:', error);
     }
   };
 
@@ -176,11 +201,6 @@ const ScholarDosen = () => {
     }
   ];
 
-  const totalDosen = pagination?.totalRecords || 0;
-  const totalSitasi = dosenData.reduce((sum, dosen) => sum + (dosen.n_sitasi_gs || 0), 0);
-  const totalPublikasi = dosenData.reduce((sum, dosen) => sum + (dosen.n_total_publikasi || 0), 0);
-  const avgHIndex = dosenData.length > 0 ? (dosenData.reduce((sum, dosen) => sum + (dosen.n_h_index_gs || 0), 0) / dosenData.length).toFixed(1) : 0;
-
   const StatCard = ({ title, value, icon: Icon, color, subtitle }) => (
     <div className="bg-white rounded-lg shadow-md p-6 border-l-4" style={{ borderColor: color }}>
       <div className="flex items-center justify-between">
@@ -213,25 +233,25 @@ const ScholarDosen = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Dosen"
-            value={totalDosen.toLocaleString()}
+            value={stats.totalDosen.toLocaleString()}
             icon={Users}
             color="#DC2626"
           />
           <StatCard
             title="Total Publikasi"
-            value={totalPublikasi.toLocaleString()}
+            value={stats.totalPublikasi.toLocaleString()}
             icon={TrendingUp}
             color="#059669"
           />
           <StatCard
             title="Total Sitasi"
-            value={totalSitasi.toLocaleString()}
+            value={stats.totalSitasi.toLocaleString()}
             icon={Award}
             color="#D97706"
           />
           <StatCard
             title="Rata-rata H-Index"
-            value={avgHIndex}
+            value={stats.avgHIndex}
             icon={Award}
             color="#7C3AED"
             subtitle="Google Scholar"

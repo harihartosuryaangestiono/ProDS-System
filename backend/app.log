@@ -1,0 +1,67 @@
+2025-10-09 10:32:42,011 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-09 10:32:42,013 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-09 10:32:42,143 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-09 10:32:42,280 - __main__ - ERROR - Database connection error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  role "postgres" does not exist
+
+2025-10-09 10:32:42,280 - __main__ - ERROR - Cannot initialize database - connection failed
+2025-10-09 10:32:42,280 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 10:32:42,280 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-09 10:32:42,280 - __main__ - INFO - Environment: development
+2025-10-09 10:33:16,161 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-09 10:33:16,161 - flask_cors.core - WARNING - Unknown option passed to Flask-CORS: allow_credentials
+2025-10-09 10:33:16,257 - engineio.server - INFO - Server initialized for eventlet.
+2025-10-09 10:33:16,277 - __main__ - ERROR - Database connection error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  role "postgres" does not exist
+
+2025-10-09 10:33:16,277 - __main__ - ERROR - Cannot initialize database - connection failed
+2025-10-09 10:33:16,278 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 10:33:16,278 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-10-09 10:33:16,278 - __main__ - INFO - Environment: development
+2025-10-09 10:39:29,495 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 10:39:29,496 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-09 10:39:29,496 - __main__ - INFO - Environment: development
+2025-10-09 10:40:55,877 - routes.auth - INFO - User logged in: adji (ID: 1)
+2025-10-09 10:42:46,531 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 10:42:46,532 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-09 10:42:46,532 - __main__ - INFO - Environment: development
+2025-10-09 10:43:34,269 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 10:43:34,269 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-09 10:43:34,269 - __main__ - INFO - Environment: development
+2025-10-09 10:46:11,030 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 10:46:11,030 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-09 10:46:11,030 - __main__ - INFO - Environment: development
+2025-10-09 10:59:53,766 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 10:59:53,766 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-09 10:59:53,766 - __main__ - INFO - Environment: development
+2025-10-09 11:19:05,568 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 11:19:05,568 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-09 11:19:05,568 - __main__ - INFO - Environment: development
+2025-10-09 11:22:20,219 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 11:22:20,219 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-09 11:22:20,219 - __main__ - INFO - Environment: development
+2025-10-09 11:42:13,197 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 11:42:13,197 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-09 11:42:13,197 - __main__ - INFO - Environment: development
+2025-10-09 11:49:34,148 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 11:49:34,148 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-09 11:49:34,148 - __main__ - INFO - Environment: development
+2025-10-09 11:52:55,596 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 11:52:55,597 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-09 11:52:55,597 - __main__ - INFO - Environment: development
+2025-10-09 14:56:39,658 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 14:56:39,659 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-09 14:56:39,659 - __main__ - INFO - Environment: development
+2025-10-09 14:57:29,623 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 14:57:29,624 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-09 14:57:29,624 - __main__ - INFO - Environment: development
+2025-10-09 14:58:30,446 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 14:58:30,446 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-09 14:58:30,446 - __main__ - INFO - Environment: development
+2025-10-09 15:20:52,185 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 15:20:52,185 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-09 15:20:52,185 - __main__ - INFO - Environment: development
+2025-10-09 15:27:04,767 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 15:27:04,767 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-09 15:27:04,767 - __main__ - INFO - Environment: development
+2025-10-09 20:40:59,570 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-09 20:40:59,570 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-09 20:40:59,570 - __main__ - INFO - Environment: development
