@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
+from flask_socketio import SocketIO, emit
 from werkzeug.security import generate_password_hash, check_password_hash
 import psycopg2
 import psycopg2.extras
@@ -19,17 +20,24 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# Konfigurasi CORS yang benar
-CORS(app, 
-     resources={r"/*": {
-         "origins": ["http://localhost:5173"],
-         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-         "allow_headers": ["Content-Type", "Authorization"],
-         "supports_credentials": True,
-         "expose_headers": ["Content-Type", "Authorization"],
-         "max_age": 600
-     }},
-     allow_credentials=True)  # Tambahkan ini
+# Konfigurasi CORS
+CORS(app,
+    resources={r"/*": {
+        "origins": ["http://localhost:5173"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True,
+        "expose_headers": ["Content-Type", "Authorization"],
+        "max_age": 600
+    }},
+    allow_credentials=True)
+
+# Initialize SocketIO
+socketio = SocketIO(app,
+    cors_allowed_origins=["http://localhost:5173"],
+    async_mode='eventlet',
+    logger=True,
+    engineio_logger=True)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-this')
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-change-this')
@@ -37,7 +45,7 @@ app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-chan
 # Database configuration
 DB_CONFIG = {
     'dbname': os.environ.get('DB_NAME', 'SKM_PUBLIKASI'),
-    'user': os.environ.get('DB_USER', 'rayhanadjisantoso'), 
+    'user': os.environ.get('DB_USER', 'rayhanadjisantoso'),
     'password': os.environ.get('DB_PASSWORD', 'rayhan123'),
     'host': os.environ.get('DB_HOST', 'localhost'),
     'port': os.environ.get('DB_PORT', '5432')
@@ -69,15 +77,12 @@ def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.headers.get('Authorization')
-        
         if not token:
             return jsonify({'message': 'Token is missing'}), 401
         
         try:
-            # Remove 'Bearer ' prefix
             if token.startswith('Bearer '):
                 token = token[7:]
-            
             data = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
             current_user_id = data['user_id']
         except jwt.ExpiredSignatureError:
@@ -86,14 +91,24 @@ def token_required(f):
             return jsonify({'message': 'Token is invalid'}), 401
         
         return f(current_user_id, *args, **kwargs)
-    
     return decorated
 
 # Import and register blueprints
 from routes.auth import auth_bp
-app.register_blueprint(auth_bp, url_prefix='/auth')  # Changed from '/api' to '/auth'
+from routes.scraping_routes import scraping_bp
 
-# Authentication Routes (These have been moved to auth.py and are now removed from app.py)
+app.register_blueprint(auth_bp, url_prefix='/auth')
+app.register_blueprint(scraping_bp, url_prefix='')
+
+# SocketIO event handlers
+@socketio.on('connect')
+def handle_connect():
+    logger.info('Client connected')
+    emit('connection_response', {'status': 'connected'})
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    logger.info('Client disconnected')
 
 # Dashboard Routes
 @app.route('/api/dashboard/stats', methods=['GET'])
@@ -107,39 +122,33 @@ def dashboard_stats(current_user_id):
         
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         
-        # Get total dosen
         cur.execute("SELECT COUNT(*) as total FROM tmp_dosen_dt")
         total_dosen = cur.fetchone()['total']
         
-        # Get total publikasi
         cur.execute("SELECT COUNT(*) as total FROM stg_publikasi_tr")
         total_publikasi = cur.fetchone()['total']
         
-        # Get total sitasi
         cur.execute("SELECT COALESCE(SUM(n_total_sitasi_gs), 0) as total FROM tmp_dosen_dt")
         total_sitasi = cur.fetchone()['total']
         
-        # Get publikasi by year
         cur.execute("""
-            SELECT v_tahun_publikasi, COUNT(*) as count 
-            FROM stg_publikasi_tr 
-            WHERE v_tahun_publikasi IS NOT NULL 
-            GROUP BY v_tahun_publikasi 
+            SELECT v_tahun_publikasi, COUNT(*) as count
+            FROM stg_publikasi_tr
+            WHERE v_tahun_publikasi IS NOT NULL
+            GROUP BY v_tahun_publikasi
             ORDER BY v_tahun_publikasi DESC
             LIMIT 10
         """)
         publikasi_by_year = [dict(row) for row in cur.fetchall()]
         
-        # Get top authors by citations
         cur.execute("""
             SELECT v_nama_dosen, COALESCE(n_total_sitasi_gs, 0) as n_total_sitasi_gs
-            FROM tmp_dosen_dt 
-            ORDER BY n_total_sitasi_gs DESC 
+            FROM tmp_dosen_dt
+            ORDER BY n_total_sitasi_gs DESC
             LIMIT 10
         """)
         top_authors = [dict(row) for row in cur.fetchall()]
         
-        # Get publication by type
         cur.execute("""
             SELECT v_jenis, COUNT(*) as count
             FROM stg_publikasi_tr
@@ -148,7 +157,6 @@ def dashboard_stats(current_user_id):
         """)
         publikasi_by_type = [dict(row) for row in cur.fetchall()]
         
-        # Get recent activities (publications added in last 30 days)
         cur.execute("""
             SELECT COUNT(*) as count
             FROM stg_publikasi_tr
@@ -182,7 +190,6 @@ def get_sinta_dosen(current_user_id):
         page = int(request.args.get('page', 1))
         per_page = int(request.args.get('per_page', 20))
         search = request.args.get('search', '').strip()
-        
         offset = (page - 1) * per_page
         
         conn = get_db_connection()
@@ -201,7 +208,7 @@ def get_sinta_dosen(current_user_id):
         
         # Get total count
         count_query = f"""
-            SELECT COUNT(*) as total 
+            SELECT COUNT(*) as total
             FROM tmp_dosen_dt d
             LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
             {where_clause}
@@ -211,18 +218,17 @@ def get_sinta_dosen(current_user_id):
         
         # Get data
         data_query = f"""
-            SELECT 
+            SELECT
                 d.v_id_dosen, d.v_nama_dosen, d.v_id_sinta, d.v_id_googleScholar,
-                d.n_total_publikasi, d.n_total_sitasi_gs, d.n_h_index_gs, 
-                d.n_i10_index_gs, d.n_skor_sinta, d.n_skor_sinta_3yr,
+                d.n_total_publikasi, d.n_total_sitasi_gs, d.n_sitasi_scopus,
+                d.n_h_index_gs, d.n_i10_index_gs, d.n_skor_sinta, d.n_skor_sinta_3yr,
                 j.v_nama_jurusan, d.t_tanggal_unduh, d.v_link_url
             FROM tmp_dosen_dt d
             LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
             {where_clause}
-            ORDER BY d.n_total_sitasi_gs DESC NULLS LAST
+            ORDER BY (COALESCE(d.n_total_sitasi_gs, 0) + COALESCE(d.n_sitasi_scopus, 0)) DESC
             LIMIT %s OFFSET %s
         """
-        
         params.extend([per_page, offset])
         cur.execute(data_query, params)
         dosen_data = [dict(row) for row in cur.fetchall()]
@@ -244,16 +250,64 @@ def get_sinta_dosen(current_user_id):
         if 'conn' in locals():
             conn.close()
 
+@app.route('/api/sinta/dosen/stats', methods=['GET'])
+@token_required
+def get_sinta_dosen_stats(current_user_id):
+    """Get SINTA dosen aggregate statistics"""
+    try:
+        search = request.args.get('search', '').strip()
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        # Build query with proper table names
+        where_clause = "WHERE d.v_sumber = 'SINTA' OR d.v_sumber IS NULL"
+        params = []
+        
+        if search:
+            where_clause += " AND LOWER(d.v_nama_dosen) LIKE LOWER(%s)"
+            params.append(f'%{search}%')
+        
+        # Get aggregate statistics
+        stats_query = f"""
+            SELECT
+                COUNT(*) as total_dosen,
+                COALESCE(SUM(COALESCE(d.n_total_sitasi_gs, 0) + COALESCE(d.n_sitasi_scopus, 0)), 0) as total_sitasi,
+                COALESCE(AVG(d.n_h_index_gs), 0) as avg_h_index,
+                COALESCE(SUM(d.n_total_publikasi), 0) as total_publikasi
+            FROM tmp_dosen_dt d
+            LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
+            {where_clause}
+        """
+        cur.execute(stats_query, params)
+        stats = cur.fetchone()
+        
+        return jsonify({
+            'totalDosen': stats['total_dosen'] or 0,
+            'totalSitasi': int(stats['total_sitasi']) if stats['total_sitasi'] else 0,
+            'avgHIndex': round(float(stats['avg_h_index']), 1) if stats['avg_h_index'] else 0,
+            'totalPublikasi': stats['total_publikasi'] or 0
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Get SINTA dosen stats error: {e}")
+        return jsonify({'error': 'Failed to fetch SINTA dosen statistics'}), 500
+    finally:
+        if 'conn' in locals():
+            conn.close()
+
 @app.route('/api/sinta/publikasi', methods=['GET'])
 @token_required
 def get_sinta_publikasi(current_user_id):
     """Get SINTA publikasi data with pagination and search"""
     conn = None
     cur = None
-    
     try:
         page = int(request.args.get('page', 1))
-        per_page = int(request.args.get('per_page', 20))
+        per_page = int(request.args.get('per_page', 5))
         search = request.args.get('search', '').strip()
         offset = (page - 1) * per_page
         
@@ -268,8 +322,13 @@ def get_sinta_publikasi(current_user_id):
         params = ['%SINTA%']
         
         if search:
-            where_clause += " AND LOWER(p.v_judul) LIKE LOWER(%s)"
-            params.append(f'%{search}%')
+            where_clause += """ AND (
+                LOWER(p.v_judul) LIKE LOWER(%s) OR
+                LOWER(p.v_authors) LIKE LOWER(%s) OR
+                LOWER(p.v_publisher) LIKE LOWER(%s)
+            )"""
+            search_param = f"%{search}%"
+            params.extend([search_param, search_param, search_param])
         
         # Get total count
         count_query = f"""
@@ -277,15 +336,17 @@ def get_sinta_publikasi(current_user_id):
             FROM stg_publikasi_tr p
             {where_clause}
         """
-        
         cur.execute(count_query, params)
         total = cur.fetchone()['total']
         
-        # Get data dengan kolom lengkap seperti Scholar
+        # Get data
         data_query = f"""
             SELECT
                 p.v_id_publikasi,
-                COALESCE(STRING_AGG(DISTINCT d.v_nama_dosen, ', '), '') AS authors,
+                COALESCE(
+                    NULLIF(p.v_authors, ''),
+                    STRING_AGG(DISTINCT d.v_nama_dosen, ', ')
+                ) AS authors,
                 p.v_judul,
                 p.v_jenis AS tipe,
                 p.v_tahun_publikasi,
@@ -294,10 +355,7 @@ def get_sinta_publikasi(current_user_id):
                     pr.v_nama_konferensi,
                     'N/A'
                 ) AS venue,
-                CASE 
-                    WHEN b.v_penerbit IS NOT NULL AND b.v_penerbit != '' THEN b.v_penerbit
-                    ELSE ''
-                END AS publisher,
+                COALESCE(p.v_publisher, '') AS publisher,
                 COALESCE(a.v_volume, '') AS volume,
                 COALESCE(a.v_issue, '') AS issue,
                 COALESCE(a.v_pages, '') AS pages,
@@ -314,15 +372,15 @@ def get_sinta_publikasi(current_user_id):
             LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
             LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
             {where_clause}
-            GROUP BY 
+            GROUP BY
                 p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
                 p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
-                j.v_nama_jurnal, pr.v_nama_konferensi, b.v_penerbit,
+                p.v_authors, p.v_publisher,
+                j.v_nama_jurnal, pr.v_nama_konferensi,
                 a.v_volume, a.v_issue, a.v_pages
             ORDER BY p.n_total_sitasi DESC NULLS LAST
             LIMIT %s OFFSET %s
         """
-        
         params.extend([per_page, offset])
         cur.execute(data_query, params)
         rows = cur.fetchall()
@@ -336,7 +394,6 @@ def get_sinta_publikasi(current_user_id):
                 # Format vol/issue
                 vol = row_dict.get('volume', '').strip()
                 issue = row_dict.get('issue', '').strip()
-                
                 if vol and issue:
                     row_dict['vol_issue'] = f"{vol}({issue})"
                 elif vol:
@@ -348,14 +405,12 @@ def get_sinta_publikasi(current_user_id):
                 
                 # Format tipe publikasi
                 tipe_value = row_dict.get('tipe', '').strip() if row_dict.get('tipe') else ''
-                
                 tipe_mapping = {
                     'artikel': 'Artikel',
                     'buku': 'Buku',
                     'prosiding': 'Prosiding',
                     'penelitian': 'Penelitian'
                 }
-                
                 if tipe_value:
                     row_dict['tipe'] = tipe_mapping.get(tipe_value.lower(), tipe_value.capitalize())
                 else:
@@ -382,7 +437,6 @@ def get_sinta_publikasi(current_user_id):
             'error': 'Failed to fetch SINTA publikasi data',
             'details': str(e)
         }), 500
-        
     finally:
         if cur:
             cur.close()
@@ -398,7 +452,6 @@ def get_scholar_dosen(current_user_id):
         page = int(request.args.get('page', 1))
         per_page = int(request.args.get('per_page', 20))
         search = request.args.get('search', '').strip()
-        
         offset = (page - 1) * per_page
         
         conn = get_db_connection()
@@ -417,7 +470,7 @@ def get_scholar_dosen(current_user_id):
         
         # Get total count
         count_query = f"""
-            SELECT COUNT(*) as total 
+            SELECT COUNT(*) as total
             FROM tmp_dosen_dt d
             {where_clause}
         """
@@ -426,16 +479,15 @@ def get_scholar_dosen(current_user_id):
         
         # Get data
         data_query = f"""
-            SELECT 
+            SELECT
                 d.v_id_dosen, d.v_nama_dosen, d.v_id_googleScholar,
-                d.n_total_publikasi, d.n_total_sitasi_gs, d.n_h_index_gs, 
+                d.n_total_publikasi, d.n_total_sitasi_gs, d.n_h_index_gs,
                 d.n_i10_index_gs, d.v_link_url, d.t_tanggal_unduh
             FROM tmp_dosen_dt d
             {where_clause}
             ORDER BY d.n_total_sitasi_gs DESC NULLS LAST
             LIMIT %s OFFSET %s
         """
-        
         params.extend([per_page, offset])
         cur.execute(data_query, params)
         scholar_data = [dict(row) for row in cur.fetchall()]
@@ -460,7 +512,6 @@ def get_scholar_publikasi(current_user_id):
     """Get Google Scholar publikasi data"""
     conn = None
     cur = None
-    
     print(f"🔑 Authenticated user ID: {current_user_id}")
     
     try:
@@ -479,65 +530,71 @@ def get_scholar_publikasi(current_user_id):
         where_clause = "WHERE p.v_sumber ILIKE %s"
         params = ['%Scholar%']
         
+        # Expand search to include author, title, and publisher
         if search:
-            where_clause += " AND LOWER(p.v_judul) LIKE LOWER(%s)"
-            params.append(f"%{search}%")
+            where_clause += """ AND (
+                LOWER(p.v_judul) LIKE LOWER(%s) OR
+                LOWER(p.v_authors) LIKE LOWER(%s) OR
+                LOWER(p.v_publisher) LIKE LOWER(%s)
+            )"""
+            search_param = f"%{search}%"
+            params.extend([search_param, search_param, search_param])
         
-        # ======== Hitung total data ========
+        # Get total count
         count_query = f"""
             SELECT COUNT(*) AS total
             FROM stg_publikasi_tr p
             {where_clause}
         """
-        
         cur.execute(count_query, params)
         count_result = cur.fetchone()
-        
         total = 0
         if count_result:
             total = count_result.get('total', 0) or 0
         
-        # ======== Ambil data publikasi ========
+        # Get data
         data_query = f"""
-        SELECT
-            p.v_id_publikasi,
-            COALESCE(STRING_AGG(DISTINCT d.v_nama_dosen, ', '), '') AS authors,
-            p.v_judul,
-            p.v_jenis AS tipe,
-            p.v_tahun_publikasi,
-            COALESCE(
-                j.v_nama_jurnal,
-                pr.v_nama_konferensi,
-                'N/A'
-            ) AS venue,
-            COALESCE(b.v_penerbit, '') AS publisher,  -- Tambahkan kolom publisher
-            COALESCE(a.v_volume, '') AS volume,
-            COALESCE(a.v_issue, '') AS issue,
-            COALESCE(a.v_pages, '') AS pages,
-            p.n_total_sitasi,
-            p.v_sumber,
-            p.t_tanggal_unduh,
-            p.v_link_url
-        FROM stg_publikasi_tr p
-        LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
-        LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
-        LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
-        LEFT JOIN stg_buku_dr b ON p.v_id_publikasi = b.v_id_publikasi
-        LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
-        LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
-        LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-        {where_clause}
-        GROUP BY 
-            p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
-            p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
-            j.v_nama_jurnal, pr.v_nama_konferensi, b.v_penerbit,
-            a.v_volume, a.v_issue, a.v_pages
-        ORDER BY p.n_total_sitasi DESC NULLS LAST
-        LIMIT %s OFFSET %s
-    """
-
+            SELECT
+                p.v_id_publikasi,
+                COALESCE(
+                    NULLIF(p.v_authors, ''),
+                    STRING_AGG(DISTINCT d.v_nama_dosen, ', ')
+                ) AS authors,
+                p.v_judul,
+                p.v_jenis AS tipe,
+                p.v_tahun_publikasi,
+                COALESCE(
+                    j.v_nama_jurnal,
+                    pr.v_nama_konferensi,
+                    'N/A'
+                ) AS venue,
+                COALESCE(p.v_publisher, '') AS publisher,
+                COALESCE(a.v_volume, '') AS volume,
+                COALESCE(a.v_issue, '') AS issue,
+                COALESCE(a.v_pages, '') AS pages,
+                p.n_total_sitasi,
+                p.v_sumber,
+                p.t_tanggal_unduh,
+                p.v_link_url
+            FROM stg_publikasi_tr p
+            LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+            LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
+            LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
+            LEFT JOIN stg_buku_dr b ON p.v_id_publikasi = b.v_id_publikasi
+            LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
+            LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
+            LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
+            {where_clause}
+            GROUP BY
+                p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
+                p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
+                p.v_authors, p.v_publisher,
+                j.v_nama_jurnal, pr.v_nama_konferensi,
+                a.v_volume, a.v_issue, a.v_pages
+            ORDER BY p.n_total_sitasi DESC NULLS LAST
+            LIMIT %s OFFSET %s
+        """
         final_params = params + [per_page, offset]
-        
         cur.execute(data_query, final_params)
         rows = cur.fetchall()
         
@@ -550,7 +607,6 @@ def get_scholar_publikasi(current_user_id):
                 # Format vol/issue
                 vol = row_dict.get('volume', '').strip()
                 issue = row_dict.get('issue', '').strip()
-                
                 if vol and issue:
                     row_dict['vol_issue'] = f"{vol}({issue})"
                 elif vol:
@@ -560,17 +616,14 @@ def get_scholar_publikasi(current_user_id):
                 else:
                     row_dict['vol_issue'] = "-"
                 
-                # Format tipe publikasi - PERBAIKAN DI SINI
+                # Format tipe publikasi
                 tipe_value = row_dict.get('tipe', '').strip() if row_dict.get('tipe') else ''
-                
                 tipe_mapping = {
                     'artikel': 'Artikel',
                     'buku': 'Buku',
                     'prosiding': 'Prosiding',
                     'penelitian': 'Penelitian'
                 }
-                
-                # Jika tipe_value ada dan tidak kosong, gunakan mapping
                 if tipe_value:
                     row_dict['tipe'] = tipe_mapping.get(tipe_value.lower(), tipe_value.capitalize())
                 else:
@@ -578,7 +631,7 @@ def get_scholar_publikasi(current_user_id):
                 
                 publikasi_data.append(row_dict)
         
-        # Hitung total pages dengan aman
+        # Hitung total pages
         total_pages = 0
         if total > 0 and per_page > 0:
             total_pages = (total + per_page - 1) // per_page
@@ -596,6 +649,7 @@ def get_scholar_publikasi(current_user_id):
         return jsonify(response_data), 200
         
     except psycopg2.Error as db_error:
+        import traceback
         error_details = traceback.format_exc()
         print("❌ Database error:\n", error_details)
         logger.error(f"Database error in Scholar publikasi: {db_error}\n{error_details}")
@@ -603,15 +657,6 @@ def get_scholar_publikasi(current_user_id):
             "error": "Database query failed",
             "details": str(db_error)
         }), 500
-        
-    except ValueError as val_error:
-        print("❌ Value error:", str(val_error))
-        logger.error(f"Invalid parameter value: {val_error}")
-        return jsonify({
-            "error": "Invalid parameter value",
-            "details": str(val_error)
-        }), 400
-        
     except Exception as e:
         import traceback
         error_details = traceback.format_exc()
@@ -621,13 +666,11 @@ def get_scholar_publikasi(current_user_id):
             "error": "Failed to fetch Scholar publikasi data",
             "details": str(e)
         }), 500
-        
     finally:
         if cur:
             cur.close()
         if conn:
             conn.close()
-            print("🔌 Database connection closed")
 
 # Scraping Routes
 @app.route('/api/scraping/sinta', methods=['POST'])
@@ -636,7 +679,6 @@ def scrape_sinta(current_user_id):
     """Run SINTA scraping"""
     try:
         data = request.get_json()
-        
         if not data or not data.get('username') or not data.get('password'):
             return jsonify({'error': 'SINTA credentials required'}), 400
         
@@ -657,7 +699,7 @@ def scrape_sinta(current_user_id):
             # Run publication scrapers sequentially
             scrapers = [
                 'scrapers/sinta_garuda.py',
-                'scrapers/sinta_googlescholar.py', 
+                'scrapers/sinta_googlescholar.py',
                 'scrapers/sinta_scopus.py'
             ]
             results = []
@@ -851,10 +893,10 @@ def init_database():
         
         cur = conn.cursor()
         
-        # Check if users table exists, create if not
+        # Check if users table exists
         cur.execute("""
             SELECT EXISTS (
-                SELECT FROM information_schema.tables 
+                SELECT FROM information_schema.tables
                 WHERE table_name = 'users'
             );
         """)
@@ -870,13 +912,36 @@ def init_database():
                     f_is_admin BOOLEAN DEFAULT FALSE,
                     t_tanggal_bikin TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
-                
                 CREATE UNIQUE INDEX idx_users_email ON users(v_email);
                 CREATE UNIQUE INDEX idx_users_username ON users(v_username);
             """)
-            
             conn.commit()
             logger.info("Users table created successfully")
+        
+        # Check if temp_dosenGS_scraping table exists
+        cur.execute("""
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables
+                WHERE table_name = 'temp_dosengs_scraping'
+            );
+        """)
+        
+        if not cur.fetchone()[0]:
+            logger.info("Creating temp_dosenGS_scraping table...")
+            cur.execute("""
+                CREATE TABLE temp_dosenGS_scraping (
+                    v_id_dosen SERIAL PRIMARY KEY,
+                    v_nama VARCHAR(255) NOT NULL,
+                    v_link TEXT,
+                    v_status VARCHAR(50) DEFAULT 'pending',
+                    v_error_message TEXT,
+                    t_last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+                CREATE INDEX idx_dosengs_status ON temp_dosenGS_scraping(v_status);
+                CREATE INDEX idx_dosengs_nama ON temp_dosenGS_scraping(v_nama);
+            """)
+            conn.commit()
+            logger.info("temp_dosenGS_scraping table created successfully")
         
         conn.close()
         return True
@@ -893,14 +958,17 @@ if __name__ == '__main__':
     os.makedirs('scrapers', exist_ok=True)
     
     # Log startup information
-    logger.info("Starting ProDS Flask Application")
+    logger.info("Starting ProDS Flask Application with SocketIO")
     logger.info(f"Database: {DB_CONFIG['dbname']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}")
     logger.info(f"Environment: {os.environ.get('FLASK_ENV', 'development')}")
     
-    # Run the Flask app
+    # Run with SocketIO
     debug_mode = os.environ.get('FLASK_ENV') == 'development'
-    app.run(
-        debug=debug_mode, 
-        host='0.0.0.0', 
-        port=int(os.environ.get('PORT', 5000))
+    
+    socketio.run(
+        app,
+        debug=debug_mode,
+        host='0.0.0.0',
+        port=int(os.environ.get('PORT', 5005)),
+        allow_unsafe_werkzeug=True
     )
