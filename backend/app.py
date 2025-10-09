@@ -20,24 +20,33 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# Konfigurasi CORS
-CORS(app,
-    resources={r"/*": {
-        "origins": ["http://localhost:5173"],
-        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"],
-        "supports_credentials": True,
-        "expose_headers": ["Content-Type", "Authorization"],
-        "max_age": 600
-    }},
-    allow_credentials=True)
+# Konfigurasi dasar
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
 
-# Initialize SocketIO
+# Konfigurasi CORS yang lebih sederhana
+CORS(app, 
+     resources={
+         r"/api/*": {
+             "origins": ["http://localhost:5173"],
+             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+             "allow_headers": ["Content-Type", "Authorization", "Access-Control-Allow-Credentials"],
+             "supports_credentials": True
+         }
+     })
+
+# Middleware untuk response headers
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
+
+# Konfigurasi SocketIO
 socketio = SocketIO(app,
     cors_allowed_origins=["http://localhost:5173"],
-    async_mode='eventlet',
-    logger=True,
-    engineio_logger=True)
+    async_mode='threading')
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-this')
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-change-this')

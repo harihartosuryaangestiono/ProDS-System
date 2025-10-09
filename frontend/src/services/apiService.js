@@ -11,8 +11,27 @@ const apiService = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true,
-  timeout: 30000, // 30 second timeout
+  timeout: 30000,
 });
+
+// Request interceptor
+apiService.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    // Ensure CORS headers
+    config.headers['Access-Control-Allow-Credentials'] = 'true';
+    
+    return config;
+  },
+  (error) => {
+    console.error('Request interceptor error:', error);
+    return Promise.reject(error);
+  }
+);
 
 // Request interceptor to add the auth token to headers
 apiService.interceptors.request.use(

@@ -19,6 +19,7 @@ from task.scraping_tasks import (
     scrape_sinta_googlescholar_task,
     scrape_sinta_garuda_task
 )
+from flask_cors import cross_origin
 
 scraping_bp = Blueprint('scraping', __name__)
 
@@ -135,16 +136,21 @@ def run_google_scholar_scraping(job_id, max_authors, scrape_from_beginning):
 # SINTA ROUTES
 # ============================================================================
 
-@scraping_bp.route('/api/scraping/sinta/dosen', methods=['POST'])
+@scraping_bp.route('/api/scraping/sinta/dosen', methods=['POST', 'OPTIONS'])
+@cross_origin(origins=['http://localhost:5173'], supports_credentials=True)
 def scrape_sinta_dosen():
-    """Endpoint untuk scraping data dosen dari SINTA"""
+    """Endpoint untuk scraping SINTA Dosen"""
+    # Handle OPTIONS request
+    if request.method == 'OPTIONS':
+        return '', 204
+        
     try:
         data = request.get_json()
         
-        # Validate required fields
-        required_fields = ['username', 'password', 'affiliation_id']
+        # Validasi input
+        required_fields = ['username', 'password', 'affiliation_id', 'target_dosen', 'max_pages', 'max_cycles']
         for field in required_fields:
-            if field not in data or not data[field]:
+            if field not in data:
                 return jsonify({
                     'success': False,
                     'error': f'Field {field} is required'
@@ -153,7 +159,7 @@ def scrape_sinta_dosen():
         # Generate job ID
         job_id = f"sinta_dosen_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         
-        # Start background task
+        # Start scraping task
         thread = threading.Thread(
             target=run_scraping_task,
             args=(job_id, scrape_sinta_dosen_task),
@@ -161,9 +167,9 @@ def scrape_sinta_dosen():
                 'username': data['username'],
                 'password': data['password'],
                 'affiliation_id': data['affiliation_id'],
-                'target_dosen': data.get('target_dosen', 473),
-                'max_pages': data.get('max_pages', 50),
-                'max_cycles': data.get('max_cycles', 20),
+                'target_dosen': data['target_dosen'],
+                'max_pages': data['max_pages'],
+                'max_cycles': data['max_cycles'],
                 'job_id': job_id
             }
         )
@@ -172,7 +178,7 @@ def scrape_sinta_dosen():
         
         return jsonify({
             'success': True,
-            'message': 'Scraping job started',
+            'message': 'SINTA Dosen scraping started',
             'job_id': job_id
         })
         

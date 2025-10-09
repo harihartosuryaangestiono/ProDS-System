@@ -9,9 +9,9 @@ const ScrapingDashboard = () => {
   });
   const [dosenConfig, setDosenConfig] = useState({
     affiliationId: '1397',
-    targetDosen: 473,
-    maxPages: 50,
-    maxCycles: 20
+    targetDosen: 10,  // Ubah nilai default ke number
+    maxPages: 10,     // Ubah nilai default ke number
+    maxCycles: 10     // Ubah nilai default ke number
   });
   const [gsConfig, setGsConfig] = useState({
     maxAuthors: 10,
@@ -27,47 +27,85 @@ const ScrapingDashboard = () => {
     let pollInterval = null;
     
     if (currentJobId && isLoading) {
-      pollInterval = setInterval(async () => {
-        try {
-          const response = await fetch(`http://localhost:5000/api/scraping/jobs/${currentJobId}`);
-          const data = await response.json();
+      // Gunakan WebSocket untuk update realtime
+      const socket = new WebSocket('ws://localhost:5000');
+      
+      socket.onopen = () => {
+        console.log('WebSocket Connected');
+      };
+      
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.job_id === currentJobId) {
+          setScrapingProgress(data.progress);
           
-          if (data.success && data.job) {
-            const job = data.job;
-            
-            setScrapingProgress({
-              status: job.status,
-              message: job.message,
-              currentCount: job.current,
-              targetCount: job.total
+          if (data.progress.status === 'completed') {
+            setScrapingResults({
+              success: true,
+              message: data.progress.message,
+              summary: data.progress.summary
             });
-            
-            if (job.status === 'completed') {
-              setScrapingResults({
-                success: true,
-                message: job.message,
-                summary: job.result
-              });
-              setIsLoading(false);
-              setCurrentJobId(null);
-            } else if (job.status === 'failed') {
-              setScrapingResults({
-                success: false,
-                error: job.error || job.message
-              });
-              setIsLoading(false);
-              setCurrentJobId(null);
-            }
+            setIsLoading(false);
+            setCurrentJobId(null);
+          } else if (data.progress.status === 'failed') {
+            setScrapingResults({
+              success: false,
+              error: data.progress.error
+            });
+            setIsLoading(false);
+            setCurrentJobId(null);
           }
-        } catch (error) {
-          console.error('Polling error:', error);
         }
-      }, 2000); // Poll every 2 seconds
+      };
+      
+      socket.onerror = (error) => {
+        console.error('WebSocket Error:', error);
+        // Fallback ke polling jika WebSocket gagal
+        pollInterval = setInterval(async () => {
+          try {
+            const response = await fetch(`http://localhost:5000/api/scraping/jobs/${currentJobId}`);
+            const data = await response.json();
+            
+            if (data.success && data.job) {
+              const job = data.job;
+              
+              setScrapingProgress({
+                status: job.status,
+                message: job.message,
+                currentCount: job.current,
+                targetCount: job.total
+              });
+              
+              if (job.status === 'completed') {
+                setScrapingResults({
+                  success: true,
+                  message: job.message,
+                  summary: job.result
+                });
+                setIsLoading(false);
+                setCurrentJobId(null);
+              } else if (job.status === 'failed') {
+                setScrapingResults({
+                  success: false,
+                  error: job.error || job.message
+                });
+                setIsLoading(false);
+                setCurrentJobId(null);
+              }
+            }
+          } catch (error) {
+            console.error('Polling error:', error);
+          }
+        }, 2000); // Poll setiap 2 detik
+      };
+      
+      return () => {
+        if (socket.readyState === WebSocket.OPEN) {
+          socket.close();
+        }
+        if (pollInterval) clearInterval(pollInterval);
+      };
     }
-    
-    return () => {
-      if (pollInterval) clearInterval(pollInterval);
-    };
   }, [currentJobId, isLoading]);
 
   const handleCredentialChange = (e) => {
@@ -78,10 +116,14 @@ const ScrapingDashboard = () => {
   };
 
   const handleDosenConfigChange = (e) => {
-    const value = e.target.name === 'affiliationId' ? e.target.value : parseInt(e.target.value);
+    const { name, value } = e.target;
+    
+    // Pastikan nilai yang diset adalah number yang valid
+    const numValue = name === 'affiliationId' ? value : parseInt(value) || 0;
+    
     setDosenConfig(prev => ({
       ...prev,
-      [e.target.name]: value
+      [name]: numValue
     }));
   };
 
@@ -102,18 +144,20 @@ const ScrapingDashboard = () => {
       currentCount: 0,
       targetCount: payload.target_dosen || payload.max_authors || 100
     });
-
+  
     try {
-      const response = await fetch(`http://localhost:5000/api/scraping/${endpoint}`, {
+      const response = await fetch(`/api/scraping/${endpoint}`, { // Ubah URL menjadi relatif
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(payload)
       });
-
+  
       const data = await response.json();
-
+  
       if (data.success) {
         if (data.job_id) {
           setCurrentJobId(data.job_id);
@@ -199,7 +243,7 @@ const ScrapingDashboard = () => {
   };
 
   const handleGoogleScholar = async () => {
-    // Confirmation for scrape from beginning
+    // Konfirmasi untuk scrape dari awal
     if (gsConfig.scrapeFromBeginning) {
       const confirmed = window.confirm(
         '⚠️ PERHATIAN: Anda akan melakukan scraping dari awal!\n\n' +
@@ -212,11 +256,64 @@ const ScrapingDashboard = () => {
       }
     }
 
-    await startScraping('googlescholar/scrape', {
-      max_authors: gsConfig.maxAuthors,
-      scrape_from_beginning: gsConfig.scrapeFromBeginning
+    setIsLoading(true);
+    setScrapingResults(null);
+    setScrapingProgress({
+      status: 'starting',
+      message: 'Memulai scraping Google Scholar...',
+      currentCount: 0,
+      targetCount: gsConfig.maxAuthors
     });
+
+    try {
+      const response = await fetch('http://localhost:5000/api/scraping/googlescholar/scrape', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          max_authors: gsConfig.maxAuthors,
+          scrape_from_beginning: gsConfig.scrapeFromBeginning
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setCurrentJobId(data.job_id);
+        // Tampilkan instruksi login jika diperlukan
+        if (data.instructions) {
+          alert(data.instructions);
+        }
+      } else {
+        setScrapingResults({
+          success: false,
+          error: data.error
+        });
+        setIsLoading(false);
+      }
+    } catch (error) {
+      setScrapingResults({
+        success: false,
+        error: 'Network error: ' + error.message
+      });
+      setIsLoading(false);
+    }
   };
+
+  const TabButton = ({ id, label, icon: Icon, isActive, onClick }) => (
+    <button
+      onClick={onClick}
+      className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+        isActive
+          ? 'bg-blue-600 text-white shadow-md'
+          : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+      }`}
+    >
+      <Icon className="w-4 h-4 mr-2" />
+      {label}
+    </button>
+  );
 
   const getProgressPercentage = () => {
     if (!scrapingProgress || !scrapingProgress.targetCount) return 0;
@@ -240,20 +337,6 @@ const ScrapingDashboard = () => {
         return 'bg-gray-500';
     }
   };
-
-  const TabButton = ({ id, label, icon: Icon, isActive, onClick }) => (
-    <button
-      onClick={onClick}
-      className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-        isActive
-          ? 'bg-blue-600 text-white shadow-md'
-          : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
-      }`}
-    >
-      <Icon className="w-4 h-4 mr-2" />
-      {label}
-    </button>
-  );
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -310,6 +393,63 @@ const ScrapingDashboard = () => {
           </div>
         </div>
 
+        {/* Progress Bar */}
+        {isLoading && scrapingProgress && (
+          <div className="mb-6">
+            <div className="bg-white rounded-lg shadow-sm p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center">
+                  <Clock className="w-5 h-5 text-blue-500 mr-2" />
+                  <span className="font-medium text-gray-700">
+                    {scrapingProgress.message || 'Sedang memproses...'}
+                  </span>
+                </div>
+                <span className="text-sm text-gray-500">
+                  {scrapingProgress.currentCount || 0} / {scrapingProgress.targetCount || '?'}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  className={`h-2.5 rounded-full ${getStatusColor()}`}
+                  style={{ width: `${getProgressPercentage()}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Results */}
+        {scrapingResults && (
+          <div className={`mb-6 p-4 rounded-lg ${
+            scrapingResults.success ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'
+          } border`}>
+            <div className="flex items-start">
+              {scrapingResults.success ? (
+                <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 mr-3" />
+              ) : (
+                <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 mr-3" />
+              )}
+              <div>
+                <h3 className={`text-lg font-medium ${
+                  scrapingResults.success ? 'text-green-800' : 'text-red-800'
+                }`}>
+                  {scrapingResults.success ? 'Scraping Berhasil' : 'Scraping Gagal'}
+                </h3>
+                <p className={`text-sm ${
+                  scrapingResults.success ? 'text-green-700' : 'text-red-700'
+                }`}>
+                  {scrapingResults.success ? scrapingResults.message : scrapingResults.error}
+                </p>
+                {scrapingResults.summary && (
+                  <pre className="mt-2 text-sm bg-white rounded p-2 overflow-auto">
+                    {JSON.stringify(scrapingResults.summary, null, 2)}
+                  </pre>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* SINTA Credentials (Common for SINTA tabs) */}
         {activeTab !== 'google-scholar' && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -355,14 +495,14 @@ const ScrapingDashboard = () => {
         )}
 
         {/* Tab Content */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-6">
           {activeTab === 'sinta-dosen' && (
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Scraping SINTA Dosen</h3>
               
               <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
                 <div className="flex">
-                  <AlertCircle className="h-5 w-5 text-yellow-400 flex-shrink-0" />
+                  <AlertCircle className="h-5 w-5 text-yellow-400" />
                   <div className="ml-3">
                     <p className="text-sm text-yellow-700">
                       Proses ini dapat memakan waktu lama (hingga beberapa jam) tergantung target dosen yang ditentukan.
@@ -397,6 +537,7 @@ const ScrapingDashboard = () => {
                     name="targetDosen"
                     value={dosenConfig.targetDosen}
                     onChange={handleDosenConfigChange}
+                    min="1"
                     disabled={isLoading}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                   />
@@ -411,6 +552,7 @@ const ScrapingDashboard = () => {
                     name="maxPages"
                     value={dosenConfig.maxPages}
                     onChange={handleDosenConfigChange}
+                    min="1"
                     disabled={isLoading}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                   />
@@ -426,6 +568,7 @@ const ScrapingDashboard = () => {
                     name="maxCycles"
                     value={dosenConfig.maxCycles}
                     onChange={handleDosenConfigChange}
+                    min="1"
                     disabled={isLoading}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                   />
@@ -458,7 +601,7 @@ const ScrapingDashboard = () => {
               
               <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
                 <div className="flex">
-                  <AlertCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                  <AlertCircle className="h-5 w-5 text-blue-400" />
                   <div className="ml-3">
                     <p className="text-sm text-blue-700">
                       Scraping publikasi Scopus dari semua dosen yang ada di database.
@@ -493,7 +636,7 @@ const ScrapingDashboard = () => {
               
               <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
                 <div className="flex">
-                  <AlertCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
+                  <AlertCircle className="h-5 w-5 text-green-400" />
                   <div className="ml-3">
                     <p className="text-sm text-green-700">
                       Scraping publikasi Google Scholar dari semua dosen yang ada di database.
@@ -528,7 +671,7 @@ const ScrapingDashboard = () => {
               
               <div className="bg-purple-50 border-l-4 border-purple-400 p-4 mb-6">
                 <div className="flex">
-                  <AlertCircle className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  <AlertCircle className="h-5 w-5 text-purple-400" />
                   <div className="ml-3">
                     <p className="text-sm text-purple-700">
                       Scraping publikasi Garuda dari semua dosen yang ada di database.
@@ -561,38 +704,23 @@ const ScrapingDashboard = () => {
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Scraping Google Scholar</h3>
               
-              <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-                <div className="flex">
-                  <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0" />
-                  <div className="ml-3">
-                    <p className="text-sm text-red-700 font-semibold mb-2">
-                      ⚠️ Perhatian: Browser Otomatis
-                    </p>
-                    <p className="text-sm text-red-700">
-                      Browser Chrome akan terbuka secara otomatis. Scraping akan berjalan di server. 
-                      Jika diminta login, silakan login ke Google Scholar untuk menghindari CAPTCHA.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
               <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
                 <div className="flex">
-                  <AlertCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                  <AlertCircle className="h-5 w-5 text-blue-400" />
                   <div className="ml-3">
                     <p className="text-sm text-blue-700">
-                      Scraping akan mengambil profil dan publikasi dosen dari database yang memiliki URL Google Scholar. 
-                      Data akan disimpan ke database dan file CSV secara otomatis.
+                      Scraping langsung dari Google Scholar (tidak melalui SINTA).
+                      Browser akan terbuka untuk login manual ke Google Scholar.
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     <Target className="w-4 h-4 inline mr-1" />
-                    Maksimum Authors
+                    Max Authors
                   </label>
                   <input
                     type="number"
@@ -600,40 +728,29 @@ const ScrapingDashboard = () => {
                     value={gsConfig.maxAuthors}
                     onChange={handleGsConfigChange}
                     disabled={isLoading}
-                    min="1"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                   />
-                  <p className="mt-1 text-xs text-gray-500">Jumlah maksimum author yang akan di-scrape dari database</p>
                 </div>
 
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="scrapeFromBeginning"
-                      name="scrapeFromBeginning"
-                      type="checkbox"
-                      checked={gsConfig.scrapeFromBeginning}
-                      onChange={handleGsConfigChange}
-                      disabled={isLoading}
-                      className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500 disabled:opacity-50"
-                    />
-                  </div>
-                  <div className="ml-3">
-                    <label htmlFor="scrapeFromBeginning" className="text-sm font-medium text-gray-700">
-                      Scraping Dari Awal (Reset Status)
-                    </label>
-                    <p className="text-xs text-gray-500 mt-1">
-                      ⚠️ Centang opsi ini untuk mengulang scraping semua dosen (termasuk yang sudah selesai). 
-                      Jika tidak dicentang, hanya dosen yang belum selesai yang akan di-scrape.
-                    </p>
-                  </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="scrapeFromBeginning"
+                    checked={gsConfig.scrapeFromBeginning}
+                    onChange={handleGsConfigChange}
+                    disabled={isLoading}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label className="ml-2 block text-sm text-gray-900">
+                    Scrape dari awal (ulang semua)
+                  </label>
                 </div>
               </div>
 
               <button
                 onClick={handleGoogleScholar}
                 disabled={isLoading}
-                className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isLoading ? (
                   <>
@@ -650,85 +767,6 @@ const ScrapingDashboard = () => {
             </div>
           )}
         </div>
-
-        {/* Progress Section */}
-        {scrapingProgress && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Progress Scraping</h3>
-            
-            <div className="mb-4">
-              <div className="flex justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700">
-                  {scrapingProgress.currentCount || 0} / {scrapingProgress.targetCount || 0} items
-                </span>
-                <span className="text-sm font-medium text-gray-700">
-                  {getProgressPercentage()}%
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div
-                  className={`h-3 rounded-full transition-all duration-500 ${getStatusColor()}`}
-                  style={{ width: `${getProgressPercentage()}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-              <div className="flex items-start">
-                <Clock className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                <div className="ml-3 flex-1">
-                  <p className="text-sm font-medium text-blue-900">{scrapingProgress.message || 'Processing...'}</p>
-                  {scrapingProgress.job_id && (
-                    <p className="text-xs text-blue-700 mt-1">
-                      Job ID: {scrapingProgress.job_id}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Results Section */}
-        {scrapingResults && (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center mb-4">
-              {scrapingResults.success ? (
-                <CheckCircle className="w-6 h-6 text-green-500 mr-2 flex-shrink-0" />
-              ) : (
-                <AlertCircle className="w-6 h-6 text-red-500 mr-2 flex-shrink-0" />
-              )}
-              <h3 className="text-lg font-semibold text-gray-900">
-                Hasil Scraping
-              </h3>
-            </div>
-            
-            {scrapingResults.success ? (
-              <div className="space-y-4">
-                <div className="bg-green-50 border border-green-200 rounded-md p-4">
-                  <p className="text-sm text-green-800 font-medium">{scrapingResults.message}</p>
-                </div>
-
-                {scrapingResults.summary && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {Object.entries(scrapingResults.summary).map(([key, value]) => (
-                      <div key={key} className="bg-gray-50 rounded-lg p-4">
-                        <p className="text-xs text-gray-500 uppercase">{key.replace(/_/g, ' ')}</p>
-                        <p className="text-2xl font-bold text-gray-900 mt-1">
-                          {typeof value === 'number' ? value.toLocaleString() : value}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="bg-red-50 border border-red-200 rounded-md p-4">
-                <p className="text-sm text-red-800">Error: {scrapingResults.error}</p>
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
