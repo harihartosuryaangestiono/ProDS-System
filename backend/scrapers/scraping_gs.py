@@ -27,11 +27,11 @@ import psycopg2
 from psycopg2 import sql
 import os
 
-# Database connection parameters - update these with your PostgreSQL credentials
+# Database connection parameters
 DB_PARAMS = {
-    'dbname': 'SKM_PUBLIKASI',  # Adjust this to your actual database name
-    'user': 'rayhanadjisantoso',         # Update with your username
-    'password': 'rayhan123',             # Update with your password
+    'dbname': 'SKM_PUBLIKASI',
+    'user': 'rayhanadjisantoso',
+    'password': 'rayhan123',
     'host': 'localhost',
     'port': '5432'
 }
@@ -68,7 +68,7 @@ def setup_driver():
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option('useAutomationExtension', False)
     
-    # Menambahkan prefs untuk menghindari notifikasi dan menghemat resource
+    # Menambahkan prefs
     prefs = {
         "profile.default_content_setting_values.notifications": 2,
         "profile.default_content_settings.popups": 0,
@@ -79,7 +79,7 @@ def setup_driver():
     }
     chrome_options.add_experimental_option("prefs", prefs)
     
-    # Gunakan ChromeDriverManager untuk mendapatkan driver yang sesuai
+    # Gunakan ChromeDriverManager
     try:
         service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=chrome_options)
@@ -91,61 +91,38 @@ def setup_driver():
             print(f"Error alternatif saat membuat driver: {e2}")
             raise
     
-    # Hapus properti webdriver untuk menghindari deteksi
+    # Hapus properti webdriver
     try:
         driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
     except Exception as e:
         print(f"Warning: Tidak dapat menyembunyikan webdriver: {e}")
     
-    # Set timeouts yang lebih panjang
+    # Set timeouts
     driver.set_page_load_timeout(120)
     driver.implicitly_wait(30)
     
-    # Tambahkan cookies untuk Google Scholar
-    try:
-        driver.get("https://scholar.google.com")
-        time.sleep(5)
-        
-        cookies = [
-            {'name': 'GSP', 'value': 'ID=1234567890abcdef:CF=4', 'domain': '.google.com'},
-            {'name': 'NID', 'value': '511=abcdefghijklmnopqrstuvwxyz1234567890', 'domain': '.google.com'},
-            {'name': 'CONSENT', 'value': 'PENDING+999', 'domain': '.google.com'},
-            {'name': '1P_JAR', 'value': '2024-01-01-00', 'domain': '.google.com'}
-        ]
-        
-        for cookie in cookies:
-            try:
-                driver.add_cookie(cookie)
-            except Exception as e:
-                print(f"Warning: Could not add cookie {cookie['name']}: {e}")
-    except Exception as e:
-        print(f"Warning: Tidak dapat menambahkan cookies: {e}")
-    
     return driver
 
-def setup_driver_with_manual_login():
-    """Setup driver dengan login manual untuk menghindari CAPTCHA"""
+def setup_driver_with_check_login():
+    """Setup driver dan check apakah sudah login (untuk web interface)"""
     driver = setup_driver()
     
     try:
         driver.get("https://scholar.google.com")
+        time.sleep(5)
         
-        print("\n" + "="*50)
-        print("SILAKAN LOGIN KE GOOGLE SCHOLAR SECARA MANUAL")
-        print("Setelah login berhasil, tekan Enter untuk melanjutkan")
-        print("="*50 + "\n")
-        
-        input("Tekan Enter setelah login selesai...")
-        
-        print("Memverifikasi login...")
-        time.sleep(3)
-        
-        cookies = driver.get_cookies()
-        print(f"Berhasil mendapatkan {len(cookies)} cookies")
-        
-        return driver
+        # Check if already logged in
+        try:
+            # Cari elemen yang menandakan sudah login
+            profile_element = driver.find_element(By.CSS_SELECTOR, '#gs_gb_rt a')
+            print("✓ Appears to be logged in or no sign-in required")
+            return driver
+        except NoSuchElementException:
+            print("✓ Appears to be logged in or no sign-in required")
+            return driver
+            
     except Exception as e:
-        print(f"Error saat setup driver dengan login manual: {e}")
+        print(f"Error saat setup driver: {e}")
         try:
             driver.quit()
         except:
@@ -525,79 +502,98 @@ def get_publication_details_selenium(driver, pub_url):
                 print(f"Error saat menangani tab browser: {e}")
 
 def classify_publication_type(journal, conference, publisher, title=""):
-    """Klasifikasi jenis publikasi berdasarkan aturan baru"""
-    # Prioritas 1: Journal
+    """
+    Klasifikasi jenis publikasi berdasarkan prioritas:
+    1. Jika journal memiliki nilai (bukan N/A atau kosong) → artikel
+    2. Jika conference memiliki nilai (bukan N/A atau kosong) → prosiding
+    3. Jika keduanya tidak memiliki nilai → gunakan regex pada publisher dan title
+    
+    Return values sesuai database: 'artikel', 'prosiding', 'buku', 'penelitian', 'lainnya'
+    """
+    
+    # Prioritas 1: Jika journal memiliki nilai (bukan N/A atau kosong)
     if journal and journal.strip() and journal != 'N/A':
-        return "Jurnal"
+        return 'artikel'
     
-    # Prioritas 2: Conference
+    # Prioritas 2: Jika conference memiliki nilai (bukan N/A atau kosong)
     if conference and conference.strip() and conference != 'N/A':
-        return "Prosiding Konferensi"
+        return 'prosiding'
     
-    # Prioritas 3: Regex classification
-    result = classify_by_regex(publisher, title)
-    
-    # Pastikan return value valid
-    if not result or result.strip() == '':
-        return "Lainnya"
-    
-    return result
-
+    # Prioritas 3: Jika kedua kolom tidak memiliki nilai, gunakan regex
+    return classify_by_regex(publisher, title)
 
 def classify_by_regex(publisher, title=""):
-    """Klasifikasi menggunakan regex jika journal dan conference tidak tersedia"""
+    """
+    Klasifikasi menggunakan regex jika journal dan conference tidak tersedia.
+    Return values: 'artikel', 'prosiding', 'buku', 'penelitian', 'lainnya'
+    """
+    
+    # Gabungkan publisher dan title untuk analisis
     combined_text = f"{publisher} {title}".lower()
     
     if pd.isna(combined_text) or combined_text.strip() == "":
-        return "Lainnya"
+        return 'lainnya'
     
+    # Daftar penerbit buku terkenal
     book_publishers = ['nuansa aulia', 'citra aditya bakti', 'yrama widya', 
                       'pustaka belajar', 'pustaka pelajar', 'erlangga', 
                       'andpublisher', 'prenadamedia', 'gramedia', 'grasindo',
                       'media', 'prenhalindo', 'prenhallindo', 'wiley', 'springer']
     
+    # Deteksi penerbit buku
     if any(pub in combined_text for pub in book_publishers):
-        return "Buku/Bab Buku"
+        return 'buku'
     
+    # Prioritas untuk buku jika ada kata "edisi"
     if 'edisi' in combined_text:
-        return "Buku/Bab Buku"
+        return 'buku'
     
+    # Deteksi jurnal/artikel
     if any(keyword in combined_text for keyword in ['jurnal', 'journal', 'jou.', 'j.', 'acta']):
-        return "Jurnal"
+        return 'artikel'
     
+    # Deteksi prosiding konferensi
     if any(keyword in combined_text for keyword in ['prosiding', 'proceedings', 'proc.', 'konferensi', 'conference', 
                                                    'conf.', 'simposium', 'symposium', 'workshop', 'pertemuan', 'meeting']):
-        return "Prosiding Konferensi"
+        return 'prosiding'
     
+    # Deteksi buku
     if any(keyword in combined_text for keyword in ['buku', 'book', 'bab buku', 'chapter', 'handbook', 'ensiklopedia', 
                                                    'encyclopedia', 'buku teks', 'textbook', 'penerbit', 'publisher', 'press', 
                                                    'books']):
-        return "Buku/Bab Buku"
+        return 'buku'
     
+    # Deteksi tesis/disertasi - masuk kategori 'penelitian'
     if any(keyword in combined_text for keyword in ['tesis', 'thesis', 'disertasi', 'dissertation', 'skripsi', 'program doktor',
                                                    'program pascasarjana', 'phd', 'master', 'doctoral', 'program studi', 'fakultas']):
-        return "Tesis/Disertasi"
+        return 'penelitian'
     
+    # Deteksi laporan penelitian - masuk kategori 'penelitian'
     if any(keyword in combined_text for keyword in ['analisis', 'analysis', 'penelitian', 'research']):
-        return "Laporan Penelitian"
+        return 'penelitian'
     
+    # Deteksi preprint/laporan teknis - masuk kategori 'penelitian'
     if any(keyword in combined_text for keyword in ['arxiv', 'preprint', 'laporan teknis', 'technical report', 
                                                    'naskah awal', 'working paper', 'teknis']):
-        return "Preprint/Laporan Teknis"
+        return 'penelitian'
     
+    # Deteksi paten - masuk kategori 'penelitian'
     if 'paten' in combined_text or 'patent' in combined_text:
-        return "Paten"
+        return 'penelitian'
     
+    # Deteksi referensi hukum/undang-undang - masuk kategori 'buku'
     if re.search(r'\bUU\s*No\.\s*\d+|Undang-undang\s*Nomor\s*\d+|Peraturan\s*(Pemerintah|Presiden)\s*No\.\s*\d+', 
                 combined_text):
-        return "Buku/Bab Buku"
+        return 'buku'
     
+    # Deteksi berdasarkan format volume/issue - indikasi jurnal
     if re.search(r'vol\.|\bvol\b|\bedisi\b|\bno\.|\bhal\.|\bhalaman\b', combined_text) or \
        re.search(r'\bvol\.\s*\d+\s*(\(\s*\d+\s*\))?', combined_text) or \
        re.search(r'\d+\s*\(\d+\)', combined_text):
-        return "Jurnal"
+        return 'artikel'
     
-    return "Lainnya"
+    # Default: Jika tidak terdeteksi sebagai tipe apapun
+    return 'lainnya'
 
 def extract_vol_no(venue_text, title=""):
     """Extract volume and issue information"""
@@ -727,24 +723,12 @@ def extract_pages(venue_text, title=""):
     
     return ""
 
-
 def transform_publications_data(all_publications):
-    """Transform publications data dengan memastikan publication_type selalu ada"""
+    """Transform publications data menggunakan klasifikasi yang benar"""
     transformed_data = []
     
     for pub in all_publications:
-        # Classify publication type
-        pub_type = classify_publication_type(
-            pub.get('journal', 'N/A'), 
-            pub.get('conference', 'N/A'), 
-            pub.get('publisher', ''), 
-            pub.get('title', '')
-        )
-        
-        # Ensure pub_type is never None or empty
-        if not pub_type or pub_type.strip() == '':
-            pub_type = 'Lainnya'
-        
+        # Data dasar publikasi
         base_data = {
             'judul': pub.get('title', ''),
             'author': pub.get('authors', ''),
@@ -752,7 +736,12 @@ def transform_publications_data(all_publications):
             'journal': pub.get('journal', 'N/A'),
             'conference': pub.get('conference', 'N/A'),
             'publisher': pub.get('publisher', ''),
-            'publication_type': pub_type,  # This is for CSV
+            'publication_type': classify_publication_type(
+                pub.get('journal', 'N/A'), 
+                pub.get('conference', 'N/A'), 
+                pub.get('publisher', ''), 
+                pub.get('title', '')
+            ),
             'volume': pub.get('volume', ''),
             'issue': pub.get('issue', ''),
             'pages': pub.get('pages', ''),
@@ -761,7 +750,7 @@ def transform_publications_data(all_publications):
             'sumber': 'Google Scholar'
         }
         
-        # Extract volume/issue if not present
+        # Ekstrak volume dan issue menggunakan regex jika tidak tersedia
         if not base_data['volume'] or not base_data['issue']:
             source_text = pub.get('journal', '') if pub.get('journal', 'N/A') != 'N/A' else pub.get('conference', '')
             vol, no = extract_vol_no(source_text, pub.get('title', ''))
@@ -770,13 +759,14 @@ def transform_publications_data(all_publications):
             if not base_data['issue']:
                 base_data['issue'] = no
         
-        # Extract pages if not present
+        # Ekstrak pages menggunakan regex jika tidak tersedia
         if not base_data['pages']:
             source_text = pub.get('journal', '') if pub.get('journal', 'N/A') != 'N/A' else pub.get('conference', '')
             base_data['pages'] = extract_pages(source_text, pub.get('title', ''))
         
         citations_per_year = pub.get('citations_per_year', {})
         
+        # Jika tidak ada data sitasi per tahun, tambahkan satu baris dengan data dasar
         if not citations_per_year:
             transformed_data.append({
                 **base_data,
@@ -785,6 +775,7 @@ def transform_publications_data(all_publications):
                 'tanggal_unduh': datetime.datetime.now().strftime('%Y-%m-%d')
             })
         else:
+            # Untuk setiap tahun dalam citations_per_year, buat baris terpisah
             for year, citations in citations_per_year.items():
                 transformed_data.append({
                     **base_data,
@@ -999,373 +990,342 @@ def update_scraping_status(conn, author_name, status, error_message=None):
         if cursor:
             cursor.close()
 
-def determine_publication_type(row):
-    """Determine publication type based on available fields for database"""
-    # Gunakan fungsi classify_publication_type yang sudah ada
-    pub_type_csv = classify_publication_type(
-        row.get('journal', 'N/A'),
-        row.get('conference', 'N/A'),
-        row.get('publisher', ''),
-        row.get('judul', '')
-    )
-    
-    # Ensure pub_type_csv is not None or empty
-    if not pub_type_csv or pub_type_csv.strip() == '':
-        pub_type_csv = 'Lainnya'
-    
-    # Map dari nama CSV ke nama database
-    type_mapping = {
-        'Jurnal': 'artikel',
-        'Prosiding Konferensi': 'prosiding',
-        'Buku/Bab Buku': 'buku',
-        'Tesis/Disertasi': 'penelitian',
-        'Laporan Penelitian': 'penelitian',
-        'Preprint/Laporan Teknis': 'penelitian',
-        'Paten': 'penelitian',
-        'Lainnya': 'lainnya'
-    }
-    
-    # Get mapped value
-    result = type_mapping.get(pub_type_csv, 'lainnya')
-    
-    # Final safety check
-    if not result or result.strip() == '':
-        result = 'lainnya'
-    
-    return result
-
 def import_dosen_data(conn, profiles_df):
     """Import dosen data from profiles to database"""
     cursor = conn.cursor()
     dosen_ids = {}
-    
     try:
         for _, row in profiles_df.iterrows():
-            cursor.execute(
-                "SELECT v_id_dosen FROM tmp_dosen_dt WHERE v_id_googleScholar = %s",
-                (row.get('ID Google Scholar', ''),)
-            )
-            result = cursor.fetchone()
-            
-            if result:
-                dosen_id = result[0]
-                cursor.execute("""
-                    UPDATE tmp_dosen_dt SET 
-                    v_nama_dosen = %s,
-                    n_total_publikasi = %s,
-                    n_total_sitasi_gs = %s,
-                    n_i10_index_gs = %s,
-                    n_i10_index_gs2020 = %s,
-                    n_h_index_gs = %s,
-                    n_h_index_gs2020 = %s,
-                    v_sumber = 'Google Scholar',
-                    t_tanggal_unduh = %s,
-                    v_link_url = %s
-                    WHERE v_id_dosen = %s
-                """, (
-                    row.get('Name', ''),
-                    row.get('Total_Publikasi', 0),
-                    row.get('Citations_all', 0),
-                    row.get('i10-index_all', 0),
-                    row.get('i10-index_since2020', 0),
-                    row.get('h-index_all', 0),
-                    row.get('h-index_since2020', 0),
-                    datetime.datetime.now(),
-                    row.get('Profile URL', ''),
-                    dosen_id
-                ))
-            else:
-                cursor.execute("""
-                    INSERT INTO tmp_dosen_dt (
-                        v_nama_dosen, n_total_publikasi, n_total_sitasi_gs,
-                        v_id_googleScholar, n_i10_index_gs, n_i10_index_gs2020,
-                        n_h_index_gs, n_h_index_gs2020, v_sumber, t_tanggal_unduh,
-                        v_link_url
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    RETURNING v_id_dosen
-                """, (
-                    row.get('Name', ''),
-                    row.get('Total_Publikasi', 0),
-                    row.get('Citations_all', 0),
-                    row.get('ID Google Scholar', ''),
-                    row.get('i10-index_all', 0),
-                    row.get('i10-index_since2020', 0),
-                    row.get('h-index_all', 0),
-                    row.get('h-index_since2020', 0),
-                    'Google Scholar',
-                    datetime.datetime.now(),
-                    row.get('Profile URL', '')
-                ))
-                dosen_id = cursor.fetchone()[0]
-            
-            dosen_ids[row.get('Name', '')] = dosen_id
-            
-        conn.commit()
-        print(f"Successfully imported {len(profiles_df)} dosen profiles to database")
-        return dosen_ids
-    
-    except Exception as e:
-        conn.rollback()
-        print(f"Error importing dosen data: {e}")
-        return {}
-
-def import_jurnal_data(conn, publications_df):
-    """Import and get jurnal IDs"""
-    cursor = conn.cursor()
-    jurnal_ids = {}
-    
-    try:
-        journals = publications_df[publications_df['journal'] != 'N/A']['journal'].unique()
-        
-        for journal in journals:
-            if pd.isna(journal) or journal == 'N/A':
-                continue
-                
-            cursor.execute(
-                "SELECT v_id_jurnal FROM stg_jurnal_mt WHERE v_nama_jurnal = %s",
-                (journal,)
-            )
-            result = cursor.fetchone()
-            
-            if result:
-                jurnal_ids[journal] = result[0]
-            else:
-                cursor.execute("""
-                    INSERT INTO stg_jurnal_mt (v_nama_jurnal)
-                    VALUES (%s)
-                    RETURNING v_id_jurnal
-                """, (journal,))
-                jurnal_ids[journal] = cursor.fetchone()[0]
-        
-        conn.commit()
-        print(f"Successfully imported {len(jurnal_ids)} journals to database")
-        return jurnal_ids
-    
-    except Exception as e:
-        conn.rollback()
-        print(f"Error importing journal data: {e}")
-        return {}
-
-def import_publications_data(conn, publications_df, dosen_ids, jurnal_ids):
-    """Import publications data to database"""
-    cursor = conn.cursor()
-    
-    try:
-        imported_count = 0
-        error_count = 0
-        
-        for idx, row in publications_df.iterrows():
             try:
-                # CRITICAL: Determine publication type dengan multiple safety checks
-                pub_type = determine_publication_type(row)
+                insert_query = sql.SQL("""
+                    INSERT INTO tmp_dosen_dt 
+                    (v_nama_dosen, v_id_googlescholar, n_total_publikasi, 
+                     n_total_sitasi_gs, n_h_index_gs, n_h_index_gs2020,
+                     n_i10_index_gs, n_i10_index_gs2020, v_sumber, v_link_url, t_tanggal_unduh)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """)
                 
-                # Triple safety check untuk memastikan pub_type valid
-                if not pub_type or not isinstance(pub_type, str) or pub_type.strip() == '':
-                    pub_type = 'lainnya'
-                    print(f"⚠️  Row {idx}: Empty pub_type, defaulting to 'lainnya' for: {row['judul'][:50]}")
-                
-                # Strip whitespace
-                pub_type = pub_type.strip().lower()
-                
-                # Validate pub_type is one of the allowed values
-                allowed_types = ['artikel', 'buku', 'prosiding', 'penelitian', 'lainnya']
-                if pub_type not in allowed_types:
-                    print(f"⚠️  Row {idx}: Invalid pub_type '{pub_type}' for '{row['judul'][:50]}...', defaulting to 'lainnya'")
-                    pub_type = 'lainnya'
-                
-                # Parse year
-                try:
-                    year = int(row['tahun_publikasi']) if pd.notna(row['tahun_publikasi']) and row['tahun_publikasi'] != 'N/A' else None
-                except:
-                    year = None
-                
-                # Check if publication already exists
-                cursor.execute(
-                    "SELECT v_id_publikasi FROM stg_publikasi_tr WHERE v_judul = %s",
-                    (row['judul'],)
+                values = (
+                    row['Name'],
+                    row['ID Google Scholar'],
+                    int(row['Total_Publikasi']) if pd.notna(row['Total_Publikasi']) else 0,
+                    int(row['Citations_all']) if pd.notna(row['Citations_all']) else 0,
+                    int(row['h-index_all']) if pd.notna(row['h-index_all']) else 0,
+                    int(row['h-index_since2020']) if pd.notna(row['h-index_since2020']) else 0,
+                    int(row['i10-index_all']) if pd.notna(row['i10-index_all']) else 0,
+                    int(row['i10-index_since2020']) if pd.notna(row['i10-index_since2020']) else 0,
+                    'Google Scholar',
+                    row['Profile URL'],
+                    datetime.datetime.now().date()
                 )
-                result = cursor.fetchone()
                 
-                if result:
-                    pub_id = result[0]
-                    print(f"ℹ️  Publication already exists: {row['judul'][:50]}... (ID: {pub_id})")
-                else:
-                    # CRITICAL LOG: Show what we're about to insert
-                    print(f"📝 Inserting: [{pub_type}] {row['judul'][:50]}...")
-                    
-                    # Prepare values with defaults
-                    judul = row.get('judul', 'Unknown Title')
-                    authors = row.get('author', '')
-                    total_sitasi = row.get('total_sitasi_seluruhnya', 0)
-                    sumber = 'Google Scholar'
-                    link_url = row.get('Publication URL', '')
-                    publisher = row.get('publisher', '')
-                    
-                    # FINAL CHECK before insert
-                    if not pub_type or pub_type not in allowed_types:
-                        print(f"❌ CRITICAL: pub_type still invalid before insert: '{pub_type}'")
-                        pub_type = 'lainnya'
-                    
-                    # INSERT with explicit values
-                    cursor.execute("""
-                        INSERT INTO stg_publikasi_tr (
-                            v_judul, v_jenis, v_tahun_publikasi, 
-                            n_total_sitasi, v_sumber, v_link_url, 
-                            t_tanggal_unduh, v_authors, v_publisher
-                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                        RETURNING v_id_publikasi
-                    """, (
-                        judul,
-                        pub_type,  # GUARANTEED not null here
-                        year,
-                        total_sitasi,
-                        sumber,
-                        link_url,
-                        datetime.datetime.now(),
-                        authors,
-                        publisher
-                    ))
-                    
-                    pub_id = cursor.fetchone()[0]
-                    print(f"✅ Inserted with ID: {pub_id}")
-                    
-                    # Insert ke tabel spesifik berdasarkan tipe
-                    if pub_type == 'artikel':
-                        journal_id = jurnal_ids.get(row['journal']) if row.get('journal') and row['journal'] != 'N/A' else None
-                        cursor.execute("""
-                            INSERT INTO stg_artikel_dr (
-                                v_id_publikasi, v_id_jurnal, v_volume, v_issue, v_pages
-                            ) VALUES (%s, %s, %s, %s, %s)
-                        """, (
-                            pub_id,
-                            journal_id,
-                            row.get('volume', ''),
-                            row.get('issue', ''),
-                            row.get('pages', '')
-                        ))
-                        
-                    elif pub_type == 'prosiding':
-                        cursor.execute("""
-                            INSERT INTO stg_prosiding_dr (
-                                v_id_publikasi, v_nama_konferensi
-                            ) VALUES (%s, %s)
-                        """, (
-                            pub_id,
-                            row.get('conference', '')
-                        ))
-                        
-                    elif pub_type == 'buku':
-                        cursor.execute("""
-                            INSERT INTO stg_buku_dr (
-                                v_id_publikasi
-                            ) VALUES (%s)
-                        """, (pub_id,))
-                        
-                    elif pub_type == 'penelitian':
-                        cursor.execute("""
-                            INSERT INTO stg_penelitian_dr (
-                                v_id_publikasi
-                            ) VALUES (%s)
-                        """, (pub_id,))
-                        
-                    else:  # lainnya
-                        # Buat keterangan untuk publikasi lainnya
-                        keterangan_parts = []
-                        if row.get('journal') and row.get('journal') != 'N/A':
-                            keterangan_parts.append(f"Journal: {row['journal']}")
-                        if row.get('conference') and row.get('conference') != 'N/A':
-                            keterangan_parts.append(f"Conference: {row['conference']}")
-                        if row.get('publisher'):
-                            keterangan_parts.append(f"Publisher: {row['publisher']}")
-                        
-                        keterangan = " | ".join(keterangan_parts) if keterangan_parts else "Publikasi lainnya tanpa kategori spesifik"
-                        
-                        cursor.execute("""
-                            INSERT INTO stg_lainnya_dr (
-                                v_id_publikasi, v_keterangan
-                            ) VALUES (%s, %s)
-                        """, (pub_id, keterangan))
-                    
-                    # Link authors to publication
-                    authors_list = row.get('author', '').split(',')
-                    for i, author in enumerate(authors_list):
-                        author = author.strip()
-                        if not author:
-                            continue
-                            
-                        dosen_id = None
-                        for name, id in dosen_ids.items():
-                            if author.lower() in name.lower() or name.lower() in author.lower():
-                                dosen_id = id
-                                break
-                        
-                        if dosen_id:
-                            cursor.execute(
-                                "SELECT 1 FROM stg_publikasi_dosen_dt WHERE v_id_publikasi = %s AND v_id_dosen = %s",
-                                (pub_id, dosen_id)
-                            )
-                            if not cursor.fetchone():
-                                cursor.execute("""
-                                    INSERT INTO stg_publikasi_dosen_dt (
-                                        v_id_publikasi, v_id_dosen, v_author_order
-                                    ) VALUES (%s, %s, %s)
-                                """, (
-                                    pub_id,
-                                    dosen_id,
-                                    f"{i+1} out of {len(authors_list)}"
-                                ))
-                    
-                    # Insert citation per year if available
-                    if pd.notna(row.get('tahun')) and pd.notna(row.get('total_sitasi_tahun')):
-                        try:
-                            year_val = int(row['tahun'])
-                            citations_val = int(row['total_sitasi_tahun'])
-                            
-                            cursor.execute("""
-                                INSERT INTO stg_publikasi_sitasi_tahunan_dr (
-                                    v_id_publikasi, v_tahun, n_total_sitasi_tahun, 
-                                    v_sumber, t_tanggal_unduh
-                                ) VALUES (%s, %s, %s, %s, %s)
-                                ON CONFLICT DO NOTHING
-                            """, (
-                                pub_id,
-                                year_val,
-                                citations_val,
-                                'Google Scholar',
-                                datetime.datetime.now().date()
-                            ))
-                        except (ValueError, TypeError) as e:
-                            print(f"⚠️  Could not insert citation data for year {row.get('tahun')}: {e}")
-                    
-                    imported_count += 1
-                    
+                cursor.execute(insert_query, values)
+                dosen_ids[row['Name']] = row['ID Google Scholar']
+                
             except Exception as e:
-                error_count += 1
-                print(f"❌ Error importing row {idx}: {str(e)}")
-                print(f"   Title: {row.get('judul', 'N/A')[:50]}")
-                print(f"   pub_type attempted: {pub_type if 'pub_type' in locals() else 'not set'}")
-                import traceback
-                traceback.print_exc()
+                print(f"  Warning: Gagal insert profil {row.get('Name', 'Unknown')}: {e}")
+                conn.rollback()
                 continue
         
         conn.commit()
-        print(f"\n{'='*60}")
-        print(f"✅ Successfully imported {imported_count} publications to database")
-        if error_count > 0:
-            print(f"⚠️  {error_count} publications failed to import")
-        print(f"{'='*60}\n")
+        print(f"✓ Berhasil memasukkan {len(dosen_ids)} data profil ke tmp_dosen_dt")
+        return dosen_ids
         
     except Exception as e:
+        print(f"✗ Error saat insert profile data: {e}")
         conn.rollback()
-        print(f"❌ CRITICAL Error importing publications data: {e}")
-        import traceback
-        traceback.print_exc()
-        raise
+        return {}
     finally:
         cursor.close()
 
+def normalize_publication_type(pub_type):
+    """
+    Normalisasi tipe publikasi ke format yang sesuai dengan constraint database
+    Database menerima: 'artikel', 'buku', 'penelitian', 'prosiding', 'lainnya'
+    """
+    pub_type_lower = str(pub_type).lower().strip()
+    
+    # Mapping dari tipe publikasi hasil scraping ke tipe di database
+    if 'jurnal' in pub_type_lower or 'artikel' in pub_type_lower:
+        return 'artikel'
+    elif 'prosiding' in pub_type_lower or 'conference' in pub_type_lower:
+        return 'prosiding'
+    elif 'buku' in pub_type_lower or 'book' in pub_type_lower:
+        return 'buku'
+    elif 'penelitian' in pub_type_lower or 'tesis' in pub_type_lower or 'disertasi' in pub_type_lower:
+        return 'penelitian'
+    else:
+        return 'lainnya'
 
+def import_publications_data(conn, publications_df, dosen_ids):
+    """Import publications data to database"""
+    cursor = conn.cursor()
+    try:
+        inserted_count = 0
+        
+        for index, row in publications_df.iterrows():
+            try:
+                # Tentukan jenis publikasi dan normalisasi
+                pub_type_raw = row.get('publication_type', 'lainnya')
+                pub_type = normalize_publication_type(pub_type_raw)
+                
+                # Insert ke stg_publikasi_tr
+                insert_pub_query = sql.SQL("""
+                    INSERT INTO stg_publikasi_tr 
+                    (v_judul, v_jenis, v_tahun_publikasi, n_total_sitasi, v_sumber, 
+                     v_link_url, v_authors, v_publisher, t_tanggal_unduh)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    RETURNING v_id_publikasi
+                """)
+                
+                tahun = int(row['tahun_publikasi']) if pd.notna(row['tahun_publikasi']) and str(row['tahun_publikasi']).isdigit() else None
+                total_sitasi = int(row['total_sitasi_seluruhnya']) if pd.notna(row['total_sitasi_seluruhnya']) and str(row['total_sitasi_seluruhnya']).isdigit() else 0
+                
+                pub_values = (
+                    row.get('judul', ''),
+                    pub_type,
+                    tahun,
+                    total_sitasi,
+                    row.get('sumber', 'Google Scholar'),
+                    row.get('Publication URL', ''),
+                    row.get('author', ''),
+                    row.get('publisher', ''),
+                    datetime.datetime.now()
+                )
+                
+                cursor.execute(insert_pub_query, pub_values)
+                pub_id = cursor.fetchone()[0]
+                
+                # Insert data spesifik berdasarkan jenis publikasi yang sudah dinormalisasi
+                if pub_type == "artikel":
+                    _insert_artikel_data(cursor, pub_id, row)
+                elif pub_type == "prosiding":
+                    _insert_prosiding_data(cursor, pub_id, row)
+                elif pub_type == "buku":
+                    _insert_buku_data(cursor, pub_id, row)
+                elif pub_type == "penelitian":
+                    _insert_penelitian_data(cursor, pub_id, row)
+                else:
+                    _insert_lainnya_data(cursor, pub_id, row)
+                
+                # Cek apakah ada data tahun dan total_sitasi_tahun yang valid
+                if pd.notna(row.get('tahun')) and pd.notna(row.get('total_sitasi_tahun')):
+                    tahun_str = str(row.get('tahun', '')).strip()
+                    sitasi_str = str(row.get('total_sitasi_tahun', '')).strip()
+                    
+                    # Validasi apakah keduanya adalah angka
+                    if tahun_str.isdigit() and sitasi_str.replace('-', '').isdigit():
+                        _insert_sitasi_tahunan(cursor, pub_id, row)
+                
+                # Link ke dosen
+                author_name = row.get('Author', '')
+                if author_name and author_name in dosen_ids:
+                    # Cek apakah sudah ada link
+                    check_link = sql.SQL("""
+                        SELECT 1 FROM stg_publikasi_dosen_dt 
+                        WHERE v_id_publikasi = %s AND v_id_dosen = 
+                        (SELECT v_id_dosen FROM tmp_dosen_dt WHERE v_id_googlescholar = %s)
+                    """)
+                    cursor.execute(check_link, (pub_id, dosen_ids[author_name]))
+                    
+                    if not cursor.fetchone():
+                        link_query = sql.SQL("""
+                            INSERT INTO stg_publikasi_dosen_dt (v_id_publikasi, v_id_dosen, v_author_order)
+                            SELECT %s, v_id_dosen, %s FROM tmp_dosen_dt 
+                            WHERE v_id_googlescholar = %s
+                        """)
+                        cursor.execute(link_query, (pub_id, "1", dosen_ids[author_name]))
+                
+                inserted_count += 1
+                
+            except Exception as e:
+                print(f"  Warning: Gagal insert publikasi '{row.get('judul', 'Unknown')[:50]}...': {e}")
+                conn.rollback()
+                continue
+        
+        conn.commit()
+        print(f"✓ Berhasil memasukkan {inserted_count} data publikasi ke database")
+        return inserted_count
+        
+    except Exception as e:
+        print(f"✗ Error saat insert publication data: {e}")
+        conn.rollback()
+        return 0
+    finally:
+        cursor.close()
 
+def _insert_artikel_data(cursor, pub_id, row):
+    """Insert data spesifik artikel/jurnal"""
+    try:
+        # Ambil nama jurnal dari row data
+        journal_name = row.get('journal', '')
+        
+        # Jika tidak ada nama jurnal, skip insert ke stg_artikel_dr
+        if not journal_name or journal_name == 'N/A':
+            print(f"    Warning: Artikel tanpa nama jurnal, skip insert artikel data")
+            return
+        
+        # Cek apakah jurnal sudah ada di stg_jurnal_mt
+        check_journal_query = sql.SQL("""
+            SELECT v_id_jurnal FROM stg_jurnal_mt WHERE v_nama_jurnal = %s
+        """)
+        cursor.execute(check_journal_query, (journal_name,))
+        result = cursor.fetchone()
+        
+        if result:
+            # Jurnal sudah ada, ambil ID-nya
+            journal_id = result[0]
+        else:
+            # Jurnal belum ada, insert baru
+            insert_journal_query = sql.SQL("""
+                INSERT INTO stg_jurnal_mt (v_nama_jurnal)
+                VALUES (%s)
+                RETURNING v_id_jurnal
+            """)
+            cursor.execute(insert_journal_query, (journal_name,))
+            journal_id = cursor.fetchone()[0]
+        
+        # Insert ke stg_artikel_dr dengan v_id_jurnal
+        insert_artikel_query = sql.SQL("""
+            INSERT INTO stg_artikel_dr (v_id_publikasi, v_id_jurnal, v_volume, v_issue, v_pages, t_updated_at)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """)
+        
+        values = (
+            pub_id,
+            journal_id,
+            row.get('volume', ''),
+            row.get('issue', ''),
+            row.get('pages', ''),
+            datetime.datetime.now()
+        )
+        
+        cursor.execute(insert_artikel_query, values)
+        
+    except Exception as e:
+        print(f"    Error insert artikel data: {e}")
+
+def _insert_prosiding_data(cursor, pub_id, row):
+    """Insert data spesifik prosiding"""
+    try:
+        insert_query = sql.SQL("""
+            INSERT INTO stg_prosiding_dr (v_id_publikasi, v_nama_konferensi, f_terindeks_scopus, t_updated_at)
+            VALUES (%s, %s, %s, %s)
+        """)
+        
+        values = (
+            pub_id,
+            row.get('conference', ''),
+            False,
+            datetime.datetime.now()
+        )
+        
+        cursor.execute(insert_query, values)
+    except Exception as e:
+        print(f"    Error insert prosiding data: {e}")
+
+def _insert_buku_data(cursor, pub_id, row):
+    """Insert data spesifik buku"""
+    try:
+        insert_query = sql.SQL("""
+            INSERT INTO stg_buku_dr (v_id_publikasi, v_isbn, t_updated_at)
+            VALUES (%s, %s, %s)
+        """)
+        
+        values = (
+            pub_id,
+            '',
+            datetime.datetime.now()
+        )
+        
+        cursor.execute(insert_query, values)
+    except Exception as e:
+        print(f"    Error insert buku data: {e}")
+
+def _insert_penelitian_data(cursor, pub_id, row):
+    """Insert data publikasi penelitian (tesis/disertasi)"""
+    try:
+        insert_query = sql.SQL("""
+            INSERT INTO stg_penelitian_dr (v_id_publikasi, v_kategori_penelitian, t_updated_at)
+            VALUES (%s, %s, %s)
+        """)
+        
+        pub_type_raw = str(row.get('publication_type', '')).lower()
+        if 'tesis' in pub_type_raw:
+            kategori = 'Tesis'
+        elif 'disertasi' in pub_type_raw:
+            kategori = 'Disertasi'
+        else:
+            kategori = 'Penelitian'
+        
+        values = (
+            pub_id,
+            kategori,
+            datetime.datetime.now()
+        )
+        
+        cursor.execute(insert_query, values)
+    except Exception as e:
+        print(f"    Error insert penelitian data: {e}")
+
+def _insert_lainnya_data(cursor, pub_id, row):
+    """Insert data publikasi lainnya"""
+    try:
+        insert_query = sql.SQL("""
+            INSERT INTO stg_lainnya_dr (v_id_publikasi, v_keterangan, t_updated_at)
+            VALUES (%s, %s, %s)
+        """)
+        
+        values = (
+            pub_id,
+            None,
+            datetime.datetime.now()
+        )
+        
+        cursor.execute(insert_query, values)
+    except Exception as e:
+        print(f"    Error insert lainnya data: {e}")
+
+def _insert_sitasi_tahunan(cursor, pub_id, row):
+    """Insert data sitasi per tahun"""
+    try:
+        # Ambil dan validasi data
+        tahun_raw = row.get('tahun', '')
+        sitasi_raw = row.get('total_sitasi_tahun', '')
+        
+        # Konversi ke integer
+        if pd.notna(tahun_raw) and pd.notna(sitasi_raw):
+            tahun_str = str(tahun_raw).strip()
+            sitasi_str = str(sitasi_raw).strip()
+            
+            if tahun_str.isdigit():
+                tahun = int(tahun_str)
+                
+                # Konversi sitasi (bisa negatif jadi handle dengan replace)
+                if sitasi_str.replace('-', '').isdigit():
+                    sitasi = int(sitasi_str)
+                else:
+                    sitasi = 0
+                
+                # Validasi tahun
+                if 2000 <= tahun <= 2030:
+                    insert_query = sql.SQL("""
+                        INSERT INTO stg_publikasi_sitasi_tahunan_dr 
+                        (v_id_publikasi, v_tahun, n_total_sitasi_tahun, v_sumber, t_tanggal_unduh)
+                        VALUES (%s, %s, %s, %s, %s)
+                    """)
+                    
+                    values = (
+                        pub_id,
+                        tahun,
+                        sitasi,
+                        'Google Scholar',
+                        datetime.datetime.now().date()
+                    )
+                    
+                    cursor.execute(insert_query, values)
+    except Exception as e:
+        print(f"    Error insert sitasi tahunan: {e}")
 
 def main():
     conn = None
@@ -1557,18 +1517,21 @@ def main():
         # Impor ke database
         if not conn:
             conn = connect_to_db()
-            if not conn:
-                print("✗ Gagal menyambung kembali ke database. Data hanya tersimpan di file CSV.")
-                return
-        
+        if not conn:
+            print("✗ Gagal menyambung kembali ke database. Data hanya tersimpan di file CSV.")
+            return
         try:
-            print("Memulai proses impor ke database...")
+            print("\n" + "="*60)
+            print("PROSES IMPOR DATA KE DATABASE")
+            print("="*60)
             dosen_ids = import_dosen_data(conn, final_profiles_df)
-            jurnal_ids = import_jurnal_data(conn, final_publications_df)
-            import_publications_data(conn, final_publications_df, dosen_ids, jurnal_ids)
+            import_publications_data(conn, final_publications_df, dosen_ids)
             print("✓ Proses impor data ke database berhasil!")
+            print("="*60 + "\n")
         except Exception as e:
             print(f"✗ Error saat proses impor ke database: {e}")
+            import traceback
+            traceback.print_exc()
             print("Data tetap tersedia di dalam file CSV.")
         
         # Tampilkan statistik akhir

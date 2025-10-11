@@ -29,10 +29,10 @@ const SintaPublikasi = () => {
     { value: 'artikel', label: 'Artikel' },
     { value: 'prosiding', label: 'Prosiding' },
     { value: 'buku', label: 'Buku' },
-    { value: 'penelitian', label: 'Penelitian' }
+    { value: 'penelitian', label: 'Penelitian' },
+    { value: 'lainnya', label: 'Lainnya' }
   ];
 
-  // Generate year options (from 1990 to current year)
   const currentYear = new Date().getFullYear();
   const yearOptions = [];
   for (let year = currentYear; year >= 1990; year--) {
@@ -217,6 +217,7 @@ const SintaPublikasi = () => {
           value === 'Prosiding' ? 'bg-yellow-100 text-yellow-800' :
           value === 'Buku' ? 'bg-purple-100 text-purple-800' :
           value === 'Penelitian' ? 'bg-blue-100 text-blue-800' :
+          value === 'Lainnya' ? 'bg-indigo-100 text-indigo-800' :
           'bg-gray-100 text-gray-800'
         }`}>
           {value || 'N/A'}
@@ -247,15 +248,55 @@ const SintaPublikasi = () => {
       )
     },
     {
-      key: 'publisher',
-      title: 'Publisher',
-      render: (value) => (
-        <div className="max-w-xs">
-          <p className="text-sm text-gray-700 truncate" title={value}>
-            {value || '-'}
-          </p>
-        </div>
-      )
+      key: 'v_terindeks',
+      title: 'Terindeks',
+      className: 'text-center',
+      cellClassName: 'text-center',
+      render: (value) => {
+        if (!value || value.trim() === '') return <span className="text-gray-400">-</span>;
+        
+        // Parse multiple indexing services (e.g., "Scopus, WoS")
+        const indices = value.split(',').map(i => i.trim());
+        
+        return (
+          <div className="flex flex-wrap gap-1 justify-center">
+            {indices.map((index, idx) => (
+              <span
+                key={idx}
+                className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                  index.toLowerCase().includes('scopus') ? 'bg-orange-100 text-orange-800' :
+                  index.toLowerCase().includes('wos') || index.toLowerCase().includes('web of science') ? 'bg-red-100 text-red-800' :
+                  index.toLowerCase().includes('sinta') ? 'bg-indigo-100 text-indigo-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}
+              >
+                {index}
+              </span>
+            ))}
+          </div>
+        );
+      }
+    },
+    {
+      key: 'v_ranking',
+      title: 'Ranking',
+      className: 'text-center',
+      cellClassName: 'text-center',
+      render: (value) => {
+        if (!value || value.trim() === '') return <span className="text-gray-400">-</span>;
+        
+        return (
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
+            value.toLowerCase().includes('q1') ? 'bg-green-100 text-green-800' :
+            value.toLowerCase().includes('q2') ? 'bg-blue-100 text-blue-800' :
+            value.toLowerCase().includes('q3') ? 'bg-yellow-100 text-yellow-800' :
+            value.toLowerCase().includes('q4') ? 'bg-orange-100 text-orange-800' :
+            'bg-purple-100 text-purple-800'
+          }`}>
+            {value}
+          </span>
+        );
+      }
     },
     {
       key: 'vol_issue',
@@ -465,7 +506,7 @@ const SintaPublikasi = () => {
                       {year}
                     </option>
                   ))}
-                </select>
+                  </select>
               </div>
 
               {(yearStart || yearEnd || filterTipe !== 'all') && (

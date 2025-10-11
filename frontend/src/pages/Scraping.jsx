@@ -28,7 +28,7 @@ const ScrapingDashboard = () => {
     
     if (currentJobId && isLoading) {
       // Gunakan WebSocket untuk update realtime
-      const socket = new WebSocket('ws://localhost:5000');
+      const socket = new WebSocket('ws://localhost:5005');
       
       socket.onopen = () => {
         console.log('WebSocket Connected');
@@ -63,7 +63,7 @@ const ScrapingDashboard = () => {
         // Fallback ke polling jika WebSocket gagal
         pollInterval = setInterval(async () => {
           try {
-            const response = await fetch(`http://localhost:5000/api/scraping/jobs/${currentJobId}`);
+            const response = await fetch(`http://localhost:5005/api/scraping/jobs/${currentJobId}`);
             const data = await response.json();
             
             if (data.success && data.job) {
@@ -266,7 +266,7 @@ const ScrapingDashboard = () => {
     });
 
     try {
-      const response = await fetch('http://localhost:5000/api/scraping/googlescholar/scrape', {
+      const response = await fetch('http://localhost:5005/api/scraping/googlescholar/scrape', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

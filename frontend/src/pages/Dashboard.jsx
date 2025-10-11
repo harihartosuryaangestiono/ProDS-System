@@ -106,11 +106,11 @@ const Dashboard = () => {
 
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Publications by Year Chart */}
+          {/* Publications by Year Chart - Menampilkan 10 tahun terakhir */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center mb-4">
               <Calendar className="w-5 h-5 text-blue-600 mr-2" />
-              <h2 className="text-lg font-semibold text-gray-900">Publikasi per Tahun</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Publikasi per Tahun (10 Tahun Terakhir)</h2>
             </div>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={stats.publikasi_by_year}>
@@ -119,7 +119,7 @@ const Dashboard = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="count" fill="#3B82F6" />
+                <Bar dataKey="count" fill="#3B82F6" name="Jumlah Publikasi" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -130,29 +130,47 @@ const Dashboard = () => {
               <Award className="w-5 h-5 text-green-600 mr-2" />
               <h2 className="text-lg font-semibold text-gray-900">Top 10 Dosen (Sitasi)</h2>
             </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={stats.top_authors.slice(0, 10)}
-                layout="horizontal"
-                margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis 
-                  dataKey="v_nama_dosen" 
-                  type="category" 
-                  width={100}
-                  tick={{ fontSize: 12 }}
-                />
-                <Tooltip />
-                <Bar dataKey="n_total_sitasi_gs" fill="#10B981" />
-              </BarChart>
-            </ResponsiveContainer>
+            {stats.top_authors && stats.top_authors.length > 0 ? (
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart
+                  data={stats.top_authors.slice(0, 10)}
+                  layout="vertical"
+                  margin={{ top: 5, right: 30, left: -50, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis 
+                    dataKey="v_nama_dosen" 
+                    type="category" 
+                    width={190}
+                    interval={0}
+                    tick={{ fontSize: 11 }}
+                    tickFormatter={(value) => value.length > 25 ? value.substring(0, 25) + '...' : value}
+                  />
+                  <Tooltip 
+                    formatter={(value) => value.toLocaleString()}
+                    labelFormatter={(label) => `Dosen: ${label}`}
+                  />
+                  <Legend />
+                  <Bar 
+                    dataKey="n_total_sitasi_gs" 
+                    fill="#10B981" 
+                    name="Total Sitasi"
+                    radius={[0, 8, 8, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-64 text-gray-400">
+                <p>Tidak ada data dosen</p>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Publication Types Distribution */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* PERBAIKAN: Ambil 5 tahun terakhir dari data yang sudah 10 tahun terakhir */}
           <div className="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center mb-4">
               <BookOpen className="w-5 h-5 text-purple-600 mr-2" />
@@ -171,6 +189,7 @@ const Dashboard = () => {
                   stroke="#8884d8" 
                   strokeWidth={3}
                   dot={{ r: 6 }}
+                  name="Jumlah Publikasi"
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -235,6 +254,9 @@ const Dashboard = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Total Sitasi
                   </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Sumber
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Persentase
                   </th>
@@ -258,6 +280,19 @@ const Dashboard = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {author.n_total_sitasi_gs?.toLocaleString() || 0}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      {author.v_sumber && author.v_sumber !== 'N/A' ? (
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          author.v_sumber.toLowerCase().includes('scholar') ? 'bg-red-100 text-red-800' :
+                          author.v_sumber.toLowerCase().includes('sinta') ? 'bg-indigo-100 text-indigo-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {author.v_sumber}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 text-xs">-</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {stats.total_sitasi > 0 ? 

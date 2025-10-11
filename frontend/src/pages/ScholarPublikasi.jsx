@@ -29,7 +29,8 @@ const ScholarPublikasi = () => {
     { value: 'artikel', label: 'Artikel' },
     { value: 'prosiding', label: 'Prosiding' },
     { value: 'buku', label: 'Buku' },
-    { value: 'penelitian', label: 'Penelitian' }
+    { value: 'penelitian', label: 'Penelitian' },
+    { value: 'lainnya', label: 'Lainnya' }
   ];
 
   // Generate year options (from 1990 to current year)
@@ -228,6 +229,7 @@ const ScholarPublikasi = () => {
           value === 'Prosiding' ? 'bg-yellow-100 text-yellow-800' :
           value === 'Buku' ? 'bg-purple-100 text-purple-800' :
           value === 'Penelitian' ? 'bg-blue-100 text-blue-800' :
+          value === 'Lainnya' ? 'bg-indigo-100 text-indigo-800' :
           'bg-gray-100 text-gray-800'
         }`}>
           {value || 'N/A'}

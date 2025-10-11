@@ -23,7 +23,7 @@ apiService.interceptors.request.use(
     }
     
     // Ensure CORS headers
-    config.headers['Access-Control-Allow-Credentials'] = 'true';
+    // config.headers['Access-Control-Allow-Credentials'] = 'true';
     
     return config;
   },

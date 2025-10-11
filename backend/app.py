@@ -140,18 +140,29 @@ def dashboard_stats(current_user_id):
         cur.execute("SELECT COALESCE(SUM(n_total_sitasi_gs), 0) as total FROM tmp_dosen_dt")
         total_sitasi = cur.fetchone()['total']
         
+        # PERBAIKAN: Ambil 10 tahun terakhir dengan subquery
         cur.execute("""
-            SELECT v_tahun_publikasi, COUNT(*) as count
-            FROM stg_publikasi_tr
-            WHERE v_tahun_publikasi IS NOT NULL
-            GROUP BY v_tahun_publikasi
-            ORDER BY v_tahun_publikasi DESC
-            LIMIT 10
+            WITH recent_years AS (
+                SELECT DISTINCT v_tahun_publikasi
+                FROM stg_publikasi_tr
+                WHERE v_tahun_publikasi IS NOT NULL
+                ORDER BY v_tahun_publikasi DESC
+                LIMIT 10
+            )
+            SELECT p.v_tahun_publikasi, COUNT(*) as count
+            FROM stg_publikasi_tr p
+            INNER JOIN recent_years ry ON p.v_tahun_publikasi = ry.v_tahun_publikasi
+            GROUP BY p.v_tahun_publikasi
+            ORDER BY p.v_tahun_publikasi ASC
         """)
         publikasi_by_year = [dict(row) for row in cur.fetchall()]
         
+        # Ambil top authors dengan sumber data
         cur.execute("""
-            SELECT v_nama_dosen, COALESCE(n_total_sitasi_gs, 0) as n_total_sitasi_gs
+            SELECT 
+                v_nama_dosen, 
+                COALESCE(n_total_sitasi_gs, 0) as n_total_sitasi_gs,
+                COALESCE(v_sumber, 'N/A') as v_sumber
             FROM tmp_dosen_dt
             ORDER BY n_total_sitasi_gs DESC
             LIMIT 10
@@ -422,7 +433,7 @@ def get_sinta_publikasi(current_user_id):
         
         print(f"📊 Total records found: {total}")
         
-        # Get data
+        # Get data - UPDATED: Tambahkan v_terindeks dan v_ranking
         data_query = f"""
             SELECT
                 p.v_id_publikasi,
@@ -442,6 +453,8 @@ def get_sinta_publikasi(current_user_id):
                 COALESCE(a.v_volume, '') AS volume,
                 COALESCE(a.v_issue, '') AS issue,
                 COALESCE(a.v_pages, '') AS pages,
+                COALESCE(a.v_terindeks, '') AS v_terindeks,
+                COALESCE(a.v_ranking, '') AS v_ranking,
                 p.n_total_sitasi,
                 p.v_sumber,
                 p.t_tanggal_unduh,
@@ -460,7 +473,7 @@ def get_sinta_publikasi(current_user_id):
                 p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
                 p.v_authors, p.v_publisher,
                 j.v_nama_jurnal, pr.v_nama_konferensi,
-                a.v_volume, a.v_issue, a.v_pages
+                a.v_volume, a.v_issue, a.v_pages, a.v_terindeks, a.v_ranking
             ORDER BY p.n_total_sitasi DESC NULLS LAST
             LIMIT %s OFFSET %s
         """
@@ -492,7 +505,8 @@ def get_sinta_publikasi(current_user_id):
                     'artikel': 'Artikel',
                     'buku': 'Buku',
                     'prosiding': 'Prosiding',
-                    'penelitian': 'Penelitian'
+                    'penelitian': 'Penelitian',
+                    'lainnya': 'Lainnya'
                 }
                 if tipe_value:
                     row_dict['tipe'] = tipe_mapping.get(tipe_value.lower(), tipe_value.capitalize())
@@ -832,7 +846,8 @@ def get_scholar_publikasi(current_user_id):
                     'artikel': 'Artikel',
                     'buku': 'Buku',
                     'prosiding': 'Prosiding',
-                    'penelitian': 'Penelitian'
+                    'penelitian': 'Penelitian',
+                    'lainnya': 'Lainnya'
                 }
                 if tipe_value:
                     row_dict['tipe'] = tipe_mapping.get(tipe_value.lower(), tipe_value.capitalize())
