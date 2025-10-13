@@ -27,7 +27,7 @@ import os
 class GoogleScholarScraper:
     """Google Scholar Scraper with auto-login and database integration"""
     
-    def __init__(self, db_config, job_id=None, progress_callback=None, email="6182101017@student.unpar.ac.id", password="618017SH"):
+    def __init__(self, db_config, job_id=None, progress_callback=None, email="xxxxx@student.unpar.ac.id", password="xxxxx"):
         self.db_config = db_config
         self.job_id = job_id
         self.progress_callback = progress_callback
@@ -1329,8 +1329,8 @@ if __name__ == "__main__":
     
     scraper = GoogleScholarScraper(
         db_config=DB_CONFIG,
-        email="6182101017@student.unpar.ac.id",
-        password="618017SH"
+        email="xxxxx@student.unpar.ac.id",
+        password="xxxxx"
     )
     
     result = scraper.run(max_authors=5, scrape_from_beginning=False)
