@@ -65,6 +65,13 @@ const Dashboard = () => {
     );
   }
 
+  // Filter untuk 5 tahun terakhir
+  const currentYear = new Date().getFullYear();
+  const last5YearsData = stats.publikasi_by_year.filter(item => {
+    const year = parseInt(item.v_tahun_publikasi);
+    return year >= currentYear - 5 && year <= currentYear;
+  });
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -170,14 +177,14 @@ const Dashboard = () => {
 
         {/* Publication Types Distribution */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* PERBAIKAN: Ambil 5 tahun terakhir dari data yang sudah 10 tahun terakhir */}
+          {/* PERBAIKAN: Filter 5 tahun terakhir dengan rentang tahun yang benar (2020-2025) */}
           <div className="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center mb-4">
               <BookOpen className="w-5 h-5 text-purple-600 mr-2" />
               <h2 className="text-lg font-semibold text-gray-900">Trend Publikasi (5 Tahun Terakhir)</h2>
             </div>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={stats.publikasi_by_year.slice(-5)}>
+              <LineChart data={last5YearsData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="v_tahun_publikasi" />
                 <YAxis />
@@ -222,11 +229,29 @@ const Dashboard = () => {
 
               <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
                 <span className="text-sm font-medium text-gray-600">Tahun Paling Produktif</span>
-                <span className="text-lg font-bold text-red-600">
-                  {stats.publikasi_by_year.reduce((max, item) => 
-                    item.count > (max.count || 0) ? item : max, {}
-                  ).v_tahun_publikasi || '-'}
-                </span>
+                <div className="text-right">
+                  <span className="text-sm font-bold text-red-600 block">
+                    {(() => {
+                      if (!stats.publikasi_by_year || stats.publikasi_by_year.length === 0) return '-';
+                      
+                      const maxCount = Math.max(...stats.publikasi_by_year.map(item => item.count));
+                      if (maxCount === 0) return '-';
+                      
+                      const topYears = stats.publikasi_by_year
+                        .filter(item => item.count === maxCount)
+                        .map(item => item.v_tahun_publikasi)
+                        .sort();
+                      
+                      return topYears.join(', ');
+                    })()}
+                  </span>
+                  <span className="text-xs text-red-500">
+                    {(() => {
+                      const maxCount = Math.max(...stats.publikasi_by_year.map(item => item.count));
+                      return maxCount > 0 ? `(${maxCount} publikasi)` : '';
+                    })()}
+                  </span>
+                </div>
               </div>
             </div>
           </div>

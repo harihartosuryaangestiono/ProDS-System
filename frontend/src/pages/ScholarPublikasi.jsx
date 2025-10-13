@@ -380,7 +380,7 @@ const ScholarPublikasi = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <StatCard
-            title="Total Publikasi"
+            title=" Publikasi"
             value={aggregateStats.totalPublikasi}
             icon={FileText}
             color="#DC2626"

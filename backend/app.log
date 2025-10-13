@@ -2752,3 +2752,1366 @@
 2025-10-11 21:19:49,974 - werkzeug - INFO - 127.0.0.1 - - [11/Oct/2025 21:19:49] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search=&tipe=artikel HTTP/1.1" 200 -
 2025-10-11 21:19:49,990 - werkzeug - INFO - 127.0.0.1 - - [11/Oct/2025 21:19:49] "GET /api/scholar/publikasi?page=1&per_page=10000&search=&tipe=artikel HTTP/1.1" 200 -
 2025-10-11 21:19:49,990 - werkzeug - INFO - 127.0.0.1 - - [11/Oct/2025 21:19:49] "GET /api/scholar/publikasi?page=1&per_page=20&search=&tipe=artikel HTTP/1.1" 200 -
+2025-10-12 15:46:39,647 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 15:46:39,648 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 15:46:39,648 - __main__ - INFO - Environment: development
+2025-10-12 15:46:39,739 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 15:46:39,739 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 15:46:39,739 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 15:46:40,058 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 15:46:40,058 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 15:46:40,058 - __main__ - INFO - Environment: development
+2025-10-12 15:46:40,072 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 15:46:40,080 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 15:46:59,745 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:46:59] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 15:46:59,805 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:46:59] "[31m[1mGET /api/dashboard/stats HTTP/1.1[0m" 401 -
+2025-10-12 15:47:02,030 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:02] "OPTIONS /auth/login HTTP/1.1" 200 -
+2025-10-12 15:47:02,208 - routes.auth - INFO - User logged in: adji (ID: 1)
+2025-10-12 15:47:02,209 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:02] "POST /auth/login HTTP/1.1" 200 -
+2025-10-12 15:47:02,299 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:02] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 15:47:05,811 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:05] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 15:47:05,812 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:05] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 15:47:05,841 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:05] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 15:47:05,841 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:05] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 15:47:09,467 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:09] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=&tipe=artikel HTTP/1.1" 200 -
+2025-10-12 15:47:09,468 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:09] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search=&tipe=artikel HTTP/1.1" 200 -
+2025-10-12 15:47:09,488 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:09] "GET /api/scholar/publikasi?page=1&per_page=10000&search=&tipe=artikel HTTP/1.1" 200 -
+2025-10-12 15:47:09,488 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:09] "GET /api/scholar/publikasi?page=1&per_page=20&search=&tipe=artikel HTTP/1.1" 200 -
+2025-10-12 15:47:11,273 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:11] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=&tipe=penelitian HTTP/1.1" 200 -
+2025-10-12 15:47:11,273 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:11] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search=&tipe=penelitian HTTP/1.1" 200 -
+2025-10-12 15:47:11,288 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:11] "GET /api/scholar/publikasi?page=1&per_page=20&search=&tipe=penelitian HTTP/1.1" 200 -
+2025-10-12 15:47:11,289 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:11] "GET /api/scholar/publikasi?page=1&per_page=10000&search=&tipe=penelitian HTTP/1.1" 200 -
+2025-10-12 15:47:47,991 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:47] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 15:47:47,991 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:47] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 15:47:48,008 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:48] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 15:47:48,012 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:47:48] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 15:48:13,914 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:13] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=e HTTP/1.1" 200 -
+2025-10-12 15:48:13,915 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:13] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search=e HTTP/1.1" 200 -
+2025-10-12 15:48:13,939 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:13] "GET /api/scholar/publikasi?page=1&per_page=20&search=e HTTP/1.1" 200 -
+2025-10-12 15:48:13,940 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:13] "GET /api/scholar/publikasi?page=1&per_page=10000&search=e HTTP/1.1" 200 -
+2025-10-12 15:48:14,101 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:14] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=el HTTP/1.1" 200 -
+2025-10-12 15:48:14,102 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:14] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search=el HTTP/1.1" 200 -
+2025-10-12 15:48:14,118 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:14] "GET /api/scholar/publikasi?page=1&per_page=20&search=el HTTP/1.1" 200 -
+2025-10-12 15:48:14,119 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:14] "GET /api/scholar/publikasi?page=1&per_page=10000&search=el HTTP/1.1" 200 -
+2025-10-12 15:48:14,418 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:14] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=eli HTTP/1.1" 200 -
+2025-10-12 15:48:14,419 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:14] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search=eli HTTP/1.1" 200 -
+2025-10-12 15:48:14,439 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:14] "GET /api/scholar/publikasi?page=1&per_page=20&search=eli HTTP/1.1" 200 -
+2025-10-12 15:48:14,439 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:14] "GET /api/scholar/publikasi?page=1&per_page=10000&search=eli HTTP/1.1" 200 -
+2025-10-12 15:48:14,528 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:14] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search=elia HTTP/1.1" 200 -
+2025-10-12 15:48:14,530 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:14] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search=elia HTTP/1.1" 200 -
+2025-10-12 15:48:14,547 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:14] "GET /api/scholar/publikasi?page=1&per_page=10000&search=elia HTTP/1.1" 200 -
+2025-10-12 15:48:14,547 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:14] "GET /api/scholar/publikasi?page=1&per_page=20&search=elia HTTP/1.1" 200 -
+2025-10-12 15:48:31,280 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:31] "OPTIONS /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 15:48:31,367 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:31] "POST /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 15:48:32,751 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-10-12 15:48:33,161 - WDM - INFO - ====== WebDriver manager ======
+2025-10-12 15:48:33,247 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:33] "[33mGET / HTTP/1.1[0m" 404 -
+2025-10-12 15:48:35,321 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:35] "GET /api/scraping/jobs/gs_scrape_20251012_154831 HTTP/1.1" 200 -
+2025-10-12 15:48:37,321 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:37] "GET /api/scraping/jobs/gs_scrape_20251012_154831 HTTP/1.1" 200 -
+2025-10-12 15:48:38,449 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 15:48:38,893 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 15:48:39,244 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 15:48:39,326 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:39] "GET /api/scraping/jobs/gs_scrape_20251012_154831 HTTP/1.1" 200 -
+2025-10-12 15:48:39,879 - WDM - INFO - WebDriver version 141.0.7390.76 selected
+2025-10-12 15:48:39,884 - WDM - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/141.0.7390.76/mac-arm64/chromedriver-mac-arm64.zip
+2025-10-12 15:48:39,884 - WDM - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/141.0.7390.76/mac-arm64/chromedriver-mac-arm64.zip
+2025-10-12 15:48:40,195 - WDM - INFO - Driver downloading response is 200
+2025-10-12 15:48:41,324 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:41] "GET /api/scraping/jobs/gs_scrape_20251012_154831 HTTP/1.1" 200 -
+2025-10-12 15:48:43,422 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:43] "GET /api/scraping/jobs/gs_scrape_20251012_154831 HTTP/1.1" 200 -
+2025-10-12 15:48:45,577 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:45] "GET /api/scraping/jobs/gs_scrape_20251012_154831 HTTP/1.1" 200 -
+2025-10-12 15:48:47,794 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:47] "GET /api/scraping/jobs/gs_scrape_20251012_154831 HTTP/1.1" 200 -
+2025-10-12 15:48:49,288 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 15:48:49,673 - WDM - INFO - Driver has been saved in cache [/Users/rayhanadjisantoso/.wdm/drivers/chromedriver/mac64/141.0.7390.76]
+2025-10-12 15:48:51,904 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:48:51] "GET /api/scraping/jobs/gs_scrape_20251012_154831 HTTP/1.1" 200 -
+2025-10-12 15:50:28,611 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:50:28] "GET /api/scraping/jobs/gs_scrape_20251012_154831 HTTP/1.1" 200 -
+2025-10-12 15:50:30,562 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:50:30] "GET /api/scraping/jobs/gs_scrape_20251012_154831 HTTP/1.1" 200 -
+2025-10-12 15:50:32,742 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:50:32] "GET /api/scraping/jobs/gs_scrape_20251012_154831 HTTP/1.1" 200 -
+2025-10-12 15:50:35,458 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:50:35] "GET /api/scraping/jobs/gs_scrape_20251012_154831 HTTP/1.1" 200 -
+2025-10-12 15:50:41,627 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 15:50:41] "GET /api/scraping/jobs/gs_scrape_20251012_154831 HTTP/1.1" 200 -
+2025-10-12 16:00:49,603 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 16:00:49,603 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 16:00:49,603 - __main__ - INFO - Environment: development
+2025-10-12 16:00:49,712 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 16:00:49,713 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 16:00:49,713 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 16:00:50,062 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 16:00:50,062 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 16:00:50,062 - __main__ - INFO - Environment: development
+2025-10-12 16:00:50,075 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 16:00:50,082 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 16:00:58,611 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:00:58] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 16:00:58,627 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:00:58] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 16:01:00,022 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:01:00] "[33mGET /api/scraping/jobs/gs_scrape_20251012_154831 HTTP/1.1[0m" 404 -
+2025-10-12 16:01:07,018 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:01:07] "OPTIONS /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 16:01:07,094 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:01:07] "POST /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 16:01:07,673 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-10-12 16:01:07,911 - WDM - INFO - ====== WebDriver manager ======
+2025-10-12 16:01:08,227 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 16:01:08,562 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 16:01:08,832 - WDM - INFO - Driver [/Users/rayhanadjisantoso/.wdm/drivers/chromedriver/mac64/141.0.7390.76/chromedriver-mac-arm64/chromedriver] found in cache
+2025-10-12 16:01:09,919 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:01:09] "[33mGET / HTTP/1.1[0m" 404 -
+2025-10-12 16:01:12,005 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:01:12] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:01:14,099 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:01:14] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:01:16,191 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:01:16] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:01:18,279 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:01:18] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:01:20,329 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:01:20] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:01:22,415 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:01:22] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:01:24,637 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:01:24] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:01:26,642 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:01:26] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:01:28,770 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:01:28] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:01:31,858 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:01:31] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:01:36,148 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:01:36] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:02:04,710 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:02:04] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:02:06,714 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:02:06] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:02:08,711 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:02:08] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:02:11,321 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:02:11] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:02:14,713 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:02:14] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:02:19,350 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:02:19] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:04:33,504 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:04:33] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:04:35,497 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:04:35] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:04:38,383 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:04:38] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:04:42,539 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:04:42] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:04:46,012 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:04:46] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:04:52,251 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:04:52] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:04:54,256 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:04:54] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:04:56,387 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:04:56] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:04:58,961 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:04:58] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:05:01,334 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:05:01] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:05:05,575 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:05:05] "GET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1" 200 -
+2025-10-12 16:08:46,780 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 16:08:46,780 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 16:08:46,780 - __main__ - INFO - Environment: development
+2025-10-12 16:08:46,815 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 16:08:46,816 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 16:08:46,816 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 16:08:47,151 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 16:08:47,151 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 16:08:47,151 - __main__ - INFO - Environment: development
+2025-10-12 16:08:47,165 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 16:08:47,172 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 16:08:56,577 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:08:56] "[33mGET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1[0m" 404 -
+2025-10-12 16:08:58,557 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:08:58] "[33mGET /api/scraping/jobs/gs_scrape_20251012_160107 HTTP/1.1[0m" 404 -
+2025-10-12 16:08:59,341 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:08:59] "OPTIONS /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-10-12 16:08:59,342 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:08:59] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:08:59,361 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:08:59] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:08:59,363 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:08:59] "GET /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-10-12 16:09:00,776 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:09:00] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:09:00,777 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:09:00] "GET /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-10-12 16:09:05,326 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:09:05] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 16:09:05,327 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:09:05] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:09:05,338 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:09:05] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:09:05,340 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:09:05] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 16:20:31,393 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 16:20:31,553 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 16:20:32,311 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 16:20:32,312 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 16:20:32,312 - __main__ - INFO - Environment: development
+2025-10-12 16:20:32,332 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 16:20:32,340 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 16:20:37,655 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:20:37] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 16:20:37,656 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:20:37] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 16:20:37,679 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:20:37] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 16:20:37,679 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:20:37] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 16:23:08,031 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 16:23:08,302 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 16:23:08,940 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 16:23:08,940 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 16:23:08,940 - __main__ - INFO - Environment: development
+2025-10-12 16:23:08,958 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 16:23:08,971 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 16:27:33,112 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 16:27:33,714 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 16:27:34,392 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 16:27:34,392 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 16:27:34,393 - __main__ - INFO - Environment: development
+2025-10-12 16:27:34,412 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 16:27:34,420 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 16:28:08,159 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 16:28:08,715 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 16:28:09,156 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 16:28:09,156 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 16:28:09,157 - __main__ - INFO - Environment: development
+2025-10-12 16:28:09,172 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 16:28:09,180 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 16:28:17,946 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:28:17] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 16:28:17,947 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:28:17] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:28:17,970 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:28:17] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 16:28:17,970 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:28:17] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:36:14,048 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/gs_scraper.py', reloading
+2025-10-12 16:36:14,210 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 16:36:14,747 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 16:36:14,747 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 16:36:14,747 - __main__ - INFO - Environment: development
+2025-10-12 16:36:14,761 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 16:36:14,770 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 16:36:22,894 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/gs_scraper.py', reloading
+2025-10-12 16:36:23,896 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 16:36:24,336 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 16:36:24,336 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 16:36:24,336 - __main__ - INFO - Environment: development
+2025-10-12 16:36:24,350 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 16:36:24,361 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 16:37:03,065 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/scrapers/scraping_gs.py', reloading
+2025-10-12 16:37:03,680 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 16:37:04,171 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 16:37:04,171 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 16:37:04,171 - __main__ - INFO - Environment: development
+2025-10-12 16:37:04,188 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 16:37:04,195 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 16:37:12,553 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 16:37:12,553 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 16:37:12,553 - __main__ - INFO - Environment: development
+2025-10-12 16:37:12,685 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 16:37:12,685 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 16:37:12,685 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 16:37:13,001 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 16:37:13,001 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 16:37:13,002 - __main__ - INFO - Environment: development
+2025-10-12 16:37:13,014 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 16:37:13,021 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 16:37:19,010 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:37:19] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 16:37:19,039 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:37:19] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 16:37:30,061 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:37:30] "OPTIONS /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 16:37:30,148 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:37:30] "POST /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 16:37:30,739 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-10-12 16:37:30,968 - WDM - INFO - ====== WebDriver manager ======
+2025-10-12 16:37:31,206 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 16:37:31,543 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 16:37:31,804 - WDM - INFO - Driver [/Users/rayhanadjisantoso/.wdm/drivers/chromedriver/mac64/141.0.7390.76/chromedriver-mac-arm64/chromedriver] found in cache
+2025-10-12 16:37:31,826 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:37:31] "[33mGET / HTTP/1.1[0m" 404 -
+2025-10-12 16:37:33,913 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:37:33] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:37:35,908 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:37:35] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:37:37,998 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:37:37] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:37:39,995 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:37:39] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:37:42,148 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:37:42] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:37:44,148 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:37:44] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:37:46,539 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:37:46] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:37:49,401 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:37:49] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:37:52,346 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:37:52] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:37:56,368 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:37:56] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:37:58,370 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:37:58] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:00,459 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:00] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:02,459 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:02] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:05,513 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:05] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:07,512 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:07] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:09,510 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:09] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:12,537 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:12] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:15,203 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:15] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:17,298 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:17] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:19,304 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:19] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:21,542 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:21] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:24,785 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:24] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:26,785 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:26] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:29,486 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:29] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:32,254 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:32] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:34,997 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:34] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:37,430 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:37] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:39,433 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:39] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:41,543 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:41] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:44,573 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:44] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:38:50,399 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:38:50] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:39:00,263 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:39:00] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:39:02,268 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:39:02] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:39:04,266 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:39:04] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:39:07,142 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:39:07] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:39:11,501 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:39:11] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:39:15,246 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:39:15] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:40:15,015 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:40:15] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:40:17,014 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:40:17] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:40:19,014 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:40:19] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:40:21,342 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:40:21] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:40:24,111 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:40:24] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:40:26,107 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:40:26] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:40:28,118 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:40:28] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:40:30,642 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:40:30] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:40:36,868 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:40:36] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:40:38,864 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:40:38] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:40:40,864 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:40:40] "GET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1" 200 -
+2025-10-12 16:40:56,122 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 16:40:56,122 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 16:40:56,122 - __main__ - INFO - Environment: development
+2025-10-12 16:40:56,152 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 16:40:56,152 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 16:40:56,152 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 16:40:56,449 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 16:40:56,449 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 16:40:56,449 - __main__ - INFO - Environment: development
+2025-10-12 16:40:56,463 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 16:40:56,471 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 16:40:57,514 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:40:57] "[33mGET /api/scraping/jobs/gs_scrape_20251012_163730 HTTP/1.1[0m" 404 -
+2025-10-12 16:41:03,811 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:41:03] "OPTIONS /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 16:41:03,888 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:41:03] "POST /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 16:41:04,467 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-10-12 16:41:04,690 - WDM - INFO - ====== WebDriver manager ======
+2025-10-12 16:41:04,919 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 16:41:05,195 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 16:41:05,461 - WDM - INFO - Driver [/Users/rayhanadjisantoso/.wdm/drivers/chromedriver/mac64/141.0.7390.76/chromedriver-mac-arm64/chromedriver] found in cache
+2025-10-12 16:41:05,510 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:41:05] "[33mGET / HTTP/1.1[0m" 404 -
+2025-10-12 16:41:07,561 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:41:07] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:41:09,558 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:41:09] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:41:11,639 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:41:11] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:41:13,706 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:41:13] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:41:15,794 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:41:15] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:41:17,905 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:41:17] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:41:21,546 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:41:21] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:41:30,239 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:41:30] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:41:32,236 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:41:32] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:41:34,536 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:41:34] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:41:37,668 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:41:37] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:41:42,970 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:41:42] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:42:30,784 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:42:30] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:42:32,785 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:42:32] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:42:35,507 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:42:35] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:42:38,212 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:42:38] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:42:40,330 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:42:40] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:42:44,603 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:42:44] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:47:20,336 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:47:20] "GET /api/scraping/jobs/gs_scrape_20251012_164103 HTTP/1.1" 200 -
+2025-10-12 16:47:23,014 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:47:23] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 16:47:23,015 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:47:23] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:47:23,042 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:47:23] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:47:23,042 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:47:23] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 16:47:58,238 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:47:58] "OPTIONS /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-10-12 16:47:58,239 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:47:58] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:47:58,253 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:47:58] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:47:58,257 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:47:58] "GET /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-10-12 16:48:02,390 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:48:02] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 16:48:02,390 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:48:02] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:48:02,405 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:48:02] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 16:48:02,408 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:48:02] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:48:04,902 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:48:04] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 16:48:04,904 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:48:04] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 16:48:04,919 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:48:04] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 16:48:04,919 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:48:04] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 16:48:21,403 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:48:21] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 16:48:21,404 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:48:21] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:48:21,421 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:48:21] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:48:21,422 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:48:21] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 16:48:59,660 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:48:59] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 16:48:59,731 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:48:59] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 16:49:03,686 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:49:03] "OPTIONS /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-10-12 16:49:03,687 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:49:03] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:49:03,702 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:49:03] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:49:03,706 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:49:03] "GET /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-10-12 16:49:08,703 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:49:08] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 16:49:08,704 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:49:08] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 16:49:08,723 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:49:08] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 16:49:08,728 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:49:08] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 16:49:29,502 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:49:29] "OPTIONS /auth/login HTTP/1.1" 200 -
+2025-10-12 16:49:29,681 - routes.auth - INFO - User logged in: adji (ID: 1)
+2025-10-12 16:49:29,681 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:49:29] "POST /auth/login HTTP/1.1" 200 -
+2025-10-12 16:49:29,762 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:49:29] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 16:49:29,774 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:49:29] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 16:50:17,060 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:17] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 16:50:17,061 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:17] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:50:17,072 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:17] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:50:17,073 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:17] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 16:50:19,002 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:19] "OPTIONS /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-10-12 16:50:19,003 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:19] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:50:19,014 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:19] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:50:19,014 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:19] "GET /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-10-12 16:50:21,410 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:21] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:50:21,411 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:21] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 16:50:22,619 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:22] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 16:50:22,636 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:22] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 16:50:28,190 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:28] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 16:50:28,192 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:28] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 16:50:28,207 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:28] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 16:50:28,207 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:28] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 16:50:35,885 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:35] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 16:50:35,898 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:35] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 16:50:39,726 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:39] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 16:50:39,727 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:39] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 16:50:39,745 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:39] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 16:50:39,745 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:39] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 16:50:43,015 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:43] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 16:50:43,016 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:43] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:50:43,028 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:43] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 16:50:43,030 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:43] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 16:50:48,785 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:48] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 16:50:48,798 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:50:48] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 16:56:25,395 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 16:56:25,625 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 16:56:26,217 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 16:56:26,217 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 16:56:26,217 - __main__ - INFO - Environment: development
+2025-10-12 16:56:26,236 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 16:56:26,244 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 16:56:29,062 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:56:29] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 16:56:29,137 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:56:29] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 16:57:07,478 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:57:07] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 16:57:07,479 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:57:07] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 16:57:07,688 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:57:07] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 16:57:07,688 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 16:57:07] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 17:02:57,524 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 17:02:57,681 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:02:58,201 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:02:58,201 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:02:58,201 - __main__ - INFO - Environment: development
+2025-10-12 17:02:58,219 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 17:02:58,227 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 17:02:59,704 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:02:59] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:02:59,725 - __main__ - ERROR - Dashboard stats error: operator does not exist: integer = text
+LINE 17: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = yr.v_tah...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+Traceback (most recent call last):
+  File "/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py", line 185, in dashboard_stats
+    cur.execute(f"""
+    ~~~~~~~~~~~^^^^^
+        {latest_publikasi_cte},
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        ORDER BY yr.v_tahun_publikasi ASC
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    """, (start_year, current_year))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/site-packages/psycopg2/extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: operator does not exist: integer = text
+LINE 17: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = yr.v_tah...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+
+2025-10-12 17:02:59,726 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:02:59] "[35m[1mGET /api/dashboard/stats HTTP/1.1[0m" 500 -
+2025-10-12 17:05:46,636 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:05:46] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:05:46,656 - __main__ - ERROR - Dashboard stats error: operator does not exist: integer = text
+LINE 17: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = yr.v_tah...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+Traceback (most recent call last):
+  File "/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py", line 185, in dashboard_stats
+    cur.execute(f"""
+    ~~~~~~~~~~~^^^^^
+        {latest_publikasi_cte},
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        ORDER BY yr.v_tahun_publikasi ASC
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    """, (start_year, current_year))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/site-packages/psycopg2/extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: operator does not exist: integer = text
+LINE 17: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = yr.v_tah...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+
+2025-10-12 17:05:46,656 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:05:46] "[35m[1mGET /api/dashboard/stats HTTP/1.1[0m" 500 -
+2025-10-12 17:05:46,935 - __main__ - ERROR - Dashboard stats error: operator does not exist: integer = text
+LINE 17: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = yr.v_tah...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+Traceback (most recent call last):
+  File "/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py", line 185, in dashboard_stats
+    cur.execute(f"""
+    ~~~~~~~~~~~^^^^^
+        {latest_publikasi_cte},
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        ORDER BY yr.v_tahun_publikasi ASC
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    """, (start_year, current_year))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/site-packages/psycopg2/extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: operator does not exist: integer = text
+LINE 17: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = yr.v_tah...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+
+2025-10-12 17:05:46,936 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:05:46] "[35m[1mGET /api/dashboard/stats HTTP/1.1[0m" 500 -
+2025-10-12 17:05:53,441 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:05:53,441 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:05:53,441 - __main__ - INFO - Environment: development
+2025-10-12 17:05:53,650 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 17:05:53,650 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 17:05:53,651 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:05:53,974 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:05:53,974 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:05:53,974 - __main__ - INFO - Environment: development
+2025-10-12 17:05:53,991 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 17:05:53,999 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 17:05:59,941 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:05:59] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:05:59,960 - __main__ - ERROR - Dashboard stats error: operator does not exist: integer = text
+LINE 17: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = yr.v_tah...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+Traceback (most recent call last):
+  File "/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py", line 185, in dashboard_stats
+    cur.execute(f"""
+    ~~~~~~~~~~~^^^^^
+        {latest_publikasi_cte},
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        ORDER BY yr.v_tahun_publikasi ASC
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    """, (start_year, current_year))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/site-packages/psycopg2/extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: operator does not exist: integer = text
+LINE 17: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = yr.v_tah...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+
+2025-10-12 17:05:59,960 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:05:59] "[35m[1mGET /api/dashboard/stats HTTP/1.1[0m" 500 -
+2025-10-12 17:08:33,916 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 17:08:34,034 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:08:43,617 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:08:43,617 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:08:43,617 - __main__ - INFO - Environment: development
+2025-10-12 17:08:43,645 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 17:08:43,645 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 17:08:43,645 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:08:43,947 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:08:43,947 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:08:43,947 - __main__ - INFO - Environment: development
+2025-10-12 17:08:43,961 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 17:08:43,968 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 17:08:50,986 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:08:50] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:08:51,003 - __main__ - ERROR - Dashboard stats error: operator does not exist: integer = text
+LINE 17: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = yr.v_tah...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+Traceback (most recent call last):
+  File "/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py", line 185, in dashboard_stats
+    cur.execute(f"""
+    ~~~~~~~~~~~^^^^^
+        {latest_publikasi_cte},
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        ORDER BY yr.v_tahun_publikasi ASC
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    """, (start_year, current_year))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/site-packages/psycopg2/extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: operator does not exist: integer = text
+LINE 17: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = yr.v_tah...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+
+2025-10-12 17:08:51,003 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:08:51] "[35m[1mGET /api/dashboard/stats HTTP/1.1[0m" 500 -
+2025-10-12 17:09:35,044 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 17:09:35,367 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:09:35,782 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:09:35,782 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:09:35,782 - __main__ - INFO - Environment: development
+2025-10-12 17:09:35,798 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 17:09:35,806 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 17:09:44,496 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 17:09:44,960 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:09:45,353 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:09:45,353 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:09:45,353 - __main__ - INFO - Environment: development
+2025-10-12 17:09:45,368 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 17:09:45,375 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 17:10:12,328 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:10:12] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:10:12,346 - __main__ - ERROR - Dashboard stats error: syntax error at or near "::"
+LINE 11:                 SELECT ::TEXTgenerate_series(2015, 2025) as ...
+                                ^
+
+Traceback (most recent call last):
+  File "/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py", line 185, in dashboard_stats
+    cur.execute(f"""
+    ~~~~~~~~~~~^^^^^
+        {latest_publikasi_cte},
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        ORDER BY yr.v_tahun_publikasi ASC
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    """, (start_year, current_year))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/site-packages/psycopg2/extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.SyntaxError: syntax error at or near "::"
+LINE 11:                 SELECT ::TEXTgenerate_series(2015, 2025) as ...
+                                ^
+
+
+2025-10-12 17:10:12,347 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:10:12] "[35m[1mGET /api/dashboard/stats HTTP/1.1[0m" 500 -
+2025-10-12 17:10:53,853 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 17:10:54,919 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:11:06,310 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:11:06,310 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:11:06,310 - __main__ - INFO - Environment: development
+2025-10-12 17:11:06,333 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 17:11:06,333 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 17:11:06,333 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:11:06,639 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:11:06,639 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:11:06,639 - __main__ - INFO - Environment: development
+2025-10-12 17:11:06,652 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 17:11:06,659 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 17:11:11,903 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:11:11] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:11:11,984 - __main__ - ERROR - Dashboard stats error: operator does not exist: integer = text
+LINE 17: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = yr.v_tah...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+Traceback (most recent call last):
+  File "/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py", line 185, in dashboard_stats
+    cur.execute(f"""
+    ~~~~~~~~~~~^^^^^
+        {latest_publikasi_cte},
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        ORDER BY yr.v_tahun_publikasi ASC
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    """, (start_year, current_year))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/site-packages/psycopg2/extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: operator does not exist: integer = text
+LINE 17: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = yr.v_tah...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+
+2025-10-12 17:11:11,985 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:11:11] "[35m[1mGET /api/dashboard/stats HTTP/1.1[0m" 500 -
+2025-10-12 17:12:15,063 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 17:12:16,135 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:12:21,278 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:12:21,278 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:12:21,279 - __main__ - INFO - Environment: development
+2025-10-12 17:12:21,301 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 17:12:21,301 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 17:12:21,301 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:12:21,614 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:12:21,615 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:12:21,615 - __main__ - INFO - Environment: development
+2025-10-12 17:12:21,627 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 17:12:21,635 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 17:12:24,291 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:12:24] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:12:24,311 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:12:24] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:12:56,787 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:12:56] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 17:12:56,788 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:12:56] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 17:12:56,812 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:12:56] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-12 17:12:56,812 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:12:56] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-12 17:13:08,536 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:13:08] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:13:08,537 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:13:08] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:13:08,551 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:13:08] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:13:08,555 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:13:08] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:13:09,890 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:13:09] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:13:09,905 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:13:09] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:15:50,407 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 17:15:50,990 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:15:57,956 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:15:57,956 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:15:57,956 - __main__ - INFO - Environment: development
+2025-10-12 17:15:57,988 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 17:15:57,988 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 17:15:57,988 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:15:58,314 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:15:58,315 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:15:58,315 - __main__ - INFO - Environment: development
+2025-10-12 17:15:58,328 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 17:15:58,336 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 17:16:00,868 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:16:00] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:16:01,007 - __main__ - ERROR - Dashboard stats error: name 'start_year' is not defined
+Traceback (most recent call last):
+  File "/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py", line 193, in dashboard_stats
+    """, (start_year, current_year))
+          ^^^^^^^^^^
+NameError: name 'start_year' is not defined
+
+2025-10-12 17:16:01,008 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:16:01] "[35m[1mGET /api/dashboard/stats HTTP/1.1[0m" 500 -
+2025-10-12 17:16:02,352 - __main__ - ERROR - Dashboard stats error: name 'start_year' is not defined
+Traceback (most recent call last):
+  File "/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py", line 193, in dashboard_stats
+    """, (start_year, current_year))
+          ^^^^^^^^^^
+NameError: name 'start_year' is not defined
+
+2025-10-12 17:16:02,352 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:16:02] "[35m[1mGET /api/dashboard/stats HTTP/1.1[0m" 500 -
+2025-10-12 17:16:12,793 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 17:16:13,534 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:16:14,005 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:16:14,005 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:16:14,005 - __main__ - INFO - Environment: development
+2025-10-12 17:16:14,021 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 17:16:14,031 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 17:16:16,449 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 17:16:17,114 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:16:20,782 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:16:20,782 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:16:20,782 - __main__ - INFO - Environment: development
+2025-10-12 17:16:20,805 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 17:16:20,806 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 17:16:20,806 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:16:21,144 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:16:21,144 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:16:21,144 - __main__ - INFO - Environment: development
+2025-10-12 17:16:21,174 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 17:16:21,187 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 17:16:23,453 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:16:23] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:16:23,542 - __main__ - ERROR - Dashboard stats error: operator does not exist: integer = text
+LINE 16: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = years.ye...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+Traceback (most recent call last):
+  File "/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py", line 185, in dashboard_stats
+    cur.execute(f"""
+    ~~~~~~~~~~~^^^^^
+        {latest_publikasi_cte}
+        ^^^^^^^^^^^^^^^^^^^^^^
+    ...<8 lines>...
+        ORDER BY years.year ASC
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    """, (start_year, current_year))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/site-packages/psycopg2/extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: operator does not exist: integer = text
+LINE 16: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = years.ye...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+
+2025-10-12 17:16:23,544 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:16:23] "[35m[1mGET /api/dashboard/stats HTTP/1.1[0m" 500 -
+2025-10-12 17:16:24,474 - __main__ - ERROR - Dashboard stats error: operator does not exist: integer = text
+LINE 16: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = years.ye...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+Traceback (most recent call last):
+  File "/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py", line 185, in dashboard_stats
+    cur.execute(f"""
+    ~~~~~~~~~~~^^^^^
+        {latest_publikasi_cte}
+        ^^^^^^^^^^^^^^^^^^^^^^
+    ...<8 lines>...
+        ORDER BY years.year ASC
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    """, (start_year, current_year))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/site-packages/psycopg2/extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: operator does not exist: integer = text
+LINE 16: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = years.ye...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+
+2025-10-12 17:16:24,475 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:16:24] "[35m[1mGET /api/dashboard/stats HTTP/1.1[0m" 500 -
+2025-10-12 17:16:31,752 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 17:16:32,356 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:16:32,845 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:16:32,845 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:16:32,845 - __main__ - INFO - Environment: development
+2025-10-12 17:16:32,863 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 17:16:32,871 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 17:16:33,968 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:16:33] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:16:33,986 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:16:33] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:16:58,453 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 17:16:59,118 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:17:03,671 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:17:03,671 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:17:03,671 - __main__ - INFO - Environment: development
+2025-10-12 17:17:03,696 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 17:17:03,696 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 17:17:03,696 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:17:04,019 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:17:04,019 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:17:04,019 - __main__ - INFO - Environment: development
+2025-10-12 17:17:04,033 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 17:17:04,041 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 17:17:06,105 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:17:06] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:17:06,124 - __main__ - ERROR - Dashboard stats error: operator does not exist: integer = text
+LINE 17: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = yr.year_...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+Traceback (most recent call last):
+  File "/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py", line 185, in dashboard_stats
+    cur.execute(f"""
+    ~~~~~~~~~~~^^^^^
+        {latest_publikasi_cte},
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        ORDER BY yr.year_num ASC
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    """, (start_year, current_year))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/site-packages/psycopg2/extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: operator does not exist: integer = text
+LINE 17: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = yr.year_...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+
+2025-10-12 17:17:06,125 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:17:06] "[35m[1mGET /api/dashboard/stats HTTP/1.1[0m" 500 -
+2025-10-12 17:17:07,106 - __main__ - ERROR - Dashboard stats error: operator does not exist: integer = text
+LINE 17: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = yr.year_...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+Traceback (most recent call last):
+  File "/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py", line 185, in dashboard_stats
+    cur.execute(f"""
+    ~~~~~~~~~~~^^^^^
+        {latest_publikasi_cte},
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        ORDER BY yr.year_num ASC
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    """, (start_year, current_year))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/site-packages/psycopg2/extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: operator does not exist: integer = text
+LINE 17: ...FT JOIN latest_publikasi p ON p.v_tahun_publikasi = yr.year_...
+                                                              ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+
+2025-10-12 17:17:07,106 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:17:07] "[35m[1mGET /api/dashboard/stats HTTP/1.1[0m" 500 -
+2025-10-12 17:17:12,147 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 17:17:13,182 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:17:13,497 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:17:13,497 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:17:13,497 - __main__ - INFO - Environment: development
+2025-10-12 17:17:13,511 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 17:17:13,517 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 17:17:14,272 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:17:14] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:17:14,287 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:17:14] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:17:22,463 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-10-12 17:17:22,646 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:17:23,022 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:17:23,022 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:17:23,022 - __main__ - INFO - Environment: development
+2025-10-12 17:17:23,036 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 17:17:23,043 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 17:17:26,448 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:17:26] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:17:26,521 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:17:26] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:19:46,223 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:19:46] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:19:46,299 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:19:46] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:20:02,731 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:20:02] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:20:02,750 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:20:02] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:23:27,307 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:23:27] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:23:27,407 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:23:27] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:23:40,114 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:23:40] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:23:40,194 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:23:40] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:23:45,010 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:23:45] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:23:46,872 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:23:46] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:23:46,885 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:23:46] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:24:28,507 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:24:28] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:24:28,533 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:24:28] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:24:30,110 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:24:30] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:24:59,003 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:24:59] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:24:59,073 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:24:59] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:25:02,473 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:25:02] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:26:48,448 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:26:48] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:26:48,469 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:26:48] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:27:24,370 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:24] "OPTIONS /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-10-12 17:27:24,371 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:24] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:27:24,392 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:24] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:27:24,393 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:24] "GET /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-10-12 17:27:28,430 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:28] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:27:28,431 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:28] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:27:28,444 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:28] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:27:28,445 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:28] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:27:31,434 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:31] "OPTIONS /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-10-12 17:27:31,434 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:31] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:27:31,457 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:31] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:27:31,458 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:31] "GET /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-10-12 17:27:36,279 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:36] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:27:36,280 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:36] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:27:36,292 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:36] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:27:36,292 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:36] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:27:57,101 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:57] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:27:57,102 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:57] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:27:57,118 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:57] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:27:57,119 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:57] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:27:58,069 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:58] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:27:58,070 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:27:58] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:28:05,621 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:28:05,621 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:28:05,621 - __main__ - INFO - Environment: development
+2025-10-12 17:28:05,702 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 17:28:05,702 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 17:28:05,702 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 17:28:06,022 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 17:28:06,022 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 17:28:06,022 - __main__ - INFO - Environment: development
+2025-10-12 17:28:06,034 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 17:28:06,046 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 17:28:11,059 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:28:11] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:28:11,071 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:28:11] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:28:13,865 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:28:13] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:28:13,866 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:28:13] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:28:13,877 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:28:13] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:28:13,878 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:28:13] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:29:14,199 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:14] "OPTIONS /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-10-12 17:29:14,200 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:14] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:29:14,215 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:14] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:29:14,216 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:14] "GET /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-10-12 17:29:17,717 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:17] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:29:17,718 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:17] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:29:17,731 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:17] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:29:17,732 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:17] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:29:41,030 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:41] "OPTIONS /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-10-12 17:29:41,031 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:41] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:29:41,047 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:41] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:29:41,051 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:41] "GET /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-10-12 17:29:44,103 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:44] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:29:44,104 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:44] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:29:44,116 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:44] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:29:44,118 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:44] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:29:44,794 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:44] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:29:44,794 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:44] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:29:45,753 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:45] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:29:45,753 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:45] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:29:50,053 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:50] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:29:50,054 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:50] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:29:50,067 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:50] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:29:50,068 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:50] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:29:58,879 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:58] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:29:58,880 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:58] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:29:58,891 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:58] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:29:58,892 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:29:58] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:30:04,210 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:30:04] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:30:04,211 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:30:04] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:30:04,223 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:30:04] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:30:04,226 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:30:04] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:31:01,149 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:31:01] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:31:01,150 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:31:01] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:31:01,164 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:31:01] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:31:01,164 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:31:01] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:31:02,636 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:31:02] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-12 17:31:02,637 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:31:02] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-12 17:35:44,208 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:35:44] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 17:35:44,230 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 17:35:44] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 20:29:33,277 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 20:29:33,277 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 20:29:33,277 - __main__ - INFO - Environment: development
+2025-10-12 20:29:33,363 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 20:29:33,363 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 20:29:33,363 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 20:29:33,695 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 20:29:33,695 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 20:29:33,695 - __main__ - INFO - Environment: development
+2025-10-12 20:29:33,709 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 20:29:33,719 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 20:29:42,605 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:29:42] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 20:29:42,654 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:29:42] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 20:29:55,935 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:29:55] "OPTIONS /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 20:29:56,025 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:29:56] "POST /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 20:29:56,617 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-10-12 20:29:56,854 - WDM - INFO - ====== WebDriver manager ======
+2025-10-12 20:29:57,233 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 20:29:57,628 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 20:29:57,718 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:29:57] "[33mGET / HTTP/1.1[0m" 404 -
+2025-10-12 20:29:57,908 - WDM - INFO - Driver [/Users/rayhanadjisantoso/.wdm/drivers/chromedriver/mac64/141.0.7390.76/chromedriver-mac-arm64/chromedriver] found in cache
+2025-10-12 20:29:59,749 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:29:59] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:30:01,774 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:30:01] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:30:03,776 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:30:03] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:30:05,877 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:30:05] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:30:07,877 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:30:07] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:30:10,029 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:30:10] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:30:13,852 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:30:13] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:30:15,855 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:30:15] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:30:18,699 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:30:18] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:30:21,042 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:30:21] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:30:23,044 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:30:23] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:30:25,053 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:30:25] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:30:27,612 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:30:27] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:30:31,536 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:30:31] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:30:35,638 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:30:35] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:30:38,071 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:30:38] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:31:41,000 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:31:41] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:31:43,005 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:31:43] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:31:45,685 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:31:45] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:31:49,246 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:31:49] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:31:54,531 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:31:54] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:32:46,471 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:32:46] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:32:48,471 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:32:48] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:32:50,476 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:32:50] "GET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1" 200 -
+2025-10-12 20:32:53,327 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 20:32:53,327 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 20:32:53,327 - __main__ - INFO - Environment: development
+2025-10-12 20:32:53,361 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 20:32:53,361 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 20:32:53,361 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 20:32:53,704 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 20:32:53,704 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 20:32:53,704 - __main__ - INFO - Environment: development
+2025-10-12 20:32:53,718 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 20:32:53,727 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 20:32:53,737 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:32:53] "[33mGET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1[0m" 404 -
+2025-10-12 20:32:56,424 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:32:56] "[33mGET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1[0m" 404 -
+2025-10-12 20:32:59,466 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:32:59] "[33mGET /api/scraping/jobs/gs_scrape_20251012_202955 HTTP/1.1[0m" 404 -
+2025-10-12 20:33:01,425 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:33:01] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 20:33:01,505 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:33:01] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 20:33:08,035 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:33:08] "OPTIONS /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 20:33:08,108 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:33:08] "POST /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 20:33:08,655 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-10-12 20:33:08,878 - WDM - INFO - ====== WebDriver manager ======
+2025-10-12 20:33:09,235 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 20:33:09,535 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 20:33:09,702 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:33:09] "[33mGET / HTTP/1.1[0m" 404 -
+2025-10-12 20:33:09,869 - WDM - INFO - Driver [/Users/rayhanadjisantoso/.wdm/drivers/chromedriver/mac64/141.0.7390.76/chromedriver-mac-arm64/chromedriver] found in cache
+2025-10-12 20:33:11,743 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:33:11] "GET /api/scraping/jobs/gs_scrape_20251012_203308 HTTP/1.1" 200 -
+2025-10-12 20:33:13,838 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:33:13] "GET /api/scraping/jobs/gs_scrape_20251012_203308 HTTP/1.1" 200 -
+2025-10-12 20:33:15,902 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:33:15] "GET /api/scraping/jobs/gs_scrape_20251012_203308 HTTP/1.1" 200 -
+2025-10-12 20:33:17,995 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:33:17] "GET /api/scraping/jobs/gs_scrape_20251012_203308 HTTP/1.1" 200 -
+2025-10-12 20:33:20,153 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:33:20] "GET /api/scraping/jobs/gs_scrape_20251012_203308 HTTP/1.1" 200 -
+2025-10-12 20:33:22,249 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:33:22] "GET /api/scraping/jobs/gs_scrape_20251012_203308 HTTP/1.1" 200 -
+2025-10-12 20:33:30,409 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:33:30] "GET /api/scraping/jobs/gs_scrape_20251012_203308 HTTP/1.1" 200 -
+2025-10-12 20:33:32,411 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:33:32] "GET /api/scraping/jobs/gs_scrape_20251012_203308 HTTP/1.1" 200 -
+2025-10-12 20:33:34,543 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:33:34] "GET /api/scraping/jobs/gs_scrape_20251012_203308 HTTP/1.1" 200 -
+2025-10-12 20:33:37,296 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:33:37] "GET /api/scraping/jobs/gs_scrape_20251012_203308 HTTP/1.1" 200 -
+2025-10-12 20:39:58,410 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 20:39:58,410 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 20:39:58,410 - __main__ - INFO - Environment: development
+2025-10-12 20:39:58,480 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 20:39:58,480 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 20:39:58,480 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 20:39:58,787 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 20:39:58,787 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 20:39:58,787 - __main__ - INFO - Environment: development
+2025-10-12 20:39:58,801 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 20:39:58,810 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 20:40:05,988 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:40:05] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 20:40:06,010 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:40:06] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 20:40:16,393 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:40:16] "OPTIONS /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 20:40:16,466 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:40:16] "POST /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 20:40:17,004 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-10-12 20:40:17,242 - WDM - INFO - ====== WebDriver manager ======
+2025-10-12 20:40:17,619 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 20:40:17,970 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 20:40:17,978 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:40:17] "[33mGET / HTTP/1.1[0m" 404 -
+2025-10-12 20:40:18,254 - WDM - INFO - Driver [/Users/rayhanadjisantoso/.wdm/drivers/chromedriver/mac64/141.0.7390.76/chromedriver-mac-arm64/chromedriver] found in cache
+2025-10-12 20:40:20,065 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:40:20] "GET /api/scraping/jobs/gs_scrape_20251012_204016 HTTP/1.1" 200 -
+2025-10-12 20:40:22,121 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:40:22] "GET /api/scraping/jobs/gs_scrape_20251012_204016 HTTP/1.1" 200 -
+2025-10-12 20:40:24,206 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:40:24] "GET /api/scraping/jobs/gs_scrape_20251012_204016 HTTP/1.1" 200 -
+2025-10-12 20:40:26,304 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:40:26] "GET /api/scraping/jobs/gs_scrape_20251012_204016 HTTP/1.1" 200 -
+2025-10-12 20:40:28,459 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:40:28] "GET /api/scraping/jobs/gs_scrape_20251012_204016 HTTP/1.1" 200 -
+2025-10-12 20:40:30,490 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:40:30] "GET /api/scraping/jobs/gs_scrape_20251012_204016 HTTP/1.1" 200 -
+2025-10-12 20:40:39,018 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:40:39] "GET /api/scraping/jobs/gs_scrape_20251012_204016 HTTP/1.1" 200 -
+2025-10-12 20:40:41,015 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:40:41] "GET /api/scraping/jobs/gs_scrape_20251012_204016 HTTP/1.1" 200 -
+2025-10-12 20:40:43,681 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:40:43] "GET /api/scraping/jobs/gs_scrape_20251012_204016 HTTP/1.1" 200 -
+2025-10-12 20:40:47,109 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:40:47] "GET /api/scraping/jobs/gs_scrape_20251012_204016 HTTP/1.1" 200 -
+2025-10-12 20:43:19,134 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 20:43:19,135 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 20:43:19,135 - __main__ - INFO - Environment: development
+2025-10-12 20:43:19,162 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 20:43:19,162 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 20:43:19,162 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 20:43:19,467 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 20:43:19,467 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 20:43:19,467 - __main__ - INFO - Environment: development
+2025-10-12 20:43:19,480 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 20:43:19,488 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 20:43:25,512 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:43:25] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 20:43:25,533 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:43:25] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 20:43:26,396 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:43:26] "[33mGET /api/scraping/jobs/gs_scrape_20251012_204016 HTTP/1.1[0m" 404 -
+2025-10-12 20:43:31,384 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:43:31] "OPTIONS /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 20:43:31,457 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:43:31] "POST /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 20:43:32,015 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-10-12 20:43:32,236 - WDM - INFO - ====== WebDriver manager ======
+2025-10-12 20:43:32,518 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 20:43:32,782 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 20:43:33,051 - WDM - INFO - Driver [/Users/rayhanadjisantoso/.wdm/drivers/chromedriver/mac64/141.0.7390.76/chromedriver-mac-arm64/chromedriver] found in cache
+2025-10-12 20:43:33,175 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:43:33] "[33mGET / HTTP/1.1[0m" 404 -
+2025-10-12 20:43:35,230 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:43:35] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:43:37,325 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:43:37] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:43:39,398 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:43:39] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:43:41,496 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:43:41] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:43:43,599 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:43:43] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:43:45,711 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:43:45] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:44:37,615 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:44:37] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:44:39,613 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:44:39] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:44:41,615 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:44:41] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:44:43,616 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:44:43] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:44:46,511 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:44:46] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:44:48,508 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:44:48] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:44:50,521 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:44:50] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:44:52,520 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:44:52] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:44:54,518 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:44:54] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:44:56,522 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:44:56] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:44:58,530 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:44:58] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:45:00,527 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:45:00] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:45:02,641 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:45:02] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:45:05,433 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:45:05] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:45:08,676 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:45:08] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:45:15,118 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:45:15] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:45:17,120 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:45:17] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:45:19,650 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:45:19] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:45:21,653 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:45:21] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:45:23,653 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:45:23] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:45:25,746 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:45:25] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:45:28,756 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:45:28] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:45:32,064 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:45:32] "GET /api/scraping/jobs/gs_scrape_20251012_204331 HTTP/1.1" 200 -
+2025-10-12 20:48:32,493 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 20:48:32,493 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 20:48:32,493 - __main__ - INFO - Environment: development
+2025-10-12 20:48:32,518 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.8.129:5005
+2025-10-12 20:48:32,518 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-12 20:48:32,518 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 20:48:32,825 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 20:48:32,825 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 20:48:32,825 - __main__ - INFO - Environment: development
+2025-10-12 20:48:32,838 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 20:48:32,846 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 20:48:39,090 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:48:39] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 20:48:39,111 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:48:39] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-12 20:48:48,407 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:48:48] "OPTIONS /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 20:48:48,480 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:48:48] "POST /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-12 20:48:49,025 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-10-12 20:48:49,254 - WDM - INFO - ====== WebDriver manager ======
+2025-10-12 20:48:49,479 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 20:48:49,761 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-12 20:48:50,022 - WDM - INFO - Driver [/Users/rayhanadjisantoso/.wdm/drivers/chromedriver/mac64/141.0.7390.76/chromedriver-mac-arm64/chromedriver] found in cache
+2025-10-12 20:48:50,271 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:48:50] "[33mGET / HTTP/1.1[0m" 404 -
+2025-10-12 20:48:52,474 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:48:52] "GET /api/scraping/jobs/gs_scrape_20251012_204848 HTTP/1.1" 200 -
+2025-10-12 20:48:54,550 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:48:54] "GET /api/scraping/jobs/gs_scrape_20251012_204848 HTTP/1.1" 200 -
+2025-10-12 20:48:56,646 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:48:56] "GET /api/scraping/jobs/gs_scrape_20251012_204848 HTTP/1.1" 200 -
+2025-10-12 20:48:58,747 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:48:58] "GET /api/scraping/jobs/gs_scrape_20251012_204848 HTTP/1.1" 200 -
+2025-10-12 20:49:00,844 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:49:00] "GET /api/scraping/jobs/gs_scrape_20251012_204848 HTTP/1.1" 200 -
+2025-10-12 20:49:03,005 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:49:03] "GET /api/scraping/jobs/gs_scrape_20251012_204848 HTTP/1.1" 200 -
+2025-10-12 20:52:49,558 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/gs_scraper.py', reloading
+2025-10-12 20:52:49,892 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-12 20:52:50,352 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-12 20:52:50,352 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-12 20:52:50,352 - __main__ - INFO - Environment: development
+2025-10-12 20:52:50,370 - werkzeug - WARNING -  * Debugger is active!
+2025-10-12 20:52:50,378 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-12 20:53:03,135 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:53:03] "[33mGET /api/scraping/jobs/gs_scrape_20251012_204848 HTTP/1.1[0m" 404 -
+2025-10-12 20:53:07,232 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:53:07] "[33mGET /api/scraping/jobs/gs_scrape_20251012_204848 HTTP/1.1[0m" 404 -
+2025-10-12 20:53:09,236 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:53:09] "[33mGET /api/scraping/jobs/gs_scrape_20251012_204848 HTTP/1.1[0m" 404 -
+2025-10-12 20:53:11,411 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:53:11] "[33mGET /api/scraping/jobs/gs_scrape_20251012_204848 HTTP/1.1[0m" 404 -
+2025-10-12 20:53:14,452 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:53:14] "[33mGET /api/scraping/jobs/gs_scrape_20251012_204848 HTTP/1.1[0m" 404 -
+2025-10-12 20:53:18,412 - werkzeug - INFO - 127.0.0.1 - - [12/Oct/2025 20:53:18] "[33mGET /api/scraping/jobs/gs_scrape_20251012_204848 HTTP/1.1[0m" 404 -
+2025-10-13 11:20:13,281 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-13 11:20:13,281 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-13 11:20:13,281 - __main__ - INFO - Environment: development
+2025-10-13 11:20:13,307 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.1.107:5005
+2025-10-13 11:20:13,307 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-13 11:20:13,308 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-13 11:20:13,684 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-13 11:20:13,685 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-13 11:20:13,685 - __main__ - INFO - Environment: development
+2025-10-13 11:20:13,699 - werkzeug - WARNING -  * Debugger is active!
+2025-10-13 11:20:13,710 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-13 11:20:18,840 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:20:18] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-13 11:20:19,257 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:20:19] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-13 11:20:25,614 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:20:25] "OPTIONS /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-13 11:20:25,629 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:20:25] "POST /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-13 11:20:26,245 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-10-13 11:20:26,492 - WDM - INFO - ====== WebDriver manager ======
+2025-10-13 11:20:27,616 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:20:27] "[33mGET / HTTP/1.1[0m" 404 -
+2025-10-13 11:20:29,724 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:20:29] "GET /api/scraping/jobs/gs_scrape_20251013_112025 HTTP/1.1" 200 -
+2025-10-13 11:20:31,019 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-13 11:20:31,267 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-13 11:20:31,450 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-13 11:20:31,726 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:20:31] "GET /api/scraping/jobs/gs_scrape_20251013_112025 HTTP/1.1" 200 -
+2025-10-13 11:20:31,867 - WDM - INFO - WebDriver version 141.0.7390.76 selected
+2025-10-13 11:20:31,872 - WDM - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/141.0.7390.76/mac-arm64/chromedriver-mac-arm64.zip
+2025-10-13 11:20:31,872 - WDM - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/141.0.7390.76/mac-arm64/chromedriver-mac-arm64.zip
+2025-10-13 11:20:32,068 - WDM - INFO - Driver downloading response is 200
+2025-10-13 11:20:33,726 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:20:33] "GET /api/scraping/jobs/gs_scrape_20251013_112025 HTTP/1.1" 200 -
+2025-10-13 11:20:35,727 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:20:35] "GET /api/scraping/jobs/gs_scrape_20251013_112025 HTTP/1.1" 200 -
+2025-10-13 11:20:36,875 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-13 11:20:37,306 - WDM - INFO - Driver has been saved in cache [/Users/rayhanadjisantoso/.wdm/drivers/chromedriver/mac64/141.0.7390.76]
+2025-10-13 11:20:37,723 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:20:37] "GET /api/scraping/jobs/gs_scrape_20251013_112025 HTTP/1.1" 200 -
+2025-10-13 11:20:39,725 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:20:39] "GET /api/scraping/jobs/gs_scrape_20251013_112025 HTTP/1.1" 200 -
+2025-10-13 11:20:41,731 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:20:41] "GET /api/scraping/jobs/gs_scrape_20251013_112025 HTTP/1.1" 200 -
+2025-10-13 11:20:44,165 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:20:44] "GET /api/scraping/jobs/gs_scrape_20251013_112025 HTTP/1.1" 200 -
+2025-10-13 11:20:47,911 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:20:47] "GET /api/scraping/jobs/gs_scrape_20251013_112025 HTTP/1.1" 200 -
+2025-10-13 11:20:53,844 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:20:53] "GET /api/scraping/jobs/gs_scrape_20251013_112025 HTTP/1.1" 200 -
+2025-10-13 11:21:00,729 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:21:00] "GET /api/scraping/jobs/gs_scrape_20251013_112025 HTTP/1.1" 200 -
+2025-10-13 11:21:18,405 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:21:18] "GET /api/scraping/jobs/gs_scrape_20251013_112025 HTTP/1.1" 200 -
+2025-10-13 11:21:24,328 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/scrapers/scraping_gs.py', reloading
+2025-10-13 11:21:25,371 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-13 11:21:25,821 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-13 11:21:25,821 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-13 11:21:25,821 - __main__ - INFO - Environment: development
+2025-10-13 11:21:25,836 - werkzeug - WARNING -  * Debugger is active!
+2025-10-13 11:21:25,843 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-13 11:21:29,009 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/scrapers/scraping_gs.py', reloading
+2025-10-13 11:21:29,935 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-13 11:21:30,260 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-13 11:21:30,260 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-13 11:21:30,260 - __main__ - INFO - Environment: development
+2025-10-13 11:21:30,276 - werkzeug - WARNING -  * Debugger is active!
+2025-10-13 11:21:30,281 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-13 11:21:44,481 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-13 11:21:44,481 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-13 11:21:44,481 - __main__ - INFO - Environment: development
+2025-10-13 11:21:44,502 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.1.107:5005
+2025-10-13 11:21:44,502 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-13 11:21:44,502 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-13 11:21:44,814 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-13 11:21:44,814 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-13 11:21:44,814 - __main__ - INFO - Environment: development
+2025-10-13 11:21:44,826 - werkzeug - WARNING -  * Debugger is active!
+2025-10-13 11:21:44,833 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-13 11:21:46,765 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:21:46] "[33mGET /api/scraping/jobs/gs_scrape_20251013_112025 HTTP/1.1[0m" 404 -
+2025-10-13 11:21:52,453 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:21:52] "OPTIONS /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-13 11:21:52,470 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:21:52] "POST /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-13 11:21:53,024 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-10-13 11:21:53,249 - WDM - INFO - ====== WebDriver manager ======
+2025-10-13 11:21:53,458 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-13 11:21:53,565 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-13 11:21:53,688 - WDM - INFO - Driver [/Users/rayhanadjisantoso/.wdm/drivers/chromedriver/mac64/141.0.7390.76/chromedriver-mac-arm64/chromedriver] found in cache
+2025-10-13 11:21:54,017 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:21:54] "[33mGET / HTTP/1.1[0m" 404 -
+2025-10-13 11:21:56,097 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:21:56] "GET /api/scraping/jobs/gs_scrape_20251013_112152 HTTP/1.1" 200 -
+2025-10-13 11:21:58,099 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:21:58] "GET /api/scraping/jobs/gs_scrape_20251013_112152 HTTP/1.1" 200 -
+2025-10-13 11:22:00,098 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:22:00] "GET /api/scraping/jobs/gs_scrape_20251013_112152 HTTP/1.1" 200 -
+2025-10-13 11:22:02,100 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:22:02] "GET /api/scraping/jobs/gs_scrape_20251013_112152 HTTP/1.1" 200 -
+2025-10-13 11:22:04,100 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:22:04] "GET /api/scraping/jobs/gs_scrape_20251013_112152 HTTP/1.1" 200 -
+2025-10-13 11:22:06,193 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:22:06] "GET /api/scraping/jobs/gs_scrape_20251013_112152 HTTP/1.1" 200 -
+2025-10-13 11:22:08,380 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:22:08] "GET /api/scraping/jobs/gs_scrape_20251013_112152 HTTP/1.1" 200 -
+2025-10-13 11:22:11,308 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:22:11] "GET /api/scraping/jobs/gs_scrape_20251013_112152 HTTP/1.1" 200 -
+2025-10-13 11:22:14,348 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:22:14] "GET /api/scraping/jobs/gs_scrape_20251013_112152 HTTP/1.1" 200 -
+2025-10-13 11:22:23,013 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:22:23] "GET /api/scraping/jobs/gs_scrape_20251013_112152 HTTP/1.1" 200 -
+2025-10-13 11:22:26,433 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:22:26] "GET /api/scraping/jobs/gs_scrape_20251013_112152 HTTP/1.1" 200 -
+2025-10-13 11:22:43,672 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:22:43] "GET /api/scraping/jobs/gs_scrape_20251013_112152 HTTP/1.1" 200 -
+2025-10-13 11:22:52,515 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:22:52] "GET /api/scraping/jobs/gs_scrape_20251013_112152 HTTP/1.1" 200 -
+2025-10-13 11:23:24,421 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-13 11:23:24,422 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-13 11:23:24,422 - __main__ - INFO - Environment: development
+2025-10-13 11:23:24,445 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.1.107:5005
+2025-10-13 11:23:24,446 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-13 11:23:24,446 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-10-13 11:23:24,775 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-10-13 11:23:24,775 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-10-13 11:23:24,776 - __main__ - INFO - Environment: development
+2025-10-13 11:23:24,789 - werkzeug - WARNING -  * Debugger is active!
+2025-10-13 11:23:24,796 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-10-13 11:23:27,253 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:23:27] "[33mGET /api/scraping/jobs/gs_scrape_20251013_112152 HTTP/1.1[0m" 404 -
+2025-10-13 11:23:33,574 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:23:33] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-13 11:23:33,600 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:23:33] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-10-13 11:23:42,326 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:23:42] "OPTIONS /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-13 11:23:42,342 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:23:42] "POST /api/scraping/googlescholar/scrape HTTP/1.1" 200 -
+2025-10-13 11:23:42,878 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-10-13 11:23:43,102 - WDM - INFO - ====== WebDriver manager ======
+2025-10-13 11:23:43,337 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-13 11:23:43,723 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-13 11:23:43,845 - WDM - INFO - Driver [/Users/rayhanadjisantoso/.wdm/drivers/chromedriver/mac64/141.0.7390.76/chromedriver-mac-arm64/chromedriver] found in cache
+2025-10-13 11:23:44,003 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:23:44] "[33mGET / HTTP/1.1[0m" 404 -
+2025-10-13 11:23:46,048 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:23:46] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:23:48,046 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:23:48] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:23:50,050 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:23:50] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:23:52,130 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:23:52] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:23:54,225 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:23:54] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:23:56,321 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:23:56] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:24:00,997 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:24:00] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:24:08,830 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:24:08] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:24:25,288 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:24:25] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:24:40,905 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:24:40] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:24:45,684 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:24:45] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:24:47,683 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:24:47] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:24:50,466 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:24:50] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:24:53,744 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:24:53] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:24:56,208 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:24:56] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:25:01,679 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:25:01] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:25:10,337 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:25:10] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:25:18,041 - selenium.webdriver.common.service - ERROR - Service process refused to terminate gracefully with SIGTERM, escalating to SIGKILL.
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.13/site-packages/selenium/webdriver/common/service.py", line 179, in _terminate_process
+    self.process.wait(60)
+    ~~~~~~~~~~~~~~~~~^^^^
+  File "/opt/anaconda3/lib/python3.13/subprocess.py", line 1280, in wait
+    return self._wait(timeout=timeout)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/subprocess.py", line 2058, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['/Users/rayhanadjisantoso/.wdm/drivers/chromedriver/mac64/141.0.7390.76/chromedriver-mac-arm64/chromedriver', '--port=50645']' timed out after 60 seconds
+2025-10-13 11:25:29,874 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:25:29] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:33:35,983 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:33:35] "GET /api/scraping/jobs/gs_scrape_20251013_112342 HTTP/1.1" 200 -
+2025-10-13 11:33:44,706 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:33:44] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-13 11:33:44,706 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:33:44] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-13 11:33:44,724 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:33:44] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-10-13 11:33:44,725 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:33:44] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-10-13 11:34:21,109 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:34:21] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-10-13 11:34:21,111 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:34:21] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-13 11:34:21,151 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:34:21] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-10-13 11:34:21,152 - werkzeug - INFO - 127.0.0.1 - - [13/Oct/2025 11:34:21] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -

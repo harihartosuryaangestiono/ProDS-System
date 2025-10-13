@@ -110,8 +110,15 @@ const ScholarDosen = () => {
       )
     },
     {
+      key: 'v_nama_jurusan',
+      title: 'Jurusan',
+      render: (value) => (
+        <span className="text-sm text-gray-900">{value || 'N/A'}</span>
+      )
+    },
+    {
       key: 'n_total_publikasi',
-      title: 'Total Publikasi',
+      title: 'Publikasi',
       type: 'number',
       className: 'text-center',
       cellClassName: 'text-center',
@@ -123,7 +130,7 @@ const ScholarDosen = () => {
     },
     {
       key: 'n_total_sitasi_gs',
-      title: 'Total Sitasi',
+      title: 'Sitasi',
       type: 'number',
       className: 'text-center',
       cellClassName: 'text-center',

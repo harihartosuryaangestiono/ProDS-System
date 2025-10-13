@@ -123,7 +123,7 @@ def handle_disconnect():
 @app.route('/api/dashboard/stats', methods=['GET'])
 @token_required
 def dashboard_stats(current_user_id):
-    """Get dashboard statistics"""
+    """Get dashboard statistics - only from latest data per dosen and publikasi"""
     try:
         conn = get_db_connection()
         if not conn:
@@ -131,63 +131,117 @@ def dashboard_stats(current_user_id):
         
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         
-        cur.execute("SELECT COUNT(*) as total FROM tmp_dosen_dt")
+        # CTE for latest dosen data (by nama_dosen)
+        latest_dosen_cte = """
+            WITH latest_dosen AS (
+                SELECT DISTINCT ON (LOWER(TRIM(d.v_nama_dosen)))
+                    d.*
+                FROM tmp_dosen_dt d
+                ORDER BY LOWER(TRIM(d.v_nama_dosen)), d.t_tanggal_unduh DESC NULLS LAST
+            )
+        """
+        
+        # CTE for latest publikasi data (by judul and tahun)
+        latest_publikasi_cte = """
+            WITH latest_publikasi AS (
+                SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
+                    p.*
+                FROM stg_publikasi_tr p
+                ORDER BY LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi, p.t_tanggal_unduh DESC NULLS LAST
+            )
+        """
+        
+        # Get total dosen from latest data only
+        cur.execute(f"""
+            {latest_dosen_cte}
+            SELECT COUNT(*) as total FROM latest_dosen
+        """)
         total_dosen = cur.fetchone()['total']
         
-        cur.execute("SELECT COUNT(*) as total FROM stg_publikasi_tr")
+        print(f"📊 Total unique dosen: {total_dosen}")
+        
+        # Get total publikasi from latest data only
+        cur.execute(f"""
+            {latest_publikasi_cte}
+            SELECT COUNT(*) as total FROM latest_publikasi
+        """)
         total_publikasi = cur.fetchone()['total']
         
-        cur.execute("SELECT COALESCE(SUM(n_total_sitasi_gs), 0) as total FROM tmp_dosen_dt")
+        print(f"📊 Total unique publikasi: {total_publikasi}")
+        
+        # Get total sitasi from latest dosen data only
+        cur.execute(f"""
+            {latest_dosen_cte}
+            SELECT COALESCE(SUM(n_total_sitasi_gs), 0) as total FROM latest_dosen
+        """)
         total_sitasi = cur.fetchone()['total']
         
-        # PERBAIKAN: Ambil 10 tahun terakhir dengan subquery
-        cur.execute("""
-            WITH recent_years AS (
-                SELECT DISTINCT v_tahun_publikasi
-                FROM stg_publikasi_tr
-                WHERE v_tahun_publikasi IS NOT NULL
-                ORDER BY v_tahun_publikasi DESC
-                LIMIT 10
-            )
-            SELECT p.v_tahun_publikasi, COUNT(*) as count
-            FROM stg_publikasi_tr p
-            INNER JOIN recent_years ry ON p.v_tahun_publikasi = ry.v_tahun_publikasi
-            GROUP BY p.v_tahun_publikasi
-            ORDER BY p.v_tahun_publikasi ASC
-        """)
-        publikasi_by_year = [dict(row) for row in cur.fetchall()]
+        print(f"📊 Total sitasi from latest dosen: {total_sitasi}")
         
-        # Ambil top authors dengan sumber data
-        cur.execute("""
+        # Get publikasi by year (10 tahun terakhir: 2015-2025) from latest publikasi data only
+        current_year = datetime.now().year
+        start_year = current_year - 10
+
+        cur.execute(f"""
+            {latest_publikasi_cte},
+            year_range AS (
+                SELECT generate_series(%s, %s) as year_num
+            )
             SELECT 
-                v_nama_dosen, 
+                yr.year_num::TEXT as v_tahun_publikasi, 
+                COALESCE(COUNT(p.v_id_publikasi), 0) as count
+            FROM year_range yr
+            LEFT JOIN latest_publikasi p ON CAST(p.v_tahun_publikasi AS TEXT) = CAST(yr.year_num AS TEXT)
+            GROUP BY yr.year_num
+            ORDER BY yr.year_num ASC
+        """, (start_year, current_year))
+        publikasi_by_year = [dict(row) for row in cur.fetchall()]
+        print(f"📊 Publikasi by year (10 years): {publikasi_by_year}")
+        
+        print(f"📊 Publikasi by year (10 years): {len(publikasi_by_year)} years")
+        
+        # Get top authors from latest dosen data only
+        cur.execute(f"""
+            {latest_dosen_cte}
+            SELECT
+                v_nama_dosen,
                 COALESCE(n_total_sitasi_gs, 0) as n_total_sitasi_gs,
                 COALESCE(v_sumber, 'N/A') as v_sumber
-            FROM tmp_dosen_dt
+            FROM latest_dosen
             ORDER BY n_total_sitasi_gs DESC
             LIMIT 10
         """)
         top_authors = [dict(row) for row in cur.fetchall()]
         
-        cur.execute("""
+        print(f"📊 Top authors: {len(top_authors)}")
+        
+        # Get publikasi by type from latest publikasi data only
+        cur.execute(f"""
+            {latest_publikasi_cte}
             SELECT v_jenis, COUNT(*) as count
-            FROM stg_publikasi_tr
+            FROM latest_publikasi
             GROUP BY v_jenis
             ORDER BY count DESC
         """)
         publikasi_by_type = [dict(row) for row in cur.fetchall()]
         
-        cur.execute("""
+        print(f"📊 Publikasi by type: {len(publikasi_by_type)} types")
+        
+        # Get recent publications (30 hari terakhir) from latest publikasi data only
+        cur.execute(f"""
+            {latest_publikasi_cte}
             SELECT COUNT(*) as count
-            FROM stg_publikasi_tr
+            FROM latest_publikasi
             WHERE t_tanggal_unduh >= CURRENT_DATE - INTERVAL '30 days'
         """)
         recent_publications = cur.fetchone()['count']
         
+        print(f"📊 Recent publications (30 days): {recent_publications}")
+        
         return jsonify({
             'total_dosen': total_dosen,
             'total_publikasi': total_publikasi,
-            'total_sitasi': total_sitasi,
+            'total_sitasi': int(total_sitasi) if total_sitasi else 0,
             'publikasi_by_year': publikasi_by_year,
             'top_authors': top_authors,
             'publikasi_by_type': publikasi_by_type,
@@ -195,9 +249,14 @@ def dashboard_stats(current_user_id):
         }), 200
         
     except Exception as e:
-        logger.error(f"Dashboard stats error: {e}")
+        import traceback
+        error_details = traceback.format_exc()
+        print("❌ Dashboard stats error:\n", error_details)
+        logger.error(f"Dashboard stats error: {e}\n{error_details}")
         return jsonify({'error': 'Failed to fetch dashboard stats'}), 500
     finally:
+        if 'cur' in locals():
+            cur.close()
         if 'conn' in locals():
             conn.close()
 
@@ -205,7 +264,7 @@ def dashboard_stats(current_user_id):
 @app.route('/api/sinta/dosen', methods=['GET'])
 @token_required
 def get_sinta_dosen(current_user_id):
-    """Get SINTA dosen data with pagination and search"""
+    """Get SINTA dosen data with pagination and search - only latest version per dosen"""
     conn = None
     cur = None
     print(f"🔑 Authenticated user ID: {current_user_id}")
@@ -237,29 +296,40 @@ def get_sinta_dosen(current_user_id):
         print(f"🗃️ WHERE clause: {where_clause}")
         print(f"🗃️ Params: {params}")
         
-        # Get total count
+        # Create CTE to get only latest version of each dosen (by nama_dosen)
+        latest_dosen_cte = f"""
+            WITH latest_dosen AS (
+                SELECT DISTINCT ON (LOWER(TRIM(d.v_nama_dosen)))
+                    d.*
+                FROM tmp_dosen_dt d
+                {where_clause}
+                ORDER BY LOWER(TRIM(d.v_nama_dosen)), d.t_tanggal_unduh DESC NULLS LAST
+            )
+        """
+        
+        # Get total count from CTE
         count_query = f"""
+            {latest_dosen_cte}
             SELECT COUNT(*) as total
-            FROM tmp_dosen_dt d
+            FROM latest_dosen d
             LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
-            {where_clause}
         """
         cur.execute(count_query, params)
         total = cur.fetchone()['total']
         
-        print(f"📊 Total SINTA dosen found: {total}")
+        print(f"📊 Total unique SINTA dosen found: {total}")
         
-        # Get data
+        # Get data from CTE
         data_query = f"""
+            {latest_dosen_cte}
             SELECT
                 d.v_id_dosen, d.v_nama_dosen, d.v_id_sinta, d.v_id_googleScholar,
                 d.n_total_publikasi, d.n_total_sitasi_gs, d.n_sitasi_scopus,
                 d.n_h_index_gs, d.n_i10_index_gs, d.n_skor_sinta, d.n_skor_sinta_3yr,
                 j.v_nama_jurusan, d.t_tanggal_unduh, d.v_link_url
-            FROM tmp_dosen_dt d
+            FROM latest_dosen d
             LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
-            {where_clause}
-            ORDER BY (COALESCE(d.n_total_sitasi_gs, 0) + COALESCE(d.n_sitasi_scopus, 0)) DESC
+            ORDER BY (COALESCE(d.n_total_sitasi_gs, 0) + COALESCE(d.n_sitasi_scopus, 0)) DESC, d.t_tanggal_unduh DESC
             LIMIT %s OFFSET %s
         """
         params.extend([per_page, offset])
@@ -292,7 +362,7 @@ def get_sinta_dosen(current_user_id):
 @app.route('/api/sinta/dosen/stats', methods=['GET'])
 @token_required
 def get_sinta_dosen_stats(current_user_id):
-    """Get SINTA dosen aggregate statistics"""
+    """Get SINTA dosen aggregate statistics - only latest version per dosen"""
     conn = None
     cur = None
     
@@ -315,16 +385,27 @@ def get_sinta_dosen_stats(current_user_id):
             where_clause += " AND LOWER(d.v_nama_dosen) LIKE LOWER(%s)"
             params.append(f'%{search}%')
         
-        # Get aggregate statistics
+        # Create CTE to get only latest version of each dosen
+        latest_dosen_cte = f"""
+            WITH latest_dosen AS (
+                SELECT DISTINCT ON (LOWER(TRIM(d.v_nama_dosen)))
+                    d.*
+                FROM tmp_dosen_dt d
+                {where_clause}
+                ORDER BY LOWER(TRIM(d.v_nama_dosen)), d.t_tanggal_unduh DESC NULLS LAST
+            )
+        """
+        
+        # Get aggregate statistics from CTE
         stats_query = f"""
+            {latest_dosen_cte}
             SELECT
                 COUNT(*) as total_dosen,
                 COALESCE(SUM(COALESCE(d.n_total_sitasi_gs, 0) + COALESCE(d.n_sitasi_scopus, 0)), 0) as total_sitasi,
                 COALESCE(AVG(d.n_h_index_gs), 0) as avg_h_index,
                 COALESCE(SUM(d.n_total_publikasi), 0) as total_publikasi
-            FROM tmp_dosen_dt d
+            FROM latest_dosen d
             LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
-            {where_clause}
         """
         cur.execute(stats_query, params)
         stats = cur.fetchone()
@@ -353,7 +434,7 @@ def get_sinta_dosen_stats(current_user_id):
 @app.route('/api/sinta/publikasi', methods=['GET'])
 @token_required
 def get_sinta_publikasi(current_user_id):
-    """Get SINTA publikasi data with pagination, search, tipe and year range filter"""
+    """Get SINTA publikasi data with pagination, search, tipe and year range filter - only latest version per publication"""
     conn = None
     cur = None
     print(f"🔑 Authenticated user ID: {current_user_id}")
@@ -419,11 +500,23 @@ def get_sinta_publikasi(current_user_id):
         print(f"🗃️ WHERE clause: {where_clause}")
         print(f"🗃️ Params: {params}")
         
-        # Get total count
+        # Create CTE to get only latest version of each publication (by title and year)
+        # Using DISTINCT ON to get the most recent record per unique publication
+        latest_publikasi_cte = f"""
+            WITH latest_publikasi AS (
+                SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
+                    p.*
+                FROM stg_publikasi_tr p
+                {where_clause}
+                ORDER BY LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi, p.t_tanggal_unduh DESC NULLS LAST
+            )
+        """
+        
+        # Get total count from CTE
         count_query = f"""
+            {latest_publikasi_cte}
             SELECT COUNT(*) as total
-            FROM stg_publikasi_tr p
-            {where_clause}
+            FROM latest_publikasi
         """
         cur.execute(count_query, params)
         count_result = cur.fetchone()
@@ -431,10 +524,11 @@ def get_sinta_publikasi(current_user_id):
         if count_result:
             total = count_result.get('total', 0) or 0
         
-        print(f"📊 Total records found: {total}")
+        print(f"📊 Total unique records found: {total}")
         
-        # Get data - UPDATED: Tambahkan v_terindeks dan v_ranking
+        # Get data from CTE - UPDATED: Tambahkan v_terindeks dan v_ranking
         data_query = f"""
+            {latest_publikasi_cte}
             SELECT
                 p.v_id_publikasi,
                 COALESCE(
@@ -459,7 +553,7 @@ def get_sinta_publikasi(current_user_id):
                 p.v_sumber,
                 p.t_tanggal_unduh,
                 p.v_link_url
-            FROM stg_publikasi_tr p
+            FROM latest_publikasi p
             LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
             LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
             LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
@@ -467,14 +561,13 @@ def get_sinta_publikasi(current_user_id):
             LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
             LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
             LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-            {where_clause}
             GROUP BY
                 p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
                 p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
                 p.v_authors, p.v_publisher,
                 j.v_nama_jurnal, pr.v_nama_konferensi,
                 a.v_volume, a.v_issue, a.v_pages, a.v_terindeks, a.v_ranking
-            ORDER BY p.n_total_sitasi DESC NULLS LAST
+            ORDER BY p.n_total_sitasi DESC NULLS LAST, p.t_tanggal_unduh DESC
             LIMIT %s OFFSET %s
         """
         final_params = params + [per_page, offset]
@@ -558,7 +651,7 @@ def get_sinta_publikasi(current_user_id):
 @app.route('/api/scholar/dosen', methods=['GET'])
 @token_required
 def get_scholar_dosen(current_user_id):
-    """Get Google Scholar dosen data with pagination and search"""
+    """Get Google Scholar dosen data with pagination and search - only latest version per dosen"""
     conn = None
     cur = None
     print(f"🔑 Authenticated user ID: {current_user_id}")
@@ -590,26 +683,37 @@ def get_scholar_dosen(current_user_id):
         print(f"🗃️ WHERE clause: {where_clause}")
         print(f"🗃️ Params: {params}")
         
-        # Get total count
+        # Create CTE to get only latest version of each dosen (by nama_dosen)
+        latest_dosen_cte = f"""
+            WITH latest_dosen AS (
+                SELECT DISTINCT ON (LOWER(TRIM(d.v_nama_dosen)))
+                    d.*
+                FROM tmp_dosen_dt d
+                {where_clause}
+                ORDER BY LOWER(TRIM(d.v_nama_dosen)), d.t_tanggal_unduh DESC NULLS LAST
+            )
+        """
+        
+        # Get total count from CTE
         count_query = f"""
+            {latest_dosen_cte}
             SELECT COUNT(*) as total
-            FROM tmp_dosen_dt d
-            {where_clause}
+            FROM latest_dosen
         """
         cur.execute(count_query, params)
         total = cur.fetchone()['total']
         
-        print(f"📊 Total Scholar dosen found: {total}")
+        print(f"📊 Total unique Scholar dosen found: {total}")
         
-        # Get data
+        # Get data from CTE
         data_query = f"""
+            {latest_dosen_cte}
             SELECT
                 d.v_id_dosen, d.v_nama_dosen, d.v_id_googleScholar,
                 d.n_total_publikasi, d.n_total_sitasi_gs, d.n_h_index_gs,
                 d.n_i10_index_gs, d.v_link_url, d.t_tanggal_unduh
-            FROM tmp_dosen_dt d
-            {where_clause}
-            ORDER BY d.n_total_sitasi_gs DESC NULLS LAST
+            FROM latest_dosen d
+            ORDER BY d.n_total_sitasi_gs DESC NULLS LAST, d.t_tanggal_unduh DESC
             LIMIT %s OFFSET %s
         """
         params.extend([per_page, offset])
@@ -642,7 +746,7 @@ def get_scholar_dosen(current_user_id):
 @app.route('/api/scholar/dosen/stats', methods=['GET'])
 @token_required
 def get_scholar_dosen_stats(current_user_id):
-    """Get Google Scholar dosen aggregate statistics"""
+    """Get Google Scholar dosen aggregate statistics - only latest version per dosen"""
     conn = None
     cur = None
     
@@ -665,16 +769,27 @@ def get_scholar_dosen_stats(current_user_id):
             where_clause += " AND LOWER(d.v_nama_dosen) LIKE LOWER(%s)"
             params.append(f'%{search}%')
         
-        # Get aggregate statistics
+        # Create CTE to get only latest version of each dosen
+        latest_dosen_cte = f"""
+            WITH latest_dosen AS (
+                SELECT DISTINCT ON (LOWER(TRIM(d.v_nama_dosen)))
+                    d.*
+                FROM tmp_dosen_dt d
+                {where_clause}
+                ORDER BY LOWER(TRIM(d.v_nama_dosen)), d.t_tanggal_unduh DESC NULLS LAST
+            )
+        """
+        
+        # Get aggregate statistics from CTE
         stats_query = f"""
+            {latest_dosen_cte}
             SELECT
                 COUNT(*) as total_dosen,
                 COALESCE(SUM(d.n_total_sitasi_gs), 0) as total_sitasi,
                 COALESCE(AVG(d.n_h_index_gs), 0) as avg_h_index,
                 COALESCE(SUM(d.n_total_publikasi), 0) as total_publikasi,
                 COALESCE(AVG(d.n_i10_index_gs), 0) as avg_i10_index
-            FROM tmp_dosen_dt d
-            {where_clause}
+            FROM latest_dosen d
         """
         cur.execute(stats_query, params)
         stats = cur.fetchone()
@@ -704,7 +819,7 @@ def get_scholar_dosen_stats(current_user_id):
 @app.route('/api/scholar/publikasi', methods=['GET'])
 @token_required
 def get_scholar_publikasi(current_user_id):
-    """Get Google Scholar publikasi data with pagination, search, tipe and year range filter"""
+    """Get Google Scholar publikasi data with pagination, search, tipe and year range filter - only latest version per publication"""
     conn = None
     cur = None
     print(f"🔑 Authenticated user ID: {current_user_id}")
@@ -762,11 +877,23 @@ def get_scholar_publikasi(current_user_id):
         print(f"🗃️ WHERE clause: {where_clause}")
         print(f"🗃️ Params: {params}")
         
-        # Get total count
+        # Create CTE to get only latest version of each publication (by title and year)
+        # Using DISTINCT ON to get the most recent record per unique publication
+        latest_publikasi_cte = f"""
+            WITH latest_publikasi AS (
+                SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
+                    p.*
+                FROM stg_publikasi_tr p
+                {where_clause}
+                ORDER BY LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi, p.t_tanggal_unduh DESC NULLS LAST
+            )
+        """
+        
+        # Get total count from CTE
         count_query = f"""
+            {latest_publikasi_cte}
             SELECT COUNT(*) AS total
-            FROM stg_publikasi_tr p
-            {where_clause}
+            FROM latest_publikasi
         """
         cur.execute(count_query, params)
         count_result = cur.fetchone()
@@ -774,10 +901,11 @@ def get_scholar_publikasi(current_user_id):
         if count_result:
             total = count_result.get('total', 0) or 0
         
-        print(f"📊 Total records found: {total}")
+        print(f"📊 Total unique records found: {total}")
         
-        # Get data
+        # Get data from CTE
         data_query = f"""
+            {latest_publikasi_cte}
             SELECT
                 p.v_id_publikasi,
                 COALESCE(
@@ -800,7 +928,7 @@ def get_scholar_publikasi(current_user_id):
                 p.v_sumber,
                 p.t_tanggal_unduh,
                 p.v_link_url
-            FROM stg_publikasi_tr p
+            FROM latest_publikasi p
             LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
             LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
             LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
@@ -808,14 +936,13 @@ def get_scholar_publikasi(current_user_id):
             LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
             LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
             LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-            {where_clause}
             GROUP BY
                 p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
                 p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
                 p.v_authors, p.v_publisher,
                 j.v_nama_jurnal, pr.v_nama_konferensi,
                 a.v_volume, a.v_issue, a.v_pages
-            ORDER BY p.n_total_sitasi DESC NULLS LAST
+            ORDER BY p.n_total_sitasi DESC NULLS LAST, p.t_tanggal_unduh DESC
             LIMIT %s OFFSET %s
         """
         final_params = params + [per_page, offset]

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Google Scholar Scraper Module for Web Integration
+Google Scholar Scraper Module with Auto-Login
 """
 
 from selenium import webdriver
@@ -25,14 +25,16 @@ import os
 
 
 class GoogleScholarScraper:
-    """Google Scholar Scraper with database integration"""
+    """Google Scholar Scraper with auto-login and database integration"""
     
-    def __init__(self, db_config, job_id, progress_callback=None):
+    def __init__(self, db_config, job_id=None, progress_callback=None, email="6182101017@student.unpar.ac.id", password="618017SH"):
         self.db_config = db_config
         self.job_id = job_id
         self.progress_callback = progress_callback
         self.driver = None
         self.conn = None
+        self.email = email
+        self.password = password
         
     def emit_progress(self, data):
         """Emit progress update"""
@@ -100,48 +102,260 @@ class GoogleScholarScraper:
         driver.set_page_load_timeout(120)
         driver.implicitly_wait(30)
         
-        # Add cookies
-        try:
-            driver.get("https://scholar.google.com")
-            time.sleep(5)
-        except:
-            pass
-        
         return driver
     
+    def perform_auto_login(self):
+        """Perform automatic login to Google Scholar through SSO"""
+        max_retries = 3
+        retry_count = 0
+        
+        while retry_count < max_retries:
+            try:
+                # Step 1: Open Google Scholar
+                self.emit_progress({
+                    'message': 'Step 1: Opening Google Scholar...',
+                    'status': 'login_in_progress'
+                })
+                print("Step 1: Opening https://scholar.google.com/")
+                self.driver.get("https://scholar.google.com/")
+                time.sleep(random.uniform(3, 5))
+                
+                # Step 2: Click Login button
+                self.emit_progress({
+                    'message': 'Step 2: Clicking Login button...',
+                    'status': 'login_in_progress'
+                })
+                print("Step 2: Clicking Login button")
+                try:
+                    login_button = WebDriverWait(self.driver, 10).until(
+                        EC.element_to_be_clickable((By.ID, "gs_hdr_act_s"))
+                    )
+                    login_button.click()
+                    time.sleep(random.uniform(3, 5))
+                except Exception as e:
+                    print(f"Could not find login button: {e}")
+                    # Cek apakah sudah login
+                    if self.check_if_logged_in():
+                        print("✓ Already logged in!")
+                        return True
+                    raise
+                
+                # Step 3: Enter email on Google login page
+                self.emit_progress({
+                    'message': 'Step 3: Entering email...',
+                    'status': 'login_in_progress'
+                })
+                print("Step 3: Entering email on Google login page")
+                
+                # Wait for email input
+                email_input = WebDriverWait(self.driver, 15).until(
+                    EC.presence_of_element_located((By.ID, "identifierId"))
+                )
+                email_input.clear()
+                email_input.send_keys(self.email)
+                time.sleep(random.uniform(1, 2))
+                
+                # Step 4: Click Next button (Google)
+                self.emit_progress({
+                    'message': 'Step 4: Clicking Next...',
+                    'status': 'login_in_progress'
+                })
+                print("Step 4: Clicking Next button")
+                
+                next_button = WebDriverWait(self.driver, 10).until(
+                    EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Selanjutnya')]"))
+                )
+                next_button.click()
+                time.sleep(random.uniform(3, 5))
+                
+                # Step 5: Check for CAPTCHA
+                self.emit_progress({
+                    'message': 'Step 5: Checking for CAPTCHA...',
+                    'status': 'login_in_progress'
+                })
+                print("Step 5: Checking for CAPTCHA")
+                
+                try:
+                    captcha = self.driver.find_element(By.ID, "captchaimg")
+                    if captcha.is_displayed():
+                        print("⚠️  CAPTCHA detected! Retrying after delay...")
+                        retry_count += 1
+                        
+                        if retry_count >= max_retries:
+                            raise Exception("CAPTCHA detected after multiple retries. Please try again later.")
+                        
+                        # Close driver and wait before retry
+                        self.driver.quit()
+                        
+                        delay = random.uniform(300, 600)  # 10-15 minutes
+                        self.emit_progress({
+                            'message': f'CAPTCHA detected. Waiting {delay/60:.1f} minutes before retry...',
+                            'status': 'captcha_delay'
+                        })
+                        print(f"Waiting {delay/60:.1f} minutes before retry...")
+                        time.sleep(delay)
+                        
+                        # Setup new driver and continue loop
+                        self.driver = self.setup_driver()
+                        continue
+                except NoSuchElementException:
+                    print("✓ No CAPTCHA detected, continuing...")
+                
+                # Step 6: Enter email on SSO page
+                self.emit_progress({
+                    'message': 'Step 6: Entering email on SSO...',
+                    'status': 'login_in_progress'
+                })
+                print("Step 6: Entering email on UNPAR SSO page")
+                
+                sso_email_input = WebDriverWait(self.driver, 15).until(
+                    EC.presence_of_element_located((By.ID, "username"))
+                )
+                sso_email_input.clear()
+                sso_email_input.send_keys(self.email)
+                time.sleep(random.uniform(1, 2))
+                
+                # Step 7: Click Next on SSO
+                self.emit_progress({
+                    'message': 'Step 7: Clicking Next on SSO...',
+                    'status': 'login_in_progress'
+                })
+                print("Step 7: Clicking Next button on SSO")
+                
+                sso_next_button = WebDriverWait(self.driver, 10).until(
+                    EC.element_to_be_clickable((By.ID, "next_login"))
+                )
+                sso_next_button.click()
+                time.sleep(random.uniform(2, 4))
+                
+                # Step 8: Enter password
+                self.emit_progress({
+                    'message': 'Step 8: Entering password...',
+                    'status': 'login_in_progress'
+                })
+                print("Step 8: Entering password")
+                
+                password_input = WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.ID, "password"))
+                )
+                password_input.clear()
+                password_input.send_keys(self.password)
+                time.sleep(random.uniform(1, 2))
+                
+                # Step 9: Click Login button
+                self.emit_progress({
+                    'message': 'Step 9: Clicking Login...',
+                    'status': 'login_in_progress'
+                })
+                print("Step 9: Clicking Login button")
+                
+                login_submit = WebDriverWait(self.driver, 10).until(
+                    EC.element_to_be_clickable((By.CSS_SELECTOR, "button.login__submit2"))
+                )
+                login_submit.click()
+                time.sleep(random.uniform(4, 6))
+                
+                # Step 10: Click Continue on confirmation page
+                self.emit_progress({
+                    'message': 'Step 10: Clicking Continue...',
+                    'status': 'login_in_progress'
+                })
+                print("Step 10: Clicking Continue button")
+                
+                try:
+                    continue_button = WebDriverWait(self.driver, 10).until(
+                        EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Lanjutkan')]"))
+                    )
+                    continue_button.click()
+                    time.sleep(random.uniform(4, 6))
+                except TimeoutException:
+                    print("Continue button not found or already passed")
+                
+                # Verify login success
+                self.emit_progress({
+                    'message': 'Verifying login...',
+                    'status': 'login_in_progress'
+                })
+                print("Verifying login success...")
+                
+                if self.check_if_logged_in():
+                    self.emit_progress({
+                        'message': '✓ Login successful!',
+                        'status': 'login_success'
+                    })
+                    print("✓ Login successful!")
+                    return True
+                else:
+                    raise Exception("Login verification failed")
+                
+            except Exception as e:
+                print(f"Error during login attempt {retry_count + 1}: {e}")
+                retry_count += 1
+                
+                if retry_count >= max_retries:
+                    self.emit_progress({
+                        'message': f'✗ Login failed after {max_retries} attempts',
+                        'status': 'login_failed'
+                    })
+                    raise Exception(f"Login failed after {max_retries} attempts: {e}")
+                
+                # Wait before retry
+                time.sleep(random.uniform(5, 10))
+        
+        return False
+    
+    def check_if_logged_in(self):
+        """Check if successfully logged in to Google Scholar"""
+        try:
+            # Wait a bit for page to load
+            time.sleep(3)
+            
+            # Try to find profile or account indicator
+            try:
+                # Method 1: Check for sign-in button absence
+                self.driver.find_element(By.ID, "gs_hdr_act_s")
+                return False  # Still see login button, not logged in
+            except NoSuchElementException:
+                # Method 2: Check for profile menu or settings
+                try:
+                    profile_element = self.driver.find_element(By.CSS_SELECTOR, '#gs_gb_rt a')
+                    return True
+                except:
+                    pass
+                
+                # Method 3: Check URL
+                current_url = self.driver.current_url
+                if 'scholar.google.com' in current_url and 'accounts.google.com' not in current_url:
+                    return True
+            
+            return False
+            
+        except Exception as e:
+            print(f"Error checking login status: {e}")
+            return False
+    
     def setup_driver_with_auto_login(self):
-        """Setup driver and handle automatic login"""
+        """Setup driver and perform automatic login"""
         self.driver = self.setup_driver()
         
         try:
-            self.driver.get("https://scholar.google.com")
-            
-            self.emit_progress({
-                'message': 'Browser opened. Waiting for automatic navigation...',
-                'status': 'waiting_login'
-            })
-            
-            # Wait a bit for page to load
-            time.sleep(10)
-            
-            # Check if we're logged in by looking for profile indicators
-            try:
-                # Look for sign-in button - if present, not logged in
-                sign_in = self.driver.find_element(By.LINK_TEXT, "Sign in")
-                print("⚠️  Not logged in. You may encounter CAPTCHA issues.")
-            except:
-                print("✓ Appears to be logged in or no sign-in required")
-            
-            self.emit_progress({
-                'message': 'Ready to start scraping...',
-                'status': 'ready'
-            })
-            
-            return self.driver
+            # Perform auto-login
+            if self.perform_auto_login():
+                self.emit_progress({
+                    'message': 'Ready to start scraping...',
+                    'status': 'ready'
+                })
+                return self.driver
+            else:
+                raise Exception("Auto-login failed")
             
         except Exception as e:
-            print(f"Error during setup: {e}")
-            return self.driver
+            print(f"Error during setup with auto-login: {e}")
+            self.emit_progress({
+                'message': f'Setup failed: {e}',
+                'status': 'error'
+            })
+            raise
     
     def get_authors_from_db(self, scrape_from_beginning=False):
         """Get list of authors from database"""
@@ -235,9 +449,15 @@ class GoogleScholarScraper:
         }
         
         try:
+            # Verify driver is still valid
+            if not self.driver or not self.driver.session_id:
+                print(f"Driver session invalid for {pub_url}")
+                return details
+            
             try:
                 self.driver.execute_script("window.open('');")
                 new_tab_created = True
+                time.sleep(random.uniform(0.5, 1))
                 
                 if len(self.driver.window_handles) < 2:
                     return details
@@ -261,13 +481,11 @@ class GoogleScholarScraper:
             except TimeoutException:
                 print(f"Timeout waiting for main content at {pub_url}")
             
-            # Scroll to load all content
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(1.5)
             self.driver.execute_script("window.scrollTo(0, 0);")
             time.sleep(1.5)
             
-            # Parse with BeautifulSoup
             page_source = self.driver.page_source
             soup = BeautifulSoup(page_source, 'html.parser')
             
@@ -315,107 +533,97 @@ class GoogleScholarScraper:
         finally:
             if new_tab_created:
                 try:
-                    if self.driver.session_id:
-                        if len(self.driver.window_handles) > 1:
-                            if self.driver.current_window_handle != original_window:
+                    # Check if driver and session are still valid
+                    if self.driver and hasattr(self.driver, 'session_id') and self.driver.session_id:
+                        # Get current handles
+                        current_handles = self.driver.window_handles
+                        
+                        # Only close if we have more than one window
+                        if len(current_handles) > 1:
+                            # Close current window if it's not the original
+                            current_window = self.driver.current_window_handle
+                            if current_window != original_window and current_window in current_handles:
                                 self.driver.close()
+                                time.sleep(0.5)
+                            
+                            # Switch back to original window if it exists
                             if original_window in self.driver.window_handles:
                                 self.driver.switch_to.window(original_window)
+                                time.sleep(0.5)
                 except Exception as e:
-                    print(f"Error handling browser tabs: {e}")
+                    print(f"Error in finally block (details): {e}")
+                    # Try to recover by switching to first available window
+                    try:
+                        if self.driver and hasattr(self.driver, 'window_handles'):
+                            handles = self.driver.window_handles
+                            if handles:
+                                self.driver.switch_to.window(handles[0])
+                    except:
+                        pass
     
     def classify_publication_type(self, journal, conference, publisher, title=""):
-        """
-        Klasifikasi jenis publikasi berdasarkan prioritas:
-        1. Jika journal memiliki nilai (bukan N/A atau kosong) → artikel
-        2. Jika conference memiliki nilai (bukan N/A atau kosong) → prosiding
-        3. Jika keduanya tidak memiliki nilai → gunakan regex pada publisher dan title
-        
-        Return values sesuai database: 'artikel', 'prosiding', 'buku', 'penelitian', 'lainnya'
-        """
-        
-        # Prioritas 1: Jika journal memiliki nilai (bukan N/A atau kosong)
+        """Classify publication type"""
         if journal and journal.strip() and journal != 'N/A':
             return 'artikel'
         
-        # Prioritas 2: Jika conference memiliki nilai (bukan N/A atau kosong)
         if conference and conference.strip() and conference != 'N/A':
             return 'prosiding'
         
-        # Prioritas 3: Jika kedua kolom tidak memiliki nilai, gunakan regex
         return self.classify_by_regex(publisher, title)
     
     def classify_by_regex(self, publisher, title=""):
-        """
-        Klasifikasi menggunakan regex jika journal dan conference tidak tersedia.
-        Return values: 'artikel', 'prosiding', 'buku', 'penelitian', 'lainnya'
-        """
-        
-        # Gabungkan publisher dan title untuk analisis
+        """Classify using regex if journal and conference not available"""
         combined_text = f"{publisher} {title}".lower()
         
         if pd.isna(combined_text) or combined_text.strip() == "":
             return 'lainnya'
         
-        # Daftar penerbit buku terkenal
         book_publishers = ['nuansa aulia', 'citra aditya bakti', 'yrama widya', 
                           'pustaka belajar', 'pustaka pelajar', 'erlangga', 
                           'andpublisher', 'prenadamedia', 'gramedia', 'grasindo',
                           'media', 'prenhalindo', 'prenhallindo', 'wiley', 'springer']
         
-        # Deteksi penerbit buku
         if any(pub in combined_text for pub in book_publishers):
             return 'buku'
         
-        # Prioritas untuk buku jika ada kata "edisi"
         if 'edisi' in combined_text:
             return 'buku'
         
-        # Deteksi jurnal/artikel
         if any(keyword in combined_text for keyword in ['jurnal', 'journal', 'jou.', 'j.', 'acta', 'review', 'letters']):
             return 'artikel'
         
-        # Deteksi prosiding konferensi
         if any(keyword in combined_text for keyword in ['prosiding', 'proceedings', 'proc.', 'konferensi', 'conference', 
                                                        'conf.', 'simposium', 'symposium', 'workshop', 'pertemuan', 'meeting']):
             return 'prosiding'
         
-        # Deteksi buku
         if any(keyword in combined_text for keyword in ['buku', 'book', 'bab buku', 'chapter', 'handbook', 'ensiklopedia', 
                                                        'encyclopedia', 'buku teks', 'textbook', 'penerbit', 'publisher', 'press', 
                                                        'books']):
             return 'buku'
         
-        # Deteksi tesis/disertasi - masuk kategori 'penelitian'
         if any(keyword in combined_text for keyword in ['tesis', 'thesis', 'disertasi', 'dissertation', 'skripsi', 'program doktor',
                                                        'program pascasarjana', 'phd', 'master', 'doctoral', 'program studi', 'fakultas']):
             return 'penelitian'
         
-        # Deteksi laporan penelitian - masuk kategori 'penelitian'
         if any(keyword in combined_text for keyword in ['analisis', 'analysis', 'penelitian', 'research']):
             return 'penelitian'
         
-        # Deteksi preprint/laporan teknis - masuk kategori 'penelitian'
         if any(keyword in combined_text for keyword in ['arxiv', 'preprint', 'laporan teknis', 'technical report', 
                                                        'naskah awal', 'working paper', 'teknis']):
             return 'penelitian'
         
-        # Deteksi paten - masuk kategori 'penelitian'
         if 'paten' in combined_text or 'patent' in combined_text:
             return 'penelitian'
         
-        # Deteksi referensi hukum/undang-undang - masuk kategori 'buku'
         if re.search(r'\bUU\s*No\.\s*\d+|Undang-undang\s*Nomor\s*\d+|Peraturan\s*(Pemerintah|Presiden)\s*No\.\s*\d+', 
                     combined_text):
             return 'buku'
         
-        # Deteksi berdasarkan format volume/issue - indikasi jurnal
         if re.search(r'vol\.|\bvol\b|\bedisi\b|\bno\.|\bhal\.|\bhalaman\b', combined_text) or \
            re.search(r'\bvol\.\s*\d+\s*(\(\s*\d+\s*\))?', combined_text) or \
            re.search(r'\d+\s*\(\d+\)', combined_text):
             return 'artikel'
         
-        # Default: Jika tidak terdeteksi sebagai tipe apapun
         return 'lainnya'
     
     def scrape_profile(self, profile_url, author_name):
@@ -426,12 +634,10 @@ class GoogleScholarScraper:
             self.driver.get(profile_url)
             time.sleep(random.uniform(5, 8))
             
-            # Extract Scholar ID
             scholar_id = ""
             if "user=" in profile_url:
                 scholar_id = profile_url.split("user=")[1].split("&")[0]
             
-            # Extract profile information
             try:
                 name = WebDriverWait(self.driver, 20).until(
                     EC.presence_of_element_located((By.CSS_SELECTOR, '#gsc_prf_in'))
@@ -444,18 +650,33 @@ class GoogleScholarScraper:
             except:
                 affiliation = ""
             
-            # Extract citation stats
-            citation_stats = self.driver.find_elements(By.CSS_SELECTOR, '#gsc_rsb_st tbody tr')
-            citation_data = {}
+            citation_data = {
+                'Citations_all': '0',
+                'Citations_since2020': '0',
+                'h-index_all': '0',
+                'h-index_since2020': '0',
+                'i10-index_all': '0',
+                'i10-index_since2020': '0'
+            }
             
-            for stat in citation_stats:
-                metric_name = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(1)').text
-                all_citations = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(2)').text
-                recent_citations = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(3)').text
-                citation_data[f"{metric_name}_all"] = all_citations
-                citation_data[f"{metric_name}_since2020"] = recent_citations
+            try:
+                citation_stats = self.driver.find_elements(By.CSS_SELECTOR, '#gsc_rsb_st tbody tr')
+                
+                if citation_stats:
+                    for stat in citation_stats:
+                        try:
+                            metric_name = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(1)').text
+                            all_citations = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(2)').text
+                            recent_citations = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(3)').text
+                            
+                            citation_data[f"{metric_name}_all"] = all_citations if all_citations else '0'
+                            citation_data[f"{metric_name}_since2020"] = recent_citations if recent_citations else '0'
+                        except Exception as e:
+                            print(f"Warning: Error extracting metric: {e}")
+                            continue
+            except Exception as e:
+                print(f"Warning: Cannot get citation stats for {author_name}: {e}")
             
-            # Extract citations per year
             citations_per_year = {}
             try:
                 chart = self.driver.find_element(By.CSS_SELECTOR, '#gsc_g')
@@ -471,10 +692,8 @@ class GoogleScholarScraper:
             except:
                 pass
             
-            # Extract publications
             publications = []
         
-            # Click "Show more" until all loaded
             while True:
                 try:
                     show_more = self.driver.find_element(By.ID, 'gsc_bpf_more')
@@ -485,7 +704,6 @@ class GoogleScholarScraper:
                 except:
                     break
             
-            # Scrape publications
             pub_items = self.driver.find_elements(By.CSS_SELECTOR, '#gsc_a_b .gsc_a_tr')
             
             for item in pub_items:
@@ -494,7 +712,6 @@ class GoogleScholarScraper:
                     title = title_element.text
                     pub_link = title_element.get_attribute('href')
                     
-                    # Get detailed publication info
                     pub_details = self.get_publication_details(pub_link)
                     
                     authors = item.find_element(By.CSS_SELECTOR, '.gs_gray:nth-of-type(1)').text
@@ -502,10 +719,8 @@ class GoogleScholarScraper:
                     citations = item.find_element(By.CSS_SELECTOR, '.gsc_a_c a').text or "0"
                     year = item.find_element(By.CSS_SELECTOR, '.gsc_a_y span').text or "N/A"
                     
-                    # **TAMBAHKAN INI**: Get citations per year untuk publikasi ini
                     pub_citations_per_year = self.get_publication_citations_per_year(pub_link)
                     
-                    # Classify publication type using the improved method
                     pub_type = self.classify_publication_type(
                         pub_details.get('journal', 'N/A'),
                         pub_details.get('conference', 'N/A'),
@@ -528,11 +743,11 @@ class GoogleScholarScraper:
                         'volume': pub_details.get('volume', ''),
                         'issue': pub_details.get('issue', ''),
                         'pages': pub_details.get('pages', ''),
-                        'citations_per_year': pub_citations_per_year  # **TAMBAHKAN INI**
+                        'citations_per_year': pub_citations_per_year
                     }
                     
                     publications.append(pub_data)
-                    time.sleep(random.uniform(1, 2))  # Delay antar publikasi
+                    time.sleep(random.uniform(1, 2))
                     
                 except Exception as e:
                     print(f"Error extracting publication: {e}")
@@ -559,9 +774,15 @@ class GoogleScholarScraper:
         new_tab_created = False
         
         try:
+            # Verify driver is still valid
+            if not self.driver or not self.driver.session_id:
+                print(f"Driver session invalid for {pub_url}")
+                return {}
+            
             try:
                 self.driver.execute_script("window.open('');")
                 new_tab_created = True
+                time.sleep(random.uniform(0.5, 1))
                 
                 if len(self.driver.window_handles) < 2:
                     return {}
@@ -585,29 +806,24 @@ class GoogleScholarScraper:
             except TimeoutException:
                 print(f"Timeout waiting for main content at {pub_url}")
             
-            # Scroll to load all content
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(1.5)
             self.driver.execute_script("window.scrollTo(0, 0);")
             time.sleep(1.5)
             
-            # Parse with BeautifulSoup
             page_source = self.driver.page_source
             soup = BeautifulSoup(page_source, 'html.parser')
             
             citations_per_year = {}
             
-            # Extract year elements
             year_elements = soup.select('.gsc_oci_g_t')
             citation_elements = soup.select('.gsc_oci_g_a')
             
-            # Initialize years with 0 citations
             for year_element in year_elements:
                 year = year_element.text.strip()
                 if year.isdigit() and 2000 <= int(year) <= 2030:
                     citations_per_year[year] = 0
             
-            # Map citation values to years based on position
             for citation_element in citation_elements:
                 style = citation_element.get('style', '')
                 left_match = re.search(r'left:([0-9]+)px', style)
@@ -647,19 +863,37 @@ class GoogleScholarScraper:
         finally:
             if new_tab_created:
                 try:
-                    if self.driver.session_id:
-                        if len(self.driver.window_handles) > 1:
-                            if self.driver.current_window_handle != original_window:
+                    # Check if driver and session are still valid
+                    if self.driver and hasattr(self.driver, 'session_id') and self.driver.session_id:
+                        # Get current handles
+                        current_handles = self.driver.window_handles
+                        
+                        # Only close if we have more than one window
+                        if len(current_handles) > 1:
+                            # Close current window if it's not the original
+                            current_window = self.driver.current_window_handle
+                            if current_window != original_window and current_window in current_handles:
                                 self.driver.close()
+                                time.sleep(0.5)
+                            
+                            # Switch back to original window if it exists
                             if original_window in self.driver.window_handles:
                                 self.driver.switch_to.window(original_window)
+                                time.sleep(0.5)
                 except Exception as e:
-                    print(f"Error handling browser tabs: {e}")
+                    print(f"Error in finally block (citations): {e}")
+                    # Try to recover by switching to first available window
+                    try:
+                        if self.driver and hasattr(self.driver, 'window_handles'):
+                            handles = self.driver.window_handles
+                            if handles:
+                                self.driver.switch_to.window(handles[0])
+                    except:
+                        pass
     
     def save_to_csv(self, profile_data):
         """Save profile and publications to CSV"""
         try:
-            # Save profile
             profile_entry = {
                 'Name': profile_data['name'],
                 'Affiliation': profile_data['affiliation'],
@@ -676,10 +910,8 @@ class GoogleScholarScraper:
             header_needed = not os.path.exists(profiles_csv) or os.path.getsize(profiles_csv) == 0
             profile_df.to_csv(profiles_csv, mode='a', header=header_needed, index=False, encoding='utf-8')
             
-            # Save publications with all fields
             pubs_csv = 'all_dosen_data_publications.csv'
             
-            # Add publication_type for CSV if not exists
             pubs_data = []
             for pub in profile_data['publications']:
                 pub_entry = {
@@ -715,84 +947,44 @@ class GoogleScholarScraper:
         try:
             cursor = self.conn.cursor()
             
-            # Import dosen profile
             scholar_id = profile_data.get('scholar_id', '')
             
-            cursor.execute(
-                "SELECT v_id_dosen FROM tmp_dosen_dt WHERE v_id_googlescholar = %s",
-                (scholar_id,)
-            )
-            result = cursor.fetchone()
+            cursor.execute(sql.SQL("""
+                INSERT INTO tmp_dosen_dt (
+                    v_nama_dosen, n_total_publikasi, n_total_sitasi_gs,
+                    v_id_googlescholar, n_h_index_gs, n_h_index_gs2020,
+                    n_i10_index_gs, n_i10_index_gs2020, v_sumber, t_tanggal_unduh,
+                    v_link_url
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING v_id_dosen
+            """), (
+                profile_data.get('name', ''),
+                len(profile_data.get('publications', [])),
+                int(profile_data['citation_stats'].get('Citations_all', 0)) if 'Citations_all' in profile_data['citation_stats'] else 0,
+                scholar_id,
+                int(profile_data['citation_stats'].get('h-index_all', 0)) if 'h-index_all' in profile_data['citation_stats'] else 0,
+                int(profile_data['citation_stats'].get('h-index_since2020', 0)) if 'h-index_since2020' in profile_data['citation_stats'] else 0,
+                int(profile_data['citation_stats'].get('i10-index_all', 0)) if 'i10-index_all' in profile_data['citation_stats'] else 0,
+                int(profile_data['citation_stats'].get('i10-index_since2020', 0)) if 'i10-index_since2020' in profile_data['citation_stats'] else 0,
+                'Google Scholar',
+                datetime.datetime.now(),
+                profile_data.get('profile_url', '')
+            ))
+            dosen_id = cursor.fetchone()[0]
             
-            if result:
-                # Update existing
-                dosen_id = result[0]
-                cursor.execute(sql.SQL("""
-                    UPDATE tmp_dosen_dt SET 
-                    v_nama_dosen = %s,
-                    n_total_publikasi = %s,
-                    n_total_sitasi_gs = %s,
-                    n_h_index_gs = %s,
-                    n_h_index_gs2020 = %s,
-                    n_i10_index_gs = %s,
-                    n_i10_index_gs2020 = %s,
-                    v_sumber = %s,
-                    t_tanggal_unduh = %s,
-                    v_link_url = %s
-                    WHERE v_id_dosen = %s
-                """), (
-                    profile_data.get('name', ''),
-                    len(profile_data.get('publications', [])),
-                    int(profile_data['citation_stats'].get('Citations_all', 0)) if 'Citations_all' in profile_data['citation_stats'] else 0,
-                    int(profile_data['citation_stats'].get('h-index_all', 0)) if 'h-index_all' in profile_data['citation_stats'] else 0,
-                    int(profile_data['citation_stats'].get('h-index_since2020', 0)) if 'h-index_since2020' in profile_data['citation_stats'] else 0,
-                    int(profile_data['citation_stats'].get('i10-index_all', 0)) if 'i10-index_all' in profile_data['citation_stats'] else 0,
-                    int(profile_data['citation_stats'].get('i10-index_since2020', 0)) if 'i10-index_since2020' in profile_data['citation_stats'] else 0,
-                    'Google Scholar',
-                    datetime.datetime.now(),
-                    profile_data.get('profile_url', ''),
-                    dosen_id
-                ))
-            else:
-                # Insert new
-                cursor.execute(sql.SQL("""
-                    INSERT INTO tmp_dosen_dt (
-                        v_nama_dosen, n_total_publikasi, n_total_sitasi_gs,
-                        v_id_googlescholar, n_h_index_gs, n_h_index_gs2020,
-                        n_i10_index_gs, n_i10_index_gs2020, v_sumber, t_tanggal_unduh,
-                        v_link_url
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    RETURNING v_id_dosen
-                """), (
-                    profile_data.get('name', ''),
-                    len(profile_data.get('publications', [])),
-                    int(profile_data['citation_stats'].get('Citations_all', 0)) if 'Citations_all' in profile_data['citation_stats'] else 0,
-                    scholar_id,
-                    int(profile_data['citation_stats'].get('h-index_all', 0)) if 'h-index_all' in profile_data['citation_stats'] else 0,
-                    int(profile_data['citation_stats'].get('h-index_since2020', 0)) if 'h-index_since2020' in profile_data['citation_stats'] else 0,
-                    int(profile_data['citation_stats'].get('i10-index_all', 0)) if 'i10-index_all' in profile_data['citation_stats'] else 0,
-                    int(profile_data['citation_stats'].get('i10-index_since2020', 0)) if 'i10-index_since2020' in profile_data['citation_stats'] else 0,
-                    'Google Scholar',
-                    datetime.datetime.now(),
-                    profile_data.get('profile_url', '')
-                ))
-                dosen_id = cursor.fetchone()[0]
+            print(f"✓ Inserted new dosen record with ID: {dosen_id}")
             
-            # Import publications
             imported_count = 0
             for pub in profile_data.get('publications', []):
                 try:
-                    # Normalize publication type
                     pub_type_raw = pub.get('publication_type', 'lainnya')
                     pub_type = normalize_publication_type(pub_type_raw)
                     
-                    # Parse year
                     try:
                         year = int(pub.get('year', 'N/A')) if pub.get('year') != 'N/A' else None
                     except:
                         year = None
                     
-                    # Insert to main table
                     cursor.execute(sql.SQL("""
                         INSERT INTO stg_publikasi_tr (
                             v_judul, v_jenis, v_tahun_publikasi, n_total_sitasi,
@@ -812,7 +1004,6 @@ class GoogleScholarScraper:
                     ))
                     pub_id = cursor.fetchone()[0]
                     
-                    # Insert to specific type table using helper methods
                     if pub_type == 'artikel':
                         self._insert_artikel_data(cursor, pub_id, pub)
                     elif pub_type == 'prosiding':
@@ -824,11 +1015,9 @@ class GoogleScholarScraper:
                     else:
                         self._insert_lainnya_data(cursor, pub_id, pub)
                     
-                    # **TAMBAHKAN INI**: Insert sitasi per tahun jika ada
                     if 'citations_per_year' in pub and pub['citations_per_year']:
                         self._insert_sitasi_tahunan_batch(cursor, pub_id, pub['citations_per_year'])
                     
-                    # Link dosen to publication
                     cursor.execute(sql.SQL("""
                         SELECT 1 FROM stg_publikasi_dosen_dt 
                         WHERE v_id_publikasi = %s AND v_id_dosen = %s
@@ -862,15 +1051,12 @@ class GoogleScholarScraper:
     def _insert_artikel_data(self, cursor, pub_id, pub):
         """Insert data spesifik artikel/jurnal"""
         try:
-            # Ambil nama jurnal dari pub data
             journal_name = pub.get('journal', '')
             
-            # Jika tidak ada nama jurnal, skip insert ke stg_artikel_dr
             if not journal_name or journal_name == 'N/A':
                 print(f"    Warning: Artikel tanpa nama jurnal, skip insert artikel data")
                 return
             
-            # Cek apakah jurnal sudah ada di stg_jurnal_mt
             check_journal_query = sql.SQL("""
                 SELECT v_id_jurnal FROM stg_jurnal_mt WHERE v_nama_jurnal = %s
             """)
@@ -878,10 +1064,8 @@ class GoogleScholarScraper:
             result = cursor.fetchone()
             
             if result:
-                # Jurnal sudah ada, ambil ID-nya
                 journal_id = result[0]
             else:
-                # Jurnal belum ada, insert baru
                 insert_journal_query = sql.SQL("""
                     INSERT INTO stg_jurnal_mt (v_nama_jurnal)
                     VALUES (%s)
@@ -890,7 +1074,6 @@ class GoogleScholarScraper:
                 cursor.execute(insert_journal_query, (journal_name,))
                 journal_id = cursor.fetchone()[0]
             
-            # Insert ke stg_artikel_dr dengan v_id_jurnal
             insert_artikel_query = sql.SQL("""
                 INSERT INTO stg_artikel_dr (v_id_publikasi, v_id_jurnal, v_volume, v_issue, v_pages, t_updated_at)
                 VALUES (%s, %s, %s, %s, %s, %s)
@@ -997,17 +1180,14 @@ class GoogleScholarScraper:
             if not citations_per_year or not isinstance(citations_per_year, dict):
                 return
             
-            # Insert setiap tahun
             for year, citations in citations_per_year.items():
                 try:
-                    # Validasi tahun
                     if not str(year).isdigit():
                         continue
                     
                     year_int = int(year)
                     citations_int = int(citations) if citations else 0
                     
-                    # Skip jika tahun tidak valid
                     if year_int < 2000 or year_int > 2030:
                         continue
                     
@@ -1037,18 +1217,15 @@ class GoogleScholarScraper:
     def run(self, max_authors=10, scrape_from_beginning=False):
         """Main scraping execution"""
         try:
-            # Connect to database
             if not self.connect_to_db():
                 raise Exception("Failed to connect to database")
             
-            # Get authors
             df = self.get_authors_from_db(scrape_from_beginning)
             if df.empty:
                 raise Exception("No authors to scrape")
             
             max_authors = min(max_authors, len(df))
             
-            # Setup driver
             self.emit_progress({
                 'message': 'Setting up browser...',
                 'current': 0,
@@ -1060,7 +1237,6 @@ class GoogleScholarScraper:
             if not self.driver:
                 raise Exception("Failed to setup driver")
             
-            # Start scraping
             successful = 0
             failed = 0
             
@@ -1094,7 +1270,6 @@ class GoogleScholarScraper:
                         self.update_scraping_status(author_name, 'error', str(e))
                         failed += 1
                     
-                    # Delay between scrapes
                     if index < max_authors - 1:
                         delay = random.uniform(60, 120)
                         self.emit_progress({
@@ -1125,11 +1300,9 @@ class GoogleScholarScraper:
             if self.conn:
                 self.conn.close()
 
+
 def normalize_publication_type(pub_type):
-    """
-    Normalisasi tipe publikasi ke format yang sesuai dengan constraint database
-    Database menerima: 'artikel', 'buku', 'penelitian', 'prosiding', 'lainnya'
-    """
+    """Normalize publication type to database format"""
     pub_type_lower = str(pub_type).lower().strip()
 
     if 'jurnal' in pub_type_lower or 'artikel' in pub_type_lower:
@@ -1142,3 +1315,23 @@ def normalize_publication_type(pub_type):
         return 'penelitian'
     else:
         return 'lainnya'
+
+
+# Example usage
+if __name__ == "__main__":
+    DB_CONFIG = {
+        'dbname': 'SKM_PUBLIKASI',
+        'user': 'rayhanadjisantoso',
+        'password': 'rayhan123',
+        'host': 'localhost',
+        'port': '5432'
+    }
+    
+    scraper = GoogleScholarScraper(
+        db_config=DB_CONFIG,
+        email="6182101017@student.unpar.ac.id",
+        password="618017SH"
+    )
+    
+    result = scraper.run(max_authors=5, scrape_from_beginning=False)
+    print(result)

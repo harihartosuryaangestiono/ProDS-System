@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Combined Google Scholar Scraper with PostgreSQL Database Import
+Combined Google Scholar Scraper with PostgreSQL Database Import and Auto-Login
 Created on Wed Sep 24 12:18:02 2025
 @author: rayhanadjisantoso
 """
@@ -35,6 +35,10 @@ DB_PARAMS = {
     'host': 'localhost',
     'port': '5432'
 }
+
+# Login credentials
+LOGIN_EMAIL = "6182101017@student.unpar.ac.id"
+LOGIN_PASSWORD = "618017SH"
 
 def setup_driver():
     """Setup dan mengembalikan WebDriver dengan konfigurasi yang sesuai"""
@@ -103,26 +107,213 @@ def setup_driver():
     
     return driver
 
-def setup_driver_with_check_login():
-    """Setup driver dan check apakah sudah login (untuk web interface)"""
+def check_if_logged_in(driver):
+    """Check if successfully logged in to Google Scholar"""
+    try:
+        time.sleep(3)
+        
+        try:
+            driver.find_element(By.ID, "gs_hdr_act_s")
+            return False
+        except NoSuchElementException:
+            try:
+                profile_element = driver.find_element(By.CSS_SELECTOR, '#gs_gb_rt a')
+                return True
+            except:
+                pass
+            
+            current_url = driver.current_url
+            if 'scholar.google.com' in current_url and 'accounts.google.com' not in current_url:
+                return True
+        
+        return False
+        
+    except Exception as e:
+        print(f"Error checking login status: {e}")
+        return False
+
+def perform_auto_login(driver, email, password):
+    """Perform automatic login to Google Scholar through SSO"""
+    max_retries = 3
+    retry_count = 0
+    
+    while retry_count < max_retries:
+        try:
+            # Step 1: Open Google Scholar
+            print("Step 1: Opening https://scholar.google.com/")
+            driver.get("https://scholar.google.com/")
+            time.sleep(random.uniform(3, 5))
+            
+            # Step 2: Click Login button
+            print("Step 2: Clicking Login button")
+            try:
+                login_button = WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((By.ID, "gs_hdr_act_s"))
+                )
+                login_button.click()
+                time.sleep(random.uniform(3, 5))
+            except Exception as e:
+                print(f"Could not find login button: {e}")
+                if check_if_logged_in(driver):
+                    print("✓ Already logged in!")
+                    return True
+                raise
+            
+            # Step 3: Enter email on Google login page
+            print("Step 3: Entering email on Google login page")
+            
+            email_input = WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.ID, "identifierId"))
+            )
+            
+            # Human-like behavior: wait before typing
+            time.sleep(random.uniform(1.5, 2.5))
+            
+            email_input.clear()
+            time.sleep(random.uniform(2, 5))
+            
+            # Type email character by character with random delays (human-like)
+            for char in email:
+                email_input.send_keys(char)
+                time.sleep(random.uniform(1, 3))
+            
+            # Wait after typing (like human reading what they typed)
+            time.sleep(random.uniform(2, 4))
+            
+            # Step 4: Click Next button (Google)
+            print("Step 4: Clicking Next button")
+            
+            next_button = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Selanjutnya')]"))
+            )
+            next_button.click()
+            time.sleep(random.uniform(3, 5))
+            
+            # Step 5: Check for CAPTCHA
+            print("Step 5: Checking for CAPTCHA")
+            
+            try:
+                captcha = driver.find_element(By.ID, "captchaimg")
+                if captcha.is_displayed():
+                    print("⚠️  CAPTCHA detected! Retrying after delay...")
+                    retry_count += 1
+                    
+                    if retry_count >= max_retries:
+                        raise Exception("CAPTCHA detected after multiple retries. Please try again later.")
+                    
+                    driver.quit()
+                    
+                    delay = random.uniform(300, 600)  # 10-15 minutes
+                    print(f"Waiting {delay/60:.1f} minutes before retry...")
+                    time.sleep(delay)
+                    
+                    driver = setup_driver()
+                    continue
+            except NoSuchElementException:
+                print("✓ No CAPTCHA detected, continuing...")
+            
+            # Step 6: Enter email on SSO page
+            print("Step 6: Entering email on UNPAR SSO page")
+            
+            sso_email_input = WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.ID, "username"))
+            )
+            
+            # Human-like behavior
+            time.sleep(random.uniform(1, 2))
+            
+            sso_email_input.clear()
+            time.sleep(random.uniform(0.3, 0.7))
+            
+            # Type email character by character
+            for char in email:
+                sso_email_input.send_keys(char)
+                time.sleep(random.uniform(0.05, 0.15))
+            
+            time.sleep(random.uniform(0.8, 1.5))
+            
+            # Step 7: Click Next on SSO
+            print("Step 7: Clicking Next button on SSO")
+            
+            sso_next_button = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.ID, "next_login"))
+            )
+            sso_next_button.click()
+            time.sleep(random.uniform(2, 4))
+            
+            # Step 8: Enter password
+            print("Step 8: Entering password")
+            
+            password_input = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.ID, "password"))
+            )
+            
+            # Human-like behavior
+            time.sleep(random.uniform(1, 2))
+            
+            password_input.clear()
+            time.sleep(random.uniform(0.3, 0.7))
+            
+            # Type password character by character
+            for char in password:
+                password_input.send_keys(char)
+                time.sleep(random.uniform(0.05, 0.15))
+            
+            time.sleep(random.uniform(0.8, 1.5))
+            
+            # Step 9: Click Login button
+            print("Step 9: Clicking Login button")
+            
+            login_submit = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "button.login__submit2"))
+            )
+            login_submit.click()
+            time.sleep(random.uniform(4, 6))
+            
+            # Step 10: Click Continue on confirmation page
+            print("Step 10: Clicking Continue button")
+            
+            try:
+                continue_button = WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Lanjutkan')]"))
+                )
+                continue_button.click()
+                time.sleep(random.uniform(4, 6))
+            except TimeoutException:
+                print("Continue button not found or already passed")
+            
+            # Verify login success
+            print("Verifying login success...")
+            
+            if check_if_logged_in(driver):
+                print("✓ Login successful!")
+                return True
+            else:
+                raise Exception("Login verification failed")
+            
+        except Exception as e:
+            print(f"Error during login attempt {retry_count + 1}: {e}")
+            retry_count += 1
+            
+            if retry_count >= max_retries:
+                raise Exception(f"Login failed after {max_retries} attempts: {e}")
+            
+            time.sleep(random.uniform(5, 10))
+    
+    return False
+
+def setup_driver_with_auto_login():
+    """Setup driver dan lakukan login otomatis"""
     driver = setup_driver()
     
     try:
-        driver.get("https://scholar.google.com")
-        time.sleep(5)
-        
-        # Check if already logged in
-        try:
-            # Cari elemen yang menandakan sudah login
-            profile_element = driver.find_element(By.CSS_SELECTOR, '#gs_gb_rt a')
-            print("✓ Appears to be logged in or no sign-in required")
+        if perform_auto_login(driver, LOGIN_EMAIL, LOGIN_PASSWORD):
+            print("✓ Driver ready with successful login")
             return driver
-        except NoSuchElementException:
-            print("✓ Appears to be logged in or no sign-in required")
-            return driver
-            
+        else:
+            raise Exception("Auto-login failed")
     except Exception as e:
-        print(f"Error saat setup driver: {e}")
+        print(f"Error during setup with auto-login: {e}")
         try:
             driver.quit()
         except:
@@ -157,16 +348,34 @@ def scrape_google_scholar_profile_with_existing_driver(driver, profile_url, auth
         except NoSuchElementException:
             affiliation = ""
         
-        # Ekstrak statistik sitasi
-        citation_stats = driver.find_elements(By.CSS_SELECTOR, '#gsc_rsb_st tbody tr')
-        citation_data = {}
+        # Ekstrak statistik sitasi dengan default value
+        citation_data = {
+            'Citations_all': '0',
+            'Citations_since2020': '0',
+            'h-index_all': '0',
+            'h-index_since2020': '0',
+            'i10-index_all': '0',
+            'i10-index_since2020': '0'
+        }
         
-        for stat in citation_stats:
-            metric_name = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(1)').text
-            all_citations = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(2)').text
-            recent_citations = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(3)').text
-            citation_data[f"{metric_name}_all"] = all_citations
-            citation_data[f"{metric_name}_since2020"] = recent_citations
+        try:
+            citation_stats = driver.find_elements(By.CSS_SELECTOR, '#gsc_rsb_st tbody tr')
+            
+            if citation_stats:
+                for stat in citation_stats:
+                    try:
+                        metric_name = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(1)').text
+                        all_citations = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(2)').text
+                        recent_citations = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(3)').text
+                        
+                        # Pastikan nilai tidak kosong
+                        citation_data[f"{metric_name}_all"] = all_citations if all_citations else '0'
+                        citation_data[f"{metric_name}_since2020"] = recent_citations if recent_citations else '0'
+                    except Exception as e:
+                        print(f"Warning: Error saat extract metrik {metric_name}: {e}")
+                        continue
+        except Exception as e:
+            print(f"Warning: Tidak dapat mengambil citation stats untuk {author_name}: {e}")
         
         # Ekstrak sitasi per tahun untuk profil
         citations_per_year = {}
@@ -181,9 +390,11 @@ def scrape_google_scholar_profile_with_existing_driver(driver, profile_url, auth
                     citations = value_element.get_attribute('style').split(':')[-1].strip('%')
                     
                     if year.isdigit() and 2015 <= int(year) <= 2024:
-                        citations_per_year[year] = int(citations)
+                        citations_per_year[year] = int(citations) if citations.isdigit() else 0
         except NoSuchElementException:
-            pass
+            print(f"Warning: Tidak ada grafik sitasi untuk {author_name}")
+        except Exception as e:
+            print(f"Warning: Error saat extract citations per year: {e}")
         
         # Ekstrak publikasi
         publications = []
@@ -266,9 +477,15 @@ def get_publication_citations_per_year_selenium(driver, pub_url):
     new_tab_created = False
     
     try:
+        # Verify driver is still valid
+        if not driver or not driver.session_id:
+            print(f"Driver session invalid for {pub_url}")
+            return {}
+        
         try:
             driver.execute_script("window.open('');")        
             new_tab_created = True
+            time.sleep(random.uniform(0.5, 1))
             
             if len(driver.window_handles) < 2:
                 print(f"Tidak dapat membuka tab baru untuk {pub_url}")
@@ -376,9 +593,6 @@ def get_publication_citations_per_year_selenium(driver, pub_url):
                         if citation_value.isdigit():
                             citations_per_year[closest_year] = int(citation_value)
         
-        driver.close()
-        driver.switch_to.window(original_window)
-        
         return citations_per_year
         
     except Exception as e:
@@ -388,14 +602,33 @@ def get_publication_citations_per_year_selenium(driver, pub_url):
     finally:
         if new_tab_created:
             try:
-                if driver.session_id:
-                    if len(driver.window_handles) > 1:
-                        if driver.current_window_handle != original_window:
+                # Check if driver and session are still valid
+                if driver and hasattr(driver, 'session_id') and driver.session_id:
+                    # Get current handles
+                    current_handles = driver.window_handles
+                    
+                    # Only close if we have more than one window
+                    if len(current_handles) > 1:
+                        # Close current window if it's not the original
+                        current_window = driver.current_window_handle
+                        if current_window != original_window and current_window in current_handles:
                             driver.close()
+                            time.sleep(0.5)
+                        
+                        # Switch back to original window if it exists
                         if original_window in driver.window_handles:
                             driver.switch_to.window(original_window)
+                            time.sleep(0.5)
             except Exception as e:
-                print(f"Error saat menangani tab browser: {e}")
+                print(f"Error in finally block (citations): {e}")
+                # Try to recover by switching to first available window
+                try:
+                    if driver and hasattr(driver, 'window_handles'):
+                        handles = driver.window_handles
+                        if handles:
+                            driver.switch_to.window(handles[0])
+                except:
+                    pass
 
 def get_publication_details_selenium(driver, pub_url):
     """Extract detailed publication information from publication page using Selenium + BeautifulSoup"""
@@ -413,9 +646,15 @@ def get_publication_details_selenium(driver, pub_url):
     }
     
     try:
+        # Verify driver is still valid
+        if not driver or not driver.session_id:
+            print(f"Driver session invalid for {pub_url}")
+            return details
+        
         try:
             driver.execute_script("window.open('');")        
             new_tab_created = True
+            time.sleep(random.uniform(0.5, 1))
             
             if len(driver.window_handles) < 2:
                 print(f"Tidak dapat membuka tab baru untuk {pub_url}")
@@ -492,14 +731,33 @@ def get_publication_details_selenium(driver, pub_url):
     finally:
         if new_tab_created:
             try:
-                if driver.session_id:
-                    if len(driver.window_handles) > 1:
-                        if driver.current_window_handle != original_window:
+                # Check if driver and session are still valid
+                if driver and hasattr(driver, 'session_id') and driver.session_id:
+                    # Get current handles
+                    current_handles = driver.window_handles
+                    
+                    # Only close if we have more than one window
+                    if len(current_handles) > 1:
+                        # Close current window if it's not the original
+                        current_window = driver.current_window_handle
+                        if current_window != original_window and current_window in current_handles:
                             driver.close()
+                            time.sleep(0.5)
+                        
+                        # Switch back to original window if it exists
                         if original_window in driver.window_handles:
                             driver.switch_to.window(original_window)
+                            time.sleep(0.5)
             except Exception as e:
-                print(f"Error saat menangani tab browser: {e}")
+                print(f"Error in finally block (details): {e}")
+                # Try to recover by switching to first available window
+                try:
+                    if driver and hasattr(driver, 'window_handles'):
+                        handles = driver.window_handles
+                        if handles:
+                            driver.switch_to.window(handles[0])
+                except:
+                    pass
 
 def classify_publication_type(journal, conference, publisher, title=""):
     """
@@ -991,18 +1249,20 @@ def update_scraping_status(conn, author_name, status, error_message=None):
             cursor.close()
 
 def import_dosen_data(conn, profiles_df):
-    """Import dosen data from profiles to database"""
+    """Import dosen data from profiles to database - SELALU INSERT BARU"""
     cursor = conn.cursor()
     dosen_ids = {}
     try:
         for _, row in profiles_df.iterrows():
             try:
+                # LANGSUNG INSERT tanpa pengecekan existing
                 insert_query = sql.SQL("""
                     INSERT INTO tmp_dosen_dt 
                     (v_nama_dosen, v_id_googlescholar, n_total_publikasi, 
                      n_total_sitasi_gs, n_h_index_gs, n_h_index_gs2020,
                      n_i10_index_gs, n_i10_index_gs2020, v_sumber, v_link_url, t_tanggal_unduh)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    RETURNING v_id_dosen
                 """)
                 
                 values = (
@@ -1020,7 +1280,12 @@ def import_dosen_data(conn, profiles_df):
                 )
                 
                 cursor.execute(insert_query, values)
+                new_dosen_id = cursor.fetchone()[0]
+                
+                # Simpan mapping untuk linking publikasi
                 dosen_ids[row['Name']] = row['ID Google Scholar']
+                
+                print(f"  ✓ Inserted new record for {row['Name']} with ID: {new_dosen_id}")
                 
             except Exception as e:
                 print(f"  Warning: Gagal insert profil {row.get('Name', 'Unknown')}: {e}")
@@ -1028,7 +1293,7 @@ def import_dosen_data(conn, profiles_df):
                 continue
         
         conn.commit()
-        print(f"✓ Berhasil memasukkan {len(dosen_ids)} data profil ke tmp_dosen_dt")
+        print(f"✓ Berhasil memasukkan {len(dosen_ids)} data profil BARU ke tmp_dosen_dt")
         return dosen_ids
         
     except Exception as e:
@@ -1400,6 +1665,7 @@ def main():
         print(f"Mode Scraping: {'DARI AWAL (semua dosen)' if scrape_from_beginning else 'LANJUTKAN (hanya yang belum selesai)'}")
         print(f"Authors to Scrape: {max_authors} dari {len(df)} yang tersedia")
         print(f"Import to Database: Ya (otomatis)")
+        print(f"Auto-Login: Enabled (Email: {LOGIN_EMAIL})")
         print("---------------------------\n")
 
         # Path file CSV
@@ -1415,12 +1681,17 @@ def main():
         final_profiles_df = pd.DataFrame()
         final_publications_df = pd.DataFrame()
 
-        # Setup driver
-        driver = setup_driver_with_manual_login()
+        # Setup driver dengan auto-login
+        print("\n" + "="*60)
+        print("PROSES AUTO-LOGIN")
+        print("="*60)
+        driver = setup_driver_with_auto_login()
         
         if driver is None:
-            print("Gagal membuat driver dengan login manual. Program berhenti.")
+            print("✗ Gagal membuat driver dengan auto-login. Program berhenti.")
             return
+        
+        print("="*60 + "\n")
 
         try:
             scraping_count = 0
@@ -1447,7 +1718,12 @@ def main():
                             'Affiliation': profile_data['affiliation'],
                             'Profile URL': profile_data['profile_url'],
                             'ID Google Scholar': profile_data['scholar_id'],
-                            **profile_data['citation_stats'],
+                            'Citations_all': profile_data['citation_stats'].get('Citations_all', '0'),
+                            'Citations_since2020': profile_data['citation_stats'].get('Citations_since2020', '0'),
+                            'h-index_all': profile_data['citation_stats'].get('h-index_all', '0'),
+                            'h-index_since2020': profile_data['citation_stats'].get('h-index_since2020', '0'),
+                            'i10-index_all': profile_data['citation_stats'].get('i10-index_all', '0'),
+                            'i10-index_since2020': profile_data['citation_stats'].get('i10-index_since2020', '0'),
                             'Total_Publikasi': len(profile_data['publications']),
                             'Tanggal_Unduh': datetime.datetime.now().strftime('%Y-%m-%d')
                         }
