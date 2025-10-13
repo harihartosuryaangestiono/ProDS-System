@@ -37,8 +37,8 @@ DB_PARAMS = {
 }
 
 # Login credentials
-LOGIN_EMAIL = "6182101017@student.unpar.ac.id"
-LOGIN_PASSWORD = "618017SH"
+LOGIN_EMAIL = "xxxxx@student.unpar.ac.id"
+LOGIN_PASSWORD = "xxxxx"
 
 def setup_driver():
     """Setup dan mengembalikan WebDriver dengan konfigurasi yang sesuai"""
