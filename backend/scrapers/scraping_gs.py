@@ -36,9 +36,49 @@ DB_PARAMS = {
     'port': '5432'
 }
 
-# Login credentials
-LOGIN_EMAIL = "6182101017@student.unpar.ac.id"
-LOGIN_PASSWORD = "618017SH"
+# Multi-account pool for login rotation
+ACCOUNT_POOL = [
+    {"email": "6182101017@student.unpar.ac.id", "password": "618017SH"},
+    {"email": "6182101045@student.unpar.ac.id", "password": "618045CD"},
+    {"email": "6182101059@student.unpar.ac.id", "password": "618059SJ"},
+    {"email": "6182101063@student.unpar.ac.id", "password": "618063XJ"},
+]
+
+# Global variables for account management
+current_account_index = 0
+failed_accounts = set()
+restart_count = 0
+max_restarts = 3
+
+def get_next_account():
+    """Get next available account that hasn't failed (random selection)"""
+    global current_account_index, failed_accounts
+    
+    # Get list of indices that haven't failed
+    available_indices = [i for i in range(len(ACCOUNT_POOL)) if i not in failed_accounts]
+    
+    if not available_indices:
+        # All accounts have failed
+        return None, None
+    
+    # Random selection from available accounts
+    selected_index = random.choice(available_indices)
+    account = ACCOUNT_POOL[selected_index]
+    
+    return account, selected_index
+
+def mark_account_failed(account_index):
+    """Mark an account as failed (hit CAPTCHA)"""
+    global failed_accounts
+    failed_accounts.add(account_index)
+    print(f"⚠️  Account {account_index + 1} ({ACCOUNT_POOL[account_index]['email']}) marked as failed (CAPTCHA detected)")
+    print(f"   Failed accounts: {len(failed_accounts)}/{len(ACCOUNT_POOL)}")
+
+def reset_failed_accounts():
+    """Reset failed accounts (for retry after all failed)"""
+    global failed_accounts, current_account_index
+    failed_accounts.clear()
+    print("♻️  All accounts reset for new attempt")
 
 def setup_driver():
     """Setup dan mengembalikan WebDriver dengan konfigurasi yang sesuai"""
@@ -86,14 +126,46 @@ def setup_driver():
     # Gunakan ChromeDriverManager
     try:
         service = Service(ChromeDriverManager().install())
+        
+        # For macOS: Remove quarantine attribute if needed
+        import platform
+        import subprocess
+        if platform.system() == 'Darwin':  # macOS
+            driver_path = service.path
+            try:
+                # Remove quarantine attribute
+                subprocess.run(['xattr', '-d', 'com.apple.quarantine', driver_path], 
+                             capture_output=True, check=False)
+                # Set executable permission
+                subprocess.run(['chmod', '+x', driver_path], 
+                             capture_output=True, check=False)
+                print(f"✓ Fixed ChromeDriver permissions for macOS")
+            except Exception as perm_error:
+                print(f"Warning: Could not fix permissions: {perm_error}")
+        
         driver = webdriver.Chrome(service=service, options=chrome_options)
+        
     except Exception as e:
         print(f"Error saat membuat driver: {e}")
+        print("Trying alternative method...")
+        
         try:
             driver = webdriver.Chrome(options=chrome_options)
         except Exception as e2:
             print(f"Error alternatif saat membuat driver: {e2}")
-            raise
+            
+            # Last resort: try to find chromedriver manually
+            try:
+                import shutil
+                chromedriver_path = shutil.which('chromedriver')
+                if chromedriver_path:
+                    service = Service(chromedriver_path)
+                    driver = webdriver.Chrome(service=service, options=chrome_options)
+                else:
+                    raise Exception("ChromeDriver not found in system PATH")
+            except Exception as e3:
+                print(f"All methods failed: {e3}")
+                raise
     
     # Hapus properti webdriver
     try:
@@ -132,182 +204,225 @@ def check_if_logged_in(driver):
         print(f"Error checking login status: {e}")
         return False
 
-def perform_auto_login(driver, email, password):
-    """Perform automatic login to Google Scholar through SSO"""
-    max_retries = 3
-    retry_count = 0
+def perform_auto_login(driver):
+    """Perform automatic login to Google Scholar through SSO with account rotation"""
+    global restart_count, max_restarts
     
-    while retry_count < max_retries:
-        try:
-            # Step 1: Open Google Scholar
-            print("Step 1: Opening https://scholar.google.com/")
-            driver.get("https://scholar.google.com/")
-            time.sleep(random.uniform(3, 5))
-            
-            # Step 2: Click Login button
-            print("Step 2: Clicking Login button")
-            try:
-                login_button = WebDriverWait(driver, 10).until(
-                    EC.element_to_be_clickable((By.ID, "gs_hdr_act_s"))
-                )
-                login_button.click()
-                time.sleep(random.uniform(3, 5))
-            except Exception as e:
-                print(f"Could not find login button: {e}")
-                if check_if_logged_in(driver):
-                    print("✓ Already logged in!")
-                    return True
-                raise
-            
-            # Step 3: Enter email on Google login page
-            print("Step 3: Entering email on Google login page")
-            
-            email_input = WebDriverWait(driver, 15).until(
-                EC.presence_of_element_located((By.ID, "identifierId"))
-            )
-            
-            # Human-like behavior: wait before typing
-            time.sleep(random.uniform(1.5, 2.5))
-            
-            email_input.clear()
-            time.sleep(random.uniform(2, 5))
-            
-            # Type email character by character with random delays (human-like)
-            for char in email:
-                email_input.send_keys(char)
-                time.sleep(random.uniform(1, 3))
-            
-            # Wait after typing (like human reading what they typed)
-            time.sleep(random.uniform(2, 4))
-            
-            # Step 4: Click Next button (Google)
-            print("Step 4: Clicking Next button")
-            
-            next_button = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Selanjutnya')]"))
-            )
-            next_button.click()
-            time.sleep(random.uniform(3, 5))
-            
-            # Step 5: Check for CAPTCHA
-            print("Step 5: Checking for CAPTCHA")
-            
-            try:
-                captcha = driver.find_element(By.ID, "captchaimg")
-                if captcha.is_displayed():
-                    print("⚠️  CAPTCHA detected! Retrying after delay...")
-                    retry_count += 1
-                    
-                    if retry_count >= max_retries:
-                        raise Exception("CAPTCHA detected after multiple retries. Please try again later.")
-                    
+    # Start with first account
+    account, idx = get_next_account()
+    if account:
+        email = account['email']
+        password = account['password']
+        current_account_index = idx
+    else:
+        raise Exception("No accounts available")
+    
+    while restart_count < max_restarts:
+        # Try login with available accounts
+        while True:
+            # Check if all accounts failed
+            if len(failed_accounts) >= len(ACCOUNT_POOL):
+                print(f"\n⚠️  All {len(ACCOUNT_POOL)} accounts have failed!")
+                restart_count += 1
+                
+                if restart_count >= max_restarts:
+                    raise Exception(f"Login failed after {max_restarts} complete restarts. All accounts hit CAPTCHA.")
+                
+                # Delay 2-5 minutes before restart
+                delay = random.uniform(120, 300)
+                print(f"\n🔄 Restart attempt {restart_count}/{max_restarts}")
+                print(f"⏳ Waiting {delay/60:.1f} minutes before restarting from Step 1...")
+                time.sleep(delay)
+                
+                # Reset all accounts and close driver
+                reset_failed_accounts()
+                try:
                     driver.quit()
-                    
-                    delay = random.uniform(300, 600)  # 10-15 minutes
-                    print(f"Waiting {delay/60:.1f} minutes before retry...")
-                    time.sleep(delay)
-                    
-                    driver = setup_driver()
-                    continue
-            except NoSuchElementException:
-                print("✓ No CAPTCHA detected, continuing...")
+                except:
+                    pass
+                
+                # Setup new driver
+                driver = setup_driver()
+                
+                # Select random account for restart
+                account, idx = get_next_account()
+                if account:
+                    email = account['email']
+                    password = account['password']
+                    current_account_index = idx
+                    print(f"\n🔄 Restarting with random account: {email}")
+                break
             
-            # Step 6: Enter email on SSO page
-            print("Step 6: Entering email on UNPAR SSO page")
+            # Get next available account
+            account, idx = get_next_account()
+            if not account:
+                # This shouldn't happen, but just in case
+                break
             
-            sso_email_input = WebDriverWait(driver, 15).until(
-                EC.presence_of_element_located((By.ID, "username"))
-            )
+            email = account['email']
+            password = account['password']
+            current_account_index = idx
             
-            # Human-like behavior
-            time.sleep(random.uniform(1, 2))
-            
-            sso_email_input.clear()
-            time.sleep(random.uniform(0.3, 0.7))
-            
-            # Type email character by character
-            for char in email:
-                sso_email_input.send_keys(char)
-                time.sleep(random.uniform(0.05, 0.15))
-            
-            time.sleep(random.uniform(0.8, 1.5))
-            
-            # Step 7: Click Next on SSO
-            print("Step 7: Clicking Next button on SSO")
-            
-            sso_next_button = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.ID, "next_login"))
-            )
-            sso_next_button.click()
-            time.sleep(random.uniform(2, 4))
-            
-            # Step 8: Enter password
-            print("Step 8: Entering password")
-            
-            password_input = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.ID, "password"))
-            )
-            
-            # Human-like behavior
-            time.sleep(random.uniform(1, 2))
-            
-            password_input.clear()
-            time.sleep(random.uniform(0.3, 0.7))
-            
-            # Type password character by character
-            for char in password:
-                password_input.send_keys(char)
-                time.sleep(random.uniform(0.05, 0.15))
-            
-            time.sleep(random.uniform(0.8, 1.5))
-            
-            # Step 9: Click Login button
-            print("Step 9: Clicking Login button")
-            
-            login_submit = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, "button.login__submit2"))
-            )
-            login_submit.click()
-            time.sleep(random.uniform(4, 6))
-            
-            # Step 10: Click Continue on confirmation page
-            print("Step 10: Clicking Continue button")
+            print(f"\n🔐 Attempting login with account {idx + 1}: {email}")
             
             try:
-                continue_button = WebDriverWait(driver, 10).until(
-                    EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Lanjutkan')]"))
+                # Step 1: Open Google Scholar
+                print("Step 1: Opening https://scholar.google.com/")
+                driver.get("https://scholar.google.com/")
+                time.sleep(random.uniform(3, 5))
+                
+                # Step 2: Click Login button
+                print("Step 2: Clicking Login button")
+                try:
+                    login_button = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.ID, "gs_hdr_act_s"))
+                    )
+                    login_button.click()
+                    time.sleep(random.uniform(3, 5))
+                except Exception as e:
+                    print(f"Could not find login button: {e}")
+                    if check_if_logged_in(driver):
+                        print("✓ Already logged in!")
+                        return driver
+                    raise
+                
+                # Step 3: Enter email on Google login page
+                print("Step 3: Entering email on Google login page")
+                
+                email_input = WebDriverWait(driver, 15).until(
+                    EC.presence_of_element_located((By.ID, "identifierId"))
                 )
-                continue_button.click()
+                
+                # Human-like behavior: wait before typing
+                time.sleep(random.uniform(1.5, 2.5))
+                
+                email_input.clear()
+                time.sleep(random.uniform(0.3, 0.7))
+                
+                # Type email character by character with random delays
+                for char in email:
+                    email_input.send_keys(char)
+                    time.sleep(random.uniform(0.05, 0.15))
+                
+                time.sleep(random.uniform(1, 2))
+                
+                # Step 4: Click Next button (Google)
+                print("Step 4: Clicking Next button")
+                
+                next_button = WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Selanjutnya')]"))
+                )
+                next_button.click()
+                time.sleep(random.uniform(5, 10))
+                
+                # Step 5: Check for CAPTCHA
+                print("Step 5: Checking for CAPTCHA")
+                
+                try:
+                    captcha = driver.find_element(By.ID, "captchaimg")
+                    if captcha.is_displayed():
+                        print(f"⚠️  CAPTCHA detected for account {idx + 1}!")
+                        mark_account_failed(idx)
+                        
+                        # Continue to try next account
+                        continue
+                except NoSuchElementException:
+                    print("✓ No CAPTCHA detected, continuing...")
+                
+                # Step 6: Enter email on SSO page
+                print("Step 6: Entering email on UNPAR SSO page")
+                
+                sso_email_input = WebDriverWait(driver, 15).until(
+                    EC.presence_of_element_located((By.ID, "username"))
+                )
+                
+                # Human-like behavior
+                time.sleep(random.uniform(1, 2))
+                
+                sso_email_input.clear()
+                time.sleep(random.uniform(0.3, 0.7))
+                
+                # Type email character by character
+                for char in email:
+                    sso_email_input.send_keys(char)
+                    time.sleep(random.uniform(0.05, 0.15))
+                
+                time.sleep(random.uniform(0.8, 1.5))
+                
+                # Step 7: Click Next on SSO
+                print("Step 7: Clicking Next button on SSO")
+                
+                sso_next_button = WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((By.ID, "next_login"))
+                )
+                sso_next_button.click()
+                time.sleep(random.uniform(2, 4))
+                
+                # Step 8: Enter password
+                print("Step 8: Entering password")
+                
+                password_input = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.ID, "password"))
+                )
+                
+                # Human-like behavior
+                time.sleep(random.uniform(1, 2))
+                
+                password_input.clear()
+                time.sleep(random.uniform(0.3, 0.7))
+                
+                # Type password character by character
+                for char in password:
+                    password_input.send_keys(char)
+                    time.sleep(random.uniform(0.05, 0.15))
+                
+                time.sleep(random.uniform(0.8, 1.5))
+                
+                # Step 9: Click Login button
+                print("Step 9: Clicking Login button")
+                
+                login_submit = WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((By.CSS_SELECTOR, "button.login__submit2"))
+                )
+                login_submit.click()
                 time.sleep(random.uniform(4, 6))
-            except TimeoutException:
-                print("Continue button not found or already passed")
-            
-            # Verify login success
-            print("Verifying login success...")
-            
-            if check_if_logged_in(driver):
-                print("✓ Login successful!")
-                return True
-            else:
-                raise Exception("Login verification failed")
-            
-        except Exception as e:
-            print(f"Error during login attempt {retry_count + 1}: {e}")
-            retry_count += 1
-            
-            if retry_count >= max_retries:
-                raise Exception(f"Login failed after {max_retries} attempts: {e}")
-            
-            time.sleep(random.uniform(5, 10))
+                
+                # Step 10: Click Continue on confirmation page
+                print("Step 10: Clicking Continue button")
+                
+                try:
+                    continue_button = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Lanjutkan')]"))
+                    )
+                    continue_button.click()
+                    time.sleep(random.uniform(4, 6))
+                except TimeoutException:
+                    print("Continue button not found or already passed")
+                
+                # Verify login success
+                print("Verifying login success...")
+                
+                if check_if_logged_in(driver):
+                    print(f"✓ Login successful with {email}!")
+                    return driver
+                else:
+                    raise Exception("Login verification failed")
+                
+            except Exception as e:
+                print(f"Error during login with account {idx + 1}: {e}")
+                mark_account_failed(idx)
+                continue
     
-    return False
+    # If we've exhausted all restarts
+    raise Exception(f"Login failed after {max_restarts} complete restarts. Unable to bypass CAPTCHA.")
 
 def setup_driver_with_auto_login():
     """Setup driver dan lakukan login otomatis"""
     driver = setup_driver()
     
     try:
-        if perform_auto_login(driver, LOGIN_EMAIL, LOGIN_PASSWORD):
+        driver = perform_auto_login(driver)
+        if driver:
             print("✓ Driver ready with successful login")
             return driver
         else:
@@ -1593,6 +1708,7 @@ def _insert_sitasi_tahunan(cursor, pub_id, row):
         print(f"    Error insert sitasi tahunan: {e}")
 
 def main():
+    global restart_count, failed_accounts
     conn = None
     try:
         # 1. Hubungkan ke database
@@ -1615,8 +1731,8 @@ def main():
 
         # Tanyakan apakah ingin scraping dari awal
         print("Pilihan Mode Scraping:")
-        print("1. Lanjutkan scraping (hanya dosen yang belum selesai)")
-        print("2. Scraping dari awal (reset semua status dan scrape ulang semua dosen)")
+        print("1. Lanjutkan scraping (hanya dosen yang belum selesai: error, pending, processing)")
+        print("2. Scraping dari awal (reset semua status dan scrape ulang SEMUA dosen termasuk yang completed)")
         
         while True:
             scrape_mode = input("\nPilih mode (1/2): ").strip()
@@ -1629,16 +1745,17 @@ def main():
         
         if scrape_from_beginning:
             print("\n⚠️  Mode: SCRAPING DARI AWAL")
-            confirm = input("Apakah Anda yakin ingin reset semua status dan scraping ulang? (yes/no): ").strip().lower()
+            print("     Ini akan scrape ulang SEMUA dosen (termasuk yang statusnya 'completed')")
+            confirm = input("Apakah Anda yakin ingin melanjutkan? (yes/no): ").strip().lower()
             if confirm in ['yes', 'y']:
-                if reset_all_status_to_pending(conn):
-                    print("✓ Status berhasil di-reset. Memulai scraping dari awal...\n")
-                else:
-                    print("✗ Gagal reset status. Program berhenti.")
-                    return
+                print("✓ Mode scraping dari awal dikonfirmasi. Semua dosen akan di-scrape ulang.\n")
             else:
                 print("Scraping dari awal dibatalkan. Menggunakan mode lanjutkan scraping.")
                 scrape_from_beginning = False
+        else:
+            print("\n✓ Mode: LANJUTKAN SCRAPING")
+            print("     Hanya akan scrape dosen dengan status: error → pending → processing")
+            print("     Dosen dengan status 'completed' akan di-SKIP.\n")
 
         # Ambil daftar author
         df = get_authors_from_db(conn, scrape_from_beginning)
@@ -1662,10 +1779,15 @@ def main():
 
         print("\n--- Konfigurasi Dimuat ---")
         print(f"Sumber Data: Database PostgreSQL")
-        print(f"Mode Scraping: {'DARI AWAL (semua dosen)' if scrape_from_beginning else 'LANJUTKAN (hanya yang belum selesai)'}")
+        if scrape_from_beginning:
+            print(f"Mode Scraping: DARI AWAL (scrape ulang SEMUA dosen termasuk yang 'completed')")
+        else:
+            print(f"Mode Scraping: LANJUTKAN (hanya scrape dosen dengan status 'error', 'pending', 'processing')")
+            print(f"               → Dosen dengan status 'completed' akan di-SKIP")
         print(f"Authors to Scrape: {max_authors} dari {len(df)} yang tersedia")
         print(f"Import to Database: Ya (otomatis)")
-        print(f"Auto-Login: Enabled (Email: {LOGIN_EMAIL})")
+        print(f"Auto-Login: Enabled with Account Rotation ({len(ACCOUNT_POOL)} accounts)")
+        print(f"Max Restarts: {max_restarts}")
         print("---------------------------\n")
 
         # Path file CSV
@@ -1683,8 +1805,13 @@ def main():
 
         # Setup driver dengan auto-login
         print("\n" + "="*60)
-        print("PROSES AUTO-LOGIN")
+        print("PROSES AUTO-LOGIN DENGAN ACCOUNT ROTATION")
         print("="*60)
+        
+        # Reset global variables
+        restart_count = 0
+        failed_accounts = set()
+        
         driver = setup_driver_with_auto_login()
         
         if driver is None:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Google Scholar Scraper Module with Auto-Login
+Google Scholar Scraper Module with Auto-Login and Account Rotation
 """
 
 from selenium import webdriver
@@ -27,14 +27,60 @@ import os
 class GoogleScholarScraper:
     """Google Scholar Scraper with auto-login and database integration"""
     
-    def __init__(self, db_config, job_id=None, progress_callback=None, email="6182101017@student.unpar.ac.id", password="618017SH"):
+    # Multi-account pool
+    ACCOUNT_POOL = [
+        {"email": "6182101017@student.unpar.ac.id", "password": "618017SH"},
+        {"email": "6182101045@student.unpar.ac.id", "password": "618045CD"},
+        {"email": "6182101059@student.unpar.ac.id", "password": "618059SJ"},
+        {"email": "6182101063@student.unpar.ac.id", "password": "618063XJ"},
+    ]
+    
+    def __init__(self, db_config, job_id=None, progress_callback=None, email=None, password=None):
         self.db_config = db_config
         self.job_id = job_id
         self.progress_callback = progress_callback
         self.driver = None
         self.conn = None
+        self.current_account_index = 0
+        self.failed_accounts = set()
+        self.restart_count = 0
+        self.max_restarts = 3
+        
+        # Tambahkan email dan password
         self.email = email
         self.password = password
+        
+        # Jika email/password tidak diberikan, ambil dari ACCOUNT_POOL (index 0)
+        if not self.email or not self.password:
+            self.email = self.ACCOUNT_POOL[0]['email']
+            self.password = self.ACCOUNT_POOL[0]['password']
+            self.current_account_index = 0
+        
+    def get_next_account(self):
+        """Get next available account that hasn't failed (random selection)"""
+        # Get list of indices that haven't failed
+        available_indices = [i for i in range(len(self.ACCOUNT_POOL)) if i not in self.failed_accounts]
+        
+        if not available_indices:
+            # All accounts have failed
+            return None, None
+        
+        # Random selection from available accounts
+        selected_index = random.choice(available_indices)
+        account = self.ACCOUNT_POOL[selected_index]
+        
+        return account, selected_index
+    
+    def mark_account_failed(self, account_index):
+        """Mark an account as failed (hit CAPTCHA)"""
+        self.failed_accounts.add(account_index)
+        print(f"⚠️  Account {account_index + 1} ({self.ACCOUNT_POOL[account_index]['email']}) marked as failed (CAPTCHA detected)")
+        print(f"   Failed accounts: {len(self.failed_accounts)}/{len(self.ACCOUNT_POOL)}")
+    
+    def reset_failed_accounts(self):
+        """Reset failed accounts (for retry after all failed)"""
+        self.failed_accounts.clear()
+        print("♻️  All accounts reset for new attempt")
         
     def emit_progress(self, data):
         """Emit progress update"""
@@ -88,12 +134,43 @@ class GoogleScholarScraper:
         
         try:
             service = Service(ChromeDriverManager().install())
+            
+            import platform
+            import subprocess
+            if platform.system() == 'Darwin':
+                driver_path = service.path
+                try:
+                    subprocess.run(['xattr', '-d', 'com.apple.quarantine', driver_path], 
+                                 capture_output=True, check=False)
+                    subprocess.run(['chmod', '+x', driver_path], 
+                                 capture_output=True, check=False)
+                    print(f"✓ Fixed ChromeDriver permissions for macOS")
+                except Exception as perm_error:
+                    print(f"Warning: Could not fix permissions: {perm_error}")
+            
             driver = webdriver.Chrome(service=service, options=chrome_options)
+            
         except Exception as e:
-            print(f"Error creating driver: {e}")
-            driver = webdriver.Chrome(options=chrome_options)
+            print(f"Error with ChromeDriverManager: {e}")
+            print("Trying alternative method...")
+            
+            try:
+                driver = webdriver.Chrome(options=chrome_options)
+            except Exception as e2:
+                print(f"Error with system ChromeDriver: {e2}")
+                
+                try:
+                    import shutil
+                    chromedriver_path = shutil.which('chromedriver')
+                    if chromedriver_path:
+                        service = Service(chromedriver_path)
+                        driver = webdriver.Chrome(service=service, options=chrome_options)
+                    else:
+                        raise Exception("ChromeDriver not found in system PATH")
+                except Exception as e3:
+                    print(f"All methods failed: {e3}")
+                    raise Exception("Could not initialize ChromeDriver. Please install manually.")
         
-        # Remove webdriver property
         try:
             driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         except:
@@ -105,225 +182,245 @@ class GoogleScholarScraper:
         return driver
     
     def perform_auto_login(self):
-        """Perform automatic login to Google Scholar through SSO"""
-        max_retries = 3
-        retry_count = 0
+        """Perform automatic login to Google Scholar through SSO with account rotation"""
         
-        while retry_count < max_retries:
-            try:
-                # Step 1: Open Google Scholar
-                self.emit_progress({
-                    'message': 'Step 1: Opening Google Scholar...',
-                    'status': 'login_in_progress'
-                })
-                print("Step 1: Opening https://scholar.google.com/")
-                self.driver.get("https://scholar.google.com/")
-                time.sleep(random.uniform(3, 5))
+        while self.restart_count < self.max_restarts:
+            # Try login with available accounts
+            while True:
+                # Check if all accounts failed
+                if len(self.failed_accounts) >= len(self.ACCOUNT_POOL):
+                    print(f"\n⚠️  All {len(self.ACCOUNT_POOL)} accounts have failed!")
+                    self.restart_count += 1
+                    
+                    if self.restart_count >= self.max_restarts:
+                        raise Exception(f"Login failed after {self.max_restarts} complete restarts. All accounts hit CAPTCHA.")
+                    
+                    # Delay 2-5 minutes before restart
+                    delay = random.uniform(120, 300)
+                    print(f"\n🔄 Restart attempt {self.restart_count}/{self.max_restarts}")
+                    print(f"⏳ Waiting {delay/60:.1f} minutes before restarting from Step 1...")
+                    self.emit_progress({
+                        'message': f'All accounts failed. Waiting {delay/60:.1f} minutes before restart {self.restart_count}/{self.max_restarts}...',
+                        'status': 'restart_delay'
+                    })
+                    time.sleep(delay)
+                    
+                    # Reset all accounts and close driver
+                    self.reset_failed_accounts()
+                    if self.driver:
+                        try:
+                            self.driver.quit()
+                        except:
+                            pass
+                    
+                    # Setup new driver
+                    self.driver = self.setup_driver()
+                    
+                    # Select random account for restart
+                    account, idx = self.get_next_account()
+                    if account:
+                        self.email = account['email']
+                        self.password = account['password']
+                        self.current_account_index = idx
+                        print(f"\n🔄 Restarting with random account: {self.email}")
+                    break
                 
-                # Step 2: Click Login button
-                self.emit_progress({
-                    'message': 'Step 2: Clicking Login button...',
-                    'status': 'login_in_progress'
-                })
-                print("Step 2: Clicking Login button")
+                # Get next available account
+                account, idx = self.get_next_account()
+                if not account:
+                    # This shouldn't happen, but just in case
+                    break
+                
+                self.email = account['email']
+                self.password = account['password']
+                self.current_account_index = idx
+                
+                print(f"\n🔐 Attempting login with account {idx + 1}: {self.email}")
+                
                 try:
-                    login_button = WebDriverWait(self.driver, 10).until(
-                        EC.element_to_be_clickable((By.ID, "gs_hdr_act_s"))
-                    )
-                    login_button.click()
+                    # Step 1: Open Google Scholar
+                    self.emit_progress({
+                        'message': f'Step 1: Opening Google Scholar (Account {idx + 1})...',
+                        'status': 'login_in_progress'
+                    })
+                    print("Step 1: Opening https://scholar.google.com/")
+                    self.driver.get("https://scholar.google.com/")
                     time.sleep(random.uniform(3, 5))
-                except Exception as e:
-                    print(f"Could not find login button: {e}")
-                    # Cek apakah sudah login
-                    if self.check_if_logged_in():
-                        print("✓ Already logged in!")
-                        return True
-                    raise
-                
-                # Step 3: Enter email on Google login page
-                self.emit_progress({
-                    'message': 'Step 3: Entering email...',
-                    'status': 'login_in_progress'
-                })
-                print("Step 3: Entering email on Google login page")
-                
-                # Wait for email input
-                email_input = WebDriverWait(self.driver, 15).until(
-                    EC.presence_of_element_located((By.ID, "identifierId"))
-                )
-                email_input.clear()
-                email_input.send_keys(self.email)
-                time.sleep(random.uniform(1, 2))
-                
-                # Step 4: Click Next button (Google)
-                self.emit_progress({
-                    'message': 'Step 4: Clicking Next...',
-                    'status': 'login_in_progress'
-                })
-                print("Step 4: Clicking Next button")
-                
-                next_button = WebDriverWait(self.driver, 10).until(
-                    EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Selanjutnya')]"))
-                )
-                next_button.click()
-                time.sleep(random.uniform(3, 5))
-                
-                # Step 5: Check for CAPTCHA
-                self.emit_progress({
-                    'message': 'Step 5: Checking for CAPTCHA...',
-                    'status': 'login_in_progress'
-                })
-                print("Step 5: Checking for CAPTCHA")
-                
-                try:
-                    captcha = self.driver.find_element(By.ID, "captchaimg")
-                    if captcha.is_displayed():
-                        print("⚠️  CAPTCHA detected! Retrying after delay...")
-                        retry_count += 1
-                        
-                        if retry_count >= max_retries:
-                            raise Exception("CAPTCHA detected after multiple retries. Please try again later.")
-                        
-                        # Close driver and wait before retry
-                        self.driver.quit()
-                        
-                        delay = random.uniform(300, 600)  # 10-15 minutes
-                        self.emit_progress({
-                            'message': f'CAPTCHA detected. Waiting {delay/60:.1f} minutes before retry...',
-                            'status': 'captcha_delay'
-                        })
-                        print(f"Waiting {delay/60:.1f} minutes before retry...")
-                        time.sleep(delay)
-                        
-                        # Setup new driver and continue loop
-                        self.driver = self.setup_driver()
-                        continue
-                except NoSuchElementException:
-                    print("✓ No CAPTCHA detected, continuing...")
-                
-                # Step 6: Enter email on SSO page
-                self.emit_progress({
-                    'message': 'Step 6: Entering email on SSO...',
-                    'status': 'login_in_progress'
-                })
-                print("Step 6: Entering email on UNPAR SSO page")
-                
-                sso_email_input = WebDriverWait(self.driver, 15).until(
-                    EC.presence_of_element_located((By.ID, "username"))
-                )
-                sso_email_input.clear()
-                sso_email_input.send_keys(self.email)
-                time.sleep(random.uniform(1, 2))
-                
-                # Step 7: Click Next on SSO
-                self.emit_progress({
-                    'message': 'Step 7: Clicking Next on SSO...',
-                    'status': 'login_in_progress'
-                })
-                print("Step 7: Clicking Next button on SSO")
-                
-                sso_next_button = WebDriverWait(self.driver, 10).until(
-                    EC.element_to_be_clickable((By.ID, "next_login"))
-                )
-                sso_next_button.click()
-                time.sleep(random.uniform(2, 4))
-                
-                # Step 8: Enter password
-                self.emit_progress({
-                    'message': 'Step 8: Entering password...',
-                    'status': 'login_in_progress'
-                })
-                print("Step 8: Entering password")
-                
-                password_input = WebDriverWait(self.driver, 10).until(
-                    EC.presence_of_element_located((By.ID, "password"))
-                )
-                password_input.clear()
-                password_input.send_keys(self.password)
-                time.sleep(random.uniform(1, 2))
-                
-                # Step 9: Click Login button
-                self.emit_progress({
-                    'message': 'Step 9: Clicking Login...',
-                    'status': 'login_in_progress'
-                })
-                print("Step 9: Clicking Login button")
-                
-                login_submit = WebDriverWait(self.driver, 10).until(
-                    EC.element_to_be_clickable((By.CSS_SELECTOR, "button.login__submit2"))
-                )
-                login_submit.click()
-                time.sleep(random.uniform(4, 6))
-                
-                # Step 10: Click Continue on confirmation page
-                self.emit_progress({
-                    'message': 'Step 10: Clicking Continue...',
-                    'status': 'login_in_progress'
-                })
-                print("Step 10: Clicking Continue button")
-                
-                try:
-                    continue_button = WebDriverWait(self.driver, 10).until(
-                        EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Lanjutkan')]"))
+                    
+                    # Step 2: Click Login button
+                    self.emit_progress({
+                        'message': 'Step 2: Clicking Login button...',
+                        'status': 'login_in_progress'
+                    })
+                    print("Step 2: Clicking Login button")
+                    try:
+                        login_button = WebDriverWait(self.driver, 10).until(
+                            EC.element_to_be_clickable((By.ID, "gs_hdr_act_s"))
+                        )
+                        login_button.click()
+                        time.sleep(random.uniform(3, 5))
+                    except Exception as e:
+                        print(f"Could not find login button: {e}")
+                        if self.check_if_logged_in():
+                            print("✓ Already logged in!")
+                            return True
+                        raise
+                    
+                    # Step 3: Enter email on Google login page
+                    self.emit_progress({
+                        'message': 'Step 3: Entering email...',
+                        'status': 'login_in_progress'
+                    })
+                    print("Step 3: Entering email on Google login page")
+                    
+                    email_input = WebDriverWait(self.driver, 15).until(
+                        EC.presence_of_element_located((By.ID, "identifierId"))
                     )
-                    continue_button.click()
+                    email_input.clear()
+                    email_input.send_keys(self.email)
+                    time.sleep(random.uniform(1, 2))
+                    
+                    # Step 4: Click Next button (Google)
+                    self.emit_progress({
+                        'message': 'Step 4: Clicking Next...',
+                        'status': 'login_in_progress'
+                    })
+                    print("Step 4: Clicking Next button")
+                    
+                    next_button = WebDriverWait(self.driver, 10).until(
+                        EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Selanjutnya')]"))
+                    )
+                    next_button.click()
+                    time.sleep(random.uniform(3, 5))
+                    
+                    # Step 5: Check for CAPTCHA
+                    self.emit_progress({
+                        'message': 'Step 5: Checking for CAPTCHA...',
+                        'status': 'login_in_progress'
+                    })
+                    print("Step 5: Checking for CAPTCHA")
+                    
+                    try:
+                        captcha = self.driver.find_element(By.ID, "captchaimg")
+                        if captcha.is_displayed():
+                            print(f"⚠️  CAPTCHA detected for account {idx + 1}!")
+                            self.mark_account_failed(idx)
+                            
+                            # Continue to try next account
+                            continue
+                    except NoSuchElementException:
+                        print("✓ No CAPTCHA detected, continuing...")
+                    
+                    # Step 6: Enter email on SSO page
+                    self.emit_progress({
+                        'message': 'Step 6: Entering email on SSO...',
+                        'status': 'login_in_progress'
+                    })
+                    print("Step 6: Entering email on UNPAR SSO page")
+                    
+                    sso_email_input = WebDriverWait(self.driver, 15).until(
+                        EC.presence_of_element_located((By.ID, "username"))
+                    )
+                    sso_email_input.clear()
+                    sso_email_input.send_keys(self.email)
+                    time.sleep(random.uniform(1, 2))
+                    
+                    # Step 7: Click Next on SSO
+                    self.emit_progress({
+                        'message': 'Step 7: Clicking Next on SSO...',
+                        'status': 'login_in_progress'
+                    })
+                    print("Step 7: Clicking Next button on SSO")
+                    
+                    sso_next_button = WebDriverWait(self.driver, 10).until(
+                        EC.element_to_be_clickable((By.ID, "next_login"))
+                    )
+                    sso_next_button.click()
+                    time.sleep(random.uniform(2, 4))
+                    
+                    # Step 8: Enter password
+                    self.emit_progress({
+                        'message': 'Step 8: Entering password...',
+                        'status': 'login_in_progress'
+                    })
+                    print("Step 8: Entering password")
+                    
+                    password_input = WebDriverWait(self.driver, 10).until(
+                        EC.presence_of_element_located((By.ID, "password"))
+                    )
+                    password_input.clear()
+                    password_input.send_keys(self.password)
+                    time.sleep(random.uniform(1, 2))
+                    
+                    # Step 9: Click Login button
+                    self.emit_progress({
+                        'message': 'Step 9: Clicking Login...',
+                        'status': 'login_in_progress'
+                    })
+                    print("Step 9: Clicking Login button")
+                    
+                    login_submit = WebDriverWait(self.driver, 10).until(
+                        EC.element_to_be_clickable((By.CSS_SELECTOR, "button.login__submit2"))
+                    )
+                    login_submit.click()
                     time.sleep(random.uniform(4, 6))
-                except TimeoutException:
-                    print("Continue button not found or already passed")
-                
-                # Verify login success
-                self.emit_progress({
-                    'message': 'Verifying login...',
-                    'status': 'login_in_progress'
-                })
-                print("Verifying login success...")
-                
-                if self.check_if_logged_in():
+                    
+                    # Step 10: Click Continue on confirmation page
                     self.emit_progress({
-                        'message': '✓ Login successful!',
-                        'status': 'login_success'
+                        'message': 'Step 10: Clicking Continue...',
+                        'status': 'login_in_progress'
                     })
-                    print("✓ Login successful!")
-                    return True
-                else:
-                    raise Exception("Login verification failed")
-                
-            except Exception as e:
-                print(f"Error during login attempt {retry_count + 1}: {e}")
-                retry_count += 1
-                
-                if retry_count >= max_retries:
+                    print("Step 10: Clicking Continue button")
+                    
+                    try:
+                        continue_button = WebDriverWait(self.driver, 10).until(
+                            EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Lanjutkan')]"))
+                        )
+                        continue_button.click()
+                        time.sleep(random.uniform(4, 6))
+                    except TimeoutException:
+                        print("Continue button not found or already passed")
+                    
+                    # Verify login success
                     self.emit_progress({
-                        'message': f'✗ Login failed after {max_retries} attempts',
-                        'status': 'login_failed'
+                        'message': 'Verifying login...',
+                        'status': 'login_in_progress'
                     })
-                    raise Exception(f"Login failed after {max_retries} attempts: {e}")
-                
-                # Wait before retry
-                time.sleep(random.uniform(5, 10))
+                    print("Verifying login success...")
+                    
+                    if self.check_if_logged_in():
+                        self.emit_progress({
+                            'message': f'✓ Login successful with account {idx + 1}!',
+                            'status': 'login_success'
+                        })
+                        print(f"✓ Login successful with {self.email}!")
+                        return True
+                    else:
+                        raise Exception("Login verification failed")
+                    
+                except Exception as e:
+                    print(f"Error during login with account {idx + 1}: {e}")
+                    self.mark_account_failed(idx)
+                    continue
         
-        return False
+        # If we've exhausted all restarts
+        raise Exception(f"Login failed after {self.max_restarts} complete restarts. Unable to bypass CAPTCHA.")
     
     def check_if_logged_in(self):
         """Check if successfully logged in to Google Scholar"""
         try:
-            # Wait a bit for page to load
             time.sleep(3)
             
-            # Try to find profile or account indicator
             try:
-                # Method 1: Check for sign-in button absence
                 self.driver.find_element(By.ID, "gs_hdr_act_s")
-                return False  # Still see login button, not logged in
+                return False
             except NoSuchElementException:
-                # Method 2: Check for profile menu or settings
                 try:
                     profile_element = self.driver.find_element(By.CSS_SELECTOR, '#gs_gb_rt a')
                     return True
                 except:
                     pass
                 
-                # Method 3: Check URL
                 current_url = self.driver.current_url
                 if 'scholar.google.com' in current_url and 'accounts.google.com' not in current_url:
                     return True
@@ -339,7 +436,6 @@ class GoogleScholarScraper:
         self.driver = self.setup_driver()
         
         try:
-            # Perform auto-login
             if self.perform_auto_login():
                 self.emit_progress({
                     'message': 'Ready to start scraping...',
@@ -449,7 +545,6 @@ class GoogleScholarScraper:
         }
         
         try:
-            # Verify driver is still valid
             if not self.driver or not self.driver.session_id:
                 print(f"Driver session invalid for {pub_url}")
                 return details
@@ -533,26 +628,20 @@ class GoogleScholarScraper:
         finally:
             if new_tab_created:
                 try:
-                    # Check if driver and session are still valid
                     if self.driver and hasattr(self.driver, 'session_id') and self.driver.session_id:
-                        # Get current handles
                         current_handles = self.driver.window_handles
                         
-                        # Only close if we have more than one window
                         if len(current_handles) > 1:
-                            # Close current window if it's not the original
                             current_window = self.driver.current_window_handle
                             if current_window != original_window and current_window in current_handles:
                                 self.driver.close()
                                 time.sleep(0.5)
                             
-                            # Switch back to original window if it exists
                             if original_window in self.driver.window_handles:
                                 self.driver.switch_to.window(original_window)
                                 time.sleep(0.5)
                 except Exception as e:
                     print(f"Error in finally block (details): {e}")
-                    # Try to recover by switching to first available window
                     try:
                         if self.driver and hasattr(self.driver, 'window_handles'):
                             handles = self.driver.window_handles
@@ -774,7 +863,6 @@ class GoogleScholarScraper:
         new_tab_created = False
         
         try:
-            # Verify driver is still valid
             if not self.driver or not self.driver.session_id:
                 print(f"Driver session invalid for {pub_url}")
                 return {}
@@ -863,26 +951,20 @@ class GoogleScholarScraper:
         finally:
             if new_tab_created:
                 try:
-                    # Check if driver and session are still valid
                     if self.driver and hasattr(self.driver, 'session_id') and self.driver.session_id:
-                        # Get current handles
                         current_handles = self.driver.window_handles
                         
-                        # Only close if we have more than one window
                         if len(current_handles) > 1:
-                            # Close current window if it's not the original
                             current_window = self.driver.current_window_handle
                             if current_window != original_window and current_window in current_handles:
                                 self.driver.close()
                                 time.sleep(0.5)
                             
-                            # Switch back to original window if it exists
                             if original_window in self.driver.window_handles:
                                 self.driver.switch_to.window(original_window)
                                 time.sleep(0.5)
                 except Exception as e:
                     print(f"Error in finally block (citations): {e}")
-                    # Try to recover by switching to first available window
                     try:
                         if self.driver and hasattr(self.driver, 'window_handles'):
                             handles = self.driver.window_handles
