@@ -9,7 +9,7 @@ import logging
 # Configure logging for this module
 logger = logging.getLogger(__name__)
 
-# Definisikan blueprint sekali saja, tanpa url_prefix (akan diatur di app.py)
+# Definisikan blueprint
 auth_bp = Blueprint('auth', __name__)
 
 def get_db_connection():
@@ -21,28 +21,24 @@ def get_db_connection():
         logger.error(f"Database connection error in auth_bp: {e}")
         return None
 
-@auth_bp.route('/register', methods=['OPTIONS'])
-def handle_register_preflight():
-    response = jsonify({'message': 'OK'})
-    response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
-    return response, 200
+# HAPUS ini - CORS sudah dihandle di app.py
+# @auth_bp.route('/register', methods=['OPTIONS'])
+# def handle_register_preflight():
+#     ...
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
     """User registration"""
     try:
         data = request.get_json()
-        logger.info(f"Received registration data: {data}")  # Log data yang diterima
+        logger.info(f"Received registration data: {data}")
         
         if not data or not data.get('v_email') or not data.get('v_username') or not data.get('v_password_hash'):
             return jsonify({'error': 'Missing required fields'}), 400
         
         email = data['v_email'].strip().lower()
         username = data['v_username'].strip()
-        password = data['v_password_hash'] # This is the raw password from frontend
+        password = data['v_password_hash']  # Raw password from frontend
         
         # Validate email format
         email_pattern = r'^[^\s@]+@[^\s@]+\.[^\s@]+$'
@@ -69,10 +65,12 @@ def register():
         )
         
         if cur.fetchone():
+            cur.close()
+            conn.close()
             return jsonify({'error': 'User already exists'}), 409
         
         try:
-            # Insert new user with t_tanggal_bikin defaulting to CURRENT_TIMESTAMP
+            # Insert new user
             cur.execute(
                 """
                 INSERT INTO users (v_username, v_email, v_password_hash, f_is_admin) 
@@ -96,13 +94,13 @@ def register():
             conn.rollback()
             logger.error(f"Database error during registration: {e}")
             return jsonify({'error': f'Database error: {str(e)}'}), 500
+        finally:
+            cur.close()
+            conn.close()
             
     except Exception as e:
         logger.error(f"Registration error: {e}")
         return jsonify({'error': f'Registration failed: {str(e)}'}), 500
-    finally:
-        if 'conn' in locals():
-            conn.close()
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -114,7 +112,7 @@ def login():
             return jsonify({'error': 'Missing email or password'}), 400
         
         email = data['v_email'].strip().lower()
-        password = data['v_password_hash'] # This is the raw password from frontend
+        password = data['v_password_hash']  # Raw password from frontend
         
         conn = get_db_connection()
         if not conn:
@@ -131,6 +129,8 @@ def login():
         user = cur.fetchone()
         
         if not user or not check_password_hash(user[2], password):
+            cur.close()
+            conn.close()
             return jsonify({'error': 'Invalid credentials', 'success': False}), 401
         
         # Generate JWT token
@@ -143,6 +143,9 @@ def login():
         token = jwt.encode(token_payload, current_app.config['JWT_SECRET_KEY'], algorithm='HS256')
         
         logger.info(f"User logged in: {user[1]} (ID: {user[0]})")
+        
+        cur.close()
+        conn.close()
         
         return jsonify({
             'message': 'Login successful',
@@ -157,6 +160,3 @@ def login():
     except Exception as e:
         logger.error(f"Login error: {e}")
         return jsonify({'error': 'Login failed', 'success': False}), 500
-    finally:
-        if 'conn' in locals():
-            conn.close()

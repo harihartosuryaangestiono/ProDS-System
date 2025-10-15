@@ -63,8 +63,16 @@ class SintaDosenScraper:
             options.add_argument("--window-size=1920,1080")
             options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
             
+            # FIX: Force win64 architecture
+            from webdriver_manager.chrome import ChromeDriverManager
+            from webdriver_manager.core.os_manager import ChromeType
+            from selenium.webdriver.chrome.service import Service
+            
+            # Explicitly download win64 version
+            service = Service(ChromeDriverManager(chrome_type=ChromeType.GOOGLE).install())
+            
             self.driver = webdriver.Chrome(
-                service=Service(ChromeDriverManager().install()), 
+                service=service,
                 options=options
             )
             logger.info("WebDriver Chrome berhasil diinisialisasi")
@@ -709,9 +717,9 @@ class SintaDosenScraper:
 if __name__ == '__main__':
     # Konfigurasi database PostgreSQL - sesuai dengan database baru
     db_config = {
-        'dbname': 'SKM_PUBLIKASI',  # Nama database baru
-        'user': 'rayhanadjisantoso',        
-        'password': 'rayhan123',    
+        'dbname': 'ProDSGabungan',  # Nama database baru
+        'user': 'postgres',        
+        'password': 'password123',    
         'host': 'localhost',            
         'port': '5432'                  
     }

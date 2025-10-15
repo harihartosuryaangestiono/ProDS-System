@@ -5,8 +5,6 @@ import os
 from datetime import datetime
 import threading
 import traceback
-import random
-import time
 
 # Add scrapers directory to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'scrapers'))
@@ -34,104 +32,80 @@ def emit_progress(job_id, progress_data):
             'job_id': job_id,
             'progress': progress_data
         })
+        print(f"✅ Progress emitted for job {job_id}: {progress_data.get('message', 'N/A')}")
     except Exception as e:
-        print(f"Error emitting progress: {e}")
+        print(f"⚠️ Error emitting progress: {e}")
 
-def run_scraping_task(job_id, task_func, **kwargs):
-    """Run scraping task in background thread"""
+def run_scraping_task(job_id, task_func, task_kwargs):
+    """
+    Run scraping task in background thread
+    
+    Args:
+        job_id: Unique job identifier
+        task_func: Function to execute
+        task_kwargs: Dictionary of keyword arguments for task_func
+    """
     try:
+        print(f"\n🚀 Starting scraping task - Job ID: {job_id}")
+        print(f"📝 Task function: {task_func.__name__}")
+        print(f"📋 Task kwargs: {list(task_kwargs.keys())}")
+        
+        # Initialize job with proper structure
         active_jobs[job_id] = {
             'status': 'running',
             'started_at': datetime.now().isoformat(),
-            'progress': 0
-        }
-        
-        # Run the task
-        result = task_func(**kwargs)
-        
-        # Update job status
-        active_jobs[job_id] = {
-            'status': 'completed',
-            'completed_at': datetime.now().isoformat(),
-            'result': result
-        }
-        
-        # Emit completion
-        emit_progress(job_id, {
-            'status': 'completed',
-            'result': result
-        })
-        
-    except Exception as e:
-        error_msg = str(e)
-        traceback_msg = traceback.format_exc()
-        
-        active_jobs[job_id] = {
-            'status': 'failed',
-            'error': error_msg,
-            'traceback': traceback_msg,
-            'failed_at': datetime.now().isoformat()
-        }
-        
-        emit_progress(job_id, {
-            'status': 'failed',
-            'error': error_msg
-        })
-
-def run_google_scholar_scraping(job_id, max_authors, scrape_from_beginning):
-    """Run Google Scholar scraping in background thread"""
-    try:
-        from gs_scraper import GoogleScholarScraper
-        
-        active_jobs[job_id] = {
-            'status': 'running',
+            'progress': 0,
             'current': 0,
-            'total': max_authors,
-            'message': 'Initializing scraper...',
-            'started_at': datetime.now().isoformat()
+            'total': task_kwargs.get('target_dosen', 100),
+            'message': 'Starting scraping task...'
         }
         
         emit_progress(job_id, active_jobs[job_id])
         
-        # Create scraper instance
-        scraper = GoogleScholarScraper(
-            db_config=DB_CONFIG,
-            job_id=job_id,
-            progress_callback=lambda data: emit_progress(job_id, data)
-        )
+        # Run the task with job_id included in kwargs
+        task_kwargs['job_id'] = job_id
+        print(f"🔄 Executing task function...")
+        result = task_func(**task_kwargs)
         
-        # Run scraping
-        result = scraper.run(max_authors=max_authors, scrape_from_beginning=scrape_from_beginning)
+        # Update job status on completion
+        active_jobs[job_id].update({
+            'status': 'completed',
+            'completed_at': datetime.now().isoformat(),
+            'result': result,
+            'message': result.get('message', 'Scraping completed successfully!')
+        })
         
-        active_jobs[job_id]['status'] = 'completed'
-        active_jobs[job_id]['message'] = 'Scraping completed successfully!'
-        active_jobs[job_id]['completed_at'] = datetime.now().isoformat()
-        active_jobs[job_id]['result'] = result
+        print(f"✅ Task completed successfully - Job ID: {job_id}")
         
+        # Emit completion
         emit_progress(job_id, {
             'status': 'completed',
-            'message': result.get('message', 'Scraping completed'),
-            'summary': result.get('summary', {})
+            'message': result.get('message', 'Scraping completed!'),
+            'result': result
         })
         
     except Exception as e:
-        import traceback
         error_msg = str(e)
         traceback_msg = traceback.format_exc()
         
-        print(f"\n❌ ERROR: {error_msg}")
+        print(f"\n❌ Task failed - Job ID: {job_id}")
+        print(f"Error: {error_msg}")
         print(f"Traceback:\n{traceback_msg}")
         
-        active_jobs[job_id]['status'] = 'failed'
-        active_jobs[job_id]['message'] = error_msg
-        active_jobs[job_id]['error'] = error_msg
-        active_jobs[job_id]['traceback'] = traceback_msg
-        active_jobs[job_id]['failed_at'] = datetime.now().isoformat()
+        active_jobs[job_id].update({
+            'status': 'failed',
+            'error': error_msg,
+            'traceback': traceback_msg,
+            'failed_at': datetime.now().isoformat(),
+            'message': f'Scraping failed: {error_msg}'
+        })
         
         emit_progress(job_id, {
             'status': 'failed',
-            'error': error_msg
+            'error': error_msg,
+            'message': f'Scraping failed: {error_msg}'
         })
+
 # ============================================================================
 # SINTA ROUTES
 # ============================================================================
@@ -140,17 +114,24 @@ def run_google_scholar_scraping(job_id, max_authors, scrape_from_beginning):
 @cross_origin(origins=['http://localhost:5173'], supports_credentials=True)
 def scrape_sinta_dosen():
     """Endpoint untuk scraping SINTA Dosen"""
+    print("\n" + "="*60)
+    print("📥 Received request to /api/scraping/sinta/dosen")
+    print("="*60)
+    
     # Handle OPTIONS request
     if request.method == 'OPTIONS':
+        print("✅ Handling OPTIONS request")
         return '', 204
         
     try:
         data = request.get_json()
+        print(f"📋 Request data: {data}")
         
         # Validasi input
         required_fields = ['username', 'password', 'affiliation_id', 'target_dosen', 'max_pages', 'max_cycles']
         for field in required_fields:
             if field not in data:
+                print(f"❌ Missing field: {field}")
                 return jsonify({
                     'success': False,
                     'error': f'Field {field} is required'
@@ -158,34 +139,56 @@ def scrape_sinta_dosen():
         
         # Generate job ID
         job_id = f"sinta_dosen_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        print(f"🆔 Generated job ID: {job_id}")
+        
+        # Initialize job immediately in active_jobs
+        active_jobs[job_id] = {
+            'status': 'starting',
+            'current': 0,
+            'total': data['target_dosen'],
+            'message': 'Initializing SINTA Dosen scraping...',
+            'started_at': datetime.now().isoformat()
+        }
+        print(f"✅ Job initialized in active_jobs")
+        
+        # Prepare task kwargs (WITHOUT job_id, akan ditambahkan di run_scraping_task)
+        task_kwargs = {
+            'username': data['username'],
+            'password': data['password'],
+            'affiliation_id': data['affiliation_id'],
+            'target_dosen': data['target_dosen'],
+            'max_pages': data['max_pages'],
+            'max_cycles': data['max_cycles']
+        }
         
         # Start scraping task
         thread = threading.Thread(
             target=run_scraping_task,
-            args=(job_id, scrape_sinta_dosen_task),
-            kwargs={
-                'username': data['username'],
-                'password': data['password'],
-                'affiliation_id': data['affiliation_id'],
-                'target_dosen': data['target_dosen'],
-                'max_pages': data['max_pages'],
-                'max_cycles': data['max_cycles'],
-                'job_id': job_id
-            }
+            args=(job_id, scrape_sinta_dosen_task, task_kwargs)
         )
         thread.daemon = True
         thread.start()
+        print(f"🚀 Background thread started")
         
-        return jsonify({
+        response_data = {
             'success': True,
             'message': 'SINTA Dosen scraping started',
             'job_id': job_id
-        })
+        }
+        print(f"📤 Sending response: {response_data}")
+        
+        return jsonify(response_data), 200
         
     except Exception as e:
+        error_msg = str(e)
+        traceback_msg = traceback.format_exc()
+        print(f"\n❌ ERROR in scrape_sinta_dosen:")
+        print(f"Error: {error_msg}")
+        print(f"Traceback:\n{traceback_msg}")
+        
         return jsonify({
             'success': False,
-            'error': str(e)
+            'error': error_msg
         }), 500
 
 @scraping_bp.route('/api/scraping/sinta/scopus', methods=['POST'])
@@ -204,14 +207,21 @@ def scrape_sinta_scopus():
         
         job_id = f"sinta_scopus_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         
+        # Initialize job
+        active_jobs[job_id] = {
+            'status': 'starting',
+            'message': 'Initializing Scopus scraping...',
+            'started_at': datetime.now().isoformat()
+        }
+        
+        task_kwargs = {
+            'username': data['username'],
+            'password': data['password']
+        }
+        
         thread = threading.Thread(
             target=run_scraping_task,
-            args=(job_id, scrape_sinta_scopus_task),
-            kwargs={
-                'username': data['username'],
-                'password': data['password'],
-                'job_id': job_id
-            }
+            args=(job_id, scrape_sinta_scopus_task, task_kwargs)
         )
         thread.daemon = True
         thread.start()
@@ -244,14 +254,21 @@ def scrape_sinta_googlescholar():
         
         job_id = f"sinta_gs_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         
+        # Initialize job
+        active_jobs[job_id] = {
+            'status': 'starting',
+            'message': 'Initializing Google Scholar scraping...',
+            'started_at': datetime.now().isoformat()
+        }
+        
+        task_kwargs = {
+            'username': data['username'],
+            'password': data['password']
+        }
+        
         thread = threading.Thread(
             target=run_scraping_task,
-            args=(job_id, scrape_sinta_googlescholar_task),
-            kwargs={
-                'username': data['username'],
-                'password': data['password'],
-                'job_id': job_id
-            }
+            args=(job_id, scrape_sinta_googlescholar_task, task_kwargs)
         )
         thread.daemon = True
         thread.start()
@@ -284,14 +301,21 @@ def scrape_sinta_garuda():
         
         job_id = f"sinta_garuda_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         
+        # Initialize job
+        active_jobs[job_id] = {
+            'status': 'starting',
+            'message': 'Initializing Garuda scraping...',
+            'started_at': datetime.now().isoformat()
+        }
+        
+        task_kwargs = {
+            'username': data['username'],
+            'password': data['password']
+        }
+        
         thread = threading.Thread(
             target=run_scraping_task,
-            args=(job_id, scrape_sinta_garuda_task),
-            kwargs={
-                'username': data['username'],
-                'password': data['password'],
-                'job_id': job_id
-            }
+            args=(job_id, scrape_sinta_garuda_task, task_kwargs)
         )
         thread.daemon = True
         thread.start()
@@ -320,6 +344,7 @@ def scrape_google_scholar():
     try:
         data = request.get_json() or {}
         max_authors = data.get('max_authors', 10)
+        scrape_from_beginning = data.get('scrape_from_beginning', False)
         
         # Validate input
         if not isinstance(max_authors, int) or max_authors <= 0:
@@ -331,19 +356,19 @@ def scrape_google_scholar():
         # Generate job ID
         job_id = f"gs_scrape_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         
-        # Get socketio instance from app
-        try:
-            from app import socketio
-        except ImportError:
-            return jsonify({
-                'success': False,
-                'error': 'SocketIO not configured properly'
-            }), 500
+        # Initialize job
+        active_jobs[job_id] = {
+            'status': 'starting',
+            'current': 0,
+            'total': max_authors,
+            'message': 'Initializing Google Scholar scraping...',
+            'started_at': datetime.now().isoformat()
+        }
         
         # Start scraping in background thread
         thread = threading.Thread(
             target=run_google_scholar_scraping,
-            args=(job_id, max_authors, socketio)
+            args=(job_id, max_authors, scrape_from_beginning)
         )
         thread.daemon = True
         thread.start()
@@ -364,18 +389,28 @@ def scrape_google_scholar():
         }), 500
 
 # ============================================================================
+# JOB MANAGEMENT ROUTES - CRITICAL FIX!
+# ============================================================================
+
+# ============================================================================
 # JOB MANAGEMENT ROUTES
 # ============================================================================
 
 @scraping_bp.route('/api/scraping/jobs/<job_id>', methods=['GET'])
 def get_job_status(job_id):
     """Get status of a specific scraping job"""
+    print(f"\n📊 Job status requested for: {job_id}")
+    print(f"📋 Active jobs: {list(active_jobs.keys())}")
+    
     if job_id in active_jobs:
+        job_data = active_jobs[job_id]
+        print(f"✅ Job found: {job_data}")
         return jsonify({
             'success': True,
-            'job': active_jobs[job_id]
-        })
+            'job': job_data
+        }), 200
     else:
+        print(f"❌ Job not found: {job_id}")
         return jsonify({
             'success': False,
             'error': 'Job not found'
@@ -384,11 +419,12 @@ def get_job_status(job_id):
 @scraping_bp.route('/api/scraping/jobs', methods=['GET'])
 def list_jobs():
     """List all scraping jobs"""
+    print(f"\n📋 Listing all jobs - Total: {len(active_jobs)}")
     return jsonify({
         'success': True,
         'jobs': active_jobs,
         'total_jobs': len(active_jobs)
-    })
+    }), 200
 
 @scraping_bp.route('/api/scraping/jobs/<job_id>', methods=['DELETE'])
 def delete_job(job_id):
@@ -398,7 +434,7 @@ def delete_job(job_id):
         return jsonify({
             'success': True,
             'message': f'Job {job_id} deleted'
-        })
+        }), 200
     else:
         return jsonify({
             'success': False,
@@ -408,9 +444,11 @@ def delete_job(job_id):
 @scraping_bp.route('/api/scraping/health', methods=['GET'])
 def scraping_health():
     """Health check for scraping service"""
+    running_jobs = len([j for j in active_jobs.values() if j.get('status') == 'running'])
     return jsonify({
         'success': True,
         'status': 'healthy',
-        'active_jobs_count': len([j for j in active_jobs.values() if j.get('status') == 'running']),
-        'total_jobs': len(active_jobs)
-    })
+        'active_jobs_count': running_jobs,
+        'total_jobs': len(active_jobs),
+        'jobs': list(active_jobs.keys())
+    }), 200

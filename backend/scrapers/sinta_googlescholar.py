@@ -32,7 +32,7 @@ logging.basicConfig(
 logger = logging.getLogger("SintaScraper")
 
 class DatabaseManager:
-    def __init__(self, dbname="SKM_PUBLIKASI", user="rayhanadjisantoso", password="rayhan123", host="localhost", port="5432"):
+    def __init__(self, dbname="ProDSGabungan", user="postgres", password="password123", host="localhost", port="5432"):
         self.conn_params = {
             'dbname': dbname,
             'user': user,
@@ -58,20 +58,59 @@ class DatabaseManager:
             self.connection.close()
             logger.info("Disconnected from database")
     
-    def get_dosen_id_by_sinta_id(self, sinta_id):
-        """Get dosen ID from database using SINTA ID"""
+    def get_or_create_jurusan_id(self, nama_jurusan="Unknown"):
+        """Get or create jurusan ID"""
         try:
             with self.connection.cursor() as cursor:
-                cursor.execute("SELECT v_id_dosen, v_nama_dosen FROM tmp_dosen_dt WHERE v_id_sinta = %s", (sinta_id,))
+                # Check if jurusan exists
+                cursor.execute("SELECT v_id_jurusan FROM stg_jurusan_mt WHERE v_nama_jurusan = %s", (nama_jurusan,))
                 result = cursor.fetchone()
                 if result:
-                    return result[0], result[1]  # Return dosen_id and nama_dosen
-                else:
-                    logger.warning(f"Dosen with SINTA ID {sinta_id} not found in database")
-                    return None, None
+                    return result[0]
+                
+                # Create new jurusan
+                cursor.execute(
+                    "INSERT INTO stg_jurusan_mt (v_nama_jurusan) VALUES (%s) RETURNING v_id_jurusan",
+                    (nama_jurusan,)
+                )
+                jurusan_id = cursor.fetchone()[0]
+                self.connection.commit()
+                logger.info(f"Created new jurusan: {nama_jurusan} with ID: {jurusan_id}")
+                return jurusan_id
+                
         except Exception as e:
-            logger.error(f"Error getting dosen by SINTA ID: {e}")
-            return None, None
+            self.connection.rollback()
+            logger.error(f"Error managing jurusan: {e}")
+            return None
+    
+    def get_or_create_dosen_id(self, nama_dosen, sinta_id, jurusan_id=None):
+        """Get or create dosen ID"""
+        try:
+            with self.connection.cursor() as cursor:
+                # Check if dosen exists by SINTA ID
+                cursor.execute("SELECT v_id_dosen FROM tmp_dosen_dt WHERE v_id_sinta = %s", (sinta_id,))
+                result = cursor.fetchone()
+                if result:
+                    return result[0]
+                
+                # If no jurusan_id provided, create a default one
+                if jurusan_id is None:
+                    jurusan_id = self.get_or_create_jurusan_id("Unknown")
+                
+                # Create new dosen
+                cursor.execute("""
+                    INSERT INTO tmp_dosen_dt (v_nama_dosen, v_id_jurusan, v_id_sinta) 
+                    VALUES (%s, %s, %s) RETURNING v_id_dosen
+                """, (nama_dosen, jurusan_id, sinta_id))
+                dosen_id = cursor.fetchone()[0]
+                self.connection.commit()
+                logger.info(f"Created new dosen: {nama_dosen} with ID: {dosen_id}")
+                return dosen_id
+                
+        except Exception as e:
+            self.connection.rollback()
+            logger.error(f"Error managing dosen: {e}")
+            return None
     
     def get_or_create_jurnal_id(self, nama_jurnal):
         """Get or create jurnal ID"""
@@ -226,10 +265,13 @@ class DatabaseManager:
     def insert_publication_complete(self, pub_data):
         """Insert complete publication data with all related tables"""
         try:
-            # Get dosen ID from database using SINTA ID
-            dosen_id, author_name = self.get_dosen_id_by_sinta_id(pub_data['sinta_id'])
+            # Get or create dosen
+            dosen_id = self.get_or_create_dosen_id(
+                pub_data['author'], 
+                pub_data['sinta_id']
+            )
             if not dosen_id:
-                logger.error(f"Dosen with SINTA ID {pub_data['sinta_id']} not found in database")
+                logger.error(f"Failed to create/get dosen for {pub_data['author']}")
                 return False
             
             # Get or create jurnal (extract journal name from venue)
@@ -239,14 +281,14 @@ class DatabaseManager:
                 logger.error(f"Failed to create/get jurnal for {jurnal_name}")
                 return False
             
-            # Create publikasi dengan semua field yang diperlukan
+            # Create publikasi with link URL
             publikasi_id = self.get_or_create_publikasi_id(
-                judul=pub_data['judul'],
-                jenis=pub_data['publication_type'],
-                tahun_publikasi=pub_data['tahun_publikasi'],
-                total_sitasi=pub_data['total_sitasi_seluruhnya'],
-                sumber='Sinta_GoogleScholar',
-                link_url=pub_data.get('link_url')
+                pub_data['judul'],
+                pub_data['publication_type'],
+                pub_data['tahun_publikasi'],
+                pub_data['total_sitasi_seluruhnya'],
+                'Sinta_GoogleScholar',
+                pub_data.get('link_url')
             )
             if not publikasi_id:
                 logger.error(f"Failed to create/get publikasi for {pub_data['judul']}")
@@ -257,27 +299,25 @@ class DatabaseManager:
                 if not self.insert_artikel_details(
                     publikasi_id, jurnal_id, 
                     pub_data['volume'], pub_data['issue'], pub_data['pages'],
-                    pub_data.get('terindeks', 'GoogleScholar'), 
-                    pub_data.get('ranking', 'N/A')
+                    pub_data.get('terindeks', 'N/A'), pub_data.get('ranking', 'N/A')
                 ):
                     logger.error(f"Failed to insert artikel details")
                     return False
             
             # Link publikasi with dosen
-            author_order = self.extract_author_order(pub_data['all_authors'], author_name)
+            author_order = self.extract_author_order(pub_data['all_authors'], pub_data['author'])
             if not self.link_publikasi_dosen(publikasi_id, dosen_id, author_order):
                 logger.error(f"Failed to link publikasi with dosen")
                 return False
             
-            # Insert citation data for current year
+            # Insert current year citation data if citation count > 0
             if pub_data['total_sitasi_seluruhnya'] > 0:
                 current_year = datetime.now().year
                 if not self.insert_sitasi_tahunan(
-                    publikasi_id, 
-                    pub_data['tahun_publikasi'],  # Use publication year instead of current year
+                    publikasi_id, current_year, 
                     pub_data['total_sitasi_seluruhnya'], 
                     'GoogleScholar', 
-                    datetime.strptime(pub_data['tanggal_unduh'], '%Y-%m-%d').date() if isinstance(pub_data['tanggal_unduh'], str) else pub_data['tanggal_unduh']
+                    datetime.strptime(pub_data['tanggal_unduh'], '%Y-%m-%d').date()
                 ):
                     logger.error(f"Failed to insert citation data")
                     return False
@@ -814,65 +854,223 @@ def process_single_author(scraper, author_id, author_name):
         else:
             logger.info(f"No publications found for {author_name}")
             return 0
-            
     except Exception as e:
-        logger.error(f"Error processing author {author_name}: {e}")
+        logger.error(f"Error processing author {author_id}: {e}")
         return 0
 
+def process_authors_from_csv(scraper, input_csv):
+    """Process all authors from a CSV file"""
+    # Read author data
+    try:
+        df = pd.read_csv(input_csv)
+        author_data = []
+        for _, row in df.iterrows():
+            # Make sure to handle potential NaN values
+            sinta_id = row.get('ID SINTA', row.get('ID_SINTA', None))
+            if pd.notna(sinta_id):
+                author_data.append({
+                    'id': str(int(sinta_id)),  # Convert to int then string to remove decimals
+                    'name': row.get('Nama', 'Unknown')
+                })
+        logger.info(f"Found {len(author_data)} authors in the input CSV file.")
+    except Exception as e:
+        logger.error(f"Error reading input CSV with pandas: {e}")
+        # Fallback to raw CSV reading if pandas fails
+        author_data = []
+        try:
+            with open(input_csv, mode='r', encoding='utf-8') as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    sinta_id = row.get('ID SINTA', row.get('ID_SINTA', None))
+                    if sinta_id and sinta_id.strip():
+                        author_data.append({
+                            'id': sinta_id.strip(),
+                            'name': row.get('Nama', 'Unknown')
+                        })
+            logger.info(f"Found {len(author_data)} authors in the input CSV file (fallback method).")
+        except Exception as e:
+            logger.error(f"Error with fallback CSV reading: {e}")
+            return
+    
+    # Process each author
+    total_processed = 0
+    total_publications = 0
+    
+    for i, author in enumerate(author_data):
+        author_id = author['id']
+        author_name = author['name']
+            
+        logger.info(f"\nProcessing author {i+1}/{len(author_data)}: {author_name} (ID: {author_id})")
+        
+        try:
+            # Check login status and relogin if needed every 10 authors
+            if i > 0 and i % 10 == 0:
+                scraper.relogin_if_needed()
+            
+            publications_count = process_single_author(scraper, author_id, author_name)
+            total_processed += 1
+            total_publications += publications_count
+            
+            # Random delay between authors to avoid rate limiting
+            delay = random.uniform(3, 6)
+            logger.info(f"Waiting {delay:.2f} seconds before next author...")
+            sleep(delay)
+            
+        except Exception as e:
+            logger.error(f"Error processing author {author_id}: {e}")
+            continue
+    
+    logger.info(f"Batch processing completed. Processed {total_processed} authors, {total_publications} total publications.")
+
+def process_authors_from_database(scraper):
+    """Process all authors from the database"""
+    # Get author data from database
+    try:
+        author_data = scraper.db.get_all_authors()
+        logger.info(f"Found {len(author_data)} authors in the database.")
+        
+        if not author_data:
+            logger.warning("No authors found in the database.")
+            return
+            
+        # Process each author
+        total_processed = 0
+        total_publications = 0
+        
+        for i, author in enumerate(author_data):
+            author_id = author['id']
+            author_name = author['name']
+                
+            logger.info(f"\nProcessing author {i+1}/{len(author_data)}: {author_name} (ID: {author_id})")
+            
+            try:
+                # Check login status and relogin if needed every 10 authors
+                if i > 0 and i % 10 == 0:
+                    scraper.relogin_if_needed()
+                
+                publications_count = process_single_author(scraper, author_id, author_name)
+                total_processed += 1
+                total_publications += publications_count
+                
+                # Random delay between authors to avoid rate limiting
+                delay = random.uniform(3, 6)
+                logger.info(f"Waiting {delay:.2f} seconds before next author...")
+                sleep(delay)
+                
+            except Exception as e:
+                logger.error(f"Error processing author {author_id}: {e}")
+                continue
+        
+        logger.info(f"Database processing completed. Processed {total_processed} authors, {total_publications} total publications.")
+                
+    except Exception as e:
+        logger.error(f"Error processing authors from database: {e}")
+
 def main():
-    # Initialize database connection
-    db_manager = DatabaseManager()
+    """Main function with command line options"""
+    # Database configuration - modify these values as needed
+    DB_CONFIG = {
+        'dbname': 'ProDSGabungan',
+        'user': 'postgres',
+        'password': 'password123',
+        'host': 'localhost',
+        'port': '5432'
+    }
+    
+    # Initialize database manager
+    db_manager = DatabaseManager(**DB_CONFIG)
     if not db_manager.connect():
         logger.error("Failed to connect to database. Exiting.")
         return
     
-    # Initialize scraper
+    # Initialize scraper with database manager
     scraper = SintaScraper(db_manager)
     
-    # Get login credentials from environment or user input
-    username = os.getenv('6182101045@student.unpar.ac.id')
-    password = os.getenv('PAPAganteng1_')
+    # Login credentials
+    username = "6182101045@student.unpar.ac.id"
+    password = "PAPAganteng1_"
     
-    if not username or not password:
-        logger.info("Please enter your SINTA credentials:")
-        username = input("Username/Email: ").strip()
-        password = input("Password: ").strip()
+    logger.info("Starting SINTA Google Scholar Scraper")
+    logger.info(f"Logging in to SINTA with username: {username}")
     
-    # Login to SINTA
     if not scraper.login(username, password):
-        logger.error("Login failed. Exiting.")
-        return
+        logger.warning("Login failed. Some data may be limited or inaccessible.")
     
-    # Get all authors from database
-    authors = db_manager.get_all_authors()
-    if not authors:
-        logger.error("No authors found in database. Exiting.")
-        return
-    
-    logger.info(f"Found {len(authors)} authors in database")
-    
-    total_processed = 0
-    total_publications = 0
-    
-    for author in authors:
-        author_id = author['id']
-        author_name = author['name']
+    try:
+        # Choose scraping mode
+        print("\nSINTA Google Scholar Scraper Options:")
+        print("1: Scrape a single author")
+        print("2: Scrape all authors from CSV file")
+        print("3: Scrape all authors from database")
+        scrape_mode = input("Select an option (1/2/3): ").strip()
         
-        # Process each author
-        pub_count = process_single_author(scraper, author_id, author_name)
-        total_publications += pub_count
-        total_processed += 1
+        if scrape_mode == "1":
+            # Single author mode
+            author_id = input("Enter author SINTA ID: ").strip()
+            author_name = input("Enter author name (or press Enter to use 'Unknown'): ").strip() or "Unknown"
+            
+            # Validate author ID
+            if not author_id:
+                logger.error("Author ID cannot be empty. Exiting.")
+                return
+            
+            # Make sure it's numeric
+            if not author_id.isdigit():
+                logger.warning("Warning: Author ID should be numeric. Continuing anyway...")
+            
+            # Confirm before proceeding
+            print(f"\nWill scrape Google Scholar publications for:")
+            print(f"  Author: {author_name} (ID: {author_id})")
+            
+            confirm = input("Proceed? (y/n): ").strip().lower()
+            if confirm != 'y':
+                print("Operation cancelled.")
+                return
+            
+            publications_found = process_single_author(scraper, author_id, author_name)
+            print(f"\nScraping completed. Found {publications_found} publications.")
+            
+        elif scrape_mode == "2":
+            # CSV batch mode
+            input_csv = input("Enter input CSV filename (default: unpar_dosen_460.csv): ").strip() or "unpar_dosen_460.csv"
+            
+            # Check if input file exists
+            if not os.path.exists(input_csv):
+                logger.error(f"Input file '{input_csv}' not found. Exiting.")
+                return
+            
+            # Confirm before proceeding
+            print(f"\nWill scrape Google Scholar publications for all authors in {input_csv}")
+            
+            confirm = input("This may take a long time. Proceed? (y/n): ").strip().lower()
+            if confirm != 'y':
+                print("Operation cancelled.")
+                return
+            
+            process_authors_from_csv(scraper, input_csv)
+            print("\nBatch scraping completed.")
+            
+        elif scrape_mode == "3":
+            # Database mode
+            print("\nWill scrape Google Scholar publications for all authors in the database")
+            
+            confirm = input("This may take a long time. Proceed? (y/n): ").strip().lower()
+            if confirm != 'y':
+                print("Operation cancelled.")
+                return
+            
+            process_authors_from_database(scraper)
+            print("\nDatabase scraping completed.")
+            
+        else:
+            logger.error("Invalid option selected. Exiting.")
+            return
         
-        # Add delay between authors
-        if total_processed < len(authors):
-            delay = random.uniform(5, 10)
-            logger.info(f"Waiting {delay:.2f} seconds before next author...")
-            sleep(delay)
+        logger.info("Scraping completed successfully!")
     
-    logger.info(f"Processing complete! Processed {total_processed} authors, found {total_publications} total publications")
-    
-    # Close database connection
-    db_manager.disconnect()
+    finally:
+        # Ensure database connection is closed
+        db_manager.disconnect()
 
 if __name__ == "__main__":
     main()

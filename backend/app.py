@@ -21,41 +21,42 @@ load_dotenv()
 app = Flask(__name__)
 
 # Konfigurasi dasar
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-this')
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-change-this')
 
-# Konfigurasi CORS yang lebih sederhana
+# ===================================
+# CORS Configuration (SIMPLIFIED - FIXED)
+# ===================================
+# Gunakan CORS() saja, hapus @app.after_request untuk menghindari duplikasi
 CORS(app, 
      resources={
-         r"/api/*": {
+         r"/*": {
              "origins": ["http://localhost:5173"],
              "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-             "allow_headers": ["Content-Type", "Authorization", "Access-Control-Allow-Credentials"],
+             "allow_headers": ["Content-Type", "Authorization"],
              "supports_credentials": True
          }
      })
 
 # Middleware untuk response headers
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
-    return response
+# @app.after_request
+# def after_request(response):
+#     response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
+#     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+#     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+#     response.headers.add('Access-Control-Allow-Credentials', 'true')
+#     return response
 
-# Konfigurasi SocketIO
+#  Konfigurasi SocketIO
 socketio = SocketIO(app,
     cors_allowed_origins=["http://localhost:5173"],
     async_mode='threading')
 
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-this')
-app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-change-this')
-
 # Database configuration
 DB_CONFIG = {
-    'dbname': os.environ.get('DB_NAME', 'SKM_PUBLIKASI'),
-    'user': os.environ.get('DB_USER', 'rayhanadjisantoso'),
-    'password': os.environ.get('DB_PASSWORD', 'rayhan123'),
+    'dbname': os.environ.get('DB_NAME', 'ProDSGabungan'),
+    'user': os.environ.get('DB_USER', 'postgres'),
+    'password': os.environ.get('DB_PASSWORD', 'password123'),
     'host': os.environ.get('DB_HOST', 'localhost'),
     'port': os.environ.get('DB_PORT', '5432')
 }
@@ -108,6 +109,7 @@ from routes.scraping_routes import scraping_bp
 
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(scraping_bp, url_prefix='')
+
 
 # SocketIO event handlers
 @socketio.on('connect')
@@ -1321,6 +1323,6 @@ if __name__ == '__main__':
         app,
         debug=debug_mode,
         host='0.0.0.0',
-        port=int(os.environ.get('PORT', 5005)),
+        port=int(os.environ.get('PORT', 5000)),
         allow_unsafe_werkzeug=True
     )

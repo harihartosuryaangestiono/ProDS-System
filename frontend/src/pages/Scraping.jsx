@@ -9,12 +9,12 @@ const ScrapingDashboard = () => {
   });
   const [dosenConfig, setDosenConfig] = useState({
     affiliationId: '1397',
-    targetDosen: 10,  // Ubah nilai default ke number
-    maxPages: 10,     // Ubah nilai default ke number
-    maxCycles: 10     // Ubah nilai default ke number
+    targetDosen: 473,  // Ubah nilai default ke number
+    maxPages: 50,     // Ubah nilai default ke number
+    maxCycles: 20     // Ubah nilai default ke number
   });
   const [gsConfig, setGsConfig] = useState({
-    maxAuthors: 10,
+    maxAuthors: 473,
     scrapeFromBeginning: false
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -23,90 +23,79 @@ const ScrapingDashboard = () => {
   const [currentJobId, setCurrentJobId] = useState(null);
 
   // WebSocket/Polling for progress updates
-  useEffect(() => {
-    let pollInterval = null;
+  // REPLACE useEffect untuk WebSocket/Polling di Scraping.jsx
+// Mulai dari line ~25 hingga ~115
+
+useEffect(() => {
+  let pollInterval = null;
+  
+  if (currentJobId && isLoading) {
+    console.log(`🔄 Starting job monitoring for: ${currentJobId}`);
     
-    if (currentJobId && isLoading) {
-      // Gunakan WebSocket untuk update realtime
-      const socket = new WebSocket('ws://localhost:5005');
-      
-      socket.onopen = () => {
-        console.log('WebSocket Connected');
-      };
-      
-      socket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.job_id === currentJobId) {
-          setScrapingProgress(data.progress);
+    // Langsung gunakan polling saja, skip WebSocket karena sering gagal
+    pollInterval = setInterval(async () => {
+      try {
+        console.log(`📡 Polling job status: ${currentJobId}`);
+        
+        const response = await fetch(`/api/scraping/jobs/${currentJobId}`);
+        
+        if (!response.ok) {
+          console.error(`❌ Job status request failed: ${response.status}`);
+          return;
+        }
+        
+        const data = await response.json();
+        console.log(`✅ Job status received:`, data);
+        
+        if (data.success && data.job) {
+          const job = data.job;
           
-          if (data.progress.status === 'completed') {
+          setScrapingProgress({
+            status: job.status,
+            message: job.message || 'Processing...',
+            currentCount: job.current || 0,
+            targetCount: job.total || 0
+          });
+          
+          // Check for completion
+          if (job.status === 'completed') {
+            console.log('✅ Job completed!');
             setScrapingResults({
               success: true,
-              message: data.progress.message,
-              summary: data.progress.summary
+              message: job.message || 'Scraping completed successfully!',
+              summary: job.result
             });
             setIsLoading(false);
             setCurrentJobId(null);
-          } else if (data.progress.status === 'failed') {
+            clearInterval(pollInterval);
+          } else if (job.status === 'failed') {
+            console.error('❌ Job failed:', job.error);
             setScrapingResults({
               success: false,
-              error: data.progress.error
+              error: job.error || job.message || 'Scraping failed'
             });
             setIsLoading(false);
             setCurrentJobId(null);
+            clearInterval(pollInterval);
           }
         }
-      };
-      
-      socket.onerror = (error) => {
-        console.error('WebSocket Error:', error);
-        // Fallback ke polling jika WebSocket gagal
-        pollInterval = setInterval(async () => {
-          try {
-            const response = await fetch(`http://localhost:5005/api/scraping/jobs/${currentJobId}`);
-            const data = await response.json();
-            
-            if (data.success && data.job) {
-              const job = data.job;
-              
-              setScrapingProgress({
-                status: job.status,
-                message: job.message,
-                currentCount: job.current,
-                targetCount: job.total
-              });
-              
-              if (job.status === 'completed') {
-                setScrapingResults({
-                  success: true,
-                  message: job.message,
-                  summary: job.result
-                });
-                setIsLoading(false);
-                setCurrentJobId(null);
-              } else if (job.status === 'failed') {
-                setScrapingResults({
-                  success: false,
-                  error: job.error || job.message
-                });
-                setIsLoading(false);
-                setCurrentJobId(null);
-              }
-            }
-          } catch (error) {
-            console.error('Polling error:', error);
-          }
-        }, 2000); // Poll setiap 2 detik
-      };
-      
-      return () => {
-        if (socket.readyState === WebSocket.OPEN) {
-          socket.close();
-        }
-        if (pollInterval) clearInterval(pollInterval);
-      };
+      } catch (error) {
+        console.error('❌ Polling error:', error);
+        // Don't stop polling on error, continue trying
+      }
+    }, 2000); // Poll setiap 2 detik
+  }
+  
+  // Cleanup
+  return () => {
+    if (pollInterval) {
+      console.log('🛑 Stopping job monitoring');
+      clearInterval(pollInterval);
     }
-  }, [currentJobId, isLoading]);
+  };
+}, [currentJobId, isLoading]);
+
+// HAPUS semua kode WebSocket yang lama!
 
   const handleCredentialChange = (e) => {
     setCredentials(prev => ({
@@ -266,7 +255,7 @@ const ScrapingDashboard = () => {
     });
 
     try {
-      const response = await fetch('http://localhost:5005/api/scraping/googlescholar/scrape', {
+      const response = await fetch('http://localhost:5000/api/scraping/googlescholar/scrape', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

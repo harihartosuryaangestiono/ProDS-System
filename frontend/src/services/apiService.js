@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5005';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 // Create axios instance
 const apiService = axios.create({
@@ -22,36 +22,16 @@ apiService.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
-    // Ensure CORS headers
-    // config.headers['Access-Control-Allow-Credentials'] = 'true';
+    // Skip auth check for login/register endpoints
+    const isAuthEndpoint = config.url.includes('/auth/login') || config.url.includes('/auth/register');
     
-    return config;
-  },
-  (error) => {
-    console.error('Request interceptor error:', error);
-    return Promise.reject(error);
-  }
-);
-
-// Request interceptor to add the auth token to headers
-apiService.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`; // Ensure Bearer prefix
-    } else {
-      // Redirect to login if token is missing
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
-        return Promise.reject('Authentication required');
-      }
+    if (!token && !isAuthEndpoint && window.location.pathname !== '/login') {
+      window.location.href = '/login';
+      return Promise.reject('Authentication required');
     }
     
     if (import.meta.env.DEV) {
-      console.log(`API Request: ${config.method.toUpperCase()} ${config.url}`, {
-        params: config.params,
-        headers: config.headers, // Log headers for debugging
-      });
+      console.log(`API Request: ${config.method.toUpperCase()} ${config.url}`, config.data);
     }
     
     return config;
@@ -62,7 +42,7 @@ apiService.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle token expiration or invalid tokens
+// Response interceptor
 apiService.interceptors.response.use(
   (response) => {
     if (import.meta.env.DEV) {
@@ -96,28 +76,6 @@ apiService.interceptors.response.use(
 // Helper Functions
 // ===================================
 
-/**
- * Build pagination parameters
- * @param {object} params - The parameters object
- * @param {number} params.page - Page number
- * @param {number} params.perPage - Items per page
- * @param {string} params.search - Search term
- * @returns {Object} Formatted parameters
- */
-apiService.buildPaginationParams = (page = 1, perPage = 20, search = '') => {
-  return {
-    page,
-    per_page: perPage,
-    search: search ? search.trim() : '',
-  };
-};
-
-/**
- * Handle API response and errors consistently
- * @param {Function} apiCall - The API call function
- * @param {string} errorMessage - Default error message
- * @returns {Object} Standardized response object
- */
 const handleResponse = async (apiCall, errorMessage = 'API request failed') => {
   try {
     const response = await apiCall();
@@ -147,13 +105,6 @@ const handleResponse = async (apiCall, errorMessage = 'API request failed') => {
 // SINTA API Functions
 // ===================================
 
-/**
- * Get SINTA Dosen data with pagination and search
- * @param {object} params - The parameters object
- * @param {number} params.page - Page number
- * @param {number} params.perPage - Items per page
- * @param {string} params.search - Search term
- */
 apiService.getSintaDosen = async (params) => {
   return handleResponse(
     () => apiService.get('/api/sinta/dosen', { params }),
@@ -161,13 +112,6 @@ apiService.getSintaDosen = async (params) => {
   );
 };
 
-/**
- * Get SINTA Dosen aggregate statistics
- * Returns total citations from both Google Scholar (n_total_sitasi_gs) and Scopus (n_sitasi_scopus)
- * @param {object} params - The parameters object
- * @param {string} params.search - Search term (optional)
- * @returns {Promise} Response with { totalDosen, totalSitasi, avgHIndex }
- */
 apiService.getSintaDosenStats = async (params = {}) => {
   const queryParams = {
     search: params?.search || ''
@@ -178,13 +122,6 @@ apiService.getSintaDosenStats = async (params = {}) => {
   );
 };
 
-/**
- * Get SINTA Publikasi data with pagination and search
- * @param {object} params - The parameters object
- * @param {number} params.page - Page number
- * @param {number} params.perPage - Items per page
- * @param {string} params.search - Search term
- */
 apiService.getSintaPublikasi = async (params) => {
   return handleResponse(
     () => apiService.get('/api/sinta/publikasi', { params }),
@@ -192,27 +129,10 @@ apiService.getSintaPublikasi = async (params) => {
   );
 };
 
-/**
- * Debug endpoint for SINTA publikasi
- */
-apiService.debugSintaPublikasi = async () => {
-  return handleResponse(
-    () => apiService.get('/api/sinta/publikasi/debug'),
-    'Error fetching SINTA publikasi debug info'
-  );
-};
-
 // ===================================
 // Scholar API Functions
 // ===================================
 
-/**
- * Get Google Scholar Dosen data with pagination and search
- * @param {object} params - The parameters object
- * @param {number} params.page - Page number
- * @param {number} params.perPage - Items per page
- * @param {string} params.search - Search term
- */
 apiService.getScholarDosen = async (params) => {
   return handleResponse(
     () => apiService.get('/api/scholar/dosen', { params }),
@@ -220,11 +140,6 @@ apiService.getScholarDosen = async (params) => {
   );
 };
 
-/**
- * Get Google Scholar Dosen aggregate statistics
- * @param {object} params - The parameters object
- * @param {string} params.search - Search term (optional)
- */
 apiService.getScholarDosenStats = async (params = {}) => {
   const queryParams = {
     search: params?.search || ''
@@ -235,13 +150,6 @@ apiService.getScholarDosenStats = async (params = {}) => {
   );
 };
 
-/**
- * Get Google Scholar Publikasi data with pagination and search
- * @param {object} params - The parameters object
- * @param {number} params.page - Page number
- * @param {number} params.perPage - Items per page
- * @param {string} params.search - Search term
- */
 apiService.getScholarPublikasi = async (params) => {
   return handleResponse(
     () => apiService.get('/api/scholar/publikasi', { params }),
@@ -253,9 +161,6 @@ apiService.getScholarPublikasi = async (params) => {
 // Dashboard API Functions
 // ===================================
 
-/**
- * Get dashboard statistics
- */
 apiService.getDashboardStats = async () => {
   return handleResponse(
     () => apiService.get('/api/dashboard/stats'),
@@ -264,18 +169,17 @@ apiService.getDashboardStats = async () => {
 };
 
 // ===================================
-// Authentication API Functions
+// Authentication API Functions (FIXED)
 // ===================================
 
-/**
- * Login user
- * @param {string} username - Username
- * @param {string} password - Password
- */
-apiService.login = async (username, password) => {
+apiService.login = async (email, password) => {
   return handleResponse(
     async () => {
-      const response = await apiService.post('/api/auth/login', { username, password });
+      // FIXED: Changed from /api/auth/login to /auth/login
+      const response = await apiService.post('/auth/login', {
+        v_email: email,
+        v_password_hash: password
+      });
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
@@ -286,39 +190,18 @@ apiService.login = async (username, password) => {
   );
 };
 
-/**
- * Logout user
- */
 apiService.logout = async () => {
-  return handleResponse(
-    () => apiService.post('/api/auth/logout'),
-    'Error during logout'
-  );
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  return { success: true };
 };
 
-/**
- * Register new user
- * @param {object} userData - User registration data
- */
 apiService.register = async (userData) => {
   return handleResponse(
-    () => apiService.post('/api/auth/register', userData),
+    // FIXED: Changed from /api/auth/register to /auth/register
+    () => apiService.post('/auth/register', userData),
     'Error during registration'
   );
 };
-
-/**
- * Get current user profile
- */
-apiService.getCurrentUser = async () => {
-  return handleResponse(
-    () => apiService.get('/api/auth/me'),
-    'Error fetching user profile'
-  );
-};
-
-// ===================================
-// Export
-// ===================================
 
 export default apiService;
