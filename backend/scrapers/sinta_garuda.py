@@ -301,15 +301,24 @@ class SintaGarudaScraper:
         self.db = db_manager
 
     def login(self, username, password):
-        """Login to SINTA before scraping"""
+        """Login to SINTA before scraping - tries multiple endpoints"""
         self.username = username
         self.password = password
-            
-        # Try the general login endpoint
-        if self._try_login("https://sinta.kemdikbud.go.id/logins"):
-            return True
-            
-        logger.error("All login attempts failed")
+        
+        # Try multiple login URLs (SINTA has different domains)
+        login_urls = [
+            "https://sinta.kemdikbud.go.id/logins",
+            "https://sinta.kemdiktisaintek.go.id/logins",
+            "https://sinta.ristekdikti.go.id/logins"
+        ]
+        
+        for url in login_urls:
+            logger.info(f"Trying login URL: {url}")
+            if self._try_login(url):
+                logger.info(f"✅ Login successful with URL: {url}")
+                return True
+        
+        logger.error("❌ All login URLs failed")
         return False
         
     def _try_login(self, login_url):

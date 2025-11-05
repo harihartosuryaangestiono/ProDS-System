@@ -335,6 +335,60 @@ def scrape_sinta_garuda():
 # ============================================================================
 # GOOGLE SCHOLAR ROUTE
 # ============================================================================
+def run_google_scholar_scraping(job_id, max_authors, scrape_from_beginning):
+    """Run Google Scholar scraping in background thread"""
+    try:
+        from gs_scraper import GoogleScholarScraper
+        
+        active_jobs[job_id] = {
+            'status': 'running',
+            'current': 0,
+            'total': max_authors,
+            'message': 'Initializing scraper...',
+            'started_at': datetime.now().isoformat()
+        }
+        
+        emit_progress(job_id, active_jobs[job_id])
+        
+        # Create scraper instance
+        scraper = GoogleScholarScraper(
+            db_config=DB_CONFIG,
+            job_id=job_id,
+            progress_callback=lambda data: emit_progress(job_id, data)
+        )
+        
+        # Run scraping
+        result = scraper.run(max_authors=max_authors, scrape_from_beginning=scrape_from_beginning)
+        
+        active_jobs[job_id]['status'] = 'completed'
+        active_jobs[job_id]['message'] = 'Scraping completed successfully!'
+        active_jobs[job_id]['completed_at'] = datetime.now().isoformat()
+        active_jobs[job_id]['result'] = result
+        
+        emit_progress(job_id, {
+            'status': 'completed',
+            'message': result.get('message', 'Scraping completed'),
+            'summary': result.get('summary', {})
+        })
+        
+    except Exception as e:
+        import traceback
+        error_msg = str(e)
+        traceback_msg = traceback.format_exc()
+        
+        print(f"\n❌ ERROR: {error_msg}")
+        print(f"Traceback:\n{traceback_msg}")
+        
+        active_jobs[job_id]['status'] = 'failed'
+        active_jobs[job_id]['message'] = error_msg
+        active_jobs[job_id]['error'] = error_msg
+        active_jobs[job_id]['traceback'] = traceback_msg
+        active_jobs[job_id]['failed_at'] = datetime.now().isoformat()
+        
+        emit_progress(job_id, {
+            'status': 'failed',
+            'error': error_msg
+        })
 
 @scraping_bp.route('/api/scraping/googlescholar/scrape', methods=['POST'])
 def scrape_google_scholar():
@@ -390,10 +444,6 @@ def scrape_google_scholar():
 
 # ============================================================================
 # JOB MANAGEMENT ROUTES - CRITICAL FIX!
-# ============================================================================
-
-# ============================================================================
-# JOB MANAGEMENT ROUTES
 # ============================================================================
 
 @scraping_bp.route('/api/scraping/jobs/<job_id>', methods=['GET'])

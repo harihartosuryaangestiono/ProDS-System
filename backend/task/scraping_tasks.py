@@ -1,57 +1,127 @@
-# file: backend/task/scraping_tasks.py
-# REAL SCRAPING - Bukan stub lagi!
+# -*- coding: utf-8 -*-
+"""
+Complete Scraping Tasks - Real Implementation for All Scrapers
+File: backend/task/scraping_tasks.py
+
+Integrates all SINTA scrapers:
+- SINTA Dosen (sinta_dosen.py)
+- SINTA Scopus (sinta_scopus.py)
+- SINTA Google Scholar (sinta_googlescholar.py)
+- SINTA Garuda (sinta_garuda.py)
+
+Created: 2025-10-16
+Author: System Integration
+"""
 
 import sys
 import os
 from datetime import datetime
 import time
+import traceback
 
-# Add scrapers directory to path
+# ============================================================================
+# PATH SETUP
+# ============================================================================
+
+# Add scrapers directory to Python path
 current_dir = os.path.dirname(os.path.abspath(__file__))
-scrapers_dir = os.path.join(os.path.dirname(current_dir), 'scrapers')
+backend_dir = os.path.dirname(current_dir)
+scrapers_dir = os.path.join(backend_dir, 'scrapers')
+
+# Insert at beginning to prioritize local scrapers
 sys.path.insert(0, scrapers_dir)
+sys.path.insert(0, backend_dir)
+
+print(f"📂 Scrapers directory: {scrapers_dir}")
+print(f"📂 Backend directory: {backend_dir}")
 
 # Import database config
-from utils.database import DB_CONFIG
+try:
+    from utils.database import DB_CONFIG
+    print(f"✅ Database config loaded: {DB_CONFIG.get('dbname', 'Unknown')}")
+except ImportError as e:
+    print(f"⚠️ Warning: Could not import DB_CONFIG: {e}")
+    # Fallback config
+    DB_CONFIG = {
+        'dbname': 'ProDSGabungan',
+        'user': 'postgres',
+        'password': 'password123',
+        'host': 'localhost',
+        'port': '5432'
+    }
 
-def scrape_sinta_dosen_task(username, password, affiliation_id, target_dosen, max_pages, max_cycles, job_id=None):
-    """
-    Task untuk scraping SINTA Dosen - REAL SCRAPING
-    Menggunakan sinta_dosen.py yang sudah ada
-    """
+# ============================================================================
+# HELPER FUNCTIONS
+# ============================================================================
+
+def print_header(title, job_id=None):
+    """Print formatted header for scraping tasks"""
     print(f"\n{'='*80}")
-    print(f"🚀 SINTA DOSEN SCRAPING TASK - REAL SCRAPING MODE")
+    print(f"🚀 {title}")
     print(f"{'='*80}")
-    print(f"📋 Job ID: {job_id}")
-    print(f"👤 Username: {username}")
-    print(f"🏢 Affiliation ID: {affiliation_id}")
-    print(f"🎯 Target Dosen: {target_dosen}")
-    print(f"📄 Max Pages per Cycle: {max_pages}")
-    print(f"🔄 Max Cycles: {max_cycles}")
+    if job_id:
+        print(f"📋 Job ID: {job_id}")
+    print(f"⏰ Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"{'='*80}\n")
+
+def print_footer(title, success=True):
+    """Print formatted footer for scraping tasks"""
+    print(f"\n{'='*80}")
+    if success:
+        print(f"🎉 {title} - SUCCESS")
+    else:
+        print(f"❌ {title} - FAILED")
+    print(f"⏰ Finished at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"{'='*80}\n")
+
+# ============================================================================
+# SINTA DOSEN SCRAPING TASK
+# ============================================================================
+
+def scrape_sinta_dosen_task(username, password, affiliation_id, target_dosen, 
+                            max_pages, max_cycles, job_id=None):
+    """
+    Real scraping task for SINTA Dosen
+    
+    Args:
+        username: SINTA login username
+        password: SINTA login password
+        affiliation_id: University affiliation ID
+        target_dosen: Target number of dosen to scrape
+        max_pages: Maximum pages per cycle
+        max_cycles: Maximum number of cycles
+        job_id: Unique job identifier
+    
+    Returns:
+        dict: Result with success status, message, and summary
+    """
+    print_header("SINTA DOSEN SCRAPING TASK - REAL MODE", job_id)
+    
+    print(f"📊 Configuration:")
+    print(f"   - Username: {username}")
+    print(f"   - Affiliation ID: {affiliation_id}")
+    print(f"   - Target Dosen: {target_dosen}")
+    print(f"   - Max Pages/Cycle: {max_pages}")
+    print(f"   - Max Cycles: {max_cycles}")
+    print(f"   - Database: {DB_CONFIG['dbname']}\n")
     
     try:
-        # Import SintaDosenScraper dari file yang sudah ada
+        # Import scraper
         print("📦 Importing SintaDosenScraper...")
         from sinta_dosen import SintaDosenScraper
+        print("✅ Import successful!")
         
-        print(f"🔌 Connecting to database: {DB_CONFIG['dbname']}")
-        
-        # Inisialisasi scraper dengan database config
+        # Initialize scraper
+        print(f"\n🔌 Connecting to database: {DB_CONFIG['dbname']}@{DB_CONFIG['host']}")
         scraper = SintaDosenScraper(db_config=DB_CONFIG)
         print("✅ Scraper initialized successfully!")
         
-        # NOTE: Jika scraper Anda memerlukan login ke SINTA,
-        # uncomment dan sesuaikan method login-nya:
-        # if hasattr(scraper, 'login'):
-        #     print(f"🔐 Logging in to SINTA as {username}...")
-        #     scraper.login(username, password)
-        #     print("✅ Login successful!")
-        
+        # Start scraping
         print(f"\n🏃 Starting scraping process...")
-        print(f"⏱️  This may take several minutes to hours depending on target\n")
+        print(f"⏱️  This may take several hours depending on target...\n")
         
-        # Jalankan scraping menggunakan method yang sudah ada
+        start_time = time.time()
+        
         final_count = scraper.scrape_until_target_reached(
             affiliation_id=affiliation_id,
             target_dosen=target_dosen,
@@ -59,73 +129,51 @@ def scrape_sinta_dosen_task(username, password, affiliation_id, target_dosen, ma
             max_cycles=max_cycles
         )
         
-        print(f"\n✅ Scraping completed! Final count: {final_count}")
+        elapsed_time = time.time() - start_time
         
-        # Dapatkan ringkasan hasil extraction
-        print("📊 Getting extraction summary...")
+        print(f"\n✅ Scraping completed!")
+        print(f"📊 Final count: {final_count} dosen")
+        print(f"⏱️  Total time: {elapsed_time/60:.2f} minutes")
+        
+        # Get summary
         summary = scraper.get_extraction_summary()
         
-        # Tutup koneksi scraper
-        print("🔒 Closing scraper connections...")
+        # Close connections
         scraper.close()
         
+        # Prepare result
         result = {
             'success': True,
             'message': f'✅ Scraping berhasil! Total {final_count} dosen unik tersimpan',
             'final_count': final_count,
-            'summary': summary,
-            'details': {
-                'batch_id': summary.get('batch_id') if summary else None,
-                'extraction_time': summary.get('extraction_time') if summary else None,
-                'total_dosen': summary.get('total_dosen') if summary else final_count,
-                'total_dosen_unik': summary.get('total_dosen_unik') if summary else final_count,
-                'total_sitasi_gs': summary.get('total_sitasi_gs') if summary else 0,
-                'total_sitasi_scopus': summary.get('total_sitasi_scopus') if summary else 0,
-            }
+            'elapsed_time_minutes': round(elapsed_time/60, 2),
+            'summary': summary
         }
         
-        print(f"\n{'='*80}")
-        print(f"🎉 SCRAPING TASK COMPLETED SUCCESSFULLY")
-        print(f"{'='*80}")
-        print(f"📊 Results:")
-        print(f"   - Total Dosen: {final_count}")
-        if summary:
-            print(f"   - Total Sitasi GS: {summary.get('total_sitasi_gs', 0)}")
-            print(f"   - Total Sitasi Scopus: {summary.get('total_sitasi_scopus', 0)}")
-            print(f"   - Avg SINTA Score: {summary.get('avg_skor_sinta', 0):.2f}")
-        print(f"{'='*80}\n")
-        
+        print_footer("SINTA DOSEN SCRAPING", success=True)
         return result
         
     except ImportError as e:
-        error_msg = f"Failed to import scraper module: {str(e)}"
-        print(f"\n❌ IMPORT ERROR:")
-        print(f"   {error_msg}")
-        print(f"\n💡 Make sure sinta_dosen.py exists in scrapers/ directory")
-        print(f"   Path: {scrapers_dir}/sinta_dosen.py")
-        
-        import traceback
-        traceback_msg = traceback.format_exc()
+        error_msg = f"Failed to import sinta_dosen.py: {str(e)}"
+        print(f"\n❌ IMPORT ERROR: {error_msg}")
+        print(f"💡 Check if sinta_dosen.py exists in: {scrapers_dir}")
+        print_footer("SINTA DOSEN SCRAPING", success=False)
         
         return {
             'success': False,
             'error': error_msg,
-            'traceback': traceback_msg,
-            'hint': 'Check if sinta_dosen.py exists in scrapers/ directory'
+            'traceback': traceback.format_exc(),
+            'hint': f'Place sinta_dosen.py in {scrapers_dir}'
         }
         
     except Exception as e:
-        import traceback
         error_msg = str(e)
         traceback_msg = traceback.format_exc()
         
-        print(f"\n{'='*80}")
-        print(f"❌ SCRAPING TASK FAILED")
-        print(f"{'='*80}")
-        print(f"Error: {error_msg}")
-        print(f"\nFull Traceback:")
+        print(f"\n❌ SCRAPING FAILED: {error_msg}")
+        print(f"\n📋 Full Traceback:")
         print(traceback_msg)
-        print(f"{'='*80}\n")
+        print_footer("SINTA DOSEN SCRAPING", success=False)
         
         return {
             'success': False,
@@ -134,7 +182,7 @@ def scrape_sinta_dosen_task(username, password, affiliation_id, target_dosen, ma
         }
     
     finally:
-        # Pastikan scraper ditutup meskipun ada error
+        # Ensure cleanup
         if 'scraper' in locals():
             try:
                 scraper.close()
@@ -142,119 +190,522 @@ def scrape_sinta_dosen_task(username, password, affiliation_id, target_dosen, ma
             except:
                 pass
 
+# ============================================================================
+# SINTA SCOPUS SCRAPING TASK
+# ============================================================================
 
 def scrape_sinta_scopus_task(username, password, job_id=None):
     """
-    Task untuk scraping publikasi Scopus dari SINTA
-    TODO: Implement real scraper
+    Real scraping task for SINTA Scopus publications
+    
+    Args:
+        username: SINTA login username
+        password: SINTA login password
+        job_id: Unique job identifier
+    
+    Returns:
+        dict: Result with success status and publication count
     """
-    print(f"\n{'='*80}")
-    print(f"🚀 SINTA SCOPUS SCRAPING TASK")
-    print(f"{'='*80}")
-    print(f"📋 Job ID: {job_id}")
-    print(f"👤 Username: {username}")
-    print(f"⚠️  STATUS: STUB MODE - Real scraper not implemented yet")
-    print(f"{'='*80}\n")
+    print_header("SINTA SCOPUS SCRAPING TASK - REAL MODE", job_id)
+    
+    print(f"📊 Configuration:")
+    print(f"   - Username: {username}")
+    print(f"   - Database: {DB_CONFIG['dbname']}\n")
     
     try:
-        # TODO: Import dan jalankan scraper Scopus yang sebenarnya
-        # from sinta_scopus import SintaScopusScraper
-        # scraper = SintaScopusScraper(db_config=DB_CONFIG)
-        # result = scraper.scrape(username, password)
+        # Import scraper and database manager
+        print("📦 Importing SintaScraper and DatabaseManager...")
+        from sinta_scopus import SintaScraper, DatabaseManager
+        print("✅ Import successful!")
         
-        # Sementara simulasi
-        print("⏳ Simulating Scopus scraping (5 seconds)...")
-        time.sleep(5)
+        # Initialize database
+        print(f"\n🔌 Connecting to database: {DB_CONFIG['dbname']}@{DB_CONFIG['host']}")
+        db_manager = DatabaseManager(
+            dbname=DB_CONFIG['dbname'],
+            user=DB_CONFIG['user'],
+            password=DB_CONFIG['password'],
+            host=DB_CONFIG['host'],
+            port=DB_CONFIG['port']
+        )
+        
+        if not db_manager.connect():
+            raise Exception("Failed to connect to database")
+        print("✅ Database connected!")
+        
+        # Initialize scraper
+        scraper = SintaScraper(db_manager)
+        print("✅ Scraper initialized!")
+        
+        # Login to SINTA
+        print(f"\n⚠️ Skipping login - Testing without authentication...")
+        scraper.logged_in = False  # Mark as not logged in
+        # if not scraper.login(username, password):
+        #     raise Exception("Login to SINTA failed")
+        # print("✅ Login successful!")
+        print("⚠️ Continuing without login (some data may be limited)")
+
+        
+        
+        # Get authors from database
+        print(f"\n📋 Retrieving authors from database...")
+        authors = db_manager.get_all_authors_from_db()
+        print(f"📊 Found {len(authors)} authors with SINTA IDs")
+        
+        if not authors:
+            raise Exception("No authors found in database")
+        
+        # Start scraping
+        print(f"\n🏃 Starting Scopus scraping...")
+        print(f"⏱️  This will process {len(authors)} authors...\n")
+        
+        start_time = time.time()
+        total_publications = 0
+        processed_authors = 0
+        failed_authors = 0
+        
+        for i, author in enumerate(authors):
+            try:
+                author_id = author['id']  # SINTA ID
+                author_name = author['name']
+                
+                print(f"[{i+1}/{len(authors)}] Processing: {author_name} (SINTA: {author_id})")
+                
+                # Scrape publications
+                publications = scraper.scrape_author_publications(author_id, author_name)
+                
+                if publications:
+                    # Save to database
+                    saved_count = db_manager.process_publications_to_db(publications, author_id)
+                    total_publications += saved_count
+                    
+                    # Update dosen stats
+                    db_manager.update_dosen_stats(author_id)
+                    
+                    print(f"   ✅ Saved {saved_count} publications")
+                else:
+                    print(f"   ℹ️  No publications found")
+                
+                processed_authors += 1
+                
+                # Delay between authors (avoid rate limiting)
+                if i < len(authors) - 1:
+                    delay = 3
+                    print(f"   ⏳ Waiting {delay}s...")
+                    time.sleep(delay)
+                
+            except Exception as e:
+                failed_authors += 1
+                print(f"   ❌ Error: {str(e)}")
+                continue
+        
+        elapsed_time = time.time() - start_time
+        
+        # Close database
+        db_manager.disconnect()
+        
+        # Prepare result
+        result = {
+            'success': True,
+            'message': f'✅ Scopus scraping berhasil! {total_publications} publikasi dari {processed_authors} dosen',
+            'total_publications': total_publications,
+            'processed_authors': processed_authors,
+            'failed_authors': failed_authors,
+            'elapsed_time_minutes': round(elapsed_time/60, 2)
+        }
+        
+        print(f"\n📊 Summary:")
+        print(f"   - Total Publications: {total_publications}")
+        print(f"   - Processed Authors: {processed_authors}")
+        print(f"   - Failed Authors: {failed_authors}")
+        print(f"   - Time Taken: {elapsed_time/60:.2f} minutes")
+        
+        print_footer("SINTA SCOPUS SCRAPING", success=True)
+        return result
+        
+    except ImportError as e:
+        error_msg = f"Failed to import sinta_scopus.py: {str(e)}"
+        print(f"\n❌ IMPORT ERROR: {error_msg}")
+        print(f"💡 Check if sinta_scopus.py exists in: {scrapers_dir}")
+        print_footer("SINTA SCOPUS SCRAPING", success=False)
         
         return {
-            'success': True,
-            'message': '⚠️ Scopus scraping completed (STUB MODE - not real data)',
-            'total_publications': 0,
-            'note': 'This is a placeholder. Implement sinta_scopus.py for real scraping.'
+            'success': False,
+            'error': error_msg,
+            'traceback': traceback.format_exc(),
+            'hint': f'Place sinta_scopus.py in {scrapers_dir}'
         }
         
     except Exception as e:
-        import traceback
+        error_msg = str(e)
+        traceback_msg = traceback.format_exc()
+        
+        print(f"\n❌ SCRAPING FAILED: {error_msg}")
+        print(f"\n📋 Full Traceback:")
+        print(traceback_msg)
+        print_footer("SINTA SCOPUS SCRAPING", success=False)
+        
         return {
             'success': False,
-            'error': str(e),
-            'traceback': traceback.format_exc()
+            'error': error_msg,
+            'traceback': traceback_msg
         }
+    
+    finally:
+        # Ensure cleanup
+        if 'db_manager' in locals():
+            try:
+                db_manager.disconnect()
+            except:
+                pass
 
+# ============================================================================
+# SINTA GOOGLE SCHOLAR SCRAPING TASK
+# ============================================================================
 
 def scrape_sinta_googlescholar_task(username, password, job_id=None):
     """
-    Task untuk scraping publikasi Google Scholar dari SINTA
-    TODO: Implement real scraper
+    Real scraping task for SINTA Google Scholar publications
+    
+    Args:
+        username: SINTA login username
+        password: SINTA login password
+        job_id: Unique job identifier
+    
+    Returns:
+        dict: Result with success status and publication count
     """
-    print(f"\n{'='*80}")
-    print(f"🚀 SINTA GOOGLE SCHOLAR SCRAPING TASK")
-    print(f"{'='*80}")
-    print(f"📋 Job ID: {job_id}")
-    print(f"👤 Username: {username}")
-    print(f"⚠️  STATUS: STUB MODE - Real scraper not implemented yet")
-    print(f"{'='*80}\n")
+    print_header("SINTA GOOGLE SCHOLAR SCRAPING TASK - REAL MODE", job_id)
+    
+    print(f"📊 Configuration:")
+    print(f"   - Username: {username}")
+    print(f"   - Database: {DB_CONFIG['dbname']}\n")
     
     try:
-        # TODO: Import dan jalankan scraper Google Scholar yang sebenarnya
-        # from sinta_googlescholar import SintaGoogleScholarScraper
-        # scraper = SintaGoogleScholarScraper(db_config=DB_CONFIG)
-        # result = scraper.scrape(username, password)
+        # Import scraper and database manager
+        print("📦 Importing SintaScraper and DatabaseManager...")
+        from sinta_googlescholar import SintaScraper, DatabaseManager
+        print("✅ Import successful!")
         
-        # Sementara simulasi
-        print("⏳ Simulating Google Scholar scraping (5 seconds)...")
-        time.sleep(5)
+        # Initialize database
+        print(f"\n🔌 Connecting to database: {DB_CONFIG['dbname']}@{DB_CONFIG['host']}")
+        db_manager = DatabaseManager(
+            dbname=DB_CONFIG['dbname'],
+            user=DB_CONFIG['user'],
+            password=DB_CONFIG['password'],
+            host=DB_CONFIG['host'],
+            port=DB_CONFIG['port']
+        )
+        
+        if not db_manager.connect():
+            raise Exception("Failed to connect to database")
+        print("✅ Database connected!")
+        
+        # Initialize scraper
+        scraper = SintaScraper(db_manager)
+        print("✅ Scraper initialized!")
+        
+        # Login to SINTA
+        print(f"\n🔐 Logging in to SINTA...")
+        if not scraper.login(username, password):
+            raise Exception("Login to SINTA failed")
+        print("✅ Login successful!")
+        
+        # Get authors from database
+        print(f"\n📋 Retrieving authors from database...")
+        authors = db_manager.get_all_authors()
+        print(f"📊 Found {len(authors)} authors with SINTA IDs")
+        
+        if not authors:
+            raise Exception("No authors found in database")
+        
+        # Start scraping
+        print(f"\n🏃 Starting Google Scholar scraping...")
+        print(f"⏱️  This will process {len(authors)} authors...\n")
+        
+        start_time = time.time()
+        total_publications = 0
+        processed_authors = 0
+        failed_authors = 0
+        
+        for i, author in enumerate(authors):
+            try:
+                author_id = author['id']  # SINTA ID
+                author_name = author['name']
+                
+                print(f"[{i+1}/{len(authors)}] Processing: {author_name} (SINTA: {author_id})")
+                
+                # Check login every 10 authors
+                if i > 0 and i % 10 == 0:
+                    scraper.relogin_if_needed()
+                
+                # Scrape publications
+                publications = scraper.scrape_author_publications(author_id, author_name)
+                
+                if publications:
+                    # Save to database
+                    saved_count = db_manager.insert_publications_batch(publications)
+                    total_publications += saved_count
+                    
+                    # Update dosen stats
+                    db_manager.update_dosen_statistics(author_id)
+                    
+                    print(f"   ✅ Saved {saved_count} publications")
+                else:
+                    print(f"   ℹ️  No publications found")
+                
+                processed_authors += 1
+                
+                # Delay between authors
+                if i < len(authors) - 1:
+                    delay = 3
+                    print(f"   ⏳ Waiting {delay}s...")
+                    time.sleep(delay)
+                
+            except Exception as e:
+                failed_authors += 1
+                print(f"   ❌ Error: {str(e)}")
+                continue
+        
+        elapsed_time = time.time() - start_time
+        
+        # Close database
+        db_manager.disconnect()
+        
+        # Prepare result
+        result = {
+            'success': True,
+            'message': f'✅ Google Scholar scraping berhasil! {total_publications} publikasi dari {processed_authors} dosen',
+            'total_publications': total_publications,
+            'processed_authors': processed_authors,
+            'failed_authors': failed_authors,
+            'elapsed_time_minutes': round(elapsed_time/60, 2)
+        }
+        
+        print(f"\n📊 Summary:")
+        print(f"   - Total Publications: {total_publications}")
+        print(f"   - Processed Authors: {processed_authors}")
+        print(f"   - Failed Authors: {failed_authors}")
+        print(f"   - Time Taken: {elapsed_time/60:.2f} minutes")
+        
+        print_footer("SINTA GOOGLE SCHOLAR SCRAPING", success=True)
+        return result
+        
+    except ImportError as e:
+        error_msg = f"Failed to import sinta_googlescholar.py: {str(e)}"
+        print(f"\n❌ IMPORT ERROR: {error_msg}")
+        print(f"💡 Check if sinta_googlescholar.py exists in: {scrapers_dir}")
+        print_footer("SINTA GOOGLE SCHOLAR SCRAPING", success=False)
         
         return {
-            'success': True,
-            'message': '⚠️ Google Scholar scraping completed (STUB MODE - not real data)',
-            'total_publications': 0,
-            'note': 'This is a placeholder. Implement sinta_googlescholar.py for real scraping.'
+            'success': False,
+            'error': error_msg,
+            'traceback': traceback.format_exc(),
+            'hint': f'Place sinta_googlescholar.py in {scrapers_dir}'
         }
         
     except Exception as e:
-        import traceback
+        error_msg = str(e)
+        traceback_msg = traceback.format_exc()
+        
+        print(f"\n❌ SCRAPING FAILED: {error_msg}")
+        print(f"\n📋 Full Traceback:")
+        print(traceback_msg)
+        print_footer("SINTA GOOGLE SCHOLAR SCRAPING", success=False)
+        
         return {
             'success': False,
-            'error': str(e),
-            'traceback': traceback.format_exc()
+            'error': error_msg,
+            'traceback': traceback_msg
         }
+    
+    finally:
+        if 'db_manager' in locals():
+            try:
+                db_manager.disconnect()
+            except:
+                pass
 
+# ============================================================================
+# SINTA GARUDA SCRAPING TASK
+# ============================================================================
 
 def scrape_sinta_garuda_task(username, password, job_id=None):
     """
-    Task untuk scraping publikasi Garuda dari SINTA
-    TODO: Implement real scraper
+    Real scraping task for SINTA Garuda publications
+    
+    Args:
+        username: SINTA login username
+        password: SINTA login password
+        job_id: Unique job identifier
+    
+    Returns:
+        dict: Result with success status and publication count
     """
-    print(f"\n{'='*80}")
-    print(f"🚀 SINTA GARUDA SCRAPING TASK")
-    print(f"{'='*80}")
-    print(f"📋 Job ID: {job_id}")
-    print(f"👤 Username: {username}")
-    print(f"⚠️  STATUS: STUB MODE - Real scraper not implemented yet")
-    print(f"{'='*80}\n")
+    print_header("SINTA GARUDA SCRAPING TASK - REAL MODE", job_id)
+    
+    print(f"📊 Configuration:")
+    print(f"   - Username: {username}")
+    print(f"   - Database: {DB_CONFIG['dbname']}\n")
     
     try:
-        # TODO: Import dan jalankan scraper Garuda yang sebenarnya
-        # from sinta_garuda import SintaGarudaScraper
-        # scraper = SintaGarudaScraper(db_config=DB_CONFIG)
-        # result = scraper.scrape(username, password)
+        # Import scraper and database manager
+        print("📦 Importing SintaGarudaScraper and DatabaseManager...")
+        from sinta_garuda import SintaGarudaScraper, DatabaseManager
+        print("✅ Import successful!")
         
-        # Sementara simulasi
-        print("⏳ Simulating Garuda scraping (5 seconds)...")
-        time.sleep(5)
+        # Initialize database
+        print(f"\n🔌 Connecting to database: {DB_CONFIG['dbname']}@{DB_CONFIG['host']}")
+        db_manager = DatabaseManager(
+            dbname=DB_CONFIG['dbname'],
+            user=DB_CONFIG['user'],
+            password=DB_CONFIG['password'],
+            host=DB_CONFIG['host'],
+            port=DB_CONFIG['port']
+        )
+        
+        if not db_manager.connect():
+            raise Exception("Failed to connect to database")
+        print("✅ Database connected!")
+        
+        # Initialize scraper
+        scraper = SintaGarudaScraper(db_manager)
+        print("✅ Scraper initialized!")
+        
+        # Login to SINTA
+        print(f"\n🔐 Logging in to SINTA...")
+        if not scraper.login(username, password):
+            raise Exception("Login to SINTA failed")
+        print("✅ Login successful!")
+        
+        # Get authors from database
+        print(f"\n📋 Retrieving authors from database...")
+        authors = db_manager.get_all_dosen_with_sinta()
+        print(f"📊 Found {len(authors)} authors with SINTA IDs")
+        
+        if not authors:
+            raise Exception("No authors found in database")
+        
+        # Generate batch ID
+        db_manager.generate_batch_id()
+        
+        # Start scraping
+        print(f"\n🏃 Starting Garuda scraping...")
+        print(f"⏱️  This will process {len(authors)} authors...\n")
+        
+        start_time = time.time()
+        total_publications = 0
+        processed_authors = 0
+        failed_authors = 0
+        
+        for i, author in enumerate(authors):
+            try:
+                sinta_id = author['sinta_id']
+                nama_dosen = author['nama']
+                jurusan = author['jurusan']
+                
+                print(f"[{i+1}/{len(authors)}] Processing: {nama_dosen} (SINTA: {sinta_id})")
+                
+                dosen_data = {
+                    'nama': nama_dosen,
+                    'sinta_id': sinta_id,
+                    'jurusan': jurusan
+                }
+                
+                # Scrape publications
+                saved_count = scraper.scrape_author_publications(dosen_data)
+                
+                if saved_count > 0:
+                    total_publications += saved_count
+                    print(f"   ✅ Saved {saved_count} publications")
+                else:
+                    print(f"   ℹ️  No publications found")
+                
+                processed_authors += 1
+                
+                # Delay between authors
+                if i < len(authors) - 1:
+                    delay = 3
+                    print(f"   ⏳ Waiting {delay}s...")
+                    time.sleep(delay)
+                
+            except Exception as e:
+                failed_authors += 1
+                print(f"   ❌ Error: {str(e)}")
+                continue
+        
+        elapsed_time = time.time() - start_time
+        
+        # Close database
+        db_manager.disconnect()
+        
+        # Prepare result
+        result = {
+            'success': True,
+            'message': f'✅ Garuda scraping berhasil! {total_publications} publikasi dari {processed_authors} dosen',
+            'total_publications': total_publications,
+            'processed_authors': processed_authors,
+            'failed_authors': failed_authors,
+            'elapsed_time_minutes': round(elapsed_time/60, 2)
+        }
+        
+        print(f"\n📊 Summary:")
+        print(f"   - Total Publications: {total_publications}")
+        print(f"   - Processed Authors: {processed_authors}")
+        print(f"   - Failed Authors: {failed_authors}")
+        print(f"   - Time Taken: {elapsed_time/60:.2f} minutes")
+        
+        print_footer("SINTA GARUDA SCRAPING", success=True)
+        return result
+        
+    except ImportError as e:
+        error_msg = f"Failed to import sinta_garuda.py: {str(e)}"
+        print(f"\n❌ IMPORT ERROR: {error_msg}")
+        print(f"💡 Check if sinta_garuda.py exists in: {scrapers_dir}")
+        print_footer("SINTA GARUDA SCRAPING", success=False)
         
         return {
-            'success': True,
-            'message': '⚠️ Garuda scraping completed (STUB MODE - not real data)',
-            'total_publications': 0,
-            'note': 'This is a placeholder. Implement sinta_garuda.py for real scraping.'
+            'success': False,
+            'error': error_msg,
+            'traceback': traceback.format_exc(),
+            'hint': f'Place sinta_garuda.py in {scrapers_dir}'
         }
         
     except Exception as e:
-        import traceback
+        error_msg = str(e)
+        traceback_msg = traceback.format_exc()
+        
+        print(f"\n❌ SCRAPING FAILED: {error_msg}")
+        print(f"\n📋 Full Traceback:")
+        print(traceback_msg)
+        print_footer("SINTA GARUDA SCRAPING", success=False)
+        
         return {
             'success': False,
-            'error': str(e),
-            'traceback': traceback.format_exc()
+            'error': error_msg,
+            'traceback': traceback_msg
         }
+    
+    finally:
+        if 'db_manager' in locals():
+            try:
+                db_manager.disconnect()
+            except:
+                pass
+
+# ============================================================================
+# MODULE INFO
+# ============================================================================
+
+if __name__ == "__main__":
+    print("=" * 80)
+    print("SCRAPING TASKS MODULE")
+    print("=" * 80)
+    print("Available tasks:")
+    print("  1. scrape_sinta_dosen_task()")
+    print("  2. scrape_sinta_scopus_task()")
+    print("  3. scrape_sinta_googlescholar_task()")
+    print("  4. scrape_sinta_garuda_task()")
+    print("=" * 80)
+    print(f"Scrapers directory: {scrapers_dir}")
+    print(f"Database: {DB_CONFIG['dbname']}@{DB_CONFIG['host']}")
+    print("=" * 80)
