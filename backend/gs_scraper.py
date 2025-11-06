@@ -29,10 +29,10 @@ class GoogleScholarScraper:
     
     # Multi-account pool
     ACCOUNT_POOL = [
-        {"email": "6182101017@student.unpar.ac.id", "password": "618017SH"},
-        {"email": "6182101045@student.unpar.ac.id", "password": "618045CD"},
-        {"email": "6182101059@student.unpar.ac.id", "password": "618059SJ"},
-        {"email": "6182101063@student.unpar.ac.id", "password": "618063XJ"},
+        {"email": "xxxx@student.unpar.ac.id", "password": "xxxx"},
+        {"email": "xxxx@student.unpar.ac.id", "password": "xxxx"},
+        {"email": "xxxx@student.unpar.ac.id", "password": "xxxx"},
+        {"email": "xxxx@student.unpar.ac.id", "password": "xxxx"},
     ]
     
     def __init__(self, db_config, job_id=None, progress_callback=None, email=None, password=None):

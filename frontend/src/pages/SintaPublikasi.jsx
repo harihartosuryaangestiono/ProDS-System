@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Award, Calendar, ExternalLink } from 'lucide-react';
+import { FileText, Award, Calendar, ExternalLink, Building2 } from 'lucide-react';
 import apiService from '../services/apiService';
 import DataTable from '../components/DataTable';
 import { toast } from 'react-hot-toast';
@@ -20,6 +20,7 @@ const SintaPublikasi = () => {
     totalPublikasi: 0,
     totalSitasi: 0,
     avgSitasi: 0,
+    medianSitasi: 0,
     recentPublikasi: 0
   });
   const perPage = 20;
@@ -55,6 +56,63 @@ const SintaPublikasi = () => {
   const fetchAggregateStats = async () => {
     try {
       setStatsLoading(true);
+      
+      const params = { search: searchTerm };
+      
+      if (filterTipe !== 'all') {
+        params.tipe = filterTipe;
+      }
+      
+      if (yearStart) {
+        params.year_start = yearStart;
+      }
+      
+      if (yearEnd) {
+        params.year_end = yearEnd;
+      }
+      
+      const response = await apiService.getSintaPublikasiStats(params);
+
+      if (response.success) {
+        // Get recent publications count from full data
+        const fullParams = {
+          page: 1,
+          per_page: 10000,
+          search: searchTerm
+        };
+        
+        if (filterTipe !== 'all') fullParams.tipe = filterTipe;
+        if (yearStart) fullParams.year_start = yearStart;
+        if (yearEnd) fullParams.year_end = yearEnd;
+        
+        const fullResponse = await apiService.getSintaPublikasi(fullParams);
+        const allData = fullResponse.success ? (fullResponse.data.data || []) : [];
+        const recentPublikasi = allData.filter(pub => {
+          const year = parseInt(pub.v_tahun_publikasi);
+          return year >= currentYear - 2;
+        }).length;
+
+        setAggregateStats({
+          totalPublikasi: response.data.totalPublikasi || 0,
+          totalSitasi: response.data.totalSitasi || 0,
+          avgSitasi: response.data.avgSitasi || 0,
+          medianSitasi: response.data.medianSitasi || 0,
+          recentPublikasi
+        });
+      } else {
+        // Fallback to old method
+        await fetchAllDataForStats();
+      }
+    } catch (error) {
+      console.error('Error fetching aggregate stats:', error);
+      await fetchAllDataForStats();
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  const fetchAllDataForStats = async () => {
+    try {
       const params = {
         page: 1,
         per_page: 10000,
@@ -80,6 +138,12 @@ const SintaPublikasi = () => {
         const totalPublikasi = response.data.pagination?.total || allData.length;
         const totalSitasi = allData.reduce((sum, pub) => sum + (pub.n_total_sitasi || 0), 0);
         const avgSitasi = allData.length > 0 ? (totalSitasi / allData.length).toFixed(1) : 0;
+        
+        const sitasiValues = allData.map(p => p.n_total_sitasi || 0).sort((a, b) => a - b);
+        const medianSitasi = sitasiValues.length > 0 
+          ? sitasiValues[Math.floor(sitasiValues.length / 2)] 
+          : 0;
+        
         const recentPublikasi = allData.filter(pub => {
           const year = parseInt(pub.v_tahun_publikasi);
           return year >= currentYear - 2;
@@ -89,19 +153,12 @@ const SintaPublikasi = () => {
           totalPublikasi,
           totalSitasi,
           avgSitasi,
+          medianSitasi,
           recentPublikasi
         });
       }
     } catch (error) {
-      console.error('Error fetching aggregate stats:', error);
-      setAggregateStats({
-        totalPublikasi: 0,
-        totalSitasi: 0,
-        avgSitasi: 0,
-        recentPublikasi: 0
-      });
-    } finally {
-      setStatsLoading(false);
+      console.error('Error fetching all data for stats:', error);
     }
   };
 
@@ -198,6 +255,19 @@ const SintaPublikasi = () => {
       )
     },
     {
+      key: 'v_nama_jurusan',
+      title: 'Jurusan',
+      sortable: true,
+      render: (value) => (
+        <div className="max-w-xs">
+          <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-indigo-100 text-indigo-800">
+            <Building2 className="w-3 h-3 mr-1" />
+            {value || 'N/A'}
+          </span>
+        </div>
+      )
+    },
+    {
       key: 'v_judul',
       title: 'Judul Publikasi',
       render: (value) => (
@@ -255,7 +325,6 @@ const SintaPublikasi = () => {
       render: (value) => {
         if (!value || value.trim() === '') return <span className="text-gray-400">-</span>;
         
-        // Parse multiple indexing services (e.g., "Scopus, WoS")
         const indices = value.split(',').map(i => i.trim());
         
         return (
@@ -384,7 +453,7 @@ const SintaPublikasi = () => {
                 {typeof value === 'string' ? value : value.toLocaleString()}
               </p>
               {subtitle && (
-                <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+                <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
               )}
             </>
           )}
@@ -426,7 +495,7 @@ const SintaPublikasi = () => {
             value={aggregateStats.avgSitasi}
             icon={Award}
             color="#D97706"
-            subtitle="per publikasi"
+            subtitle={`Median: ${aggregateStats.medianSitasi}`}
             loading={statsLoading}
           />
           <StatCard
@@ -506,7 +575,7 @@ const SintaPublikasi = () => {
                       {year}
                     </option>
                   ))}
-                  </select>
+                </select>
               </div>
 
               {(yearStart || yearEnd || filterTipe !== 'all') && (

@@ -54,9 +54,9 @@ socketio = SocketIO(app,
 
 # Database configuration
 DB_CONFIG = {
-    'dbname': os.environ.get('DB_NAME', 'ProDSGabungan'),
-    'user': os.environ.get('DB_USER', 'postgres'),
-    'password': os.environ.get('DB_PASSWORD', 'password123'),
+    'dbname': os.environ.get('DB_NAME', 'SKM_PUBLIKASI'),
+    'user': os.environ.get('DB_USER', 'rayhanadjisantoso'),
+    'password': os.environ.get('DB_PASSWORD', 'rayhan123'),
     'host': os.environ.get('DB_HOST', 'localhost'),
     'port': os.environ.get('DB_PORT', '5432')
 }
@@ -171,14 +171,21 @@ def dashboard_stats(current_user_id):
         
         print(f"📊 Total unique publikasi: {total_publikasi}")
         
-        # Get total sitasi from latest dosen data only
+        # Get total sitasi and h-index statistics from latest dosen data only
         cur.execute(f"""
             {latest_dosen_cte}
-            SELECT COALESCE(SUM(n_total_sitasi_gs), 0) as total FROM latest_dosen
+            SELECT 
+                COALESCE(SUM(n_total_sitasi_gs), 0) as total_sitasi,
+                COALESCE(AVG(n_h_index_gs), 0) as avg_h_index,
+                COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY n_h_index_gs), 0) as median_h_index
+            FROM latest_dosen
         """)
-        total_sitasi = cur.fetchone()['total']
+        sitasi_stats = cur.fetchone()
+        total_sitasi = sitasi_stats['total_sitasi']
+        avg_h_index = sitasi_stats['avg_h_index']
+        median_h_index = sitasi_stats['median_h_index']
         
-        print(f"📊 Total sitasi from latest dosen: {total_sitasi}")
+        print(f"📊 Total sitasi: {total_sitasi}, Avg H-Index: {avg_h_index}, Median H-Index: {median_h_index}")
         
         # Get publikasi by year (10 tahun terakhir: 2015-2025) from latest publikasi data only
         current_year = datetime.now().year
@@ -244,6 +251,8 @@ def dashboard_stats(current_user_id):
             'total_dosen': total_dosen,
             'total_publikasi': total_publikasi,
             'total_sitasi': int(total_sitasi) if total_sitasi else 0,
+            'avg_h_index': float(avg_h_index) if avg_h_index else 0,
+            'median_h_index': float(median_h_index) if median_h_index else 0,
             'publikasi_by_year': publikasi_by_year,
             'top_authors': top_authors,
             'publikasi_by_type': publikasi_by_type,
@@ -321,17 +330,23 @@ def get_sinta_dosen(current_user_id):
         
         print(f"📊 Total unique SINTA dosen found: {total}")
         
-        # Get data from CTE
+        # Get data from CTE with separate GS and Scopus fields
         data_query = f"""
             {latest_dosen_cte}
             SELECT
                 d.v_id_dosen, d.v_nama_dosen, d.v_id_sinta, d.v_id_googleScholar,
-                d.n_total_publikasi, d.n_total_sitasi_gs, d.n_sitasi_scopus,
-                d.n_h_index_gs, d.n_i10_index_gs, d.n_skor_sinta, d.n_skor_sinta_3yr,
+                d.n_total_publikasi, 
+                d.n_sitasi_gs, 
+                d.n_sitasi_scopus,
+                d.n_h_index_gs_sinta, 
+                d.n_h_index_scopus,
+                d.n_i10_index_gs, 
+                d.n_skor_sinta, 
+                d.n_skor_sinta_3yr,
                 j.v_nama_jurusan, d.t_tanggal_unduh, d.v_link_url
             FROM latest_dosen d
             LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
-            ORDER BY (COALESCE(d.n_total_sitasi_gs, 0) + COALESCE(d.n_sitasi_scopus, 0)) DESC, d.t_tanggal_unduh DESC
+            ORDER BY (COALESCE(d.n_sitasi_gs, 0) + COALESCE(d.n_sitasi_scopus, 0)) DESC, d.t_tanggal_unduh DESC
             LIMIT %s OFFSET %s
         """
         params.extend([per_page, offset])
@@ -359,7 +374,6 @@ def get_sinta_dosen(current_user_id):
             cur.close()
         if conn:
             conn.close()
-
 
 @app.route('/api/sinta/dosen/stats', methods=['GET'])
 @token_required
@@ -398,13 +412,15 @@ def get_sinta_dosen_stats(current_user_id):
             )
         """
         
-        # Get aggregate statistics from CTE
+        # Get aggregate statistics from CTE with separate GS and Scopus
         stats_query = f"""
             {latest_dosen_cte}
             SELECT
                 COUNT(*) as total_dosen,
-                COALESCE(SUM(COALESCE(d.n_total_sitasi_gs, 0) + COALESCE(d.n_sitasi_scopus, 0)), 0) as total_sitasi,
-                COALESCE(AVG(d.n_h_index_gs), 0) as avg_h_index,
+                COALESCE(SUM(d.n_sitasi_gs), 0) as total_sitasi_gs,
+                COALESCE(SUM(d.n_sitasi_scopus), 0) as total_sitasi_scopus,
+                COALESCE(AVG(d.n_h_index_gs_sinta), 0) as avg_h_index,
+                COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY d.n_h_index_gs_sinta), 0) as median_h_index,
                 COALESCE(SUM(d.n_total_publikasi), 0) as total_publikasi
             FROM latest_dosen d
             LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
@@ -416,8 +432,10 @@ def get_sinta_dosen_stats(current_user_id):
         
         return jsonify({
             'totalDosen': stats['total_dosen'] or 0,
-            'totalSitasi': int(stats['total_sitasi']) if stats['total_sitasi'] else 0,
+            'totalSitasiGS': int(stats['total_sitasi_gs']) if stats['total_sitasi_gs'] else 0,
+            'totalSitasiScopus': int(stats['total_sitasi_scopus']) if stats['total_sitasi_scopus'] else 0,
             'avgHIndex': round(float(stats['avg_h_index']), 1) if stats['avg_h_index'] else 0,
+            'medianHIndex': round(float(stats['median_h_index']), 1) if stats['median_h_index'] else 0,
             'totalPublikasi': stats['total_publikasi'] or 0
         }), 200
         
@@ -480,9 +498,8 @@ def get_sinta_publikasi(current_user_id):
             params.append(int(year_end))
             print(f"🔍 Adding year_end filter: {year_end}")
         
-        # Expand search to include author, title, and publisher
+        # Expand search to include author, title, publisher, and jurusan
         if search:
-            # Search in both p.v_authors and aggregated dosen names
             where_clause += """ AND (
                 LOWER(p.v_judul) LIKE LOWER(%s) OR
                 LOWER(p.v_authors) LIKE LOWER(%s) OR
@@ -491,19 +508,19 @@ def get_sinta_publikasi(current_user_id):
                     SELECT 1 
                     FROM stg_publikasi_dosen_dt pd2
                     JOIN tmp_dosen_dt d2 ON pd2.v_id_dosen = d2.v_id_dosen
+                    LEFT JOIN stg_jurusan_mt j2 ON d2.v_id_jurusan = j2.v_id_jurusan
                     WHERE pd2.v_id_publikasi = p.v_id_publikasi
-                    AND LOWER(d2.v_nama_dosen) LIKE LOWER(%s)
+                    AND (LOWER(d2.v_nama_dosen) LIKE LOWER(%s) OR LOWER(j2.v_nama_jurusan) LIKE LOWER(%s))
                 )
             )"""
             search_param = f"%{search}%"
-            params.extend([search_param, search_param, search_param, search_param])
+            params.extend([search_param, search_param, search_param, search_param, search_param])
             print(f"🔍 Adding search filter: {search}")
         
         print(f"🗃️ WHERE clause: {where_clause}")
         print(f"🗃️ Params: {params}")
         
         # Create CTE to get only latest version of each publication (by title and year)
-        # Using DISTINCT ON to get the most recent record per unique publication
         latest_publikasi_cte = f"""
             WITH latest_publikasi AS (
                 SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
@@ -528,7 +545,7 @@ def get_sinta_publikasi(current_user_id):
         
         print(f"📊 Total unique records found: {total}")
         
-        # Get data from CTE - UPDATED: Tambahkan v_terindeks dan v_ranking
+        # Get data from CTE with jurusan
         data_query = f"""
             {latest_publikasi_cte}
             SELECT
@@ -537,6 +554,7 @@ def get_sinta_publikasi(current_user_id):
                     NULLIF(p.v_authors, ''),
                     STRING_AGG(DISTINCT d.v_nama_dosen, ', ')
                 ) AS authors,
+                STRING_AGG(DISTINCT ju.v_nama_jurusan, ', ') AS v_nama_jurusan,
                 p.v_judul,
                 p.v_jenis AS tipe,
                 p.v_tahun_publikasi,
@@ -563,6 +581,7 @@ def get_sinta_publikasi(current_user_id):
             LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
             LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
             LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
+            LEFT JOIN stg_jurusan_mt ju ON d.v_id_jurusan = ju.v_id_jurusan
             GROUP BY
                 p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
                 p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
@@ -649,6 +668,106 @@ def get_sinta_publikasi(current_user_id):
         if conn:
             conn.close()
 
+
+@app.route('/api/sinta/publikasi/stats', methods=['GET'])
+@token_required
+def get_sinta_publikasi_stats(current_user_id):
+    """Get SINTA publikasi aggregate statistics with median"""
+    conn = None
+    cur = None
+    
+    try:
+        search = request.args.get('search', '').strip()
+        tipe_filter = request.args.get('tipe', '').strip().lower()
+        year_start = request.args.get('year_start', '').strip()
+        year_end = request.args.get('year_end', '').strip()
+        
+        print(f"📊 SINTA Publikasi Stats - search: '{search}', tipe: '{tipe_filter}', year_start: '{year_start}', year_end: '{year_end}'")
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        # Build query - filter untuk SINTA
+        where_clause = "WHERE (p.v_sumber ILIKE %s OR p.v_sumber IS NULL)"
+        params = ['%SINTA%']
+        
+        if tipe_filter and tipe_filter != 'all':
+            where_clause += " AND LOWER(p.v_jenis) = %s"
+            params.append(tipe_filter)
+        
+        if year_start:
+            where_clause += " AND CAST(p.v_tahun_publikasi AS INTEGER) >= %s"
+            params.append(int(year_start))
+        
+        if year_end:
+            where_clause += " AND CAST(p.v_tahun_publikasi AS INTEGER) <= %s"
+            params.append(int(year_end))
+        
+        if search:
+            where_clause += """ AND (
+                LOWER(p.v_judul) LIKE LOWER(%s) OR
+                LOWER(p.v_authors) LIKE LOWER(%s) OR
+                LOWER(p.v_publisher) LIKE LOWER(%s) OR
+                EXISTS (
+                    SELECT 1 
+                    FROM stg_publikasi_dosen_dt pd2
+                    JOIN tmp_dosen_dt d2 ON pd2.v_id_dosen = d2.v_id_dosen
+                    LEFT JOIN stg_jurusan_mt j2 ON d2.v_id_jurusan = j2.v_id_jurusan
+                    WHERE pd2.v_id_publikasi = p.v_id_publikasi
+                    AND (LOWER(d2.v_nama_dosen) LIKE LOWER(%s) OR LOWER(j2.v_nama_jurusan) LIKE LOWER(%s))
+                )
+            )"""
+            search_param = f"%{search}%"
+            params.extend([search_param, search_param, search_param, search_param, search_param])
+        
+        # Create CTE for latest publikasi
+        latest_publikasi_cte = f"""
+            WITH latest_publikasi AS (
+                SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
+                    p.*
+                FROM stg_publikasi_tr p
+                {where_clause}
+                ORDER BY LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi, p.t_tanggal_unduh DESC NULLS LAST
+            )
+        """
+        
+        # Get aggregate statistics with median
+        stats_query = f"""
+            {latest_publikasi_cte}
+            SELECT
+                COUNT(*) as total_publikasi,
+                COALESCE(SUM(n_total_sitasi), 0) as total_sitasi,
+                COALESCE(AVG(n_total_sitasi), 0) as avg_sitasi,
+                COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY n_total_sitasi), 0) as median_sitasi
+            FROM latest_publikasi
+        """
+        cur.execute(stats_query, params)
+        stats = cur.fetchone()
+        
+        print(f"📊 Stats result: {stats}")
+        
+        return jsonify({
+            'totalPublikasi': stats['total_publikasi'] or 0,
+            'totalSitasi': int(stats['total_sitasi']) if stats['total_sitasi'] else 0,
+            'avgSitasi': round(float(stats['avg_sitasi']), 1) if stats['avg_sitasi'] else 0,
+            'medianSitasi': round(float(stats['median_sitasi']), 1) if stats['median_sitasi'] else 0
+        }), 200
+        
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print("❌ SINTA Publikasi stats error:\n", error_details)
+        logger.error(f"Get SINTA publikasi stats error: {e}\n{error_details}")
+        return jsonify({'error': 'Failed to fetch SINTA publikasi statistics'}), 500
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
 # Google Scholar Routes
 @app.route('/api/scholar/dosen', methods=['GET'])
 @token_required
@@ -707,14 +826,18 @@ def get_scholar_dosen(current_user_id):
         
         print(f"📊 Total unique Scholar dosen found: {total}")
         
-        # Get data from CTE
+        # Get data from CTE with jurusan and 2020 indices
         data_query = f"""
             {latest_dosen_cte}
             SELECT
                 d.v_id_dosen, d.v_nama_dosen, d.v_id_googleScholar,
-                d.n_total_publikasi, d.n_total_sitasi_gs, d.n_h_index_gs,
-                d.n_i10_index_gs, d.v_link_url, d.t_tanggal_unduh
+                d.n_total_publikasi, d.n_total_sitasi_gs, 
+                d.n_h_index_gs, d.n_h_index_gs2020,
+                d.n_i10_index_gs, d.n_i10_index_gs2020,
+                d.v_link_url, d.t_tanggal_unduh,
+                j.v_nama_jurusan
             FROM latest_dosen d
+            LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
             ORDER BY d.n_total_sitasi_gs DESC NULLS LAST, d.t_tanggal_unduh DESC
             LIMIT %s OFFSET %s
         """
@@ -743,7 +866,6 @@ def get_scholar_dosen(current_user_id):
             cur.close()
         if conn:
             conn.close()
-
 
 @app.route('/api/scholar/dosen/stats', methods=['GET'])
 @token_required
@@ -782,15 +904,18 @@ def get_scholar_dosen_stats(current_user_id):
             )
         """
         
-        # Get aggregate statistics from CTE
+        # Get aggregate statistics from CTE with median
         stats_query = f"""
             {latest_dosen_cte}
             SELECT
                 COUNT(*) as total_dosen,
                 COALESCE(SUM(d.n_total_sitasi_gs), 0) as total_sitasi,
                 COALESCE(AVG(d.n_h_index_gs), 0) as avg_h_index,
+                COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY d.n_h_index_gs), 0) as median_h_index,
                 COALESCE(SUM(d.n_total_publikasi), 0) as total_publikasi,
-                COALESCE(AVG(d.n_i10_index_gs), 0) as avg_i10_index
+                COALESCE(AVG(d.n_i10_index_gs), 0) as avg_i10_index,
+                COALESCE(AVG(d.n_h_index_gs2020), 0) as avg_h_index_2020,
+                COALESCE(AVG(d.n_i10_index_gs2020), 0) as avg_i10_index_2020
             FROM latest_dosen d
         """
         cur.execute(stats_query, params)
@@ -802,8 +927,11 @@ def get_scholar_dosen_stats(current_user_id):
             'totalDosen': stats['total_dosen'] or 0,
             'totalSitasi': int(stats['total_sitasi']) if stats['total_sitasi'] else 0,
             'avgHIndex': round(float(stats['avg_h_index']), 1) if stats['avg_h_index'] else 0,
+            'medianHIndex': round(float(stats['median_h_index']), 1) if stats['median_h_index'] else 0,
             'totalPublikasi': stats['total_publikasi'] or 0,
-            'avgI10Index': round(float(stats['avg_i10_index']), 1) if stats['avg_i10_index'] else 0
+            'avgI10Index': round(float(stats['avg_i10_index']), 1) if stats['avg_i10_index'] else 0,
+            'avgHIndex2020': round(float(stats['avg_h_index_2020']), 1) if stats['avg_h_index_2020'] else 0,
+            'avgI10Index2020': round(float(stats['avg_i10_index_2020']), 1) if stats['avg_i10_index_2020'] else 0
         }), 200
         
     except Exception as e:
@@ -865,22 +993,29 @@ def get_scholar_publikasi(current_user_id):
             params.append(int(year_end))
             print(f"🔍 Adding year_end filter: {year_end}")
         
-        # Expand search to include author, title, and publisher
+        # Expand search to include author, title, publisher, and jurusan
         if search:
             where_clause += """ AND (
                 LOWER(p.v_judul) LIKE LOWER(%s) OR
                 LOWER(p.v_authors) LIKE LOWER(%s) OR
-                LOWER(p.v_publisher) LIKE LOWER(%s)
+                LOWER(p.v_publisher) LIKE LOWER(%s) OR
+                EXISTS (
+                    SELECT 1 
+                    FROM stg_publikasi_dosen_dt pd2
+                    JOIN tmp_dosen_dt d2 ON pd2.v_id_dosen = d2.v_id_dosen
+                    LEFT JOIN stg_jurusan_mt j2 ON d2.v_id_jurusan = j2.v_id_jurusan
+                    WHERE pd2.v_id_publikasi = p.v_id_publikasi
+                    AND (LOWER(d2.v_nama_dosen) LIKE LOWER(%s) OR LOWER(j2.v_nama_jurusan) LIKE LOWER(%s))
+                )
             )"""
             search_param = f"%{search}%"
-            params.extend([search_param, search_param, search_param])
+            params.extend([search_param, search_param, search_param, search_param, search_param])
             print(f"🔍 Adding search filter: {search}")
         
         print(f"🗃️ WHERE clause: {where_clause}")
         print(f"🗃️ Params: {params}")
         
         # Create CTE to get only latest version of each publication (by title and year)
-        # Using DISTINCT ON to get the most recent record per unique publication
         latest_publikasi_cte = f"""
             WITH latest_publikasi AS (
                 SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
@@ -905,7 +1040,7 @@ def get_scholar_publikasi(current_user_id):
         
         print(f"📊 Total unique records found: {total}")
         
-        # Get data from CTE
+        # Get data from CTE with jurusan
         data_query = f"""
             {latest_publikasi_cte}
             SELECT
@@ -914,6 +1049,7 @@ def get_scholar_publikasi(current_user_id):
                     NULLIF(p.v_authors, ''),
                     STRING_AGG(DISTINCT d.v_nama_dosen, ', ')
                 ) AS authors,
+                STRING_AGG(DISTINCT ju.v_nama_jurusan, ', ') AS v_nama_jurusan,
                 p.v_judul,
                 p.v_jenis AS tipe,
                 p.v_tahun_publikasi,
@@ -938,6 +1074,7 @@ def get_scholar_publikasi(current_user_id):
             LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
             LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
             LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
+            LEFT JOIN stg_jurusan_mt ju ON d.v_id_jurusan = ju.v_id_jurusan
             GROUP BY
                 p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
                 p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
@@ -1020,6 +1157,106 @@ def get_scholar_publikasi(current_user_id):
             "error": "Failed to fetch Scholar publikasi data",
             "details": str(e)
         }), 500
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
+@app.route('/api/scholar/publikasi/stats', methods=['GET'])
+@token_required
+def get_scholar_publikasi_stats(current_user_id):
+    """Get Google Scholar publikasi aggregate statistics with median"""
+    conn = None
+    cur = None
+    
+    try:
+        search = request.args.get('search', '').strip()
+        tipe_filter = request.args.get('tipe', '').strip().lower()
+        year_start = request.args.get('year_start', '').strip()
+        year_end = request.args.get('year_end', '').strip()
+        
+        print(f"📊 Scholar Publikasi Stats - search: '{search}', tipe: '{tipe_filter}', year_start: '{year_start}', year_end: '{year_end}'")
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        # Build base query - filter untuk Google Scholar
+        where_clause = "WHERE p.v_sumber ILIKE %s"
+        params = ['%Scholar%']
+        
+        if tipe_filter and tipe_filter != 'all':
+            where_clause += " AND LOWER(p.v_jenis) = %s"
+            params.append(tipe_filter)
+        
+        if year_start:
+            where_clause += " AND CAST(p.v_tahun_publikasi AS INTEGER) >= %s"
+            params.append(int(year_start))
+        
+        if year_end:
+            where_clause += " AND CAST(p.v_tahun_publikasi AS INTEGER) <= %s"
+            params.append(int(year_end))
+        
+        if search:
+            where_clause += """ AND (
+                LOWER(p.v_judul) LIKE LOWER(%s) OR
+                LOWER(p.v_authors) LIKE LOWER(%s) OR
+                LOWER(p.v_publisher) LIKE LOWER(%s) OR
+                EXISTS (
+                    SELECT 1 
+                    FROM stg_publikasi_dosen_dt pd2
+                    JOIN tmp_dosen_dt d2 ON pd2.v_id_dosen = d2.v_id_dosen
+                    LEFT JOIN stg_jurusan_mt j2 ON d2.v_id_jurusan = j2.v_id_jurusan
+                    WHERE pd2.v_id_publikasi = p.v_id_publikasi
+                    AND (LOWER(d2.v_nama_dosen) LIKE LOWER(%s) OR LOWER(j2.v_nama_jurusan) LIKE LOWER(%s))
+                )
+            )"""
+            search_param = f"%{search}%"
+            params.extend([search_param, search_param, search_param, search_param, search_param])
+        
+        # Create CTE for latest publikasi
+        latest_publikasi_cte = f"""
+            WITH latest_publikasi AS (
+                SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
+                    p.*
+                FROM stg_publikasi_tr p
+                {where_clause}
+                ORDER BY LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi, p.t_tanggal_unduh DESC NULLS LAST
+            )
+        """
+        
+        # Get aggregate statistics with median
+        stats_query = f"""
+            {latest_publikasi_cte}
+            SELECT
+                COUNT(*) as total_publikasi,
+                COALESCE(SUM(n_total_sitasi), 0) as total_sitasi,
+                COALESCE(AVG(n_total_sitasi), 0) as avg_sitasi,
+                COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY n_total_sitasi), 0) as median_sitasi
+            FROM latest_publikasi
+        """
+        cur.execute(stats_query, params)
+        stats = cur.fetchone()
+        
+        print(f"📊 Stats result: {stats}")
+        
+        return jsonify({
+            'totalPublikasi': stats['total_publikasi'] or 0,
+            'totalSitasi': int(stats['total_sitasi']) if stats['total_sitasi'] else 0,
+            'avgSitasi': round(float(stats['avg_sitasi']), 1) if stats['avg_sitasi'] else 0,
+            'medianSitasi': round(float(stats['median_sitasi']), 1) if stats['median_sitasi'] else 0
+        }), 200
+        
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print("❌ Scholar Publikasi stats error:\n", error_details)
+        logger.error(f"Get Scholar publikasi stats error: {e}\n{error_details}")
+        return jsonify({'error': 'Failed to fetch Scholar publikasi statistics'}), 500
     finally:
         if cur:
             cur.close()
@@ -1323,6 +1560,6 @@ if __name__ == '__main__':
         app,
         debug=debug_mode,
         host='0.0.0.0',
-        port=int(os.environ.get('PORT', 5000)),
+        port=int(os.environ.get('PORT', 5002)),
         allow_unsafe_werkzeug=True
     )

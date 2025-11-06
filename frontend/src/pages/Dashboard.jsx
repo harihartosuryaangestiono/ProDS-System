@@ -8,6 +8,8 @@ const Dashboard = () => {
     total_dosen: 0,
     total_publikasi: 0,
     total_sitasi: 0,
+    avg_h_index: 0,
+    median_h_index: 0,
     publikasi_by_year: [],
     top_authors: []
   });
@@ -37,12 +39,15 @@ const Dashboard = () => {
   // Colors for charts
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
-  const StatCard = ({ title, value, icon: Icon, color, trend }) => (
+  const StatCard = ({ title, value, icon: Icon, color, trend, subtitle }) => (
     <div className="bg-white rounded-lg shadow-md p-6 border-l-4" style={{ borderColor: color }}>
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">{value.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-gray-900">{value}</p>
+          {subtitle && (
+            <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
+          )}
           {trend && (
             <p className="text-sm text-green-600 mt-1">
               <TrendingUp className="inline w-4 h-4 mr-1" />
@@ -87,25 +92,26 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Dosen"
-            value={stats.total_dosen}
+            value={stats.total_dosen.toLocaleString()}
             icon={Users}
             color="#3B82F6"
           />
           <StatCard
             title="Total Publikasi"
-            value={stats.total_publikasi}
+            value={stats.total_publikasi.toLocaleString()}
             icon={FileText}
             color="#10B981"
           />
           <StatCard
             title="Total Sitasi"
-            value={stats.total_sitasi}
+            value={stats.total_sitasi.toLocaleString()}
             icon={Award}
             color="#F59E0B"
           />
           <StatCard
             title="H-Index Rata-rata"
-            value={stats.total_dosen > 0 ? Math.round(stats.total_sitasi / stats.total_dosen * 0.1) : 0}
+            value={stats.avg_h_index ? stats.avg_h_index.toFixed(1) : '0.0'}
+            subtitle={`Median: ${stats.median_h_index ? stats.median_h_index.toFixed(1) : '0.0'}`}
             icon={TrendingUp}
             color="#EF4444"
           />

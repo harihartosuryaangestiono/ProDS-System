@@ -13,10 +13,12 @@ const SintaDosen = () => {
   const [pagination, setPagination] = useState(null);
   const [aggregateStats, setAggregateStats] = useState({
     totalDosen: 0,
-    totalSitasi: 0,
-    avgHIndex: 0
+    totalSitasiGS: 0,
+    totalSitasiScopus: 0,
+    avgHIndex: 0,
+    medianHIndex: 0
   });
-  const perPage = 2;
+  const perPage = 20;
 
   useEffect(() => {
     fetchDosenData();
@@ -34,24 +36,18 @@ const SintaDosen = () => {
       const response = await apiService.getSintaDosenStats({ search: searchTerm });
 
       if (response.success) {
-        // If backend provides stats endpoint
-        if (response.data.totalDosen !== undefined) {
-          setAggregateStats({
-            totalDosen: response.data.totalDosen || 0,
-            totalSitasi: response.data.totalSitasi || 0,
-            avgHIndex: response.data.avgHIndex || 0
-          });
-        } else {
-          // Fallback: fetch all data for calculation
-          await fetchAllDataForStats();
-        }
+        setAggregateStats({
+          totalDosen: response.data.totalDosen || 0,
+          totalSitasiGS: response.data.totalSitasiGS || 0,
+          totalSitasiScopus: response.data.totalSitasiScopus || 0,
+          avgHIndex: response.data.avgHIndex || 0,
+          medianHIndex: response.data.medianHIndex || 0
+        });
       } else {
-        // Fallback if stats endpoint doesn't exist
         await fetchAllDataForStats();
       }
     } catch (error) {
       console.error('Error fetching aggregate stats:', error);
-      // Fallback to fetching all data
       await fetchAllDataForStats();
     } finally {
       setStatsLoading(false);
@@ -72,21 +68,24 @@ const SintaDosen = () => {
         const allData = response.data.data || [];
         const totalDosen = response.data.pagination?.total || allData.length;
         
-        // Calculate total citations from both Google Scholar and Scopus
-        const totalSitasi = allData.reduce((sum, dosen) => {
-          const gsCitations = dosen.n_total_sitasi_gs || 0;
-          const scopusCitations = dosen.n_sitasi_scopus || 0;
-          return sum + gsCitations + scopusCitations;
-        }, 0);
+        const totalSitasiGS = allData.reduce((sum, dosen) => sum + (dosen.n_sitasi_gs || 0), 0);
+        const totalSitasiScopus = allData.reduce((sum, dosen) => sum + (dosen.n_sitasi_scopus || 0), 0);
+        
+        const hIndexValues = allData.map(d => d.n_h_index_gs_sinta || 0).filter(h => h > 0).sort((a, b) => a - b);
+        const medianHIndex = hIndexValues.length > 0 
+          ? hIndexValues[Math.floor(hIndexValues.length / 2)] 
+          : 0;
         
         const avgHIndex = allData.length > 0 
-          ? (allData.reduce((sum, dosen) => sum + (dosen.n_h_index_gs || 0), 0) / allData.length).toFixed(1) 
+          ? (allData.reduce((sum, dosen) => sum + (dosen.n_h_index_gs_sinta || 0), 0) / allData.length).toFixed(1) 
           : 0;
 
         setAggregateStats({
           totalDosen,
-          totalSitasi,
-          avgHIndex
+          totalSitasiGS,
+          totalSitasiScopus,
+          avgHIndex,
+          medianHIndex
         });
       }
     } catch (error) {
@@ -180,50 +179,49 @@ const SintaDosen = () => {
       )
     },
     {
-      key: 'n_total_sitasi_gs',
-      title: 'Sitasi',
-      type: 'number',
-      className: 'text-center',
-      cellClassName: 'text-center',
-      render: (value, row) => {
-        const gsCitations = value || 0;
-        const scopusCitations = row.n_sitasi_scopus || 0;
-        const totalCitations = gsCitations + scopusCitations;
-        
-        return (
-          <div className="text-center">
-            <span className="font-semibold text-green-600 block mb-1">
-              {totalCitations.toLocaleString()}
-            </span>
-            {(gsCitations > 0 || scopusCitations > 0) && (
-              <div className="text-xs text-gray-500">
-                {gsCitations > 0 && (
-                  <span title="Google Scholar" className="inline-block">
-                    GS: {gsCitations.toLocaleString()}
-                  </span>
-                )}
-                {gsCitations > 0 && scopusCitations > 0 && (
-                  <span className="mx-1">|</span>
-                )}
-                {scopusCitations > 0 && (
-                  <span title="Scopus" className="inline-block">
-                    Scopus: {scopusCitations.toLocaleString()}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-        );
-      }
-    },
-    {
-      key: 'n_h_index_gs',
-      title: 'H-Index',
+      key: 'n_sitasi_gs',
+      title: 'Sitasi GS',
       type: 'number',
       className: 'text-center',
       cellClassName: 'text-center',
       render: (value) => (
-        <span className="inline-flex items-center px-2 py-1 rounded text-sm font-medium bg-yellow-100 text-yellow-800">
+        <span className="text-sm font-semibold text-red-600">
+          {(value || 0).toLocaleString()}
+        </span>
+      )
+    },
+    {
+      key: 'n_sitasi_scopus',
+      title: 'Sitasi Scopus',
+      type: 'number',
+      className: 'text-center',
+      cellClassName: 'text-center',
+      render: (value) => (
+        <span className="text-sm font-semibold text-orange-600">
+          {(value || 0).toLocaleString()}
+        </span>
+      )
+    },
+    {
+      key: 'n_h_index_gs_sinta',
+      title: 'H-Index GS',
+      type: 'number',
+      className: 'text-center',
+      cellClassName: 'text-center',
+      render: (value) => (
+        <span className="inline-flex items-center px-2 py-1 rounded text-sm font-medium bg-red-100 text-red-800">
+          {value || 0}
+        </span>
+      )
+    },
+    {
+      key: 'n_h_index_scopus',
+      title: 'H-Index Scopus',
+      type: 'number',
+      className: 'text-center',
+      cellClassName: 'text-center',
+      render: (value) => (
+        <span className="inline-flex items-center px-2 py-1 rounded text-sm font-medium bg-orange-100 text-orange-800">
           {value || 0}
         </span>
       )
@@ -236,6 +234,18 @@ const SintaDosen = () => {
       cellClassName: 'text-center',
       render: (value) => (
         <span className="text-sm font-medium text-purple-600">
+          {(Number(value) || 0).toFixed(2)}
+        </span>
+      )
+    },
+    {
+      key: 'n_skor_sinta_3yr',
+      title: 'Skor SINTA 3 Thn',
+      type: 'number',
+      className: 'text-center',
+      cellClassName: 'text-center',
+      render: (value) => (
+        <span className="text-sm font-medium text-indigo-600">
           {(Number(value) || 0).toFixed(2)}
         </span>
       )
@@ -278,7 +288,7 @@ const SintaDosen = () => {
                 {typeof value === 'string' ? value : value.toLocaleString()}
               </p>
               {subtitle && (
-                <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+                <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
               )}
             </>
           )}
@@ -302,7 +312,7 @@ const SintaDosen = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <StatCard
             title="Total Dosen"
             value={aggregateStats.totalDosen}
@@ -311,26 +321,34 @@ const SintaDosen = () => {
             loading={statsLoading}
           />
           <StatCard
-            title="Total Sitasi"
-            value={aggregateStats.totalSitasi}
+            title="Sitasi Google Scholar"
+            value={aggregateStats.totalSitasiGS}
             icon={Award}
-            color="#10B981"
-            subtitle="Google Scholar + Scopus"
+            color="#EF4444"
+            subtitle="Total dari GS"
+            loading={statsLoading}
+          />
+          <StatCard
+            title="Sitasi Scopus"
+            value={aggregateStats.totalSitasiScopus}
+            icon={Award}
+            color="#F97316"
+            subtitle="Total dari Scopus"
             loading={statsLoading}
           />
           <StatCard
             title="Rata-rata H-Index"
             value={aggregateStats.avgHIndex}
             icon={TrendingUp}
-            color="#F59E0B"
-            subtitle="Keseluruhan"
+            color="#10B981"
+            subtitle={`Median: ${aggregateStats.medianHIndex}`}
             loading={statsLoading}
           />
           <StatCard
             title="Data Terbaru"
             value={dosenData.length > 0 ? new Date().toLocaleDateString('id-ID') : '-'}
             icon={Calendar}
-            color="#EF4444"
+            color="#8B5CF6"
             loading={false}
           />
         </div>

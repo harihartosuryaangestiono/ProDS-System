@@ -7127,3 +7127,358 @@ PL/pgSQL function update_updated_at_column() line 3 at assignment
 2025-11-05 07:55:11,111 - werkzeug - INFO - 127.0.0.1 - - [05/Nov/2025 07:55:11] "GET /api/dashboard/stats HTTP/1.1" 200 -
 2025-11-05 07:55:15,218 - werkzeug - INFO - 127.0.0.1 - - [05/Nov/2025 07:55:15] "GET /api/dashboard/stats HTTP/1.1" 200 -
 2025-11-05 07:55:15,631 - werkzeug - INFO - 127.0.0.1 - - [05/Nov/2025 07:55:15] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 10:26:53,591 - __main__ - ERROR - Database connection error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  role "postgres" does not exist
+
+2025-11-06 10:26:53,591 - __main__ - ERROR - Cannot initialize database - connection failed
+2025-11-06 10:26:53,591 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 10:26:53,591 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 10:26:53,591 - __main__ - INFO - Environment: development
+2025-11-06 10:29:32,246 - __main__ - ERROR - Database connection error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  role "postgres" does not exist
+
+2025-11-06 10:29:32,246 - __main__ - ERROR - Cannot initialize database - connection failed
+2025-11-06 10:29:32,246 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 10:29:32,246 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 10:29:32,246 - __main__ - INFO - Environment: development
+2025-11-06 10:29:32,276 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5002
+ * Running on http://10.101.64.222:5002
+2025-11-06 10:29:32,276 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-06 10:29:32,277 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 10:29:32,575 - __main__ - ERROR - Database connection error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  role "postgres" does not exist
+
+2025-11-06 10:29:32,575 - __main__ - ERROR - Cannot initialize database - connection failed
+2025-11-06 10:29:32,576 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 10:29:32,576 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 10:29:32,576 - __main__ - INFO - Environment: development
+2025-11-06 10:29:32,588 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 10:29:32,599 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 10:30:38,362 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-11-06 10:30:39,046 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 10:30:39,525 - __main__ - ERROR - Database connection error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  database "ProDSGabungan" does not exist
+
+2025-11-06 10:30:39,525 - __main__ - ERROR - Cannot initialize database - connection failed
+2025-11-06 10:30:39,526 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 10:30:39,526 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 10:30:39,526 - __main__ - INFO - Environment: development
+2025-11-06 10:30:39,543 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 10:30:39,551 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 10:30:43,529 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-11-06 10:30:43,652 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 10:30:43,959 - __main__ - ERROR - Database connection error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  database "ProDSGabungan" does not exist
+
+2025-11-06 10:30:43,959 - __main__ - ERROR - Cannot initialize database - connection failed
+2025-11-06 10:30:43,960 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 10:30:43,960 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 10:30:43,960 - __main__ - INFO - Environment: development
+2025-11-06 10:30:43,973 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 10:30:43,979 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 10:31:14,217 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-11-06 10:31:14,230 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-11-06 10:31:15,275 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 10:31:15,742 - __main__ - ERROR - Database connection error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  database "SKM_Publikasi" does not exist
+
+2025-11-06 10:31:15,742 - __main__ - ERROR - Cannot initialize database - connection failed
+2025-11-06 10:31:15,742 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 10:31:15,742 - __main__ - INFO - Database: SKM_Publikasi@localhost:5432
+2025-11-06 10:31:15,742 - __main__ - INFO - Environment: development
+2025-11-06 10:31:15,757 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 10:31:15,765 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 10:31:19,076 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-11-06 10:31:19,084 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-11-06 10:31:19,887 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 10:31:20,195 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 10:31:20,195 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 10:31:20,195 - __main__ - INFO - Environment: development
+2025-11-06 10:31:20,211 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 10:31:20,217 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 10:31:24,410 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 10:31:24,410 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 10:31:24,410 - __main__ - INFO - Environment: development
+2025-11-06 10:31:24,438 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5002
+ * Running on http://10.101.64.222:5002
+2025-11-06 10:31:24,438 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-06 10:31:24,438 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 10:31:24,747 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 10:31:24,747 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 10:31:24,747 - __main__ - INFO - Environment: development
+2025-11-06 10:31:24,766 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 10:31:24,773 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 10:34:38,185 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 10:34:38,185 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 10:34:38,185 - __main__ - INFO - Environment: development
+2025-11-06 10:34:38,216 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5002
+ * Running on http://10.101.64.222:5002
+2025-11-06 10:34:38,216 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-06 10:34:38,216 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 10:34:38,526 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 10:34:38,526 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 10:34:38,526 - __main__ - INFO - Environment: development
+2025-11-06 10:34:38,542 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 10:34:38,555 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 10:35:02,155 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:02] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 10:35:02,158 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:02] "[31m[1mGET /api/dashboard/stats HTTP/1.1[0m" 401 -
+2025-11-06 10:35:06,081 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:06] "OPTIONS /auth/login HTTP/1.1" 200 -
+2025-11-06 10:35:06,224 - routes.auth - INFO - User logged in: adji (ID: 1)
+2025-11-06 10:35:06,224 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:06] "POST /auth/login HTTP/1.1" 200 -
+2025-11-06 10:35:06,260 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:06] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 10:35:11,006 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:11] "OPTIONS /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-11-06 10:35:11,007 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:11] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:35:11,025 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:11] "GET /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-11-06 10:35:11,031 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:11] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:35:13,130 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:13] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 10:35:13,132 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:13] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:35:13,146 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:13] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:35:13,146 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:13] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 10:35:19,869 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:19] "OPTIONS /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-11-06 10:35:19,870 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:19] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:35:19,886 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:19] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:35:19,886 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:19] "GET /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-11-06 10:35:22,135 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:22] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 10:35:22,137 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:22] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:35:22,155 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:22] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:35:22,162 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:22] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 10:35:24,392 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:24] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:35:24,394 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:24] "GET /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-11-06 10:35:40,206 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:40] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 10:35:40,209 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:40] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:35:40,227 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:40] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:35:40,227 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:40] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 10:35:45,017 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:45] "OPTIONS /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-11-06 10:35:45,018 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:45] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:35:45,037 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:45] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:35:45,037 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:35:45] "GET /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-11-06 10:36:08,585 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:36:08] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 10:36:08,586 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:36:08] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 10:36:08,620 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:36:08] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 10:36:08,620 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:36:08] "GET /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 10:36:22,003 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:36:22] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 10:36:22,033 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:36:22] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 10:37:30,766 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:37:30] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 10:37:30,787 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:37:30] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 10:43:10,592 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-11-06 10:43:11,590 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 10:43:12,283 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 10:43:12,283 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 10:43:12,283 - __main__ - INFO - Environment: development
+2025-11-06 10:43:12,303 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 10:43:12,314 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 10:43:16,580 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-11-06 10:43:17,479 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 10:43:18,008 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 10:43:18,009 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 10:43:18,009 - __main__ - INFO - Environment: development
+2025-11-06 10:43:18,025 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 10:43:18,036 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 10:45:06,070 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 10:45:06,070 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 10:45:06,070 - __main__ - INFO - Environment: development
+2025-11-06 10:45:06,102 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5002
+ * Running on http://10.101.64.222:5002
+2025-11-06 10:45:06,102 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-06 10:45:06,103 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 10:45:06,431 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 10:45:06,431 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 10:45:06,431 - __main__ - INFO - Environment: development
+2025-11-06 10:45:06,447 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 10:45:06,496 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 10:45:11,558 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:11] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 10:45:11,588 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:11] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 10:45:25,580 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:25] "OPTIONS /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-11-06 10:45:25,581 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:25] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:45:25,600 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:25] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:45:25,601 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:25] "GET /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-11-06 10:45:29,500 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:29] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 10:45:29,501 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:29] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 10:45:29,521 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:29] "GET /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 10:45:29,521 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:29] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 10:45:35,805 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:35] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 10:45:35,807 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:35] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:45:35,818 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:35] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:45:35,819 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:35] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 10:45:38,755 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:38] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 10:45:38,756 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:38] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 10:45:38,777 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:38] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 10:45:38,782 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:38] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 10:45:49,283 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:49] "OPTIONS /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-11-06 10:45:49,284 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:49] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:45:49,303 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:49] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 10:45:49,304 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 10:45:49] "GET /api/sinta/dosen?page=1&perPage=2&search= HTTP/1.1" 200 -
+2025-11-06 11:00:24,904 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-11-06 11:00:25,834 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 11:00:26,490 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 11:00:26,490 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 11:00:26,490 - __main__ - INFO - Environment: development
+2025-11-06 11:00:26,517 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 11:00:26,524 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 11:00:31,383 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-11-06 11:00:31,658 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 11:00:32,127 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 11:00:32,127 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 11:00:32,127 - __main__ - INFO - Environment: development
+2025-11-06 11:00:32,146 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 11:00:32,155 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 11:00:52,368 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-11-06 11:00:53,343 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 11:00:53,797 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 11:00:53,797 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 11:00:53,797 - __main__ - INFO - Environment: development
+2025-11-06 11:00:53,814 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 11:00:53,821 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 11:01:14,442 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 11:01:14,442 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 11:01:14,442 - __main__ - INFO - Environment: development
+2025-11-06 11:01:14,471 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5002
+ * Running on http://10.101.64.222:5002
+2025-11-06 11:01:14,471 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-06 11:01:14,472 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 11:01:14,827 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 11:01:14,827 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 11:01:14,827 - __main__ - INFO - Environment: development
+2025-11-06 11:01:14,839 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 11:01:14,848 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 11:01:23,004 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:01:23] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 11:01:23,032 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:01:23] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 11:01:26,309 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:01:26] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 11:01:26,311 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:01:26] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 11:01:26,327 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:01:26] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 11:01:26,328 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:01:26] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 11:03:44,428 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:03:44] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 11:03:44,429 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:03:44] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 11:03:44,469 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:03:44] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 11:03:44,470 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:03:44] "GET /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 11:03:59,607 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:03:59] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 11:03:59,609 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:03:59] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 11:03:59,633 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:03:59] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 11:03:59,636 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:03:59] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 11:04:07,907 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:04:07] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 11:04:07,908 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:04:07] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 11:04:07,924 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:04:07] "GET /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 11:04:07,924 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:04:07] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 11:13:28,571 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:13:28] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 11:13:28,573 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:13:28] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 11:13:28,640 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:13:28] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 11:13:28,640 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:13:28] "GET /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 11:13:53,138 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-11-06 11:13:53,511 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 11:13:54,096 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 11:13:54,096 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 11:13:54,097 - __main__ - INFO - Environment: development
+2025-11-06 11:13:54,122 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 11:13:54,136 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 11:14:42,800 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:14:42] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 11:14:42,801 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:14:42] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 11:14:42,820 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:14:42] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 11:14:42,823 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:14:42] "GET /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 11:14:47,561 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:14:47] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 11:14:47,562 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:14:47] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 11:14:47,576 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:14:47] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 11:14:47,580 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:14:47] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 11:17:30,219 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-11-06 11:17:30,677 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 11:17:31,221 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 11:17:31,221 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 11:17:31,221 - __main__ - INFO - Environment: development
+2025-11-06 11:17:31,240 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 11:17:31,247 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 11:19:18,088 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:19:18] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 11:19:18,089 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:19:18] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 11:19:18,107 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:19:18] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 11:19:18,111 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:19:18] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 11:19:25,496 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:19:25] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 11:19:25,498 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:19:25] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 11:19:25,509 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:19:25] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 11:19:25,510 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:19:25] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 11:27:16,138 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-11-06 11:27:17,135 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 11:27:17,725 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 11:27:17,725 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 11:27:17,725 - __main__ - INFO - Environment: development
+2025-11-06 11:27:17,743 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 11:27:17,750 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 11:27:28,161 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-11-06 11:27:28,897 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 11:27:29,305 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 11:27:29,305 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 11:27:29,305 - __main__ - INFO - Environment: development
+2025-11-06 11:27:29,321 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 11:27:29,327 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 11:27:29,892 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:27:29] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 11:27:29,893 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:27:29] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 11:27:29,908 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:27:29] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 11:27:29,908 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:27:29] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 11:27:30,410 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:27:30] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 11:27:30,411 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:27:30] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 11:28:07,720 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:28:07] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 11:28:07,721 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:28:07] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 11:28:07,742 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:28:07] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 11:28:07,743 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:28:07] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 11:29:43,709 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:29:43] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 11:29:43,711 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:29:43] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 11:29:43,739 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:29:43] "GET /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 11:29:43,739 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:29:43] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 11:29:46,014 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:29:46] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 11:29:46,015 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:29:46] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 11:29:46,034 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:29:46] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 11:29:46,035 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:29:46] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 11:35:32,256 - werkzeug - INFO -  * Detected change in '/Users/rayhanadjisantoso/Desktop/ProDS-System v2/backend/app.py', reloading
+2025-11-06 11:35:32,344 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 11:35:32,872 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 11:35:32,872 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 11:35:32,872 - __main__ - INFO - Environment: development
+2025-11-06 11:35:32,887 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 11:35:32,895 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 11:35:42,655 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:35:42] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 11:35:42,656 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:35:42] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 11:35:42,677 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:35:42] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 11:35:42,677 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 11:35:42] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 13:48:09,949 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 13:48:09,950 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 13:48:09,950 - __main__ - INFO - Environment: development
+2025-11-06 13:48:10,236 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5002
+ * Running on http://192.168.8.107:5002
+2025-11-06 13:48:10,236 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-06 13:48:10,236 - werkzeug - INFO -  * Restarting with watchdog (fsevents)
+2025-11-06 13:48:10,560 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 13:48:10,560 - __main__ - INFO - Database: SKM_PUBLIKASI@localhost:5432
+2025-11-06 13:48:10,560 - __main__ - INFO - Environment: development
+2025-11-06 13:48:10,575 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 13:48:10,584 - werkzeug - INFO -  * Debugger PIN: 121-043-571
+2025-11-06 13:48:14,410 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:48:14] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 13:48:14,434 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:48:14] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 13:48:23,589 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:48:23] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 13:48:23,590 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:48:23] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 13:48:23,603 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:48:23] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 13:48:23,604 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:48:23] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 13:50:08,496 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:50:08] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 13:50:08,497 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:50:08] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 13:50:08,516 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:50:08] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 13:50:08,523 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:50:08] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 13:50:30,073 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:50:30] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 13:50:30,092 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:50:30] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 13:50:43,174 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:50:43] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 13:50:43,175 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:50:43] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 13:50:43,194 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:50:43] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 13:50:43,196 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:50:43] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 13:50:45,146 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:50:45] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 13:50:45,147 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:50:45] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 13:50:45,166 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:50:45] "GET /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 13:50:45,169 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:50:45] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 13:51:29,714 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:51:29] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 13:51:29,715 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:51:29] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 13:51:29,735 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:51:29] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 13:51:29,736 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:51:29] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 13:52:52,781 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:52:52] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 13:52:52,782 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:52:52] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 13:52:52,798 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:52:52] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 13:52:52,799 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:52:52] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -

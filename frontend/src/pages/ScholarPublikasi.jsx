@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Award, Calendar, ExternalLink } from 'lucide-react';
+import { FileText, Award, Calendar, ExternalLink, Building2 } from 'lucide-react';
 import apiService from '../services/apiService';
 import DataTable from '../components/DataTable';
 import { toast } from 'react-hot-toast';
@@ -20,6 +20,7 @@ const ScholarPublikasi = () => {
     totalPublikasi: 0,
     totalSitasi: 0,
     avgSitasi: 0,
+    medianSitasi: 0,
     recentPublikasi: 0
   });
   const perPage = 20;
@@ -33,7 +34,6 @@ const ScholarPublikasi = () => {
     { value: 'lainnya', label: 'Lainnya' }
   ];
 
-  // Generate year options (from 1990 to current year)
   const currentYear = new Date().getFullYear();
   const yearOptions = [];
   for (let year = currentYear; year >= 1990; year--) {
@@ -56,6 +56,65 @@ const ScholarPublikasi = () => {
   const fetchAggregateStats = async () => {
     try {
       setStatsLoading(true);
+      
+      const params = { search: searchTerm };
+      
+      if (filterTipe !== 'all') {
+        params.tipe = filterTipe;
+      }
+      
+      if (yearStart) {
+        params.year_start = yearStart;
+      }
+      
+      if (yearEnd) {
+        params.year_end = yearEnd;
+      }
+      
+      console.log('📊 Fetching aggregate stats with params:', params);
+      
+      const response = await apiService.getScholarPublikasiStats(params);
+
+      if (response.success) {
+        // Get recent publications count from full data
+        const fullParams = {
+          page: 1,
+          per_page: 10000,
+          search: searchTerm
+        };
+        
+        if (filterTipe !== 'all') fullParams.tipe = filterTipe;
+        if (yearStart) fullParams.year_start = yearStart;
+        if (yearEnd) fullParams.year_end = yearEnd;
+        
+        const fullResponse = await apiService.getScholarPublikasi(fullParams);
+        const allData = fullResponse.success ? (fullResponse.data.data || []) : [];
+        const recentPublikasi = allData.filter(pub => {
+          const year = parseInt(pub.v_tahun_publikasi);
+          return year >= currentYear - 2;
+        }).length;
+
+        setAggregateStats({
+          totalPublikasi: response.data.totalPublikasi || 0,
+          totalSitasi: response.data.totalSitasi || 0,
+          avgSitasi: response.data.avgSitasi || 0,
+          medianSitasi: response.data.medianSitasi || 0,
+          recentPublikasi
+        });
+      } else {
+        // Fallback to old method
+        await fetchAllDataForStats();
+      }
+    } catch (error) {
+      console.error('Error fetching aggregate stats:', error);
+      await fetchAllDataForStats();
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  const fetchAllDataForStats = async () => {
+    try {
       const params = {
         page: 1,
         per_page: 10000,
@@ -74,20 +133,19 @@ const ScholarPublikasi = () => {
         params.year_end = yearEnd;
       }
       
-      console.log('📊 Fetching aggregate stats with params:', params);
-      
       const response = await apiService.getScholarPublikasi(params);
-      
-      console.log('📊 Aggregate stats response:', {
-        totalRecords: response.data?.pagination?.total,
-        dataLength: response.data?.data?.length
-      });
 
       if (response.success) {
         const allData = response.data.data || [];
         const totalPublikasi = response.data.pagination?.total || allData.length;
         const totalSitasi = allData.reduce((sum, pub) => sum + (pub.n_total_sitasi || 0), 0);
         const avgSitasi = allData.length > 0 ? (totalSitasi / allData.length).toFixed(1) : 0;
+        
+        const sitasiValues = allData.map(p => p.n_total_sitasi || 0).sort((a, b) => a - b);
+        const medianSitasi = sitasiValues.length > 0 
+          ? sitasiValues[Math.floor(sitasiValues.length / 2)] 
+          : 0;
+        
         const recentPublikasi = allData.filter(pub => {
           const year = parseInt(pub.v_tahun_publikasi);
           return year >= currentYear - 2;
@@ -97,19 +155,12 @@ const ScholarPublikasi = () => {
           totalPublikasi,
           totalSitasi,
           avgSitasi,
+          medianSitasi,
           recentPublikasi
         });
       }
     } catch (error) {
-      console.error('Error fetching aggregate stats:', error);
-      setAggregateStats({
-        totalPublikasi: 0,
-        totalSitasi: 0,
-        avgSitasi: 0,
-        recentPublikasi: 0
-      });
-    } finally {
-      setStatsLoading(false);
+      console.error('Error fetching all data for stats:', error);
     }
   };
 
@@ -206,6 +257,19 @@ const ScholarPublikasi = () => {
           <p className="text-sm text-gray-900 truncate" title={value}>
             {value || 'N/A'}
           </p>
+        </div>
+      )
+    },
+    {
+      key: 'v_nama_jurusan',
+      title: 'Jurusan',
+      sortable: true,
+      render: (value) => (
+        <div className="max-w-xs">
+          <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800">
+            <Building2 className="w-3 h-3 mr-1" />
+            {value || 'N/A'}
+          </span>
         </div>
       )
     },
@@ -356,7 +420,7 @@ const ScholarPublikasi = () => {
                 {typeof value === 'string' ? value : value.toLocaleString()}
               </p>
               {subtitle && (
-                <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+                <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
               )}
             </>
           )}
@@ -380,7 +444,7 @@ const ScholarPublikasi = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <StatCard
-            title=" Publikasi"
+            title="Total Publikasi"
             value={aggregateStats.totalPublikasi}
             icon={FileText}
             color="#DC2626"
@@ -398,7 +462,7 @@ const ScholarPublikasi = () => {
             value={aggregateStats.avgSitasi}
             icon={Award}
             color="#D97706"
-            subtitle="per publikasi"
+            subtitle={`Median: ${aggregateStats.medianSitasi}`}
             loading={statsLoading}
           />
           <StatCard
