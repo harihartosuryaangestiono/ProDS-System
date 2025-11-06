@@ -63,8 +63,16 @@ class SintaDosenScraper:
             options.add_argument("--window-size=1920,1080")
             options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
             
+            # FIX: Force win64 architecture
+            from webdriver_manager.chrome import ChromeDriverManager
+            from webdriver_manager.core.os_manager import ChromeType
+            from selenium.webdriver.chrome.service import Service
+            
+            # Explicitly download win64 version
+            service = Service(ChromeDriverManager(chrome_type=ChromeType.GOOGLE).install())
+            
             self.driver = webdriver.Chrome(
-                service=Service(ChromeDriverManager().install()), 
+                service=service,
                 options=options
             )
             logger.info("WebDriver Chrome berhasil diinisialisasi")
@@ -711,7 +719,7 @@ if __name__ == '__main__':
     db_config = {
         'dbname': 'ProDSGabungan',  # Nama database baru
         'user': 'postgres',        
-        'password': 'hari123',    
+        'password': 'password123',    
         'host': 'localhost',            
         'port': '5432'                  
     }
@@ -724,8 +732,10 @@ if __name__ == '__main__':
         final_count = scraper.scrape_until_target_reached(
             affiliation_id='1397', 
             target_dosen=473,
-            max_pages=50,  # Maksimal 50 halaman per cycle
-            max_cycles=20  # Maksimal 20 cycle
+            # max_pages=50,  # Maksimal 50 halaman per cycle
+            # max_cycles=20  # Maksimal 20 cycle
+            max_pages=1,
+            max_cycles=1
         )
         
         # Tampilkan ringkasan hasil extraction

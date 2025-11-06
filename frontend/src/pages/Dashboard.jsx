@@ -8,6 +8,8 @@ const Dashboard = () => {
     total_dosen: 0,
     total_publikasi: 0,
     total_sitasi: 0,
+    avg_h_index: 0,
+    median_h_index: 0,
     publikasi_by_year: [],
     top_authors: []
   });
@@ -37,12 +39,15 @@ const Dashboard = () => {
   // Colors for charts
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
-  const StatCard = ({ title, value, icon: Icon, color, trend }) => (
+  const StatCard = ({ title, value, icon: Icon, color, trend, subtitle }) => (
     <div className="bg-white rounded-lg shadow-md p-6 border-l-4" style={{ borderColor: color }}>
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">{value.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-gray-900">{value}</p>
+          {subtitle && (
+            <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
+          )}
           {trend && (
             <p className="text-sm text-green-600 mt-1">
               <TrendingUp className="inline w-4 h-4 mr-1" />
@@ -65,6 +70,13 @@ const Dashboard = () => {
     );
   }
 
+  // Filter untuk 5 tahun terakhir
+  const currentYear = new Date().getFullYear();
+  const last5YearsData = stats.publikasi_by_year.filter(item => {
+    const year = parseInt(item.v_tahun_publikasi);
+    return year >= currentYear - 5 && year <= currentYear;
+  });
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -80,25 +92,26 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Dosen"
-            value={stats.total_dosen}
+            value={stats.total_dosen.toLocaleString()}
             icon={Users}
             color="#3B82F6"
           />
           <StatCard
             title="Total Publikasi"
-            value={stats.total_publikasi}
+            value={stats.total_publikasi.toLocaleString()}
             icon={FileText}
             color="#10B981"
           />
           <StatCard
             title="Total Sitasi"
-            value={stats.total_sitasi}
+            value={stats.total_sitasi.toLocaleString()}
             icon={Award}
             color="#F59E0B"
           />
           <StatCard
             title="H-Index Rata-rata"
-            value={stats.total_dosen > 0 ? Math.round(stats.total_sitasi / stats.total_dosen * 0.1) : 0}
+            value={stats.avg_h_index ? stats.avg_h_index.toFixed(1) : '0.0'}
+            subtitle={`Median: ${stats.median_h_index ? stats.median_h_index.toFixed(1) : '0.0'}`}
             icon={TrendingUp}
             color="#EF4444"
           />
@@ -106,11 +119,11 @@ const Dashboard = () => {
 
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Publications by Year Chart */}
+          {/* Publications by Year Chart - Menampilkan 10 tahun terakhir */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center mb-4">
               <Calendar className="w-5 h-5 text-blue-600 mr-2" />
-              <h2 className="text-lg font-semibold text-gray-900">Publikasi per Tahun</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Publikasi per Tahun (10 Tahun Terakhir)</h2>
             </div>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={stats.publikasi_by_year}>
@@ -119,7 +132,7 @@ const Dashboard = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="count" fill="#3B82F6" />
+                <Bar dataKey="count" fill="#3B82F6" name="Jumlah Publikasi" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -130,36 +143,54 @@ const Dashboard = () => {
               <Award className="w-5 h-5 text-green-600 mr-2" />
               <h2 className="text-lg font-semibold text-gray-900">Top 10 Dosen (Sitasi)</h2>
             </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={stats.top_authors.slice(0, 10)}
-                layout="horizontal"
-                margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis 
-                  dataKey="v_nama_dosen" 
-                  type="category" 
-                  width={100}
-                  tick={{ fontSize: 12 }}
-                />
-                <Tooltip />
-                <Bar dataKey="n_total_sitasi_gs" fill="#10B981" />
-              </BarChart>
-            </ResponsiveContainer>
+            {stats.top_authors && stats.top_authors.length > 0 ? (
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart
+                  data={stats.top_authors.slice(0, 10)}
+                  layout="vertical"
+                  margin={{ top: 5, right: 30, left: -50, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis 
+                    dataKey="v_nama_dosen" 
+                    type="category" 
+                    width={190}
+                    interval={0}
+                    tick={{ fontSize: 11 }}
+                    tickFormatter={(value) => value.length > 25 ? value.substring(0, 25) + '...' : value}
+                  />
+                  <Tooltip 
+                    formatter={(value) => value.toLocaleString()}
+                    labelFormatter={(label) => `Dosen: ${label}`}
+                  />
+                  <Legend />
+                  <Bar 
+                    dataKey="n_total_sitasi_gs" 
+                    fill="#10B981" 
+                    name="Total Sitasi"
+                    radius={[0, 8, 8, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-64 text-gray-400">
+                <p>Tidak ada data dosen</p>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Publication Types Distribution */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* PERBAIKAN: Filter 5 tahun terakhir dengan rentang tahun yang benar (2020-2025) */}
           <div className="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center mb-4">
               <BookOpen className="w-5 h-5 text-purple-600 mr-2" />
               <h2 className="text-lg font-semibold text-gray-900">Trend Publikasi (5 Tahun Terakhir)</h2>
             </div>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={stats.publikasi_by_year.slice(-5)}>
+              <LineChart data={last5YearsData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="v_tahun_publikasi" />
                 <YAxis />
@@ -171,6 +202,7 @@ const Dashboard = () => {
                   stroke="#8884d8" 
                   strokeWidth={3}
                   dot={{ r: 6 }}
+                  name="Jumlah Publikasi"
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -203,11 +235,29 @@ const Dashboard = () => {
 
               <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
                 <span className="text-sm font-medium text-gray-600">Tahun Paling Produktif</span>
-                <span className="text-lg font-bold text-red-600">
-                  {stats.publikasi_by_year.reduce((max, item) => 
-                    item.count > (max.count || 0) ? item : max, {}
-                  ).v_tahun_publikasi || '-'}
-                </span>
+                <div className="text-right">
+                  <span className="text-sm font-bold text-red-600 block">
+                    {(() => {
+                      if (!stats.publikasi_by_year || stats.publikasi_by_year.length === 0) return '-';
+                      
+                      const maxCount = Math.max(...stats.publikasi_by_year.map(item => item.count));
+                      if (maxCount === 0) return '-';
+                      
+                      const topYears = stats.publikasi_by_year
+                        .filter(item => item.count === maxCount)
+                        .map(item => item.v_tahun_publikasi)
+                        .sort();
+                      
+                      return topYears.join(', ');
+                    })()}
+                  </span>
+                  <span className="text-xs text-red-500">
+                    {(() => {
+                      const maxCount = Math.max(...stats.publikasi_by_year.map(item => item.count));
+                      return maxCount > 0 ? `(${maxCount} publikasi)` : '';
+                    })()}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -235,6 +285,9 @@ const Dashboard = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Total Sitasi
                   </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Sumber
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Persentase
                   </th>
@@ -258,6 +311,19 @@ const Dashboard = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {author.n_total_sitasi_gs?.toLocaleString() || 0}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      {author.v_sumber && author.v_sumber !== 'N/A' ? (
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          author.v_sumber.toLowerCase().includes('scholar') ? 'bg-red-100 text-red-800' :
+                          author.v_sumber.toLowerCase().includes('sinta') ? 'bg-indigo-100 text-indigo-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {author.v_sumber}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 text-xs">-</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {stats.total_sitasi > 0 ? 

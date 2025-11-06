@@ -7,37 +7,88 @@ import { toast } from 'react-hot-toast';
 const ScholarDosen = () => {
   const [dosenData, setDosenData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [statsLoading, setStatsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState(null);
+  const [stats, setStats] = useState({
+    totalDosen: 0,
+    totalPublikasi: 0,
+    totalSitasi: 0,
+    avgHIndex: 0,
+    medianHIndex: 0
+  });
   const perPage = 20;
 
   useEffect(() => {
     fetchDosenData();
   }, [currentPage, searchTerm]);
 
+  useEffect(() => {
+    fetchStats();
+  }, [searchTerm]);
+
   const fetchDosenData = async () => {
     try {
       setLoading(true);
-      const params = { page: currentPage, per_page: perPage, search: searchTerm };
+      
+      const params = {
+        page: currentPage,
+        perPage: perPage,
+        search: searchTerm
+      };
+      
       const response = await apiService.getScholarDosen(params);
 
       if (response.success) {
         setDosenData(response.data.data || []);
-        setPagination(response.data.pagination || {});
+        
+        const paginationData = response.data.pagination;
+        if (paginationData) {
+          setPagination({
+            currentPage: paginationData.page,
+            totalPages: paginationData.pages,
+            totalRecords: paginationData.total,
+            perPage: paginationData.per_page
+          });
+        } else {
+          setPagination(null);
+        }
       } else {
-        setError(response.error);
         toast.error('Gagal mengambil data dosen Google Scholar');
+        console.error('Error fetching Scholar dosen data:', response.error);
       }
     } catch (error) {
       console.error('Error fetching Scholar dosen data:', error);
-      setError(error.message);
       toast.error('Terjadi kesalahan saat mengambil data');
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchStats = async () => {
+    try {
+      setStatsLoading(true);
+      const params = searchTerm ? { search: searchTerm } : {};
+      const response = await apiService.getScholarDosenStats(params);
+
+      if (response.success) {
+        setStats({
+          totalDosen: response.data.totalDosen || 0,
+          totalPublikasi: response.data.totalPublikasi || 0,
+          totalSitasi: response.data.totalSitasi || 0,
+          avgHIndex: response.data.avgHIndex || 0,
+          medianHIndex: response.data.medianHIndex || 0
+        });
+      } else {
+        console.error('Error fetching Scholar dosen stats:', response.error);
+      }
+    } catch (error) {
+      console.error('Error fetching Scholar dosen stats:', error);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
 
   const handleSearchChange = (value) => {
     setSearchTerm(value);
@@ -68,8 +119,15 @@ const ScholarDosen = () => {
       )
     },
     {
+      key: 'v_nama_jurusan',
+      title: 'Jurusan',
+      render: (value) => (
+        <span className="text-sm text-gray-900">{value || 'N/A'}</span>
+      )
+    },
+    {
       key: 'n_total_publikasi',
-      title: 'Total Publikasi',
+      title: 'Publikasi',
       type: 'number',
       className: 'text-center',
       cellClassName: 'text-center',
@@ -81,7 +139,7 @@ const ScholarDosen = () => {
     },
     {
       key: 'n_total_sitasi_gs',
-      title: 'Total Sitasi',
+      title: 'Sitasi',
       type: 'number',
       className: 'text-center',
       cellClassName: 'text-center',
@@ -104,13 +162,37 @@ const ScholarDosen = () => {
       )
     },
     {
+      key: 'n_h_index_gs2020',
+      title: 'H-Index (2020)',
+      type: 'number',
+      className: 'text-center',
+      cellClassName: 'text-center',
+      render: (value) => (
+        <span className="inline-flex items-center px-2 py-1 rounded text-sm font-medium bg-amber-100 text-amber-800">
+          {value || 0}
+        </span>
+      )
+    },
+    {
       key: 'n_i10_index_gs',
       title: 'i10-Index',
       type: 'number',
       className: 'text-center',
       cellClassName: 'text-center',
       render: (value) => (
-        <span className="text-sm font-medium text-purple-600">
+        <span className="inline-flex items-center px-2 py-1 rounded text-sm font-medium bg-purple-100 text-purple-800">
+          {value || 0}
+        </span>
+      )
+    },
+    {
+      key: 'n_i10_index_gs2020',
+      title: 'i10-Index (2020)',
+      type: 'number',
+      className: 'text-center',
+      cellClassName: 'text-center',
+      render: (value) => (
+        <span className="inline-flex items-center px-2 py-1 rounded text-sm font-medium bg-violet-100 text-violet-800">
           {value || 0}
         </span>
       )
@@ -159,19 +241,22 @@ const ScholarDosen = () => {
     }
   ];
 
-  const totalDosen = pagination?.total || 0;
-  const totalSitasi = dosenData.reduce((sum, dosen) => sum + (dosen.n_total_sitasi_gs || 0), 0);
-  const totalPublikasi = dosenData.reduce((sum, dosen) => sum + (dosen.n_total_publikasi || 0), 0);
-  const avgHIndex = dosenData.length > 0 ? (dosenData.reduce((sum, dosen) => sum + (dosen.n_h_index_gs || 0), 0) / dosenData.length).toFixed(1) : 0;
-
-  const StatCard = ({ title, value, icon: Icon, color, subtitle }) => (
+  const StatCard = ({ title, value, icon: Icon, color, subtitle, loading }) => (
     <div className="bg-white rounded-lg shadow-md p-6 border-l-4" style={{ borderColor: color }}>
       <div className="flex items-center justify-between">
-        <div>
+        <div className="flex-1">
           <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
-          {subtitle && (
-            <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+          {loading ? (
+            <div className="mt-2 h-8 w-24 bg-gray-200 animate-pulse rounded"></div>
+          ) : (
+            <>
+              <p className="text-2xl font-bold text-gray-900">
+                {typeof value === 'string' ? value : value.toLocaleString()}
+              </p>
+              {subtitle && (
+                <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
+              )}
+            </>
           )}
         </div>
         <div className="p-3 rounded-full" style={{ backgroundColor: `${color}20` }}>
@@ -193,31 +278,35 @@ const ScholarDosen = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Dosen"
-            value={totalDosen.toLocaleString()}
+            value={stats.totalDosen}
             icon={Users}
             color="#DC2626"
+            loading={statsLoading}
           />
           <StatCard
             title="Total Publikasi"
-            value={totalPublikasi.toLocaleString()}
+            value={stats.totalPublikasi}
             icon={TrendingUp}
             color="#059669"
+            loading={statsLoading}
           />
           <StatCard
             title="Total Sitasi"
-            value={totalSitasi.toLocaleString()}
+            value={stats.totalSitasi}
             icon={Award}
             color="#D97706"
+            loading={statsLoading}
           />
           <StatCard
             title="Rata-rata H-Index"
-            value={avgHIndex}
+            value={stats.avgHIndex}
             icon={Award}
             color="#7C3AED"
-            subtitle="Google Scholar"
+            subtitle={`Median: ${stats.medianHIndex}`}
+            loading={statsLoading}
           />
         </div>
 

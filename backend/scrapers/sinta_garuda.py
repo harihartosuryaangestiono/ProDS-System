@@ -4,6 +4,9 @@ SINTA Garuda Publications Scraper - Fixed for Existing Database Schema
 Created on Tue May 20 07:40:01 2025
 
 @author: harih
+
+Perbaikan: Menambahkan selector CSS yang lebih beragam untuk scraping nama jurnal 
+dan menambahkan logging untuk debugging jika nama jurnal tidak ditemukan.
 """
 
 import requests
@@ -298,15 +301,24 @@ class SintaGarudaScraper:
         self.db = db_manager
 
     def login(self, username, password):
-        """Login to SINTA before scraping"""
+        """Login to SINTA before scraping - tries multiple endpoints"""
         self.username = username
         self.password = password
-            
-        # Try the general login endpoint
-        if self._try_login("https://sinta.kemdikbud.go.id/logins"):
-            return True
-            
-        logger.error("All login attempts failed")
+        
+        # Try multiple login URLs (SINTA has different domains)
+        login_urls = [
+            "https://sinta.kemdikbud.go.id/logins",
+            "https://sinta.kemdiktisaintek.go.id/logins",
+            "https://sinta.ristekdikti.go.id/logins"
+        ]
+        
+        for url in login_urls:
+            logger.info(f"Trying login URL: {url}")
+            if self._try_login(url):
+                logger.info(f"✅ Login successful with URL: {url}")
+                return True
+        
+        logger.error("❌ All login URLs failed")
         return False
         
     def _try_login(self, login_url):
@@ -569,15 +581,32 @@ class SintaGarudaScraper:
                     year = datetime.now().year
                     logger.warning(f"Could not extract year for publication '{title[:50]}...', using current year")
                 
-                # Extract journal name if available
-                journal_selectors = ['.journal-name', '.ar-journal', '.pub-journal']
+                # --- PERBAIKAN ---
+                # Menambahkan lebih banyak kemungkinan selector untuk nama jurnal.
+                # Anda mungkin perlu memeriksa halaman SINTA (Inspect Element) untuk menemukan selector yang paling akurat.
+                journal_selectors = [
+                    '.journal-name', 
+                    '.ar-journal', 
+                    '.pub-journal',
+                    'div.ar-detail > a',      # Selector jika jurnal adalah link di dalam detail
+                    'span.journal-title',     # Kemungkinan selector lain
+                    'div.publication-source'  # Kemungkinan selector lain
+                ]
                 journal_name = None
                 for selector in journal_selectors:
                     journal_elem = item.select_one(selector)
                     if journal_elem:
                         journal_name = self.extract_clean_text(journal_elem)
+                        # Hapus teks yang tidak perlu jika ada (misal: "Journal: Jurnal ABC")
+                        if journal_name and ':' in journal_name:
+                            journal_name = journal_name.split(':')[-1].strip()
                         break
                 
+                # --- PERBAIKAN ---
+                # Tambahkan log peringatan jika nama jurnal tidak berhasil ditemukan
+                if not journal_name or journal_name == "N/A":
+                    logger.warning(f"Nama jurnal tidak ditemukan untuk publikasi: '{title[:50]}...'")
+
                 # Extract journal details (volume, issue, pages)
                 volume = issue = pages = terindeks = ranking = None
                 
@@ -809,7 +838,7 @@ def main():
     print("Database Configuration:")
     dbname = input("Database name (default: ProDSGabungan): ").strip() or "ProDSGabungan"
     user = input("Database user (default: postgres): ").strip() or "postgres"
-    password = input("Database password: ").strip() or "hari123"
+    password = input("Database password: ").strip() or "password123"
     host = input("Database host (default: localhost): ").strip() or "localhost"
     port = input("Database port (default: 5432): ").strip() or "5432"
     

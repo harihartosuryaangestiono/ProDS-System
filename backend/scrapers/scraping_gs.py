@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Combined Google Scholar Scraper with PostgreSQL Database Import
+Combined Google Scholar Scraper with PostgreSQL Database Import and Auto-Login
 Created on Wed Sep 24 12:18:02 2025
 @author: rayhanadjisantoso
 """
@@ -27,17 +27,59 @@ import psycopg2
 from psycopg2 import sql
 import os
 
-# Database connection parameters - update these with your PostgreSQL credentials
+# Database connection parameters
 DB_PARAMS = {
-    'dbname': 'SKM_PUBLIKASI',  # Adjust this to your actual database name
-    'user': 'rayhanadjisantoso',         # Update with your username
-    'password': 'rayhan123',             # Update with your password
+    'dbname': 'SKM_PUBLIKASI',
+    'user': 'rayhanadjisantoso',
+    'password': 'rayhan123',
     'host': 'localhost',
     'port': '5432'
 }
 
-# ... (Semua fungsi dari setup_driver() hingga import_publications_data() tetap sama) ...
-# ... (Untuk keringkasan, fungsi-fungsi ini tidak ditampilkan, tetapi tetap ada di file Anda)
+# Multi-account pool for login rotation
+ACCOUNT_POOL = [
+    {"email": "xxxx@student.unpar.ac.id", "password": "xxxx"},
+    {"email": "xxxx@student.unpar.ac.id", "password": "xxxx"},
+    {"email": "xxxx@student.unpar.ac.id", "password": "xxxx"},
+    {"email": "xxxx@student.unpar.ac.id", "password": "xxxx"},
+]
+
+# Global variables for account management
+current_account_index = 0
+failed_accounts = set()
+restart_count = 0
+max_restarts = 3
+
+def get_next_account():
+    """Get next available account that hasn't failed (random selection)"""
+    global current_account_index, failed_accounts
+    
+    # Get list of indices that haven't failed
+    available_indices = [i for i in range(len(ACCOUNT_POOL)) if i not in failed_accounts]
+    
+    if not available_indices:
+        # All accounts have failed
+        return None, None
+    
+    # Random selection from available accounts
+    selected_index = random.choice(available_indices)
+    account = ACCOUNT_POOL[selected_index]
+    
+    return account, selected_index
+
+def mark_account_failed(account_index):
+    """Mark an account as failed (hit CAPTCHA)"""
+    global failed_accounts
+    failed_accounts.add(account_index)
+    print(f"⚠️  Account {account_index + 1} ({ACCOUNT_POOL[account_index]['email']}) marked as failed (CAPTCHA detected)")
+    print(f"   Failed accounts: {len(failed_accounts)}/{len(ACCOUNT_POOL)}")
+
+def reset_failed_accounts():
+    """Reset failed accounts (for retry after all failed)"""
+    global failed_accounts, current_account_index
+    failed_accounts.clear()
+    print("♻️  All accounts reset for new attempt")
+
 def setup_driver():
     """Setup dan mengembalikan WebDriver dengan konfigurasi yang sesuai"""
     chrome_options = Options()
@@ -70,7 +112,7 @@ def setup_driver():
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option('useAutomationExtension', False)
     
-    # Menambahkan prefs untuk menghindari notifikasi dan menghemat resource
+    # Menambahkan prefs
     prefs = {
         "profile.default_content_setting_values.notifications": 2,
         "profile.default_content_settings.popups": 0,
@@ -81,73 +123,312 @@ def setup_driver():
     }
     chrome_options.add_experimental_option("prefs", prefs)
     
-    # Gunakan ChromeDriverManager untuk mendapatkan driver yang sesuai
+    # Gunakan ChromeDriverManager
     try:
         service = Service(ChromeDriverManager().install())
+        
+        # For macOS: Remove quarantine attribute if needed
+        import platform
+        import subprocess
+        if platform.system() == 'Darwin':  # macOS
+            driver_path = service.path
+            try:
+                # Remove quarantine attribute
+                subprocess.run(['xattr', '-d', 'com.apple.quarantine', driver_path], 
+                             capture_output=True, check=False)
+                # Set executable permission
+                subprocess.run(['chmod', '+x', driver_path], 
+                             capture_output=True, check=False)
+                print(f"✓ Fixed ChromeDriver permissions for macOS")
+            except Exception as perm_error:
+                print(f"Warning: Could not fix permissions: {perm_error}")
+        
         driver = webdriver.Chrome(service=service, options=chrome_options)
+        
     except Exception as e:
         print(f"Error saat membuat driver: {e}")
+        print("Trying alternative method...")
+        
         try:
             driver = webdriver.Chrome(options=chrome_options)
         except Exception as e2:
             print(f"Error alternatif saat membuat driver: {e2}")
-            raise
+            
+            # Last resort: try to find chromedriver manually
+            try:
+                import shutil
+                chromedriver_path = shutil.which('chromedriver')
+                if chromedriver_path:
+                    service = Service(chromedriver_path)
+                    driver = webdriver.Chrome(service=service, options=chrome_options)
+                else:
+                    raise Exception("ChromeDriver not found in system PATH")
+            except Exception as e3:
+                print(f"All methods failed: {e3}")
+                raise
     
-    # Hapus properti webdriver untuk menghindari deteksi
+    # Hapus properti webdriver
     try:
         driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
     except Exception as e:
         print(f"Warning: Tidak dapat menyembunyikan webdriver: {e}")
     
-    # Set timeouts yang lebih panjang
+    # Set timeouts
     driver.set_page_load_timeout(120)
     driver.implicitly_wait(30)
     
-    # Tambahkan cookies untuk Google Scholar
-    try:
-        driver.get("https://scholar.google.com")
-        time.sleep(5)
-        
-        cookies = [
-            {'name': 'GSP', 'value': 'ID=1234567890abcdef:CF=4', 'domain': '.google.com'},
-            {'name': 'NID', 'value': '511=abcdefghijklmnopqrstuvwxyz1234567890', 'domain': '.google.com'},
-            {'name': 'CONSENT', 'value': 'PENDING+999', 'domain': '.google.com'},
-            {'name': '1P_JAR', 'value': '2024-01-01-00', 'domain': '.google.com'}
-        ]
-        
-        for cookie in cookies:
-            try:
-                driver.add_cookie(cookie)
-            except Exception as e:
-                print(f"Warning: Could not add cookie {cookie['name']}: {e}")
-    except Exception as e:
-        print(f"Warning: Tidak dapat menambahkan cookies: {e}")
-    
     return driver
 
-def setup_driver_with_manual_login():
-    """Setup driver dengan login manual untuk menghindari CAPTCHA"""
+def check_if_logged_in(driver):
+    """Check if successfully logged in to Google Scholar"""
+    try:
+        time.sleep(3)
+        
+        try:
+            driver.find_element(By.ID, "gs_hdr_act_s")
+            return False
+        except NoSuchElementException:
+            try:
+                profile_element = driver.find_element(By.CSS_SELECTOR, '#gs_gb_rt a')
+                return True
+            except:
+                pass
+            
+            current_url = driver.current_url
+            if 'scholar.google.com' in current_url and 'accounts.google.com' not in current_url:
+                return True
+        
+        return False
+        
+    except Exception as e:
+        print(f"Error checking login status: {e}")
+        return False
+
+def perform_auto_login(driver):
+    """Perform automatic login to Google Scholar through SSO with account rotation"""
+    global restart_count, max_restarts
+    
+    # Start with first account
+    account, idx = get_next_account()
+    if account:
+        email = account['email']
+        password = account['password']
+        current_account_index = idx
+    else:
+        raise Exception("No accounts available")
+    
+    while restart_count < max_restarts:
+        # Try login with available accounts
+        while True:
+            # Check if all accounts failed
+            if len(failed_accounts) >= len(ACCOUNT_POOL):
+                print(f"\n⚠️  All {len(ACCOUNT_POOL)} accounts have failed!")
+                restart_count += 1
+                
+                if restart_count >= max_restarts:
+                    raise Exception(f"Login failed after {max_restarts} complete restarts. All accounts hit CAPTCHA.")
+                
+                # Delay 2-5 minutes before restart
+                delay = random.uniform(120, 300)
+                print(f"\n🔄 Restart attempt {restart_count}/{max_restarts}")
+                print(f"⏳ Waiting {delay/60:.1f} minutes before restarting from Step 1...")
+                time.sleep(delay)
+                
+                # Reset all accounts and close driver
+                reset_failed_accounts()
+                try:
+                    driver.quit()
+                except:
+                    pass
+                
+                # Setup new driver
+                driver = setup_driver()
+                
+                # Select random account for restart
+                account, idx = get_next_account()
+                if account:
+                    email = account['email']
+                    password = account['password']
+                    current_account_index = idx
+                    print(f"\n🔄 Restarting with random account: {email}")
+                break
+            
+            # Get next available account
+            account, idx = get_next_account()
+            if not account:
+                # This shouldn't happen, but just in case
+                break
+            
+            email = account['email']
+            password = account['password']
+            current_account_index = idx
+            
+            print(f"\n🔐 Attempting login with account {idx + 1}: {email}")
+            
+            try:
+                # Step 1: Open Google Scholar
+                print("Step 1: Opening https://scholar.google.com/")
+                driver.get("https://scholar.google.com/")
+                time.sleep(random.uniform(3, 5))
+                
+                # Step 2: Click Login button
+                print("Step 2: Clicking Login button")
+                try:
+                    login_button = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.ID, "gs_hdr_act_s"))
+                    )
+                    login_button.click()
+                    time.sleep(random.uniform(3, 5))
+                except Exception as e:
+                    print(f"Could not find login button: {e}")
+                    if check_if_logged_in(driver):
+                        print("✓ Already logged in!")
+                        return driver
+                    raise
+                
+                # Step 3: Enter email on Google login page
+                print("Step 3: Entering email on Google login page")
+                
+                email_input = WebDriverWait(driver, 15).until(
+                    EC.presence_of_element_located((By.ID, "identifierId"))
+                )
+                
+                # Human-like behavior: wait before typing
+                time.sleep(random.uniform(1.5, 2.5))
+                
+                email_input.clear()
+                time.sleep(random.uniform(0.3, 0.7))
+                
+                # Type email character by character with random delays
+                for char in email:
+                    email_input.send_keys(char)
+                    time.sleep(random.uniform(0.05, 0.15))
+                
+                time.sleep(random.uniform(1, 2))
+                
+                # Step 4: Click Next button (Google)
+                print("Step 4: Clicking Next button")
+                
+                next_button = WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Selanjutnya')]"))
+                )
+                next_button.click()
+                time.sleep(random.uniform(5, 10))
+                
+                # Step 5: Check for CAPTCHA
+                print("Step 5: Checking for CAPTCHA")
+                
+                try:
+                    captcha = driver.find_element(By.ID, "captchaimg")
+                    if captcha.is_displayed():
+                        print(f"⚠️  CAPTCHA detected for account {idx + 1}!")
+                        mark_account_failed(idx)
+                        
+                        # Continue to try next account
+                        continue
+                except NoSuchElementException:
+                    print("✓ No CAPTCHA detected, continuing...")
+                
+                # Step 6: Enter email on SSO page
+                print("Step 6: Entering email on UNPAR SSO page")
+                
+                sso_email_input = WebDriverWait(driver, 15).until(
+                    EC.presence_of_element_located((By.ID, "username"))
+                )
+                
+                # Human-like behavior
+                time.sleep(random.uniform(1, 2))
+                
+                sso_email_input.clear()
+                time.sleep(random.uniform(0.3, 0.7))
+                
+                # Type email character by character
+                for char in email:
+                    sso_email_input.send_keys(char)
+                    time.sleep(random.uniform(0.05, 0.15))
+                
+                time.sleep(random.uniform(0.8, 1.5))
+                
+                # Step 7: Click Next on SSO
+                print("Step 7: Clicking Next button on SSO")
+                
+                sso_next_button = WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((By.ID, "next_login"))
+                )
+                sso_next_button.click()
+                time.sleep(random.uniform(2, 4))
+                
+                # Step 8: Enter password
+                print("Step 8: Entering password")
+                
+                password_input = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.ID, "password"))
+                )
+                
+                # Human-like behavior
+                time.sleep(random.uniform(1, 2))
+                
+                password_input.clear()
+                time.sleep(random.uniform(0.3, 0.7))
+                
+                # Type password character by character
+                for char in password:
+                    password_input.send_keys(char)
+                    time.sleep(random.uniform(0.05, 0.15))
+                
+                time.sleep(random.uniform(0.8, 1.5))
+                
+                # Step 9: Click Login button
+                print("Step 9: Clicking Login button")
+                
+                login_submit = WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((By.CSS_SELECTOR, "button.login__submit2"))
+                )
+                login_submit.click()
+                time.sleep(random.uniform(4, 6))
+                
+                # Step 10: Click Continue on confirmation page
+                print("Step 10: Clicking Continue button")
+                
+                try:
+                    continue_button = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Lanjutkan')]"))
+                    )
+                    continue_button.click()
+                    time.sleep(random.uniform(4, 6))
+                except TimeoutException:
+                    print("Continue button not found or already passed")
+                
+                # Verify login success
+                print("Verifying login success...")
+                
+                if check_if_logged_in(driver):
+                    print(f"✓ Login successful with {email}!")
+                    return driver
+                else:
+                    raise Exception("Login verification failed")
+                
+            except Exception as e:
+                print(f"Error during login with account {idx + 1}: {e}")
+                mark_account_failed(idx)
+                continue
+    
+    # If we've exhausted all restarts
+    raise Exception(f"Login failed after {max_restarts} complete restarts. Unable to bypass CAPTCHA.")
+
+def setup_driver_with_auto_login():
+    """Setup driver dan lakukan login otomatis"""
     driver = setup_driver()
     
     try:
-        driver.get("https://scholar.google.com")
-        
-        print("\n" + "="*50)
-        print("SILAKAN LOGIN KE GOOGLE SCHOLAR SECARA MANUAL")
-        print("Setelah login berhasil, tekan Enter untuk melanjutkan")
-        print("="*50 + "\n")
-        
-        input("Tekan Enter setelah login selesai...")
-        
-        print("Memverifikasi login...")
-        time.sleep(3)
-        
-        cookies = driver.get_cookies()
-        print(f"Berhasil mendapatkan {len(cookies)} cookies")
-        
-        return driver
+        driver = perform_auto_login(driver)
+        if driver:
+            print("✓ Driver ready with successful login")
+            return driver
+        else:
+            raise Exception("Auto-login failed")
     except Exception as e:
-        print(f"Error saat setup driver dengan login manual: {e}")
+        print(f"Error during setup with auto-login: {e}")
         try:
             driver.quit()
         except:
@@ -182,16 +463,34 @@ def scrape_google_scholar_profile_with_existing_driver(driver, profile_url, auth
         except NoSuchElementException:
             affiliation = ""
         
-        # Ekstrak statistik sitasi
-        citation_stats = driver.find_elements(By.CSS_SELECTOR, '#gsc_rsb_st tbody tr')
-        citation_data = {}
+        # Ekstrak statistik sitasi dengan default value
+        citation_data = {
+            'Citations_all': '0',
+            'Citations_since2020': '0',
+            'h-index_all': '0',
+            'h-index_since2020': '0',
+            'i10-index_all': '0',
+            'i10-index_since2020': '0'
+        }
         
-        for stat in citation_stats:
-            metric_name = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(1)').text
-            all_citations = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(2)').text
-            recent_citations = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(3)').text
-            citation_data[f"{metric_name}_all"] = all_citations
-            citation_data[f"{metric_name}_since2020"] = recent_citations
+        try:
+            citation_stats = driver.find_elements(By.CSS_SELECTOR, '#gsc_rsb_st tbody tr')
+            
+            if citation_stats:
+                for stat in citation_stats:
+                    try:
+                        metric_name = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(1)').text
+                        all_citations = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(2)').text
+                        recent_citations = stat.find_element(By.CSS_SELECTOR, 'td:nth-of-type(3)').text
+                        
+                        # Pastikan nilai tidak kosong
+                        citation_data[f"{metric_name}_all"] = all_citations if all_citations else '0'
+                        citation_data[f"{metric_name}_since2020"] = recent_citations if recent_citations else '0'
+                    except Exception as e:
+                        print(f"Warning: Error saat extract metrik {metric_name}: {e}")
+                        continue
+        except Exception as e:
+            print(f"Warning: Tidak dapat mengambil citation stats untuk {author_name}: {e}")
         
         # Ekstrak sitasi per tahun untuk profil
         citations_per_year = {}
@@ -206,9 +505,11 @@ def scrape_google_scholar_profile_with_existing_driver(driver, profile_url, auth
                     citations = value_element.get_attribute('style').split(':')[-1].strip('%')
                     
                     if year.isdigit() and 2015 <= int(year) <= 2024:
-                        citations_per_year[year] = int(citations)
+                        citations_per_year[year] = int(citations) if citations.isdigit() else 0
         except NoSuchElementException:
-            pass
+            print(f"Warning: Tidak ada grafik sitasi untuk {author_name}")
+        except Exception as e:
+            print(f"Warning: Error saat extract citations per year: {e}")
         
         # Ekstrak publikasi
         publications = []
@@ -291,9 +592,15 @@ def get_publication_citations_per_year_selenium(driver, pub_url):
     new_tab_created = False
     
     try:
+        # Verify driver is still valid
+        if not driver or not driver.session_id:
+            print(f"Driver session invalid for {pub_url}")
+            return {}
+        
         try:
             driver.execute_script("window.open('');")        
             new_tab_created = True
+            time.sleep(random.uniform(0.5, 1))
             
             if len(driver.window_handles) < 2:
                 print(f"Tidak dapat membuka tab baru untuk {pub_url}")
@@ -401,9 +708,6 @@ def get_publication_citations_per_year_selenium(driver, pub_url):
                         if citation_value.isdigit():
                             citations_per_year[closest_year] = int(citation_value)
         
-        driver.close()
-        driver.switch_to.window(original_window)
-        
         return citations_per_year
         
     except Exception as e:
@@ -413,14 +717,33 @@ def get_publication_citations_per_year_selenium(driver, pub_url):
     finally:
         if new_tab_created:
             try:
-                if driver.session_id:
-                    if len(driver.window_handles) > 1:
-                        if driver.current_window_handle != original_window:
+                # Check if driver and session are still valid
+                if driver and hasattr(driver, 'session_id') and driver.session_id:
+                    # Get current handles
+                    current_handles = driver.window_handles
+                    
+                    # Only close if we have more than one window
+                    if len(current_handles) > 1:
+                        # Close current window if it's not the original
+                        current_window = driver.current_window_handle
+                        if current_window != original_window and current_window in current_handles:
                             driver.close()
+                            time.sleep(0.5)
+                        
+                        # Switch back to original window if it exists
                         if original_window in driver.window_handles:
                             driver.switch_to.window(original_window)
+                            time.sleep(0.5)
             except Exception as e:
-                print(f"Error saat menangani tab browser: {e}")
+                print(f"Error in finally block (citations): {e}")
+                # Try to recover by switching to first available window
+                try:
+                    if driver and hasattr(driver, 'window_handles'):
+                        handles = driver.window_handles
+                        if handles:
+                            driver.switch_to.window(handles[0])
+                except:
+                    pass
 
 def get_publication_details_selenium(driver, pub_url):
     """Extract detailed publication information from publication page using Selenium + BeautifulSoup"""
@@ -438,9 +761,15 @@ def get_publication_details_selenium(driver, pub_url):
     }
     
     try:
+        # Verify driver is still valid
+        if not driver or not driver.session_id:
+            print(f"Driver session invalid for {pub_url}")
+            return details
+        
         try:
             driver.execute_script("window.open('');")        
             new_tab_created = True
+            time.sleep(random.uniform(0.5, 1))
             
             if len(driver.window_handles) < 2:
                 print(f"Tidak dapat membuka tab baru untuk {pub_url}")
@@ -517,79 +846,127 @@ def get_publication_details_selenium(driver, pub_url):
     finally:
         if new_tab_created:
             try:
-                if driver.session_id:
-                    if len(driver.window_handles) > 1:
-                        if driver.current_window_handle != original_window:
+                # Check if driver and session are still valid
+                if driver and hasattr(driver, 'session_id') and driver.session_id:
+                    # Get current handles
+                    current_handles = driver.window_handles
+                    
+                    # Only close if we have more than one window
+                    if len(current_handles) > 1:
+                        # Close current window if it's not the original
+                        current_window = driver.current_window_handle
+                        if current_window != original_window and current_window in current_handles:
                             driver.close()
+                            time.sleep(0.5)
+                        
+                        # Switch back to original window if it exists
                         if original_window in driver.window_handles:
                             driver.switch_to.window(original_window)
+                            time.sleep(0.5)
             except Exception as e:
-                print(f"Error saat menangani tab browser: {e}")
+                print(f"Error in finally block (details): {e}")
+                # Try to recover by switching to first available window
+                try:
+                    if driver and hasattr(driver, 'window_handles'):
+                        handles = driver.window_handles
+                        if handles:
+                            driver.switch_to.window(handles[0])
+                except:
+                    pass
 
 def classify_publication_type(journal, conference, publisher, title=""):
-    """Klasifikasi jenis publikasi berdasarkan aturan baru"""
+    """
+    Klasifikasi jenis publikasi berdasarkan prioritas:
+    1. Jika journal memiliki nilai (bukan N/A atau kosong) → artikel
+    2. Jika conference memiliki nilai (bukan N/A atau kosong) → prosiding
+    3. Jika keduanya tidak memiliki nilai → gunakan regex pada publisher dan title
+    
+    Return values sesuai database: 'artikel', 'prosiding', 'buku', 'penelitian', 'lainnya'
+    """
+    
+    # Prioritas 1: Jika journal memiliki nilai (bukan N/A atau kosong)
     if journal and journal.strip() and journal != 'N/A':
-        return "Jurnal"
+        return 'artikel'
     
+    # Prioritas 2: Jika conference memiliki nilai (bukan N/A atau kosong)
     if conference and conference.strip() and conference != 'N/A':
-        return "Prosiding Konferensi"
+        return 'prosiding'
     
+    # Prioritas 3: Jika kedua kolom tidak memiliki nilai, gunakan regex
     return classify_by_regex(publisher, title)
 
 def classify_by_regex(publisher, title=""):
-    """Klasifikasi menggunakan regex jika journal dan conference tidak tersedia"""
+    """
+    Klasifikasi menggunakan regex jika journal dan conference tidak tersedia.
+    Return values: 'artikel', 'prosiding', 'buku', 'penelitian', 'lainnya'
+    """
+    
+    # Gabungkan publisher dan title untuk analisis
     combined_text = f"{publisher} {title}".lower()
     
     if pd.isna(combined_text) or combined_text.strip() == "":
-        return "Lainnya"
+        return 'lainnya'
     
+    # Daftar penerbit buku terkenal
     book_publishers = ['nuansa aulia', 'citra aditya bakti', 'yrama widya', 
                       'pustaka belajar', 'pustaka pelajar', 'erlangga', 
                       'andpublisher', 'prenadamedia', 'gramedia', 'grasindo',
                       'media', 'prenhalindo', 'prenhallindo', 'wiley', 'springer']
     
+    # Deteksi penerbit buku
     if any(pub in combined_text for pub in book_publishers):
-        return "Buku/Bab Buku"
+        return 'buku'
     
+    # Prioritas untuk buku jika ada kata "edisi"
     if 'edisi' in combined_text:
-        return "Buku/Bab Buku"
+        return 'buku'
     
+    # Deteksi jurnal/artikel
     if any(keyword in combined_text for keyword in ['jurnal', 'journal', 'jou.', 'j.', 'acta']):
-        return "Jurnal"
+        return 'artikel'
     
+    # Deteksi prosiding konferensi
     if any(keyword in combined_text for keyword in ['prosiding', 'proceedings', 'proc.', 'konferensi', 'conference', 
                                                    'conf.', 'simposium', 'symposium', 'workshop', 'pertemuan', 'meeting']):
-        return "Prosiding Konferensi"
+        return 'prosiding'
     
+    # Deteksi buku
     if any(keyword in combined_text for keyword in ['buku', 'book', 'bab buku', 'chapter', 'handbook', 'ensiklopedia', 
                                                    'encyclopedia', 'buku teks', 'textbook', 'penerbit', 'publisher', 'press', 
                                                    'books']):
-        return "Buku/Bab Buku"
+        return 'buku'
     
+    # Deteksi tesis/disertasi - masuk kategori 'penelitian'
     if any(keyword in combined_text for keyword in ['tesis', 'thesis', 'disertasi', 'dissertation', 'skripsi', 'program doktor',
                                                    'program pascasarjana', 'phd', 'master', 'doctoral', 'program studi', 'fakultas']):
-        return "Tesis/Disertasi"
+        return 'penelitian'
     
+    # Deteksi laporan penelitian - masuk kategori 'penelitian'
     if any(keyword in combined_text for keyword in ['analisis', 'analysis', 'penelitian', 'research']):
-        return "Laporan Penelitian"
+        return 'penelitian'
     
+    # Deteksi preprint/laporan teknis - masuk kategori 'penelitian'
     if any(keyword in combined_text for keyword in ['arxiv', 'preprint', 'laporan teknis', 'technical report', 
                                                    'naskah awal', 'working paper', 'teknis']):
-        return "Preprint/Laporan Teknis"
+        return 'penelitian'
     
+    # Deteksi paten - masuk kategori 'penelitian'
     if 'paten' in combined_text or 'patent' in combined_text:
-        return "Paten"
+        return 'penelitian'
     
+    # Deteksi referensi hukum/undang-undang - masuk kategori 'buku'
     if re.search(r'\bUU\s*No\.\s*\d+|Undang-undang\s*Nomor\s*\d+|Peraturan\s*(Pemerintah|Presiden)\s*No\.\s*\d+', 
                 combined_text):
-        return "Buku/Bab Buku"
+        return 'buku'
     
+    # Deteksi berdasarkan format volume/issue - indikasi jurnal
     if re.search(r'vol\.|\bvol\b|\bedisi\b|\bno\.|\bhal\.|\bhalaman\b', combined_text) or \
        re.search(r'\bvol\.\s*\d+\s*(\(\s*\d+\s*\))?', combined_text) or \
        re.search(r'\d+\s*\(\d+\)', combined_text):
-        return "Jurnal"
+        return 'artikel'
     
-    return "Lainnya"
+    # Default: Jika tidak terdeteksi sebagai tipe apapun
+    return 'lainnya'
 
 def extract_vol_no(venue_text, title=""):
     """Extract volume and issue information"""
@@ -720,9 +1097,11 @@ def extract_pages(venue_text, title=""):
     return ""
 
 def transform_publications_data(all_publications):
+    """Transform publications data menggunakan klasifikasi yang benar"""
     transformed_data = []
     
     for pub in all_publications:
+        # Data dasar publikasi
         base_data = {
             'judul': pub.get('title', ''),
             'author': pub.get('authors', ''),
@@ -744,6 +1123,7 @@ def transform_publications_data(all_publications):
             'sumber': 'Google Scholar'
         }
         
+        # Ekstrak volume dan issue menggunakan regex jika tidak tersedia
         if not base_data['volume'] or not base_data['issue']:
             source_text = pub.get('journal', '') if pub.get('journal', 'N/A') != 'N/A' else pub.get('conference', '')
             vol, no = extract_vol_no(source_text, pub.get('title', ''))
@@ -752,12 +1132,14 @@ def transform_publications_data(all_publications):
             if not base_data['issue']:
                 base_data['issue'] = no
         
+        # Ekstrak pages menggunakan regex jika tidak tersedia
         if not base_data['pages']:
             source_text = pub.get('journal', '') if pub.get('journal', 'N/A') != 'N/A' else pub.get('conference', '')
             base_data['pages'] = extract_pages(source_text, pub.get('title', ''))
         
         citations_per_year = pub.get('citations_per_year', {})
         
+        # Jika tidak ada data sitasi per tahun, tambahkan satu baris dengan data dasar
         if not citations_per_year:
             transformed_data.append({
                 **base_data,
@@ -766,6 +1148,7 @@ def transform_publications_data(all_publications):
                 'tanggal_unduh': datetime.datetime.now().strftime('%Y-%m-%d')
             })
         else:
+            # Untuk setiap tahun dalam citations_per_year, buat baris terpisah
             for year, citations in citations_per_year.items():
                 transformed_data.append({
                     **base_data,
@@ -815,27 +1198,60 @@ def connect_to_db():
         print(f"Error connecting to database: {e}")
         return None
 
-def get_authors_from_db(conn):
+def get_authors_from_db(conn, scrape_from_beginning=False):
     """
     Mengambil daftar nama dosen dan URL profil Google Scholar dari database.
-    Asumsi:
-    - Nama tabel: temp_dosengs_scraping
-    - Kolom nama: v_nama_dosen
-    - Kolom URL profil
+    
+    Args:
+        conn: Database connection
+        scrape_from_beginning: Jika True, ambil semua dosen termasuk yang sudah 'completed'.
+                              Jika False, hanya ambil dosen dengan status pending/error/processing.
     """
     cursor = None
     try:
         cursor = conn.cursor()
-        query = """
-            SELECT v_nama, v_link
-            FROM temp_dosenGS_scraping
-            WHERE v_link IS NOT NULL
-        """
-        cursor.execute(query)
-        results = cursor.fetchall()
         
-        df = pd.DataFrame(results, columns=['Name', 'Profile URL'])
-        print(f"Berhasil mengambil {len(df)} author dari database.")
+        if scrape_from_beginning:
+            # Ambil SEMUA dosen, termasuk yang sudah completed
+            query = """
+                SELECT v_nama, v_link, COALESCE(v_status, 'pending') as status
+                FROM temp_dosenGS_scraping
+                WHERE v_link IS NOT NULL
+                ORDER BY v_nama
+            """
+            cursor.execute(query)
+            results = cursor.fetchall()
+            
+            df = pd.DataFrame(results, columns=['Name', 'Profile URL', 'Status'])
+            print(f"Berhasil mengambil {len(df)} author (SEMUA STATUS) dari database.")
+            print(f"  ⚠️  Mode: SCRAPING DARI AWAL - Semua dosen akan di-scrape ulang")
+        else:
+            # Hanya ambil dosen yang belum selesai
+            query = """
+                SELECT v_nama, v_link, COALESCE(v_status, 'pending') as status
+                FROM temp_dosenGS_scraping
+                WHERE v_link IS NOT NULL
+                AND (v_status IS NULL OR v_status IN ('pending', 'error', 'processing'))
+                ORDER BY 
+                    CASE 
+                        WHEN v_status = 'processing' THEN 1
+                        WHEN v_status = 'error' THEN 2
+                        ELSE 3
+                    END,
+                    v_nama
+            """
+            cursor.execute(query)
+            results = cursor.fetchall()
+            
+            df = pd.DataFrame(results, columns=['Name', 'Profile URL', 'Status'])
+            print(f"Berhasil mengambil {len(df)} author yang belum selesai di-scrape dari database.")
+            
+            # Tampilkan info jika ada dosen dengan status 'processing'
+            processing_count = len(df[df['Status'] == 'processing'])
+            if processing_count > 0:
+                print(f"  ⚠️  Ditemukan {processing_count} dosen dengan status 'processing' (kemungkinan scraping sebelumnya terhenti)")
+                print(f"  → Dosen tersebut akan di-scrape ulang terlebih dahulu")
+        
         return df
         
     except Exception as e:
@@ -845,295 +1261,512 @@ def get_authors_from_db(conn):
         if cursor:
             cursor.close()
 
-def determine_publication_type(row):
-    """Determine publication type based on available fields for database - matches CSV classification"""
-    # Gunakan fungsi classify_publication_type yang sudah ada
-    pub_type_csv = classify_publication_type(
-        row.get('journal', 'N/A'),
-        row.get('conference', 'N/A'),
-        row.get('publisher', ''),
-        row.get('judul', '')
-    )
-    
-    # Map dari nama CSV ke nama database
-    type_mapping = {
-        'Jurnal': 'artikel',
-        'Prosiding Konferensi': 'prosiding',
-        'Buku/Bab Buku': 'buku',
-        'Tesis/Disertasi': 'penelitian',
-        'Laporan Penelitian': 'penelitian',
-        'Preprint/Laporan Teknis': 'penelitian',
-        'Paten': 'penelitian',
-        'Lainnya': 'penelitian'
-    }
-    
-    return type_mapping.get(pub_type_csv, 'penelitian')
+def get_scraping_statistics(conn):
+    """
+    Mendapatkan statistik scraping dari database
+    """
+    cursor = None
+    try:
+        cursor = conn.cursor()
+        query = """
+            SELECT 
+                COUNT(*) as total,
+                SUM(CASE WHEN v_status = 'completed' THEN 1 ELSE 0 END) as completed,
+                SUM(CASE WHEN v_status = 'error' THEN 1 ELSE 0 END) as error,
+                SUM(CASE WHEN v_status = 'processing' THEN 1 ELSE 0 END) as processing,
+                SUM(CASE WHEN v_status IS NULL OR v_status = 'pending' THEN 1 ELSE 0 END) as pending
+            FROM temp_dosenGS_scraping
+            WHERE v_link IS NOT NULL
+        """
+        cursor.execute(query)
+        result = cursor.fetchone()
+        
+        stats = {
+            'total': result[0] if result else 0,
+            'completed': result[1] if result else 0,
+            'error': result[2] if result else 0,
+            'processing': result[3] if result else 0,
+            'pending': result[4] if result else 0
+        }
+        
+        return stats
+        
+    except Exception as e:
+        print(f"Error saat mengambil statistik scraping: {e}")
+        return {'total': 0, 'completed': 0, 'error': 0, 'processing': 0, 'pending': 0}
+    finally:
+        if cursor:
+            cursor.close()
+
+def reset_all_status_to_pending(conn):
+    """
+    Reset semua status menjadi 'pending' untuk scraping dari awal
+    """
+    cursor = None
+    try:
+        cursor = conn.cursor()
+        query = """
+            UPDATE temp_dosenGS_scraping
+            SET v_status = 'pending',
+                v_error_message = NULL,
+                t_last_updated = NOW()
+            WHERE v_link IS NOT NULL
+        """
+        cursor.execute(query)
+        affected_rows = cursor.rowcount
+        conn.commit()
+        print(f"✓ Berhasil reset {affected_rows} dosen ke status 'pending'")
+        return True
+        
+    except Exception as e:
+        conn.rollback()
+        print(f"✗ Error saat reset status: {e}")
+        return False
+    finally:
+        if cursor:
+            cursor.close()
+
+def update_scraping_status(conn, author_name, status, error_message=None):
+    """
+    Update status scraping untuk seorang dosen
+    Status: 'pending', 'processing', 'completed', 'error'
+    """
+    cursor = None
+    try:
+        cursor = conn.cursor()
+        
+        if status == 'error' and error_message:
+            query = """
+                UPDATE temp_dosenGS_scraping
+                SET v_status = %s,
+                    v_error_message = %s,
+                    t_last_updated = NOW()
+                WHERE v_nama = %s
+            """
+            cursor.execute(query, (status, error_message, author_name))
+        else:
+            query = """
+                UPDATE temp_dosenGS_scraping
+                SET v_status = %s,
+                    t_last_updated = NOW()
+                WHERE v_nama = %s
+            """
+            cursor.execute(query, (status, author_name))
+        
+        conn.commit()
+        print(f"Status untuk {author_name} diupdate menjadi: {status}")
+        
+    except Exception as e:
+        conn.rollback()
+        print(f"Error saat update status untuk {author_name}: {e}")
+    finally:
+        if cursor:
+            cursor.close()
 
 def import_dosen_data(conn, profiles_df):
-    """Import dosen data from profiles to database"""
+    """Import dosen data from profiles to database - SELALU INSERT BARU"""
     cursor = conn.cursor()
     dosen_ids = {}
-    
     try:
         for _, row in profiles_df.iterrows():
-            cursor.execute(
-                "SELECT v_id_dosen FROM tmp_dosen_dt WHERE v_id_googleScholar = %s",
-                (row.get('ID Google Scholar', ''),)
-            )
-            result = cursor.fetchone()
-            
-            if result:
-                dosen_id = result[0]
-                cursor.execute("""
-                    UPDATE tmp_dosen_dt SET 
-                    v_nama_dosen = %s,
-                    n_total_publikasi = %s,
-                    n_total_sitasi_gs = %s,
-                    n_i10_index_gs = %s,
-                    n_i10_index_gs2020 = %s,
-                    n_h_index_gs = %s,
-                    n_h_index_gs2020 = %s,
-                    v_sumber = 'Google Scholar',
-                    t_tanggal_unduh = %s,
-                    v_link_url = %s
-                    WHERE v_id_dosen = %s
-                """, (
-                    row.get('Name', ''),
-                    row.get('Total_Publikasi', 0),
-                    row.get('Citations_all', 0),
-                    row.get('i10-index_all', 0),
-                    row.get('i10-index_since2020', 0),
-                    row.get('h-index_all', 0),
-                    row.get('h-index_since2020', 0),
-                    datetime.datetime.now(),
-                    row.get('Profile URL', ''),
-                    dosen_id
-                ))
-            else:
-                cursor.execute("""
-                    INSERT INTO tmp_dosen_dt (
-                        v_nama_dosen, n_total_publikasi, n_total_sitasi_gs,
-                        v_id_googleScholar, n_i10_index_gs, n_i10_index_gs2020,
-                        n_h_index_gs, n_h_index_gs2020, v_sumber, t_tanggal_unduh,
-                        v_link_url
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            try:
+                # LANGSUNG INSERT tanpa pengecekan existing
+                insert_query = sql.SQL("""
+                    INSERT INTO tmp_dosen_dt 
+                    (v_nama_dosen, v_id_googlescholar, n_total_publikasi, 
+                     n_total_sitasi_gs, n_h_index_gs, n_h_index_gs2020,
+                     n_i10_index_gs, n_i10_index_gs2020, v_sumber, v_link_url, t_tanggal_unduh)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING v_id_dosen
-                """, (
-                    row.get('Name', ''),
-                    row.get('Total_Publikasi', 0),
-                    row.get('Citations_all', 0),
-                    row.get('ID Google Scholar', ''),
-                    row.get('i10-index_all', 0),
-                    row.get('i10-index_since2020', 0),
-                    row.get('h-index_all', 0),
-                    row.get('h-index_since2020', 0),
-                    'Google Scholar',
-                    datetime.datetime.now(),
-                    row.get('Profile URL', '')
-                ))
-                dosen_id = cursor.fetchone()[0]
-            
-            dosen_ids[row.get('Name', '')] = dosen_id
-            
-        conn.commit()
-        print(f"Successfully imported {len(profiles_df)} dosen profiles to database")
-        return dosen_ids
-    
-    except Exception as e:
-        conn.rollback()
-        print(f"Error importing dosen data: {e}")
-        return {}
-
-def import_jurnal_data(conn, publications_df):
-    """Import and get jurnal IDs"""
-    cursor = conn.cursor()
-    jurnal_ids = {}
-    
-    try:
-        journals = publications_df[publications_df['journal'] != 'N/A']['journal'].unique()
-        
-        for journal in journals:
-            if pd.isna(journal) or journal == 'N/A':
-                continue
+                """)
                 
-            cursor.execute(
-                "SELECT v_id_jurnal FROM stg_jurnal_mt WHERE v_nama_jurnal = %s",
-                (journal,)
-            )
-            result = cursor.fetchone()
-            
-            if result:
-                jurnal_ids[journal] = result[0]
-            else:
-                cursor.execute("""
-                    INSERT INTO stg_jurnal_mt (v_nama_jurnal)
-                    VALUES (%s)
-                    RETURNING v_id_jurnal
-                """, (journal,))
-                jurnal_ids[journal] = cursor.fetchone()[0]
+                values = (
+                    row['Name'],
+                    row['ID Google Scholar'],
+                    int(row['Total_Publikasi']) if pd.notna(row['Total_Publikasi']) else 0,
+                    int(row['Citations_all']) if pd.notna(row['Citations_all']) else 0,
+                    int(row['h-index_all']) if pd.notna(row['h-index_all']) else 0,
+                    int(row['h-index_since2020']) if pd.notna(row['h-index_since2020']) else 0,
+                    int(row['i10-index_all']) if pd.notna(row['i10-index_all']) else 0,
+                    int(row['i10-index_since2020']) if pd.notna(row['i10-index_since2020']) else 0,
+                    'Google Scholar',
+                    row['Profile URL'],
+                    datetime.datetime.now().date()
+                )
+                
+                cursor.execute(insert_query, values)
+                new_dosen_id = cursor.fetchone()[0]
+                
+                # Simpan mapping untuk linking publikasi
+                dosen_ids[row['Name']] = row['ID Google Scholar']
+                
+                print(f"  ✓ Inserted new record for {row['Name']} with ID: {new_dosen_id}")
+                
+            except Exception as e:
+                print(f"  Warning: Gagal insert profil {row.get('Name', 'Unknown')}: {e}")
+                conn.rollback()
+                continue
         
         conn.commit()
-        print(f"Successfully imported {len(jurnal_ids)} journals to database")
-        return jurnal_ids
-    
+        print(f"✓ Berhasil memasukkan {len(dosen_ids)} data profil BARU ke tmp_dosen_dt")
+        return dosen_ids
+        
     except Exception as e:
+        print(f"✗ Error saat insert profile data: {e}")
         conn.rollback()
-        print(f"Error importing journal data: {e}")
         return {}
+    finally:
+        cursor.close()
 
-def import_publications_data(conn, publications_df, dosen_ids, jurnal_ids):
+def normalize_publication_type(pub_type):
+    """
+    Normalisasi tipe publikasi ke format yang sesuai dengan constraint database
+    Database menerima: 'artikel', 'buku', 'penelitian', 'prosiding', 'lainnya'
+    """
+    pub_type_lower = str(pub_type).lower().strip()
+    
+    # Mapping dari tipe publikasi hasil scraping ke tipe di database
+    if 'jurnal' in pub_type_lower or 'artikel' in pub_type_lower:
+        return 'artikel'
+    elif 'prosiding' in pub_type_lower or 'conference' in pub_type_lower:
+        return 'prosiding'
+    elif 'buku' in pub_type_lower or 'book' in pub_type_lower:
+        return 'buku'
+    elif 'penelitian' in pub_type_lower or 'tesis' in pub_type_lower or 'disertasi' in pub_type_lower:
+        return 'penelitian'
+    else:
+        return 'lainnya'
+
+def import_publications_data(conn, publications_df, dosen_ids):
     """Import publications data to database"""
     cursor = conn.cursor()
-    
     try:
-        imported_count = 0
+        inserted_count = 0
         
-        for _, row in publications_df.iterrows():
-            pub_type = determine_publication_type(row)
-            
+        for index, row in publications_df.iterrows():
             try:
-                year = int(row['tahun_publikasi']) if pd.notna(row['tahun_publikasi']) and row['tahun_publikasi'] != 'N/A' else None
-            except:
-                year = None
-            
-            cursor.execute(
-                "SELECT v_id_publikasi FROM stg_publikasi_tr WHERE v_judul = %s",
-                (row['judul'],)
-            )
-            result = cursor.fetchone()
-            
-            if result:
-                pub_id = result[0]
-            else:
-                cursor.execute("""
-                    INSERT INTO stg_publikasi_tr (
-                        v_judul, v_jenis, v_tahun_publikasi, 
-                        n_total_sitasi, v_sumber, v_link_url, t_tanggal_unduh
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+                # Tentukan jenis publikasi dan normalisasi
+                pub_type_raw = row.get('publication_type', 'lainnya')
+                pub_type = normalize_publication_type(pub_type_raw)
+                
+                # Insert ke stg_publikasi_tr
+                insert_pub_query = sql.SQL("""
+                    INSERT INTO stg_publikasi_tr 
+                    (v_judul, v_jenis, v_tahun_publikasi, n_total_sitasi, v_sumber, 
+                     v_link_url, v_authors, v_publisher, t_tanggal_unduh)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING v_id_publikasi
-                """, (
-                    row['judul'],
+                """)
+                
+                tahun = int(row['tahun_publikasi']) if pd.notna(row['tahun_publikasi']) and str(row['tahun_publikasi']).isdigit() else None
+                total_sitasi = int(row['total_sitasi_seluruhnya']) if pd.notna(row['total_sitasi_seluruhnya']) and str(row['total_sitasi_seluruhnya']).isdigit() else 0
+                
+                pub_values = (
+                    row.get('judul', ''),
                     pub_type,
-                    year,
-                    row.get('total_sitasi_seluruhnya', 0),
-                    'Google Scholar',
+                    tahun,
+                    total_sitasi,
+                    row.get('sumber', 'Google Scholar'),
                     row.get('Publication URL', ''),
+                    row.get('author', ''),
+                    row.get('publisher', ''),
                     datetime.datetime.now()
-                ))
+                )
+                
+                cursor.execute(insert_pub_query, pub_values)
                 pub_id = cursor.fetchone()[0]
                 
-                if pub_type == 'artikel':
-                    journal_id = jurnal_ids.get(row['journal']) if row['journal'] != 'N/A' else None
-                    cursor.execute("""
-                        INSERT INTO stg_artikel_dr (
-                            v_id_publikasi, v_id_jurnal, v_volume, v_issue, v_pages
-                        ) VALUES (%s, %s, %s, %s, %s)
-                    """, (
-                        pub_id,
-                        journal_id,
-                        row.get('volume', ''),
-                        row.get('issue', ''),
-                        row.get('pages', '')
-                    ))
-                elif pub_type == 'prosiding':
-                    cursor.execute("""
-                        INSERT INTO stg_prosiding_dr (
-                            v_id_publikasi, v_nama_konferensi
-                        ) VALUES (%s, %s)
-                    """, (
-                        pub_id,
-                        row.get('conference', '')
-                    ))
-                elif pub_type == 'buku':
-                    cursor.execute("""
-                        INSERT INTO stg_buku_dr (
-                            v_id_publikasi, v_penerbit
-                        ) VALUES (%s, %s)
-                    """, (
-                        pub_id,
-                        row.get('publisher', '')  # ✅ Harus mengambil dari kolom 'publisher'
-                    ))
+                # Insert data spesifik berdasarkan jenis publikasi yang sudah dinormalisasi
+                if pub_type == "artikel":
+                    _insert_artikel_data(cursor, pub_id, row)
+                elif pub_type == "prosiding":
+                    _insert_prosiding_data(cursor, pub_id, row)
+                elif pub_type == "buku":
+                    _insert_buku_data(cursor, pub_id, row)
+                elif pub_type == "penelitian":
+                    _insert_penelitian_data(cursor, pub_id, row)
                 else:
-                    cursor.execute("""
-                        INSERT INTO stg_penelitian_dr (
-                            v_id_publikasi
-                        ) VALUES (%s)
-                    """, (pub_id,))
+                    _insert_lainnya_data(cursor, pub_id, row)
                 
-                authors = row['author'].split(',')
-                for i, author in enumerate(authors):
-                    author = author.strip()
-                    dosen_id = None
-                    for name, id in dosen_ids.items():
-                        if author.lower() in name.lower() or name.lower() in author.lower():
-                            dosen_id = id
-                            break
-                    
-                    if dosen_id:
-                        cursor.execute(
-                            "SELECT 1 FROM stg_publikasi_dosen_dt WHERE v_id_publikasi = %s AND v_id_dosen = %s",
-                            (pub_id, dosen_id)
-                        )
-                        if not cursor.fetchone():
-                            cursor.execute("""
-                                INSERT INTO stg_publikasi_dosen_dt (
-                                    v_id_publikasi, v_id_dosen, v_author_order
-                                ) VALUES (%s, %s, %s)
-                            """, (
-                                pub_id,
-                                dosen_id,
-                                f"{i+1} out of {len(authors)}"
-                            ))
-                
+                # Cek apakah ada data tahun dan total_sitasi_tahun yang valid
                 if pd.notna(row.get('tahun')) and pd.notna(row.get('total_sitasi_tahun')):
-                    try:
-                        year_val = int(row['tahun'])
-                        citations_val = int(row['total_sitasi_tahun'])
-                        
-                        cursor.execute("""
-                            INSERT INTO stg_publikasi_sitasi_tahunan_dr (
-                                v_id_publikasi, v_tahun, n_total_sitasi_tahun, 
-                                v_sumber, t_tanggal_unduh
-                            ) VALUES (%s, %s, %s, %s, %s)
-                        """, (
-                            pub_id,
-                            year_val,
-                            citations_val,
-                            'Google Scholar',
-                            datetime.datetime.now().date()
-                        ))
-                    except (ValueError, TypeError):
-                        pass
+                    tahun_str = str(row.get('tahun', '')).strip()
+                    sitasi_str = str(row.get('total_sitasi_tahun', '')).strip()
+                    
+                    # Validasi apakah keduanya adalah angka
+                    if tahun_str.isdigit() and sitasi_str.replace('-', '').isdigit():
+                        _insert_sitasi_tahunan(cursor, pub_id, row)
                 
-                imported_count += 1
+                # Link ke dosen
+                author_name = row.get('Author', '')
+                if author_name and author_name in dosen_ids:
+                    # Cek apakah sudah ada link
+                    check_link = sql.SQL("""
+                        SELECT 1 FROM stg_publikasi_dosen_dt 
+                        WHERE v_id_publikasi = %s AND v_id_dosen = 
+                        (SELECT v_id_dosen FROM tmp_dosen_dt WHERE v_id_googlescholar = %s)
+                    """)
+                    cursor.execute(check_link, (pub_id, dosen_ids[author_name]))
+                    
+                    if not cursor.fetchone():
+                        link_query = sql.SQL("""
+                            INSERT INTO stg_publikasi_dosen_dt (v_id_publikasi, v_id_dosen, v_author_order)
+                            SELECT %s, v_id_dosen, %s FROM tmp_dosen_dt 
+                            WHERE v_id_googlescholar = %s
+                        """)
+                        cursor.execute(link_query, (pub_id, "1", dosen_ids[author_name]))
+                
+                inserted_count += 1
+                
+            except Exception as e:
+                print(f"  Warning: Gagal insert publikasi '{row.get('judul', 'Unknown')[:50]}...': {e}")
+                conn.rollback()
+                continue
         
         conn.commit()
-        print(f"Successfully imported {imported_count} publications to database")
-    
+        print(f"✓ Berhasil memasukkan {inserted_count} data publikasi ke database")
+        return inserted_count
+        
     except Exception as e:
+        print(f"✗ Error saat insert publication data: {e}")
         conn.rollback()
-        print(f"Error importing publications data: {e}")
-        raise
+        return 0
+    finally:
+        cursor.close()
 
+def _insert_artikel_data(cursor, pub_id, row):
+    """Insert data spesifik artikel/jurnal"""
+    try:
+        # Ambil nama jurnal dari row data
+        journal_name = row.get('journal', '')
+        
+        # Jika tidak ada nama jurnal, skip insert ke stg_artikel_dr
+        if not journal_name or journal_name == 'N/A':
+            print(f"    Warning: Artikel tanpa nama jurnal, skip insert artikel data")
+            return
+        
+        # Cek apakah jurnal sudah ada di stg_jurnal_mt
+        check_journal_query = sql.SQL("""
+            SELECT v_id_jurnal FROM stg_jurnal_mt WHERE v_nama_jurnal = %s
+        """)
+        cursor.execute(check_journal_query, (journal_name,))
+        result = cursor.fetchone()
+        
+        if result:
+            # Jurnal sudah ada, ambil ID-nya
+            journal_id = result[0]
+        else:
+            # Jurnal belum ada, insert baru
+            insert_journal_query = sql.SQL("""
+                INSERT INTO stg_jurnal_mt (v_nama_jurnal)
+                VALUES (%s)
+                RETURNING v_id_jurnal
+            """)
+            cursor.execute(insert_journal_query, (journal_name,))
+            journal_id = cursor.fetchone()[0]
+        
+        # Insert ke stg_artikel_dr dengan v_id_jurnal
+        insert_artikel_query = sql.SQL("""
+            INSERT INTO stg_artikel_dr (v_id_publikasi, v_id_jurnal, v_volume, v_issue, v_pages, t_updated_at)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """)
+        
+        values = (
+            pub_id,
+            journal_id,
+            row.get('volume', ''),
+            row.get('issue', ''),
+            row.get('pages', ''),
+            datetime.datetime.now()
+        )
+        
+        cursor.execute(insert_artikel_query, values)
+        
+    except Exception as e:
+        print(f"    Error insert artikel data: {e}")
+
+def _insert_prosiding_data(cursor, pub_id, row):
+    """Insert data spesifik prosiding"""
+    try:
+        insert_query = sql.SQL("""
+            INSERT INTO stg_prosiding_dr (v_id_publikasi, v_nama_konferensi, f_terindeks_scopus, t_updated_at)
+            VALUES (%s, %s, %s, %s)
+        """)
+        
+        values = (
+            pub_id,
+            row.get('conference', ''),
+            False,
+            datetime.datetime.now()
+        )
+        
+        cursor.execute(insert_query, values)
+    except Exception as e:
+        print(f"    Error insert prosiding data: {e}")
+
+def _insert_buku_data(cursor, pub_id, row):
+    """Insert data spesifik buku"""
+    try:
+        insert_query = sql.SQL("""
+            INSERT INTO stg_buku_dr (v_id_publikasi, v_isbn, t_updated_at)
+            VALUES (%s, %s, %s)
+        """)
+        
+        values = (
+            pub_id,
+            '',
+            datetime.datetime.now()
+        )
+        
+        cursor.execute(insert_query, values)
+    except Exception as e:
+        print(f"    Error insert buku data: {e}")
+
+def _insert_penelitian_data(cursor, pub_id, row):
+    """Insert data publikasi penelitian (tesis/disertasi)"""
+    try:
+        insert_query = sql.SQL("""
+            INSERT INTO stg_penelitian_dr (v_id_publikasi, v_kategori_penelitian, t_updated_at)
+            VALUES (%s, %s, %s)
+        """)
+        
+        pub_type_raw = str(row.get('publication_type', '')).lower()
+        if 'tesis' in pub_type_raw:
+            kategori = 'Tesis'
+        elif 'disertasi' in pub_type_raw:
+            kategori = 'Disertasi'
+        else:
+            kategori = 'Penelitian'
+        
+        values = (
+            pub_id,
+            kategori,
+            datetime.datetime.now()
+        )
+        
+        cursor.execute(insert_query, values)
+    except Exception as e:
+        print(f"    Error insert penelitian data: {e}")
+
+def _insert_lainnya_data(cursor, pub_id, row):
+    """Insert data publikasi lainnya"""
+    try:
+        insert_query = sql.SQL("""
+            INSERT INTO stg_lainnya_dr (v_id_publikasi, v_keterangan, t_updated_at)
+            VALUES (%s, %s, %s)
+        """)
+        
+        values = (
+            pub_id,
+            None,
+            datetime.datetime.now()
+        )
+        
+        cursor.execute(insert_query, values)
+    except Exception as e:
+        print(f"    Error insert lainnya data: {e}")
+
+def _insert_sitasi_tahunan(cursor, pub_id, row):
+    """Insert data sitasi per tahun"""
+    try:
+        # Ambil dan validasi data
+        tahun_raw = row.get('tahun', '')
+        sitasi_raw = row.get('total_sitasi_tahun', '')
+        
+        # Konversi ke integer
+        if pd.notna(tahun_raw) and pd.notna(sitasi_raw):
+            tahun_str = str(tahun_raw).strip()
+            sitasi_str = str(sitasi_raw).strip()
+            
+            if tahun_str.isdigit():
+                tahun = int(tahun_str)
+                
+                # Konversi sitasi (bisa negatif jadi handle dengan replace)
+                if sitasi_str.replace('-', '').isdigit():
+                    sitasi = int(sitasi_str)
+                else:
+                    sitasi = 0
+                
+                # Validasi tahun
+                if 2000 <= tahun <= 2030:
+                    insert_query = sql.SQL("""
+                        INSERT INTO stg_publikasi_sitasi_tahunan_dr 
+                        (v_id_publikasi, v_tahun, n_total_sitasi_tahun, v_sumber, t_tanggal_unduh)
+                        VALUES (%s, %s, %s, %s, %s)
+                    """)
+                    
+                    values = (
+                        pub_id,
+                        tahun,
+                        sitasi,
+                        'Google Scholar',
+                        datetime.datetime.now().date()
+                    )
+                    
+                    cursor.execute(insert_query, values)
+    except Exception as e:
+        print(f"    Error insert sitasi tahunan: {e}")
 
 def main():
-    conn = None  # Inisialisasi koneksi di luar try-finally
+    global restart_count, failed_accounts
+    conn = None
     try:
-        # 1. Hubungkan ke database untuk mendapatkan daftar author
+        # 1. Hubungkan ke database
         conn = connect_to_db()
         if not conn:
             print("Gagal terhubung ke database. Program akan berhenti.")
             return
 
-        df = get_authors_from_db(conn)
+        # Tampilkan statistik scraping
+        stats = get_scraping_statistics(conn)
+        print("\n" + "="*60)
+        print("STATISTIK SCRAPING")
+        print("="*60)
+        print(f"Total Dosen        : {stats['total']}")
+        print(f"Sudah Selesai      : {stats['completed']}")
+        print(f"Processing (stuck) : {stats['processing']}")
+        print(f"Error              : {stats['error']}")
+        print(f"Belum Di-scrape    : {stats['pending']}")
+        print("="*60 + "\n")
+
+        # Tanyakan apakah ingin scraping dari awal
+        print("Pilihan Mode Scraping:")
+        print("1. Lanjutkan scraping (hanya dosen yang belum selesai: error, pending, processing)")
+        print("2. Scraping dari awal (reset semua status dan scrape ulang SEMUA dosen termasuk yang completed)")
+        
+        while True:
+            scrape_mode = input("\nPilih mode (1/2): ").strip()
+            if scrape_mode in ['1', '2']:
+                break
+            else:
+                print("Error: Pilih 1 atau 2")
+        
+        scrape_from_beginning = (scrape_mode == '2')
+        
+        if scrape_from_beginning:
+            print("\n⚠️  Mode: SCRAPING DARI AWAL")
+            print("     Ini akan scrape ulang SEMUA dosen (termasuk yang statusnya 'completed')")
+            confirm = input("Apakah Anda yakin ingin melanjutkan? (yes/no): ").strip().lower()
+            if confirm in ['yes', 'y']:
+                print("✓ Mode scraping dari awal dikonfirmasi. Semua dosen akan di-scrape ulang.\n")
+            else:
+                print("Scraping dari awal dibatalkan. Menggunakan mode lanjutkan scraping.")
+                scrape_from_beginning = False
+        else:
+            print("\n✓ Mode: LANJUTKAN SCRAPING")
+            print("     Hanya akan scrape dosen dengan status: error → pending → processing")
+            print("     Dosen dengan status 'completed' akan di-SKIP.\n")
+
+        # Ambil daftar author
+        df = get_authors_from_db(conn, scrape_from_beginning)
         if df.empty:
-            print("Tidak ada data author yang dapat di-scrape dari database. Program akan berhenti.")
+            print("Semua author telah selesai di-scrape atau tidak ada data. Program akan berhenti.")
             return
 
-        # 2. Tanyakan jumlah maksimum author di terminal
+        # 2. Tanyakan jumlah maksimum author
         while True:
             try:
-                max_authors_str = input(f"Masukkan jumlah maksimum author yang akan di-scrape (total tersedia: {len(df)}): ")
+                max_authors_str = input(f"Masukkan jumlah maksimum author yang akan di-scrape (tersisa: {len(df)}): ")
                 max_authors = int(max_authors_str)
                 if max_authors > 0:
                     break
@@ -1142,134 +1775,188 @@ def main():
             except ValueError:
                 print("Error: Input tidak valid. Harap masukkan angka.")
         
-        # Pastikan tidak scrape lebih dari yang tersedia
         max_authors = min(max_authors, len(df))
 
-        # === PERUBAHAN: Pertanyaan untuk impor ke DB dihapus ===
         print("\n--- Konfigurasi Dimuat ---")
         print(f"Sumber Data: Database PostgreSQL")
+        if scrape_from_beginning:
+            print(f"Mode Scraping: DARI AWAL (scrape ulang SEMUA dosen termasuk yang 'completed')")
+        else:
+            print(f"Mode Scraping: LANJUTKAN (hanya scrape dosen dengan status 'error', 'pending', 'processing')")
+            print(f"               → Dosen dengan status 'completed' akan di-SKIP")
         print(f"Authors to Scrape: {max_authors} dari {len(df)} yang tersedia")
-        print(f"Import to Database: Ya (otomatis)") # Diubah menjadi otomatis
+        print(f"Import to Database: Ya (otomatis)")
+        print(f"Auto-Login: Enabled with Account Rotation ({len(ACCOUNT_POOL)} accounts)")
+        print(f"Max Restarts: {max_restarts}")
         print("---------------------------\n")
 
-        # Tentukan path file output CSV
+        # Path file CSV
         profiles_csv_path = 'all_dosen_data_profiles.csv'
         publications_csv_path = 'all_dosen_data_publications.csv'
 
-        # Hapus file CSV lama jika ada untuk memulai dari awal
-        if os.path.exists(profiles_csv_path):
-            os.remove(profiles_csv_path)
-            print(f"Menghapus file lama: {profiles_csv_path}")
-        if os.path.exists(publications_csv_path):
-            os.remove(publications_csv_path)
-            print(f"Menghapus file lama: {publications_csv_path}")
+        # Buat file baru jika belum ada (dengan header)
+        if not os.path.exists(profiles_csv_path):
+            pd.DataFrame().to_csv(profiles_csv_path, index=False)
+        if not os.path.exists(publications_csv_path):
+            pd.DataFrame().to_csv(publications_csv_path, index=False)
             
-        # Kumpulan data untuk diimpor ke DB
         final_profiles_df = pd.DataFrame()
         final_publications_df = pd.DataFrame()
 
-        # Setup driver
-        driver = setup_driver_with_manual_login()
+        # Setup driver dengan auto-login
+        print("\n" + "="*60)
+        print("PROSES AUTO-LOGIN DENGAN ACCOUNT ROTATION")
+        print("="*60)
+        
+        # Reset global variables
+        restart_count = 0
+        failed_accounts = set()
+        
+        driver = setup_driver_with_auto_login()
         
         if driver is None:
-            print("Gagal membuat driver dengan login manual. Program berhenti.")
+            print("✗ Gagal membuat driver dengan auto-login. Program berhenti.")
             return
+        
+        print("="*60 + "\n")
 
         try:
+            scraping_count = 0
             for index, row in df.head(max_authors).iterrows():
                 author_name = row['Name']
                 profile_url = row['Profile URL']
-                print(f"\nScraping data untuk ({index + 1}/{max_authors}): {author_name}...")
                 
-                profile_data = scrape_google_scholar_profile_with_existing_driver(driver, profile_url, author_name)
+                print(f"\n{'='*60}")
+                print(f"Scraping ({scraping_count + 1}/{max_authors}): {author_name}")
+                print(f"{'='*60}")
                 
-                if profile_data and profile_data['publications']:
-                    print(f"Berhasil mengambil data untuk {profile_data['name']}")
+                # Update status menjadi 'processing'
+                update_scraping_status(conn, author_name, 'processing')
+                
+                try:
+                    profile_data = scrape_google_scholar_profile_with_existing_driver(driver, profile_url, author_name)
                     
-                    # --- Proses dan Simpan Data Profil ---
-                    profile_entry = {
-                        'Name': profile_data['name'],
-                        'Affiliation': profile_data['affiliation'],
-                        'Profile URL': profile_data['profile_url'],
-                        'ID Google Scholar': profile_data['scholar_id'],
-                        **profile_data['citation_stats'],
-                        'Total_Publikasi': len(profile_data['publications']),
-                        'Tanggal_Unduh': datetime.datetime.now().strftime('%Y-%m-%d')
-                    }
-                    
-                    current_profile_df = pd.DataFrame([profile_entry])
-                    
-                    if 'citations_per_year' in profile_data and profile_data['citations_per_year']:
-                         citations_per_year_df = pd.json_normalize(profile_data['citations_per_year'])
-                         citations_per_year_df.columns = [f"Citations_{year}" for year in citations_per_year_df.columns]
-                         current_profile_df = pd.concat([current_profile_df.reset_index(drop=True), citations_per_year_df], axis=1)
+                    if profile_data and profile_data['publications']:
+                        print(f"✓ Berhasil mengambil data untuk {profile_data['name']}")
+                        
+                        # Simpan data profil
+                        profile_entry = {
+                            'Name': profile_data['name'],
+                            'Affiliation': profile_data['affiliation'],
+                            'Profile URL': profile_data['profile_url'],
+                            'ID Google Scholar': profile_data['scholar_id'],
+                            'Citations_all': profile_data['citation_stats'].get('Citations_all', '0'),
+                            'Citations_since2020': profile_data['citation_stats'].get('Citations_since2020', '0'),
+                            'h-index_all': profile_data['citation_stats'].get('h-index_all', '0'),
+                            'h-index_since2020': profile_data['citation_stats'].get('h-index_since2020', '0'),
+                            'i10-index_all': profile_data['citation_stats'].get('i10-index_all', '0'),
+                            'i10-index_since2020': profile_data['citation_stats'].get('i10-index_since2020', '0'),
+                            'Total_Publikasi': len(profile_data['publications']),
+                            'Tanggal_Unduh': datetime.datetime.now().strftime('%Y-%m-%d')
+                        }
+                        
+                        current_profile_df = pd.DataFrame([profile_entry])
+                        
+                        if 'citations_per_year' in profile_data and profile_data['citations_per_year']:
+                            citations_per_year_df = pd.json_normalize(profile_data['citations_per_year'])
+                            citations_per_year_df.columns = [f"Citations_{year}" for year in citations_per_year_df.columns]
+                            current_profile_df = pd.concat([current_profile_df.reset_index(drop=True), citations_per_year_df], axis=1)
 
-                    header_needed = not os.path.exists(profiles_csv_path)
-                    current_profile_df.to_csv(profiles_csv_path, mode='a', header=header_needed, index=False, encoding='utf-8')
-                    print(f"Menambahkan data profil untuk {author_name} ke {profiles_csv_path}")
-                    
-                    # --- Proses dan Simpan Data Publikasi ---
-                    transformed_publications = transform_publications_data(profile_data['publications'])
-                    current_publications_df = pd.DataFrame(transformed_publications)
-                    
-                    header_needed = not os.path.exists(publications_csv_path)
-                    current_publications_df.to_csv(publications_csv_path, mode='a', header=header_needed, index=False, encoding='utf-8')
-                    print(f"Menambahkan {len(current_publications_df)} data publikasi ke {publications_csv_path}")
-                    
-                    # Gabungkan data untuk proses impor DB
-                    final_profiles_df = pd.concat([final_profiles_df, current_profile_df], ignore_index=True)
-                    final_publications_df = pd.concat([final_publications_df, current_publications_df], ignore_index=True)
-
-                else:
-                    print(f"Gagal mengambil data atau tidak ada publikasi untuk {author_name}")
+                        header_needed = not os.path.getsize(profiles_csv_path) > 0
+                        current_profile_df.to_csv(profiles_csv_path, mode='a', header=header_needed, index=False, encoding='utf-8')
+                        print(f"✓ Data profil disimpan ke {profiles_csv_path}")
+                        
+                        # Simpan data publikasi
+                        transformed_publications = transform_publications_data(profile_data['publications'])
+                        current_publications_df = pd.DataFrame(transformed_publications)
+                        
+                        header_needed = not os.path.getsize(publications_csv_path) > 0
+                        current_publications_df.to_csv(publications_csv_path, mode='a', header=header_needed, index=False, encoding='utf-8')
+                        print(f"✓ {len(current_publications_df)} publikasi disimpan ke {publications_csv_path}")
+                        
+                        # Gabungkan untuk impor DB
+                        final_profiles_df = pd.concat([final_profiles_df, current_profile_df], ignore_index=True)
+                        final_publications_df = pd.concat([final_publications_df, current_publications_df], ignore_index=True)
+                        
+                        # Update status menjadi 'completed'
+                        update_scraping_status(conn, author_name, 'completed')
+                        scraping_count += 1
+                        
+                    else:
+                        error_msg = f"Tidak ada publikasi ditemukan"
+                        print(f"✗ {error_msg} untuk {author_name}")
+                        update_scraping_status(conn, author_name, 'error', error_msg)
                 
-                if index < max_authors - 1:
+                except Exception as e:
+                    error_msg = f"Error scraping: {str(e)}"
+                    print(f"✗ {error_msg}")
+                    update_scraping_status(conn, author_name, 'error', error_msg)
+                
+                # Delay antara scraping
+                if scraping_count < max_authors:
                     delay_time = random.uniform(60, 120)
-                    print(f"Menunggu selama {delay_time:.1f} detik sebelum lanjut...")
+                    print(f"\n⏳ Menunggu {delay_time:.1f} detik sebelum lanjut...")
                     time.sleep(delay_time)
+                    
         finally:
             if driver is not None:
                 try:
                     driver.quit()
-                    print("\nDriver berhasil ditutup")
+                    print("\n✓ Driver berhasil ditutup")
                 except Exception as e:
-                    print(f"Error saat menutup driver: {e}")
+                    print(f"✗ Error saat menutup driver: {e}")
         
         if final_profiles_df.empty:
-            print("Tidak ada data yang berhasil di-scrape. Program berhenti.")
+            print("\n✗ Tidak ada data yang berhasil di-scrape.")
             return
             
-        print("\nProses scraping selesai. Semua data telah disimpan ke file CSV.")
+        print(f"\n{'='*60}")
+        print("PROSES SCRAPING SELESAI")
+        print(f"{'='*60}")
+        print(f"Total berhasil di-scrape: {len(final_profiles_df)} dosen")
+        print(f"Total publikasi: {len(final_publications_df)}")
+        print(f"{'='*60}\n")
         
-        # === PERUBAHAN: Blok impor DB dijalankan secara otomatis ===
-        # Tidak ada lagi 'if/else', langsung impor.
+        # Impor ke database
         if not conn:
             conn = connect_to_db()
-            if not conn:
-                print("Gagal menyambung kembali ke database. Data hanya tersimpan di file CSV.")
-                return
-        
+        if not conn:
+            print("✗ Gagal menyambung kembali ke database. Data hanya tersimpan di file CSV.")
+            return
         try:
-            print("Memulai proses impor semua data yang terkumpul ke database...")
+            print("\n" + "="*60)
+            print("PROSES IMPOR DATA KE DATABASE")
+            print("="*60)
             dosen_ids = import_dosen_data(conn, final_profiles_df)
-            jurnal_ids = import_jurnal_data(conn, final_publications_df)
-            import_publications_data(conn, final_publications_df, dosen_ids, jurnal_ids)
-            print("Proses impor data ke database berhasil!")
+            import_publications_data(conn, final_publications_df, dosen_ids)
+            print("✓ Proses impor data ke database berhasil!")
+            print("="*60 + "\n")
         except Exception as e:
-            print(f"Error saat proses impor ke database: {e}")
+            print(f"✗ Error saat proses impor ke database: {e}")
+            import traceback
+            traceback.print_exc()
             print("Data tetap tersedia di dalam file CSV.")
         
-        print(f"\nKolom pada CSV Publikasi: {final_publications_df.columns.tolist()}")
+        # Tampilkan statistik akhir
+        final_stats = get_scraping_statistics(conn)
+        print(f"\n{'='*60}")
+        print("STATISTIK SCRAPING TERBARU")
+        print(f"{'='*60}")
+        print(f"Total Dosen        : {final_stats['total']}")
+        print(f"Sudah Selesai      : {final_stats['completed']}")
+        print(f"Processing (stuck) : {final_stats['processing']}")
+        print(f"Error              : {final_stats['error']}")
+        print(f"Belum Di-scrape    : {final_stats['pending']}")
+        print(f"{'='*60}\n")
     
     except Exception as e:
-        print(f"Terjadi error pada fungsi utama: {e}")
+        print(f"✗ Terjadi error pada fungsi utama: {e}")
         import traceback
         traceback.print_exc()
     finally:
-        # Selalu pastikan koneksi database ditutup
         if conn:
             conn.close()
-            print("Koneksi database telah ditutup.")
+            print("✓ Koneksi database telah ditutup.")
 
 if __name__ == "__main__":
     main()
