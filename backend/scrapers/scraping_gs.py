@@ -38,10 +38,10 @@ DB_PARAMS = {
 
 # Multi-account pool for login rotation
 ACCOUNT_POOL = [
-    {"email": "xxxx@student.unpar.ac.id", "password": "xxxx"},
-    {"email": "xxxx@student.unpar.ac.id", "password": "xxxx"},
-    {"email": "xxxx@student.unpar.ac.id", "password": "xxxx"},
-    {"email": "xxxx@student.unpar.ac.id", "password": "xxxx"},
+    {"email": "6182101017@student.unpar.ac.id", "password": "618017SH"},
+    {"email": "6182101045@student.unpar.ac.id", "password": "6180145CD"},
+    {"email": "6182101059@student.unpar.ac.id", "password": "618059SJ"},
+    {"email": "6182101063@student.unpar.ac.id", "password": "618063XJ"},
 ]
 
 # Global variables for account management
@@ -269,7 +269,7 @@ def perform_auto_login(driver):
                 # Step 1: Open Google Scholar
                 print("Step 1: Opening https://scholar.google.com/")
                 driver.get("https://scholar.google.com/")
-                time.sleep(random.uniform(3, 5))
+                time.sleep(random.uniform(11, 29))
                 
                 # Step 2: Click Login button
                 print("Step 2: Clicking Login button")
@@ -278,7 +278,7 @@ def perform_auto_login(driver):
                         EC.element_to_be_clickable((By.ID, "gs_hdr_act_s"))
                     )
                     login_button.click()
-                    time.sleep(random.uniform(3, 5))
+                    time.sleep(random.uniform(21, 25))
                 except Exception as e:
                     print(f"Could not find login button: {e}")
                     if check_if_logged_in(driver):
@@ -294,17 +294,17 @@ def perform_auto_login(driver):
                 )
                 
                 # Human-like behavior: wait before typing
-                time.sleep(random.uniform(1.5, 2.5))
+                time.sleep(random.uniform(10, 30))
                 
                 email_input.clear()
-                time.sleep(random.uniform(0.3, 0.7))
+                time.sleep(random.uniform(9, 16))
                 
                 # Type email character by character with random delays
                 for char in email:
                     email_input.send_keys(char)
-                    time.sleep(random.uniform(0.05, 0.15))
+                    time.sleep(random.uniform(5, 9))
                 
-                time.sleep(random.uniform(1, 2))
+                time.sleep(random.uniform(7, 15))
                 
                 # Step 4: Click Next button (Google)
                 print("Step 4: Clicking Next button")
@@ -313,7 +313,7 @@ def perform_auto_login(driver):
                     EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Selanjutnya')]"))
                 )
                 next_button.click()
-                time.sleep(random.uniform(5, 10))
+                time.sleep(random.uniform(13, 28))
                 
                 # Step 5: Check for CAPTCHA
                 print("Step 5: Checking for CAPTCHA")
@@ -337,17 +337,17 @@ def perform_auto_login(driver):
                 )
                 
                 # Human-like behavior
-                time.sleep(random.uniform(1, 2))
+                time.sleep(random.uniform(8, 19))
                 
                 sso_email_input.clear()
-                time.sleep(random.uniform(0.3, 0.7))
+                time.sleep(random.uniform(9, 17))
                 
                 # Type email character by character
                 for char in email:
                     sso_email_input.send_keys(char)
-                    time.sleep(random.uniform(0.05, 0.15))
+                    time.sleep(random.uniform(8, 14))
                 
-                time.sleep(random.uniform(0.8, 1.5))
+                time.sleep(random.uniform(13, 25))
                 
                 # Step 7: Click Next on SSO
                 print("Step 7: Clicking Next button on SSO")
@@ -356,7 +356,7 @@ def perform_auto_login(driver):
                     EC.element_to_be_clickable((By.ID, "next_login"))
                 )
                 sso_next_button.click()
-                time.sleep(random.uniform(2, 4))
+                time.sleep(random.uniform(14, 27))
                 
                 # Step 8: Enter password
                 print("Step 8: Entering password")
@@ -366,17 +366,17 @@ def perform_auto_login(driver):
                 )
                 
                 # Human-like behavior
-                time.sleep(random.uniform(1, 2))
+                time.sleep(random.uniform(9, 22))
                 
                 password_input.clear()
-                time.sleep(random.uniform(0.3, 0.7))
+                time.sleep(random.uniform(13, 18))
                 
                 # Type password character by character
                 for char in password:
                     password_input.send_keys(char)
-                    time.sleep(random.uniform(0.05, 0.15))
+                    time.sleep(random.uniform(8, 14))
                 
-                time.sleep(random.uniform(0.8, 1.5))
+                time.sleep(random.uniform(10, 23))
                 
                 # Step 9: Click Login button
                 print("Step 9: Clicking Login button")
@@ -385,7 +385,7 @@ def perform_auto_login(driver):
                     EC.element_to_be_clickable((By.CSS_SELECTOR, "button.login__submit2"))
                 )
                 login_submit.click()
-                time.sleep(random.uniform(4, 6))
+                time.sleep(random.uniform(13, 27))
                 
                 # Step 10: Click Continue on confirmation page
                 print("Step 10: Clicking Continue button")
@@ -395,7 +395,7 @@ def perform_auto_login(driver):
                         EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Lanjutkan')]"))
                     )
                     continue_button.click()
-                    time.sleep(random.uniform(4, 6))
+                    time.sleep(random.uniform(12, 18))
                 except TimeoutException:
                     print("Continue button not found or already passed")
                 
@@ -1374,9 +1374,9 @@ def import_dosen_data(conn, profiles_df):
                 insert_query = sql.SQL("""
                     INSERT INTO tmp_dosen_dt 
                     (v_nama_dosen, v_id_googlescholar, n_total_publikasi, 
-                     n_total_sitasi_gs, n_h_index_gs, n_h_index_gs2020,
+                     n_total_sitasi_gs, n_total_sitasi_gs2020, n_h_index_gs, n_h_index_gs2020,
                      n_i10_index_gs, n_i10_index_gs2020, v_sumber, v_link_url, t_tanggal_unduh)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING v_id_dosen
                 """)
                 
@@ -1385,6 +1385,7 @@ def import_dosen_data(conn, profiles_df):
                     row['ID Google Scholar'],
                     int(row['Total_Publikasi']) if pd.notna(row['Total_Publikasi']) else 0,
                     int(row['Citations_all']) if pd.notna(row['Citations_all']) else 0,
+                    int(row['Citations_since2020']) if pd.notna(row['Citations_since2020']) else 0,
                     int(row['h-index_all']) if pd.notna(row['h-index_all']) else 0,
                     int(row['h-index_since2020']) if pd.notna(row['h-index_since2020']) else 0,
                     int(row['i10-index_all']) if pd.notna(row['i10-index_all']) else 0,
