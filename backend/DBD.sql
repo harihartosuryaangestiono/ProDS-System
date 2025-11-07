@@ -183,6 +183,27 @@ CREATE TABLE users (
     t_tanggal_bikin TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE tmp_dosen_dt
+ADD COLUMN n_total_sitasi_gs2020 integer;
+
+
+--DATA MASTER
+CREATE TABLE DataMaster (
+    v_nip VARCHAR(20) PRIMARY KEY,
+    v_nama_lengkap VARCHAR(150),
+    v_nama_lengkap_gelar VARCHAR(200),
+    v_homebase_unpar VARCHAR(100),
+    v_nama_homebase_unpar VARCHAR(150),
+    v_homebase_dikti VARCHAR(100),
+    v_nama_homebase_dikti VARCHAR(150),
+    v_ket_jns_pegawai VARCHAR(50),
+    v_ket_kel_pegawai VARCHAR(50),
+    v_ket_kategori_status_peg VARCHAR(50),
+    ID_SINTA VARCHAR(20),
+    ID_GS VARCHAR(50),
+    ID_SCOPUS VARCHAR(50)
+);
+
 -- ========================
 -- 9. TRIGGER FUNCTIONS UNTUK AUTO UPDATE t_updated_at
 -- ========================

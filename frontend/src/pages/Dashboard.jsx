@@ -11,9 +11,21 @@ const Dashboard = () => {
     avg_h_index: 0,
     median_h_index: 0,
     publikasi_by_year: [],
-    top_authors: []
+    top_authors_scopus: [],
+    top_authors_gs: [],
+    publikasi_internasional_q12: 0,
+    publikasi_internasional_q34_noq: 0,
+    publikasi_nasional_sinta12: 0,
+    publikasi_nasional_sinta34: 0,
+    publikasi_nasional_sinta5: 0,
+    publikasi_nasional_sinta6: 0,
+    scopus_q_breakdown: [],
+    sinta_rank_breakdown: [],
+    top_dosen_international: [],
+    top_dosen_national: []
   });
   const [loading, setLoading] = useState(true);
+  const [yearRange, setYearRange] = useState(10);
 
   useEffect(() => {
     fetchDashboardStats();
@@ -70,12 +82,14 @@ const Dashboard = () => {
     );
   }
 
-  // Filter untuk 5 tahun terakhir
-  const currentYear = new Date().getFullYear();
-  const last5YearsData = stats.publikasi_by_year.filter(item => {
-    const year = parseInt(item.v_tahun_publikasi);
-    return year >= currentYear - 5 && year <= currentYear;
-  });
+  // Filter data per tahun berdasarkan rentang pilihan
+  const filteredYearData = (() => {
+    const currentYear = new Date().getFullYear();
+    return (stats.publikasi_by_year || []).filter(item => {
+      const year = parseInt(item.v_tahun_publikasi);
+      return year >= currentYear - yearRange && year <= currentYear;
+    });
+  })();
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -117,16 +131,65 @@ const Dashboard = () => {
           />
         </div>
 
+        {/* International vs National Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <StatCard
+            title="Internasional (Scopus Q1-Q2)"
+            value={stats.publikasi_internasional_q12.toLocaleString()}
+            icon={Award}
+            color="#059669"
+          />
+          <StatCard
+            title="Internasional (Q3-Q4/noQ)"
+            value={stats.publikasi_internasional_q34_noq.toLocaleString()}
+            icon={Award}
+            color="#10B981"
+          />
+          <StatCard
+            title="Nasional (Sinta 1-2)"
+            value={stats.publikasi_nasional_sinta12.toLocaleString()}
+            icon={Award}
+            color="#7C3AED"
+          />
+          <StatCard
+            title="Nasional (Sinta 3-4)"
+            value={stats.publikasi_nasional_sinta34.toLocaleString()}
+            icon={Award}
+            color="#8B5CF6"
+          />
+        </div>
+
+        {/* Additional Sinta 5-6 combined */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <StatCard
+            title="Nasional (Sinta 5-6)"
+            value={(stats.publikasi_nasional_sinta5 + stats.publikasi_nasional_sinta6).toLocaleString()}
+            icon={Award}
+            color="#A78BFA"
+          />
+        </div>
+
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Publications by Year Chart - Menampilkan 10 tahun terakhir */}
+          {/* Publications by Year Chart - Single visualization with filter */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center mb-4">
-              <Calendar className="w-5 h-5 text-blue-600 mr-2" />
-              <h2 className="text-lg font-semibold text-gray-900">Publikasi per Tahun (10 Tahun Terakhir)</h2>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <Calendar className="w-5 h-5 text-blue-600 mr-2" />
+                <h2 className="text-lg font-semibold text-gray-900">Publikasi per Tahun ({yearRange} Tahun Terakhir)</h2>
+              </div>
+              <select
+                className="border border-gray-300 rounded-md text-sm px-2 py-1 text-gray-700"
+                value={yearRange}
+                onChange={(e) => setYearRange(parseInt(e.target.value))}
+              >
+                <option value={5}>5 Tahun</option>
+                <option value={10}>10 Tahun</option>
+                <option value={15}>15 Tahun</option>
+              </select>
             </div>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={stats.publikasi_by_year}>
+              <BarChart data={filteredYearData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="v_tahun_publikasi" />
                 <YAxis />
@@ -137,16 +200,16 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Top Authors Chart */}
+          {/* Top Dosen by h-index (Scopus) */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center mb-4">
               <Award className="w-5 h-5 text-green-600 mr-2" />
-              <h2 className="text-lg font-semibold text-gray-900">Top 10 Dosen (Sitasi)</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Top 10 Dosen (h-index Scopus)</h2>
             </div>
-            {stats.top_authors && stats.top_authors.length > 0 ? (
+            {stats.top_authors_scopus && stats.top_authors_scopus.length > 0 ? (
               <ResponsiveContainer width="100%" height={400}>
                 <BarChart
-                  data={stats.top_authors.slice(0, 10)}
+                  data={stats.top_authors_scopus.slice(0, 10)}
                   layout="vertical"
                   margin={{ top: 5, right: 30, left: -50, bottom: 5 }}
                 >
@@ -166,9 +229,9 @@ const Dashboard = () => {
                   />
                   <Legend />
                   <Bar 
-                    dataKey="n_total_sitasi_gs" 
+                    dataKey="n_h_index_scopus" 
                     fill="#10B981" 
-                    name="Total Sitasi"
+                    name="h-index Scopus"
                     radius={[0, 8, 8, 0]}
                   />
                 </BarChart>
@@ -181,34 +244,94 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Publication Types Distribution */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* PERBAIKAN: Filter 5 tahun terakhir dengan rentang tahun yang benar (2020-2025) */}
-          <div className="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
+        {/* Top Dosen by h-index (Google Scholar) */}
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-8 mb-8">
+          <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center mb-4">
-              <BookOpen className="w-5 h-5 text-purple-600 mr-2" />
-              <h2 className="text-lg font-semibold text-gray-900">Trend Publikasi (5 Tahun Terakhir)</h2>
+              <Award className="w-5 h-5 text-red-600 mr-2" />
+              <h2 className="text-lg font-semibold text-gray-900">Top 10 Dosen (h-index Google Scholar)</h2>
+            </div>
+            {stats.top_authors_gs && stats.top_authors_gs.length > 0 ? (
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart
+                  data={stats.top_authors_gs.slice(0, 10)}
+                  layout="vertical"
+                  margin={{ top: 5, right: 30, left: -50, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis 
+                    dataKey="v_nama_dosen" 
+                    type="category" 
+                    width={190}
+                    interval={0}
+                    tick={{ fontSize: 11 }}
+                    tickFormatter={(value) => value.length > 25 ? value.substring(0, 25) + '...' : value}
+                  />
+                  <Tooltip 
+                    formatter={(value) => value.toLocaleString()}
+                    labelFormatter={(label) => `Dosen: ${label}`}
+                  />
+                  <Legend />
+                  <Bar 
+                    dataKey="n_h_index_gs" 
+                    fill="#EF4444" 
+                    name="h-index GS"
+                    radius={[0, 8, 8, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-64 text-gray-400">
+                <p>Tidak ada data dosen</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Breakdown Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Scopus Q Breakdown */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="flex items-center mb-4">
+              <Award className="w-5 h-5 text-emerald-600 mr-2" />
+              <h2 className="text-lg font-semibold text-gray-900">Scopus Breakdown (Q)</h2>
             </div>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={last5YearsData}>
+              <BarChart data={stats.scopus_q_breakdown}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="v_tahun_publikasi" />
+                <XAxis dataKey="ranking" />
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="count" 
-                  stroke="#8884d8" 
-                  strokeWidth={3}
-                  dot={{ r: 6 }}
-                  name="Jumlah Publikasi"
-                />
-              </LineChart>
+                <Bar dataKey="count" fill="#10B981" name="Jumlah" />
+              </BarChart>
             </ResponsiveContainer>
           </div>
+          {/* Sinta Rank Breakdown */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="flex items-center mb-4">
+              <Award className="w-5 h-5 text-indigo-600 mr-2" />
+              <h2 className="text-lg font-semibold text-gray-900">Sinta Breakdown (S1–S6)</h2>
+            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={stats.sinta_rank_breakdown}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="ranking" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="count" fill="#6366F1" name="Jumlah" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
 
-          {/* Summary Statistics */}
+        {/* Summary Statistics */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* Removed Trend Publikasi line chart to keep a single visualization as requested */}
+
+          {/* Summary Card Column */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Ringkasan Statistik</h2>
             <div className="space-y-4">
@@ -227,9 +350,9 @@ const Dashboard = () => {
               </div>
               
               <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
-                <span className="text-sm font-medium text-gray-600">Dosen Ter-produktif</span>
+                <span className="text-sm font-medium text-gray-600">Top h-index (GS)</span>
                 <span className="text-sm font-bold text-yellow-600">
-                  {stats.top_authors[0]?.v_nama_dosen?.substring(0, 15)}...
+                  {stats.top_authors_gs?.[0]?.v_nama_dosen?.substring(0, 15)}...
                 </span>
               </div>
 
@@ -263,12 +386,12 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Recent Activities */}
+        {/* Top 10 Dosen Berdasarkan h-index (Google Scholar) */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <Search className="w-5 h-5 text-indigo-600 mr-2" />
-              <h2 className="text-lg font-semibold text-gray-900">Top 10 Dosen Berdasarkan Sitasi</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Top 10 Dosen Berdasarkan h-index (Google Scholar)</h2>
             </div>
           </div>
           
@@ -283,10 +406,7 @@ const Dashboard = () => {
                     Nama Dosen
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total Sitasi
-                  </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Sumber
+                    h-index (GS)
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Persentase
@@ -294,7 +414,7 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {stats.top_authors.slice(0, 10).map((author, index) => (
+                {stats.top_authors_gs.slice(0, 10).map((author, index) => (
                   <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -310,24 +430,103 @@ const Dashboard = () => {
                       {author.v_nama_dosen}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {author.n_total_sitasi_gs?.toLocaleString() || 0}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                      {author.v_sumber && author.v_sumber !== 'N/A' ? (
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          author.v_sumber.toLowerCase().includes('scholar') ? 'bg-red-100 text-red-800' :
-                          author.v_sumber.toLowerCase().includes('sinta') ? 'bg-indigo-100 text-indigo-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {author.v_sumber}
-                        </span>
-                      ) : (
-                        <span className="text-gray-400 text-xs">-</span>
-                      )}
+                      {author.n_h_index_gs?.toLocaleString() || 0}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {stats.total_sitasi > 0 ? 
-                        ((author.n_total_sitasi_gs / stats.total_sitasi) * 100).toFixed(1) : 0}%
+                      {stats.top_authors_gs.length > 0 ? 
+                        ((author.n_h_index_gs / Math.max(1, stats.top_authors_gs[0].n_h_index_gs)) * 100).toFixed(1) : 0}%
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Top 10 Dosen Internasional (Scopus) - styled like GS table */}
+        <div className="bg-white rounded-lg shadow-md p-6 mt-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <Search className="w-5 h-5 text-emerald-600 mr-2" />
+              <h2 className="text-lg font-semibold text-gray-900">Top 10 Dosen Berdasarkan Publikasi Internasional (Scopus)</h2>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ranking</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Dosen</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Publikasi</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Persentase</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {stats.top_dosen_international.slice(0, 10).map((author, index) => (
+                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        index === 0 ? 'bg-yellow-100 text-yellow-800' :
+                        index === 1 ? 'bg-gray-100 text-gray-800' :
+                        index === 2 ? 'bg-orange-100 text-orange-800' :
+                        'bg-blue-100 text-blue-800'
+                      }`}>
+                        #{index + 1}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{author.v_nama_dosen}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{author.count_international?.toLocaleString() || 0}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {(() => {
+                        const maxVal = stats.top_dosen_international?.[0]?.count_international || 0;
+                        return maxVal > 0 ? ((author.count_international / maxVal) * 100).toFixed(1) : '0.0';
+                      })()}%
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Top 10 Dosen Nasional (Sinta 1-4) - styled like GS table */}
+        <div className="bg-white rounded-lg shadow-md p-6 mt-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <Search className="w-5 h-5 text-indigo-600 mr-2" />
+              <h2 className="text-lg font-semibold text-gray-900">Top 10 Dosen Berdasarkan Publikasi Nasional (Sinta 1–4)</h2>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ranking</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Dosen</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Publikasi</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Persentase</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {stats.top_dosen_national.slice(0, 10).map((author, index) => (
+                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        index === 0 ? 'bg-yellow-100 text-yellow-800' :
+                        index === 1 ? 'bg-gray-100 text-gray-800' :
+                        index === 2 ? 'bg-orange-100 text-orange-800' :
+                        'bg-blue-100 text-blue-800'
+                      }`}>
+                        #{index + 1}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{author.v_nama_dosen}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{author.count_national?.toLocaleString() || 0}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {(() => {
+                        const maxVal = stats.top_dosen_national?.[0]?.count_national || 0;
+                        return maxVal > 0 ? ((author.count_national / maxVal) * 100).toFixed(1) : '0.0';
+                      })()}%
                     </td>
                   </tr>
                 ))}
