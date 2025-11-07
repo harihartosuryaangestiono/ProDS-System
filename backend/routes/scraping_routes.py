@@ -333,6 +333,26 @@ def scrape_sinta_garuda():
         }), 500
 
 # ============================================================================
+# CANCEL ENDPOINT
+# ============================================================================
+@scraping_bp.route('/api/scraping/jobs/<job_id>/cancel', methods=['POST'])
+def cancel_job(job_id):
+    try:
+        job = active_jobs.get(job_id)
+        if not job:
+            return jsonify({'success': False, 'error': 'Job not found'}), 404
+
+        # Mark cancel requested
+        job['cancel_requested'] = True
+        job['status'] = 'cancelling'
+        job['message'] = 'Cancellation requested by user'
+
+        emit_progress(job_id, job)
+        return jsonify({'success': True, 'message': 'Cancellation requested', 'job_id': job_id})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# ============================================================================
 # GOOGLE SCHOLAR ROUTE
 # ============================================================================
 def run_google_scholar_scraping(job_id, max_authors, scrape_from_beginning):

@@ -1657,6 +1657,7 @@ def run_scraper_script(script_path, params=None):
             'error': str(e)
         }
 
+
 # Health check endpoint
 @app.route('/api/health', methods=['GET'])
 def health_check():

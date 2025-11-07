@@ -95,6 +95,11 @@ def scrape_sinta_dosen_task(username, password, affiliation_id, target_dosen,
     Returns:
         dict: Result with success status, message, and summary
     """
+    # Lazy import to avoid circular dependency
+    def get_progress_helpers():
+        from routes import scraping_routes
+        return scraping_routes.active_jobs, scraping_routes.emit_progress
+    
     print_header("SINTA DOSEN SCRAPING TASK - REAL MODE", job_id)
     
     print(f"📊 Configuration:")
@@ -106,21 +111,84 @@ def scrape_sinta_dosen_task(username, password, affiliation_id, target_dosen,
     print(f"   - Database: {DB_CONFIG['dbname']}\n")
     
     try:
+        # Get progress helpers
+        active_jobs, emit_progress = get_progress_helpers() if job_id else (None, None)
+
+        def cancel_requested():
+            try:
+                return bool(active_jobs.get(job_id, {}).get('cancel_requested')) if active_jobs and job_id else False
+            except Exception:
+                return False
+
+        def finalize_cancel(message='Cancelled by user'):
+            if job_id and active_jobs and emit_progress:
+                active_jobs[job_id].update({
+                    'status': 'cancelled',
+                    'message': message,
+                    'completed_at': datetime.now().isoformat(),
+                    'result': {'success': False, 'message': message}
+                })
+                emit_progress(job_id, active_jobs[job_id])
+            return {'success': False, 'message': message}
+        
+        # Update progress
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'status': 'running',
+                'message': 'Importing scraper modules...',
+                'current': 0,
+                'total': target_dosen
+            })
+            emit_progress(job_id, active_jobs[job_id])
+        if cancel_requested():
+            return finalize_cancel()
+        
         # Import scraper
         print("📦 Importing SintaDosenScraper...")
         from sinta_dosen import SintaDosenScraper
         print("✅ Import successful!")
+        
+        # Update progress
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'message': 'Connecting to database and initializing scraper...'
+            })
+            emit_progress(job_id, active_jobs[job_id])
+        if cancel_requested():
+            return finalize_cancel()
         
         # Initialize scraper
         print(f"\n🔌 Connecting to database: {DB_CONFIG['dbname']}@{DB_CONFIG['host']}")
         scraper = SintaDosenScraper(db_config=DB_CONFIG)
         print("✅ Scraper initialized successfully!")
         
+        # Update progress
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'message': f'Starting scraping process (target: {target_dosen} dosen)...'
+            })
+            emit_progress(job_id, active_jobs[job_id])
+        if cancel_requested():
+            return finalize_cancel()
+        
         # Start scraping
         print(f"\n🏃 Starting scraping process...")
         print(f"⏱️  This may take several hours depending on target...\n")
         
         start_time = time.time()
+        
+        # Get current count before scraping
+        current_count = scraper._get_current_dosen_count()
+        
+        # Update progress with current count
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'current': current_count,
+                'message': f'Current: {current_count}/{target_dosen} dosen. Starting scraping...'
+            })
+            emit_progress(job_id, active_jobs[job_id])
+        if cancel_requested():
+            return finalize_cancel()
         
         final_count = scraper.scrape_until_target_reached(
             affiliation_id=affiliation_id,
@@ -134,6 +202,14 @@ def scrape_sinta_dosen_task(username, password, affiliation_id, target_dosen,
         print(f"\n✅ Scraping completed!")
         print(f"📊 Final count: {final_count} dosen")
         print(f"⏱️  Total time: {elapsed_time/60:.2f} minutes")
+        
+        # Update final progress
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'current': final_count,
+                'message': f'Completed! {final_count} dosen scraped successfully'
+            })
+            emit_progress(job_id, active_jobs[job_id])
         
         # Get summary
         summary = scraper.get_extraction_summary()
@@ -206,6 +282,11 @@ def scrape_sinta_scopus_task(username, password, job_id=None):
     Returns:
         dict: Result with success status and publication count
     """
+    # Lazy import to avoid circular dependency
+    def get_progress_helpers():
+        from routes import scraping_routes
+        return scraping_routes.active_jobs, scraping_routes.emit_progress
+    
     print_header("SINTA SCOPUS SCRAPING TASK - REAL MODE", job_id)
     
     print(f"📊 Configuration:")
@@ -213,10 +294,51 @@ def scrape_sinta_scopus_task(username, password, job_id=None):
     print(f"   - Database: {DB_CONFIG['dbname']}\n")
     
     try:
+        # Get progress helpers
+        active_jobs, emit_progress = get_progress_helpers() if job_id else (None, None)
+
+        def cancel_requested():
+            try:
+                return bool(active_jobs.get(job_id, {}).get('cancel_requested')) if active_jobs and job_id else False
+            except Exception:
+                return False
+
+        def finalize_cancel(message='Cancelled by user'):
+            if job_id and active_jobs and emit_progress:
+                active_jobs[job_id].update({
+                    'status': 'cancelled',
+                    'message': message,
+                    'completed_at': datetime.now().isoformat(),
+                    'result': {'success': False, 'message': message}
+                })
+                emit_progress(job_id, active_jobs[job_id])
+            return {'success': False, 'message': message}
+        
+        # Update progress
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'status': 'running',
+                'message': 'Importing scraper modules...',
+                'current': 0,
+                'total': 0
+            })
+            emit_progress(job_id, active_jobs[job_id])
+        if cancel_requested():
+            return finalize_cancel()
+        
         # Import scraper and database manager
         print("📦 Importing SintaScraper and DatabaseManager...")
         from sinta_scopus import SintaScraper, DatabaseManager
         print("✅ Import successful!")
+        
+        # Update progress
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'message': 'Connecting to database...'
+            })
+            emit_progress(job_id, active_jobs[job_id])
+        if cancel_requested():
+            return finalize_cancel()
         
         # Initialize database
         print(f"\n🔌 Connecting to database: {DB_CONFIG['dbname']}@{DB_CONFIG['host']}")
@@ -236,15 +358,22 @@ def scrape_sinta_scopus_task(username, password, job_id=None):
         scraper = SintaScraper(db_manager)
         print("✅ Scraper initialized!")
         
-        # Login to SINTA
-        print(f"\n⚠️ Skipping login - Testing without authentication...")
-        scraper.logged_in = False  # Mark as not logged in
-        # if not scraper.login(username, password):
-        #     raise Exception("Login to SINTA failed")
-        # print("✅ Login successful!")
-        print("⚠️ Continuing without login (some data may be limited)")
-
+        # Update progress
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'message': 'Logging in to SINTA...'
+            })
+            emit_progress(job_id, active_jobs[job_id])
+        if cancel_requested():
+            return finalize_cancel()
         
+        # Login to SINTA
+        print(f"\n🔐 Logging in to SINTA...")
+        if not scraper.login(username, password):
+            raise Exception("Login to SINTA failed")
+        print("✅ Login successful!")
+        if cancel_requested():
+            return finalize_cancel()
         
         # Get authors from database
         print(f"\n📋 Retrieving authors from database...")
@@ -253,6 +382,16 @@ def scrape_sinta_scopus_task(username, password, job_id=None):
         
         if not authors:
             raise Exception("No authors found in database")
+        
+        # Update progress with total authors
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'total': len(authors),
+                'message': f'Starting Scopus scraping for {len(authors)} authors...'
+            })
+            emit_progress(job_id, active_jobs[job_id])
+        if cancel_requested():
+            return finalize_cancel()
         
         # Start scraping
         print(f"\n🏃 Starting Scopus scraping...")
@@ -267,6 +406,16 @@ def scrape_sinta_scopus_task(username, password, job_id=None):
             try:
                 author_id = author['id']  # SINTA ID
                 author_name = author['name']
+                
+                # Update progress
+                if job_id:
+                    active_jobs[job_id].update({
+                        'current': i + 1,
+                        'message': f'Processing {author_name} ({i+1}/{len(authors)})...'
+                    })
+                    emit_progress(job_id, active_jobs[job_id])
+                if cancel_requested():
+                    return finalize_cancel()
                 
                 print(f"[{i+1}/{len(authors)}] Processing: {author_name} (SINTA: {author_id})")
                 
@@ -302,6 +451,14 @@ def scrape_sinta_scopus_task(username, password, job_id=None):
         
         # Close database
         db_manager.disconnect()
+        
+        # Update final progress
+        if job_id:
+            active_jobs[job_id].update({
+                'current': len(authors),
+                'message': f'Completed! {total_publications} publications from {processed_authors} authors'
+            })
+            emit_progress(job_id, active_jobs[job_id])
         
         # Prepare result
         result = {
@@ -374,6 +531,11 @@ def scrape_sinta_googlescholar_task(username, password, job_id=None):
     Returns:
         dict: Result with success status and publication count
     """
+    # Lazy import to avoid circular dependency
+    def get_progress_helpers():
+        from routes import scraping_routes
+        return scraping_routes.active_jobs, scraping_routes.emit_progress
+    
     print_header("SINTA GOOGLE SCHOLAR SCRAPING TASK - REAL MODE", job_id)
     
     print(f"📊 Configuration:")
@@ -381,10 +543,51 @@ def scrape_sinta_googlescholar_task(username, password, job_id=None):
     print(f"   - Database: {DB_CONFIG['dbname']}\n")
     
     try:
+        # Get progress helpers
+        active_jobs, emit_progress = get_progress_helpers() if job_id else (None, None)
+
+        def cancel_requested():
+            try:
+                return bool(active_jobs.get(job_id, {}).get('cancel_requested')) if active_jobs and job_id else False
+            except Exception:
+                return False
+
+        def finalize_cancel(message='Cancelled by user'):
+            if job_id and active_jobs and emit_progress:
+                active_jobs[job_id].update({
+                    'status': 'cancelled',
+                    'message': message,
+                    'completed_at': datetime.now().isoformat(),
+                    'result': {'success': False, 'message': message}
+                })
+                emit_progress(job_id, active_jobs[job_id])
+            return {'success': False, 'message': message}
+        
+        # Update progress
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'status': 'running',
+                'message': 'Importing scraper modules...',
+                'current': 0,
+                'total': 0
+            })
+            emit_progress(job_id, active_jobs[job_id])
+        if cancel_requested():
+            return finalize_cancel()
+        
         # Import scraper and database manager
         print("📦 Importing SintaScraper and DatabaseManager...")
         from sinta_googlescholar import SintaScraper, DatabaseManager
         print("✅ Import successful!")
+        
+        # Update progress
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'message': 'Connecting to database...'
+            })
+            emit_progress(job_id, active_jobs[job_id])
+        if cancel_requested():
+            return finalize_cancel()
         
         # Initialize database
         print(f"\n🔌 Connecting to database: {DB_CONFIG['dbname']}@{DB_CONFIG['host']}")
@@ -404,11 +607,22 @@ def scrape_sinta_googlescholar_task(username, password, job_id=None):
         scraper = SintaScraper(db_manager)
         print("✅ Scraper initialized!")
         
+        # Update progress
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'message': 'Logging in to SINTA...'
+            })
+            emit_progress(job_id, active_jobs[job_id])
+        if cancel_requested():
+            return finalize_cancel()
+        
         # Login to SINTA
         print(f"\n🔐 Logging in to SINTA...")
         if not scraper.login(username, password):
             raise Exception("Login to SINTA failed")
         print("✅ Login successful!")
+        if cancel_requested():
+            return finalize_cancel()
         
         # Get authors from database
         print(f"\n📋 Retrieving authors from database...")
@@ -417,6 +631,16 @@ def scrape_sinta_googlescholar_task(username, password, job_id=None):
         
         if not authors:
             raise Exception("No authors found in database")
+        
+        # Update progress with total authors
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'total': len(authors),
+                'message': f'Starting Google Scholar scraping for {len(authors)} authors...'
+            })
+            emit_progress(job_id, active_jobs[job_id])
+        if cancel_requested():
+            return finalize_cancel()
         
         # Start scraping
         print(f"\n🏃 Starting Google Scholar scraping...")
@@ -431,6 +655,16 @@ def scrape_sinta_googlescholar_task(username, password, job_id=None):
             try:
                 author_id = author['id']  # SINTA ID
                 author_name = author['name']
+                
+                # Update progress
+                if job_id and active_jobs and emit_progress:
+                    active_jobs[job_id].update({
+                        'current': i + 1,
+                        'message': f'Processing {author_name} ({i+1}/{len(authors)})...'
+                    })
+                    emit_progress(job_id, active_jobs[job_id])
+                if cancel_requested():
+                    return finalize_cancel()
                 
                 print(f"[{i+1}/{len(authors)}] Processing: {author_name} (SINTA: {author_id})")
                 
@@ -470,6 +704,14 @@ def scrape_sinta_googlescholar_task(username, password, job_id=None):
         
         # Close database
         db_manager.disconnect()
+        
+        # Update final progress
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'current': len(authors),
+                'message': f'Completed! {total_publications} publications from {processed_authors} authors'
+            })
+            emit_progress(job_id, active_jobs[job_id])
         
         # Prepare result
         result = {
@@ -541,6 +783,11 @@ def scrape_sinta_garuda_task(username, password, job_id=None):
     Returns:
         dict: Result with success status and publication count
     """
+    # Lazy import to avoid circular dependency
+    def get_progress_helpers():
+        from routes import scraping_routes
+        return scraping_routes.active_jobs, scraping_routes.emit_progress
+    
     print_header("SINTA GARUDA SCRAPING TASK - REAL MODE", job_id)
     
     print(f"📊 Configuration:")
@@ -548,10 +795,51 @@ def scrape_sinta_garuda_task(username, password, job_id=None):
     print(f"   - Database: {DB_CONFIG['dbname']}\n")
     
     try:
+        # Get progress helpers
+        active_jobs, emit_progress = get_progress_helpers() if job_id else (None, None)
+
+        def cancel_requested():
+            try:
+                return bool(active_jobs.get(job_id, {}).get('cancel_requested')) if active_jobs and job_id else False
+            except Exception:
+                return False
+
+        def finalize_cancel(message='Cancelled by user'):
+            if job_id and active_jobs and emit_progress:
+                active_jobs[job_id].update({
+                    'status': 'cancelled',
+                    'message': message,
+                    'completed_at': datetime.now().isoformat(),
+                    'result': {'success': False, 'message': message}
+                })
+                emit_progress(job_id, active_jobs[job_id])
+            return {'success': False, 'message': message}
+        
+        # Update progress
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'status': 'running',
+                'message': 'Importing scraper modules...',
+                'current': 0,
+                'total': 0
+            })
+            emit_progress(job_id, active_jobs[job_id])
+        if cancel_requested():
+            return finalize_cancel()
+        
         # Import scraper and database manager
         print("📦 Importing SintaGarudaScraper and DatabaseManager...")
         from sinta_garuda import SintaGarudaScraper, DatabaseManager
         print("✅ Import successful!")
+        
+        # Update progress
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'message': 'Connecting to database...'
+            })
+            emit_progress(job_id, active_jobs[job_id])
+        if cancel_requested():
+            return finalize_cancel()
         
         # Initialize database
         print(f"\n🔌 Connecting to database: {DB_CONFIG['dbname']}@{DB_CONFIG['host']}")
@@ -571,11 +859,22 @@ def scrape_sinta_garuda_task(username, password, job_id=None):
         scraper = SintaGarudaScraper(db_manager)
         print("✅ Scraper initialized!")
         
+        # Update progress
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'message': 'Logging in to SINTA...'
+            })
+            emit_progress(job_id, active_jobs[job_id])
+        if cancel_requested():
+            return finalize_cancel()
+        
         # Login to SINTA
         print(f"\n🔐 Logging in to SINTA...")
         if not scraper.login(username, password):
             raise Exception("Login to SINTA failed")
         print("✅ Login successful!")
+        if cancel_requested():
+            return finalize_cancel()
         
         # Get authors from database
         print(f"\n📋 Retrieving authors from database...")
@@ -587,6 +886,16 @@ def scrape_sinta_garuda_task(username, password, job_id=None):
         
         # Generate batch ID
         db_manager.generate_batch_id()
+        
+        # Update progress with total authors
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'total': len(authors),
+                'message': f'Starting Garuda scraping for {len(authors)} authors...'
+            })
+            emit_progress(job_id, active_jobs[job_id])
+        if cancel_requested():
+            return finalize_cancel()
         
         # Start scraping
         print(f"\n🏃 Starting Garuda scraping...")
@@ -602,6 +911,16 @@ def scrape_sinta_garuda_task(username, password, job_id=None):
                 sinta_id = author['sinta_id']
                 nama_dosen = author['nama']
                 jurusan = author['jurusan']
+                
+                # Update progress
+                if job_id and active_jobs and emit_progress:
+                    active_jobs[job_id].update({
+                        'current': i + 1,
+                        'message': f'Processing {nama_dosen} ({i+1}/{len(authors)})...'
+                    })
+                    emit_progress(job_id, active_jobs[job_id])
+                if cancel_requested():
+                    return finalize_cancel()
                 
                 print(f"[{i+1}/{len(authors)}] Processing: {nama_dosen} (SINTA: {sinta_id})")
                 
@@ -637,6 +956,14 @@ def scrape_sinta_garuda_task(username, password, job_id=None):
         
         # Close database
         db_manager.disconnect()
+        
+        # Update final progress
+        if job_id and active_jobs and emit_progress:
+            active_jobs[job_id].update({
+                'current': len(authors),
+                'message': f'Completed! {total_publications} publications from {processed_authors} authors'
+            })
+            emit_progress(job_id, active_jobs[job_id])
         
         # Prepare result
         result = {
