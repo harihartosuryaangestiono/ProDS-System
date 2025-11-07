@@ -54,9 +54,9 @@ socketio = SocketIO(app,
 
 # Database configuration
 DB_CONFIG = {
-    'dbname': os.environ.get('DB_NAME', 'ProDSGabungan'),
-    'user': os.environ.get('DB_USER', 'postgres'),
-    'password': os.environ.get('DB_PASSWORD', 'password123'),
+    'dbname': os.environ.get('DB_NAME', 'SKM_PUBLIKASI'),
+    'user': os.environ.get('DB_USER', 'rayhanadjisantoso'),
+    'password': os.environ.get('DB_PASSWORD', 'rayhan123'),
     'host': os.environ.get('DB_HOST', 'localhost'),
     'port': os.environ.get('DB_PORT', '5432')
 }
@@ -171,21 +171,35 @@ def dashboard_stats(current_user_id):
         
         print(f"📊 Total unique publikasi: {total_publikasi}")
         
-        # Get total sitasi and h-index statistics from latest dosen data only
+        # Get total sitasi from ALL three sources with breakdown and h-index statistics from latest dosen data only
         cur.execute(f"""
             {latest_dosen_cte}
             SELECT 
-                COALESCE(SUM(n_total_sitasi_gs), 0) as total_sitasi,
+                COALESCE(SUM(COALESCE(n_total_sitasi_gs, 0)), 0) as total_sitasi_gs,
+                COALESCE(SUM(COALESCE(n_sitasi_gs, 0)), 0) as total_sitasi_gs_sinta,
+                COALESCE(SUM(COALESCE(n_sitasi_scopus, 0)), 0) as total_sitasi_scopus,
+                COALESCE(SUM(
+                    COALESCE(n_total_sitasi_gs, 0) + 
+                    COALESCE(n_sitasi_gs, 0) + 
+                    COALESCE(n_sitasi_scopus, 0)
+                ), 0) as total_sitasi,
                 COALESCE(AVG(n_h_index_gs), 0) as avg_h_index,
                 COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY n_h_index_gs), 0) as median_h_index
             FROM latest_dosen
         """)
         sitasi_stats = cur.fetchone()
-        total_sitasi = sitasi_stats['total_sitasi']
+        total_sitasi = int(sitasi_stats['total_sitasi'] or 0)
+        total_sitasi_gs = int(sitasi_stats['total_sitasi_gs'] or 0)
+        total_sitasi_gs_sinta = int(sitasi_stats['total_sitasi_gs_sinta'] or 0)
+        total_sitasi_scopus = int(sitasi_stats['total_sitasi_scopus'] or 0)
         avg_h_index = sitasi_stats['avg_h_index']
         median_h_index = sitasi_stats['median_h_index']
         
-        print(f"📊 Total sitasi: {total_sitasi}, Avg H-Index: {avg_h_index}, Median H-Index: {median_h_index}")
+        print(f"📊 Total sitasi: {total_sitasi}")
+        print(f"   - Google Scholar (n_total_sitasi_gs): {total_sitasi_gs}")
+        print(f"   - Google Scholar SINTA (n_sitasi_gs): {total_sitasi_gs_sinta}")
+        print(f"   - Scopus (n_sitasi_scopus): {total_sitasi_scopus}")
+        print(f"📊 Avg H-Index: {avg_h_index}, Median H-Index: {median_h_index}")
         
         # Get publikasi by year (last 15 years) from latest publikasi data only
         current_year = datetime.now().year
@@ -374,7 +388,7 @@ def dashboard_stats(current_user_id):
         """)
         top_dosen_international = [dict(row) for row in cur.fetchall()]
 
-        # Top dosen by national publications (Sinta 1-4)
+        # Top dosen by national publications (Sinta 1-6)
         cur.execute(f"""
             {latest_publikasi_cte}
             SELECT 
@@ -395,6 +409,9 @@ def dashboard_stats(current_user_id):
             'total_dosen': total_dosen,
             'total_publikasi': total_publikasi,
             'total_sitasi': int(total_sitasi) if total_sitasi else 0,
+            'total_sitasi_gs': int(total_sitasi_gs) if total_sitasi_gs else 0,
+            'total_sitasi_gs_sinta': int(total_sitasi_gs_sinta) if total_sitasi_gs_sinta else 0,
+            'total_sitasi_scopus': int(total_sitasi_scopus) if total_sitasi_scopus else 0,
             'avg_h_index': float(avg_h_index) if avg_h_index else 0,
             'median_h_index': float(median_h_index) if median_h_index else 0,
             'publikasi_by_year': publikasi_by_year,
@@ -409,8 +426,7 @@ def dashboard_stats(current_user_id):
             'scopus_q_breakdown': scopus_q_breakdown,
             'sinta_rank_breakdown': sinta_rank_breakdown,
             'publikasi_by_type': publikasi_by_type,
-            'recent_publications': recent_publications
-            ,
+            'recent_publications': recent_publications,
             'top_dosen_international': top_dosen_international,
             'top_dosen_national': top_dosen_national
         }), 200
@@ -456,13 +472,8 @@ def get_sinta_dosen(current_user_id):
         params = []
         
         if search:
-            # Try to include DataMaster search, but make it safe
-            where_clause += """ AND (
-                LOWER(d.v_nama_dosen) LIKE LOWER(%s)
-            )"""
+            where_clause += " AND LOWER(d.v_nama_dosen) LIKE LOWER(%s)"
             params.append(f'%{search}%')
-            # Note: DataMaster search removed from WHERE clause to avoid errors if table doesn't exist
-            # It will be handled in the main query join instead
             print(f"🔍 Adding search filter for dosen name: {search}")
         
         print(f"🗃️ WHERE clause: {where_clause}")
@@ -470,7 +481,7 @@ def get_sinta_dosen(current_user_id):
         
         # Debug: Check raw data from database before CTE
         debug_query = """
-            SELECT v_nama_dosen, n_total_publikasi, v_sumber, t_tanggal_unduh
+            SELECT v_nama_dosen, n_total_publikasi, v_id_sinta, v_sumber, t_tanggal_unduh
             FROM tmp_dosen_dt 
             WHERE (v_sumber = 'SINTA' OR v_sumber IS NULL)
             ORDER BY t_tanggal_unduh DESC
@@ -481,7 +492,7 @@ def get_sinta_dosen(current_user_id):
             debug_data = cur.fetchall()
             print(f"🔍 Debug - Raw data from tmp_dosen_dt (first 5 rows):")
             for row in debug_data:
-                print(f"   - {row.get('v_nama_dosen', 'N/A')}: n_total_publikasi = {row.get('n_total_publikasi', 'NULL')}")
+                print(f"   - {row.get('v_nama_dosen', 'N/A')}: n_total_publikasi = {row.get('n_total_publikasi', 'NULL')}, v_id_sinta = {row.get('v_id_sinta', 'NULL')}")
         except Exception as debug_error:
             print(f"⚠️ Debug query failed: {debug_error}")
         
@@ -500,41 +511,22 @@ def get_sinta_dosen(current_user_id):
         count_query = f"""
             {latest_dosen_cte}
             SELECT COUNT(*) as total
-            FROM latest_dosen d
-            LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
-            LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm."ID_SINTA")
+            FROM latest_dosen
         """
-        try:
-            cur.execute(count_query, params)
-            total = cur.fetchone()['total']
-        except Exception as count_error:
-            # If DataMaster join fails, try without it
-            logger.warning(f"Count query with DataMaster failed: {count_error}, trying fallback")
-            # Rollback the failed transaction before trying fallback
-            conn.rollback()
-            try:
-                fallback_count_query = f"""
-                    {latest_dosen_cte}
-                    SELECT COUNT(*) as total
-                    FROM latest_dosen d
-                    LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
-                """
-                cur.execute(fallback_count_query, params)
-                total = cur.fetchone()['total']
-            except Exception as fallback_error:
-                # If fallback also fails, rollback and re-raise
-                conn.rollback()
-                logger.error(f"Fallback count query also failed: {fallback_error}")
-                raise
+        cur.execute(count_query, params)
+        total = cur.fetchone()['total']
         
         print(f"📊 Total unique SINTA dosen found: {total}")
         
-        # Get data from CTE with separate GS and Scopus fields
-        # Join with DataMaster to get v_nama_homebase_unpar as jurusan
+        # Get data from CTE with jurusan from datamaster
+        # Join using v_id_sinta (tmp_dosen_dt) = id_sinta (datamaster)
         data_query = f"""
             {latest_dosen_cte}
             SELECT
-                d.v_id_dosen, d.v_nama_dosen, d.v_id_sinta, d.v_id_googleScholar,
+                d.v_id_dosen, 
+                d.v_nama_dosen, 
+                d.v_id_sinta, 
+                d.v_id_googlescholar,
                 COALESCE(d.n_total_publikasi, 0) AS n_total_publikasi, 
                 COALESCE(d.n_sitasi_gs, 0) AS n_sitasi_gs, 
                 COALESCE(d.n_sitasi_scopus, 0) AS n_sitasi_scopus,
@@ -543,73 +535,64 @@ def get_sinta_dosen(current_user_id):
                 COALESCE(d.n_i10_index_gs, 0) AS n_i10_index_gs, 
                 d.n_skor_sinta, 
                 d.n_skor_sinta_3yr,
-                COALESCE(NULLIF(TRIM(dm."v_nama_homebase_unpar"), ''), j.v_nama_jurusan) AS v_nama_jurusan,
-                d.t_tanggal_unduh, d.v_link_url
+                d.t_tanggal_unduh, 
+                d.v_link_url,
+                dm.v_nama_homebase_unpar AS v_nama_jurusan
             FROM latest_dosen d
-            LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
-            LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm."ID_SINTA")
+            LEFT JOIN datamaster dm ON d.v_id_sinta IS NOT NULL 
+                AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta)
             ORDER BY (COALESCE(d.n_sitasi_gs, 0) + COALESCE(d.n_sitasi_scopus, 0)) DESC, d.t_tanggal_unduh DESC
             LIMIT %s OFFSET %s
         """
         params.extend([per_page, offset])
+        
         try:
             cur.execute(data_query, params)
             dosen_data = [dict(row) for row in cur.fetchall()]
-            # Debug: Check if n_total_publikasi is in the data
+            
+            # Debug: Log jurusan sources
             if dosen_data and len(dosen_data) > 0:
-                sample = dosen_data[0]
-                print(f"🔍 Sample data keys: {list(sample.keys())}")
-                print(f"🔍 Sample n_total_publikasi value: {sample.get('n_total_publikasi', 'NOT FOUND')}")
-                print(f"🔍 Sample dosen: {sample.get('v_nama_dosen', 'N/A')}")
+                print(f"📤 Returning {len(dosen_data)} SINTA dosen records")
+                for i, dosen in enumerate(dosen_data[:5]):
+                    sinta_id = dosen.get('v_id_sinta', 'N/A')
+                    jurusan = dosen.get('v_nama_jurusan', 'N/A')
+                    pub_count = dosen.get('n_total_publikasi', 'NOT FOUND')
+                    print(f"   Record {i+1}: {dosen.get('v_nama_dosen', 'N/A')} | SINTA_ID: {sinta_id} | Jurusan: {jurusan} | Publikasi: {pub_count}")
+        
         except Exception as query_error:
-            # If DataMaster join fails, try without it
-            logger.warning(f"Query with DataMaster failed: {query_error}, trying fallback query")
+            # If datamaster join fails, return data without jurusan
+            logger.warning(f"Query with datamaster failed: {query_error}, trying fallback query")
             # Rollback the failed transaction before trying fallback
             conn.rollback()
-            try:
-                fallback_query = f"""
-                    {latest_dosen_cte}
-                    SELECT
-                        d.v_id_dosen, d.v_nama_dosen, d.v_id_sinta, d.v_id_googleScholar,
-                        COALESCE(d.n_total_publikasi, 0) AS n_total_publikasi, 
-                        COALESCE(d.n_sitasi_gs, 0) AS n_sitasi_gs, 
-                        COALESCE(d.n_sitasi_scopus, 0) AS n_sitasi_scopus,
-                        COALESCE(d.n_h_index_gs_sinta, 0) AS n_h_index_gs_sinta, 
-                        COALESCE(d.n_h_index_scopus, 0) AS n_h_index_scopus,
-                        COALESCE(d.n_i10_index_gs, 0) AS n_i10_index_gs, 
-                        d.n_skor_sinta, 
-                        d.n_skor_sinta_3yr,
-                        j.v_nama_jurusan,
-                        d.t_tanggal_unduh, d.v_link_url
-                    FROM latest_dosen d
-                    LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
-                    ORDER BY (COALESCE(d.n_sitasi_gs, 0) + COALESCE(d.n_sitasi_scopus, 0)) DESC, d.t_tanggal_unduh DESC
-                    LIMIT %s OFFSET %s
-                """
-                cur.execute(fallback_query, params)
-                dosen_data = [dict(row) for row in cur.fetchall()]
-                # Debug: Check if n_total_publikasi is in the fallback data
-                if dosen_data and len(dosen_data) > 0:
-                    sample = dosen_data[0]
-                    print(f"🔍 Fallback sample data keys: {list(sample.keys())}")
-                    print(f"🔍 Fallback sample n_total_publikasi value: {sample.get('n_total_publikasi', 'NOT FOUND')}")
-                    print(f"🔍 Fallback sample dosen: {sample.get('v_nama_dosen', 'N/A')}")
-            except Exception as fallback_error:
-                # If fallback also fails, rollback and re-raise
-                conn.rollback()
-                logger.error(f"Fallback data query also failed: {fallback_error}")
-                raise
+            
+            fallback_query = f"""
+                {latest_dosen_cte}
+                SELECT
+                    d.v_id_dosen, 
+                    d.v_nama_dosen, 
+                    d.v_id_sinta, 
+                    d.v_id_googlescholar,
+                    COALESCE(d.n_total_publikasi, 0) AS n_total_publikasi, 
+                    COALESCE(d.n_sitasi_gs, 0) AS n_sitasi_gs, 
+                    COALESCE(d.n_sitasi_scopus, 0) AS n_sitasi_scopus,
+                    COALESCE(d.n_h_index_gs_sinta, 0) AS n_h_index_gs_sinta, 
+                    COALESCE(d.n_h_index_scopus, 0) AS n_h_index_scopus,
+                    COALESCE(d.n_i10_index_gs, 0) AS n_i10_index_gs, 
+                    d.n_skor_sinta, 
+                    d.n_skor_sinta_3yr,
+                    d.t_tanggal_unduh, 
+                    d.v_link_url,
+                    NULL AS v_nama_jurusan
+                FROM latest_dosen d
+                ORDER BY (COALESCE(d.n_sitasi_gs, 0) + COALESCE(d.n_sitasi_scopus, 0)) DESC, d.t_tanggal_unduh DESC
+                LIMIT %s OFFSET %s
+            """
+            cur.execute(fallback_query, params)
+            dosen_data = [dict(row) for row in cur.fetchall()]
+            print(f"⚠️ Using fallback query without datamaster join")
         
         # Commit the transaction after successful queries
         conn.commit()
-        
-        # Debug: Log final data being returned
-        if dosen_data and len(dosen_data) > 0:
-            print(f"📤 Returning {len(dosen_data)} dosen records")
-            # Check first 3 records for n_total_publikasi
-            for i, dosen in enumerate(dosen_data[:3]):
-                pub_count = dosen.get('n_total_publikasi', 'NOT FOUND')
-                print(f"   Record {i+1}: {dosen.get('v_nama_dosen', 'N/A')} - n_total_publikasi: {pub_count} (type: {type(pub_count)})")
         
         return jsonify({
             'data': dosen_data,
@@ -778,9 +761,10 @@ def get_sinta_publikasi(current_user_id):
                     SELECT 1 
                     FROM stg_publikasi_dosen_dt pd2
                     JOIN tmp_dosen_dt d2 ON pd2.v_id_dosen = d2.v_id_dosen
-                    LEFT JOIN stg_jurusan_mt j2 ON d2.v_id_jurusan = j2.v_id_jurusan
+                    LEFT JOIN datamaster dm2 ON d2.v_id_sinta IS NOT NULL 
+                        AND TRIM(d2.v_id_sinta) = TRIM(dm2.id_sinta)
                     WHERE pd2.v_id_publikasi = p.v_id_publikasi
-                    AND (LOWER(d2.v_nama_dosen) LIKE LOWER(%s) OR LOWER(j2.v_nama_jurusan) LIKE LOWER(%s))
+                    AND (LOWER(d2.v_nama_dosen) LIKE LOWER(%s) OR LOWER(dm2.v_nama_homebase_unpar) LIKE LOWER(%s))
                 )
             )"""
             search_param = f"%{search}%"
@@ -815,7 +799,8 @@ def get_sinta_publikasi(current_user_id):
         
         print(f"📊 Total unique records found: {total}")
         
-        # Get data from CTE with jurusan
+        # Get data from CTE with jurusan from datamaster
+        # Use id_sinta from datamaster to match v_id_sinta from tmp_dosen_dt
         data_query = f"""
             {latest_publikasi_cte}
             SELECT
@@ -824,7 +809,7 @@ def get_sinta_publikasi(current_user_id):
                     NULLIF(p.v_authors, ''),
                     STRING_AGG(DISTINCT d.v_nama_dosen, ', ')
                 ) AS authors,
-                STRING_AGG(DISTINCT ju.v_nama_jurusan, ', ') AS v_nama_jurusan,
+                STRING_AGG(DISTINCT COALESCE(dm.v_nama_homebase_unpar, ju.v_nama_jurusan), ', ') AS v_nama_jurusan,
                 p.v_judul,
                 p.v_jenis AS tipe,
                 p.v_tahun_publikasi,
@@ -851,6 +836,8 @@ def get_sinta_publikasi(current_user_id):
             LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
             LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
             LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
+            LEFT JOIN datamaster dm ON d.v_id_sinta IS NOT NULL 
+                AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta)
             LEFT JOIN stg_jurusan_mt ju ON d.v_id_jurusan = ju.v_id_jurusan
             GROUP BY
                 p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
@@ -862,8 +849,72 @@ def get_sinta_publikasi(current_user_id):
             LIMIT %s OFFSET %s
         """
         final_params = params + [per_page, offset]
-        cur.execute(data_query, final_params)
-        rows = cur.fetchall()
+        
+        try:
+            cur.execute(data_query, final_params)
+            rows = cur.fetchall()
+            
+            # Debug: Log jurusan for first few records
+            if rows and len(rows) > 0:
+                print(f"📤 Retrieved {len(rows)} SINTA publikasi records")
+                for i, row in enumerate(rows[:3]):
+                    jurusan = row.get('v_nama_jurusan', 'NULL')
+                    authors = row.get('authors', 'N/A')
+                    print(f"   Record {i+1}: {row.get('v_judul', 'N/A')[:50]}... | Authors: {authors[:30]}... | Jurusan: {jurusan}")
+        
+        except Exception as query_error:
+            # Fallback query without datamaster
+            logger.warning(f"Query with datamaster failed: {query_error}, trying fallback query")
+            conn.rollback()
+            
+            fallback_query = f"""
+                {latest_publikasi_cte}
+                SELECT
+                    p.v_id_publikasi,
+                    COALESCE(
+                        NULLIF(p.v_authors, ''),
+                        STRING_AGG(DISTINCT d.v_nama_dosen, ', ')
+                    ) AS authors,
+                    STRING_AGG(DISTINCT ju.v_nama_jurusan, ', ') AS v_nama_jurusan,
+                    p.v_judul,
+                    p.v_jenis AS tipe,
+                    p.v_tahun_publikasi,
+                    COALESCE(
+                        j.v_nama_jurnal,
+                        pr.v_nama_konferensi,
+                        'N/A'
+                    ) AS venue,
+                    COALESCE(p.v_publisher, '') AS publisher,
+                    COALESCE(a.v_volume, '') AS volume,
+                    COALESCE(a.v_issue, '') AS issue,
+                    COALESCE(a.v_pages, '') AS pages,
+                    COALESCE(a.v_terindeks, '') AS v_terindeks,
+                    COALESCE(a.v_ranking, '') AS v_ranking,
+                    p.n_total_sitasi,
+                    p.v_sumber,
+                    p.t_tanggal_unduh,
+                    p.v_link_url
+                FROM latest_publikasi p
+                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+                LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
+                LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
+                LEFT JOIN stg_buku_dr b ON p.v_id_publikasi = b.v_id_publikasi
+                LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
+                LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
+                LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
+                LEFT JOIN stg_jurusan_mt ju ON d.v_id_jurusan = ju.v_id_jurusan
+                GROUP BY
+                    p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
+                    p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
+                    p.v_authors, p.v_publisher,
+                    j.v_nama_jurnal, pr.v_nama_konferensi,
+                    a.v_volume, a.v_issue, a.v_pages, a.v_terindeks, a.v_ranking
+                ORDER BY p.n_total_sitasi DESC NULLS LAST, p.t_tanggal_unduh DESC
+                LIMIT %s OFFSET %s
+            """
+            cur.execute(fallback_query, final_params)
+            rows = cur.fetchall()
+            print(f"⚠️ Using fallback query without datamaster join")
         
         # Format data untuk response
         publikasi_data = []
@@ -899,6 +950,9 @@ def get_sinta_publikasi(current_user_id):
                 
                 publikasi_data.append(row_dict)
         
+        # Commit the transaction after successful queries
+        conn.commit()
+        
         # Hitung total pages
         total_pages = 0
         if total > 0 and per_page > 0:
@@ -919,6 +973,11 @@ def get_sinta_publikasi(current_user_id):
         error_details = traceback.format_exc()
         print("❌ Database error:\n", error_details)
         logger.error(f"Database error in SINTA publikasi: {db_error}\n{error_details}")
+        if conn:
+            try:
+                conn.rollback()
+            except:
+                pass
         return jsonify({
             "error": "Database query failed",
             "details": str(db_error)
@@ -928,6 +987,11 @@ def get_sinta_publikasi(current_user_id):
         error_details = traceback.format_exc()
         print("❌ Full error traceback:\n", error_details)
         logger.error(f"Get SINTA publikasi error: {e}\n{error_details}")
+        if conn:
+            try:
+                conn.rollback()
+            except:
+                pass
         return jsonify({
             'error': 'Failed to fetch SINTA publikasi data',
             'details': str(e)
@@ -985,9 +1049,10 @@ def get_sinta_publikasi_stats(current_user_id):
                     SELECT 1 
                     FROM stg_publikasi_dosen_dt pd2
                     JOIN tmp_dosen_dt d2 ON pd2.v_id_dosen = d2.v_id_dosen
-                    LEFT JOIN stg_jurusan_mt j2 ON d2.v_id_jurusan = j2.v_id_jurusan
+                    LEFT JOIN datamaster dm2 ON d2.v_id_sinta IS NOT NULL 
+                        AND TRIM(d2.v_id_sinta) = TRIM(dm2.id_sinta)
                     WHERE pd2.v_id_publikasi = p.v_id_publikasi
-                    AND (LOWER(d2.v_nama_dosen) LIKE LOWER(%s) OR LOWER(j2.v_nama_jurusan) LIKE LOWER(%s))
+                    AND (LOWER(d2.v_nama_dosen) LIKE LOWER(%s) OR LOWER(dm2.v_nama_homebase_unpar) LIKE LOWER(%s))
                 )
             )"""
             search_param = f"%{search}%"
@@ -1031,6 +1096,11 @@ def get_sinta_publikasi_stats(current_user_id):
         error_details = traceback.format_exc()
         print("❌ SINTA Publikasi stats error:\n", error_details)
         logger.error(f"Get SINTA publikasi stats error: {e}\n{error_details}")
+        if conn:
+            try:
+                conn.rollback()
+            except:
+                pass
         return jsonify({'error': 'Failed to fetch SINTA publikasi statistics'}), 500
     finally:
         if cur:
@@ -1096,24 +1166,76 @@ def get_scholar_dosen(current_user_id):
         
         print(f"📊 Total unique Scholar dosen found: {total}")
         
-        # Get data from CTE with jurusan and 2020 indices
+        # Get data from CTE with jurusan from datamaster
+        # Join using v_id_googleScholar (id_gs) since v_id_jurusan is empty
         data_query = f"""
             {latest_dosen_cte}
             SELECT
-                d.v_id_dosen, d.v_nama_dosen, d.v_id_googleScholar,
-                d.n_total_publikasi, d.n_total_sitasi_gs, 
-                d.n_h_index_gs, d.n_h_index_gs2020,
-                d.n_i10_index_gs, d.n_i10_index_gs2020,
-                d.v_link_url, d.t_tanggal_unduh,
-                j.v_nama_jurusan
+                d.v_id_dosen, 
+                d.v_nama_dosen, 
+                d.v_id_googleScholar,
+                d.n_total_publikasi, 
+                d.n_total_sitasi_gs, 
+                d.n_total_sitasi_gs2020,
+                d.n_h_index_gs, 
+                d.n_h_index_gs2020,
+                d.n_i10_index_gs, 
+                d.n_i10_index_gs2020,
+                d.v_link_url, 
+                d.t_tanggal_unduh,
+                dm.v_nama_homebase_unpar AS v_nama_jurusan
             FROM latest_dosen d
-            LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
+            LEFT JOIN datamaster dm ON d.v_id_googleScholar IS NOT NULL 
+                AND TRIM(d.v_id_googleScholar) = TRIM(dm.id_gs)
             ORDER BY d.n_total_sitasi_gs DESC NULLS LAST, d.t_tanggal_unduh DESC
             LIMIT %s OFFSET %s
         """
         params.extend([per_page, offset])
-        cur.execute(data_query, params)
-        scholar_data = [dict(row) for row in cur.fetchall()]
+        
+        try:
+            cur.execute(data_query, params)
+            scholar_data = [dict(row) for row in cur.fetchall()]
+            
+            # Debug: Log jurusan sources
+            if scholar_data and len(scholar_data) > 0:
+                print(f"📤 Returning {len(scholar_data)} Scholar dosen records")
+                for i, dosen in enumerate(scholar_data[:5]):
+                    gs_id = dosen.get('v_id_googlescholar', 'N/A')
+                    jurusan = dosen.get('v_nama_jurusan', 'N/A')
+                    print(f"   Record {i+1}: {dosen.get('v_nama_dosen', 'N/A')} | GS_ID: {gs_id} | Jurusan: {jurusan}")
+        
+        except Exception as query_error:
+            # If DataMaster join fails, return data without jurusan
+            logger.warning(f"Query with DataMaster failed: {query_error}, trying fallback query")
+            # Rollback the failed transaction before trying fallback
+            conn.rollback()
+            
+            fallback_query = f"""
+                {latest_dosen_cte}
+                SELECT
+                    d.v_id_dosen, 
+                    d.v_nama_dosen, 
+                    d.v_id_googleScholar,
+                    d.n_total_publikasi, 
+                    d.n_total_sitasi_gs, 
+                    d.n_total_sitasi_gs2020,
+                    d.n_h_index_gs, 
+                    d.n_h_index_gs2020,
+                    d.n_i10_index_gs, 
+                    d.n_i10_index_gs2020,
+                    d.v_link_url, 
+                    d.t_tanggal_unduh,
+                    NULL AS v_nama_jurusan
+                FROM latest_dosen d
+                ORDER BY d.n_total_sitasi_gs DESC NULLS LAST, d.t_tanggal_unduh DESC
+                LIMIT %s OFFSET %s
+            """
+            cur.execute(fallback_query, params)
+            scholar_data = [dict(row) for row in cur.fetchall()]
+            print(f"⚠️ Using fallback query without DataMaster join")
+        
+        # Commit the transaction after successful queries
+        conn.commit()
         
         return jsonify({
             'data': scholar_data,
@@ -1130,6 +1252,12 @@ def get_scholar_dosen(current_user_id):
         error_details = traceback.format_exc()
         print("❌ Scholar Dosen error:\n", error_details)
         logger.error(f"Get Scholar dosen error: {e}\n{error_details}")
+        # Rollback any failed transaction
+        if conn:
+            try:
+                conn.rollback()
+            except:
+                pass
         return jsonify({'error': 'Failed to fetch Scholar dosen data'}), 500
     finally:
         if cur:
@@ -1156,7 +1284,7 @@ def get_scholar_dosen_stats(current_user_id):
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         
         # Build query for Google Scholar data
-        where_clause = "WHERE (d.v_sumber = 'Google Scholar' OR d.v_id_googleScholar IS NOT NULL)"
+        where_clause = "WHERE (d.v_sumber = 'Google Scholar' OR d.v_id_googlescholar IS NOT NULL)"
         params = []
         
         if search:
@@ -1273,9 +1401,10 @@ def get_scholar_publikasi(current_user_id):
                     SELECT 1 
                     FROM stg_publikasi_dosen_dt pd2
                     JOIN tmp_dosen_dt d2 ON pd2.v_id_dosen = d2.v_id_dosen
-                    LEFT JOIN stg_jurusan_mt j2 ON d2.v_id_jurusan = j2.v_id_jurusan
+                    LEFT JOIN datamaster dm2 ON d2.v_id_googlescholar IS NOT NULL 
+                        AND TRIM(d2.v_id_googlescholar) = TRIM(dm2.id_gs)
                     WHERE pd2.v_id_publikasi = p.v_id_publikasi
-                    AND (LOWER(d2.v_nama_dosen) LIKE LOWER(%s) OR LOWER(j2.v_nama_jurusan) LIKE LOWER(%s))
+                    AND (LOWER(d2.v_nama_dosen) LIKE LOWER(%s) OR LOWER(dm2.v_nama_homebase_unpar) LIKE LOWER(%s))
                 )
             )"""
             search_param = f"%{search}%"
@@ -1310,7 +1439,8 @@ def get_scholar_publikasi(current_user_id):
         
         print(f"📊 Total unique records found: {total}")
         
-        # Get data from CTE with jurusan
+        # Get data from CTE with jurusan from datamaster
+        # Use id_gs from datamaster to match v_id_googlescholar from tmp_dosen_dt
         data_query = f"""
             {latest_publikasi_cte}
             SELECT
@@ -1319,7 +1449,7 @@ def get_scholar_publikasi(current_user_id):
                     NULLIF(p.v_authors, ''),
                     STRING_AGG(DISTINCT d.v_nama_dosen, ', ')
                 ) AS authors,
-                STRING_AGG(DISTINCT ju.v_nama_jurusan, ', ') AS v_nama_jurusan,
+                STRING_AGG(DISTINCT COALESCE(dm.v_nama_homebase_unpar, ju.v_nama_jurusan), ', ') AS v_nama_jurusan,
                 p.v_judul,
                 p.v_jenis AS tipe,
                 p.v_tahun_publikasi,
@@ -1344,6 +1474,8 @@ def get_scholar_publikasi(current_user_id):
             LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
             LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
             LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
+            LEFT JOIN datamaster dm ON d.v_id_googlescholar IS NOT NULL 
+                AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs)
             LEFT JOIN stg_jurusan_mt ju ON d.v_id_jurusan = ju.v_id_jurusan
             GROUP BY
                 p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
@@ -1355,8 +1487,70 @@ def get_scholar_publikasi(current_user_id):
             LIMIT %s OFFSET %s
         """
         final_params = params + [per_page, offset]
-        cur.execute(data_query, final_params)
-        rows = cur.fetchall()
+        
+        try:
+            cur.execute(data_query, final_params)
+            rows = cur.fetchall()
+            
+            # Debug: Log jurusan for first few records
+            if rows and len(rows) > 0:
+                print(f"📤 Retrieved {len(rows)} Scholar publikasi records")
+                for i, row in enumerate(rows[:3]):
+                    jurusan = row.get('v_nama_jurusan', 'NULL')
+                    authors = row.get('authors', 'N/A')
+                    print(f"   Record {i+1}: {row.get('v_judul', 'N/A')[:50]}... | Authors: {authors[:30]}... | Jurusan: {jurusan}")
+        
+        except Exception as query_error:
+            # Fallback query without datamaster
+            logger.warning(f"Query with datamaster failed: {query_error}, trying fallback query")
+            conn.rollback()
+            
+            fallback_query = f"""
+                {latest_publikasi_cte}
+                SELECT
+                    p.v_id_publikasi,
+                    COALESCE(
+                        NULLIF(p.v_authors, ''),
+                        STRING_AGG(DISTINCT d.v_nama_dosen, ', ')
+                    ) AS authors,
+                    STRING_AGG(DISTINCT ju.v_nama_jurusan, ', ') AS v_nama_jurusan,
+                    p.v_judul,
+                    p.v_jenis AS tipe,
+                    p.v_tahun_publikasi,
+                    COALESCE(
+                        j.v_nama_jurnal,
+                        pr.v_nama_konferensi,
+                        'N/A'
+                    ) AS venue,
+                    COALESCE(p.v_publisher, '') AS publisher,
+                    COALESCE(a.v_volume, '') AS volume,
+                    COALESCE(a.v_issue, '') AS issue,
+                    COALESCE(a.v_pages, '') AS pages,
+                    p.n_total_sitasi,
+                    p.v_sumber,
+                    p.t_tanggal_unduh,
+                    p.v_link_url
+                FROM latest_publikasi p
+                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+                LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
+                LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
+                LEFT JOIN stg_buku_dr b ON p.v_id_publikasi = b.v_id_publikasi
+                LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
+                LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
+                LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
+                LEFT JOIN stg_jurusan_mt ju ON d.v_id_jurusan = ju.v_id_jurusan
+                GROUP BY
+                    p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
+                    p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
+                    p.v_authors, p.v_publisher,
+                    j.v_nama_jurnal, pr.v_nama_konferensi,
+                    a.v_volume, a.v_issue, a.v_pages
+                ORDER BY p.n_total_sitasi DESC NULLS LAST, p.t_tanggal_unduh DESC
+                LIMIT %s OFFSET %s
+            """
+            cur.execute(fallback_query, final_params)
+            rows = cur.fetchall()
+            print(f"⚠️ Using fallback query without datamaster join")
         
         # Format data untuk response
         publikasi_data = []
@@ -1392,6 +1586,9 @@ def get_scholar_publikasi(current_user_id):
                 
                 publikasi_data.append(row_dict)
         
+        # Commit the transaction after successful queries
+        conn.commit()
+        
         # Hitung total pages
         total_pages = 0
         if total > 0 and per_page > 0:
@@ -1414,6 +1611,11 @@ def get_scholar_publikasi(current_user_id):
         error_details = traceback.format_exc()
         print("❌ Database error:\n", error_details)
         logger.error(f"Database error in Scholar publikasi: {db_error}\n{error_details}")
+        if conn:
+            try:
+                conn.rollback()
+            except:
+                pass
         return jsonify({
             "error": "Database query failed",
             "details": str(db_error)
@@ -1423,6 +1625,11 @@ def get_scholar_publikasi(current_user_id):
         error_details = traceback.format_exc()
         print("❌ Full error traceback:\n", error_details)
         logger.error(f"Get Scholar publikasi error: {e}\n{error_details}")
+        if conn:
+            try:
+                conn.rollback()
+            except:
+                pass
         return jsonify({
             "error": "Failed to fetch Scholar publikasi data",
             "details": str(e)
@@ -1480,9 +1687,10 @@ def get_scholar_publikasi_stats(current_user_id):
                     SELECT 1 
                     FROM stg_publikasi_dosen_dt pd2
                     JOIN tmp_dosen_dt d2 ON pd2.v_id_dosen = d2.v_id_dosen
-                    LEFT JOIN stg_jurusan_mt j2 ON d2.v_id_jurusan = j2.v_id_jurusan
+                    LEFT JOIN datamaster dm2 ON d2.v_id_googlescholar IS NOT NULL 
+                        AND TRIM(d2.v_id_googlescholar) = TRIM(dm2.id_gs)
                     WHERE pd2.v_id_publikasi = p.v_id_publikasi
-                    AND (LOWER(d2.v_nama_dosen) LIKE LOWER(%s) OR LOWER(j2.v_nama_jurusan) LIKE LOWER(%s))
+                    AND (LOWER(d2.v_nama_dosen) LIKE LOWER(%s) OR LOWER(dm2.v_nama_homebase_unpar) LIKE LOWER(%s))
                 )
             )"""
             search_param = f"%{search}%"
@@ -1526,6 +1734,11 @@ def get_scholar_publikasi_stats(current_user_id):
         error_details = traceback.format_exc()
         print("❌ Scholar Publikasi stats error:\n", error_details)
         logger.error(f"Get Scholar publikasi stats error: {e}\n{error_details}")
+        if conn:
+            try:
+                conn.rollback()
+            except:
+                pass
         return jsonify({'error': 'Failed to fetch Scholar publikasi statistics'}), 500
     finally:
         if cur:
@@ -1830,6 +2043,6 @@ if __name__ == '__main__':
         app,
         debug=debug_mode,
         host='0.0.0.0',
-        port=int(os.environ.get('PORT', 5000)),
+        port=int(os.environ.get('PORT', 5002)),
         allow_unsafe_werkzeug=True
     )
