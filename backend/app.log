@@ -7482,3 +7482,1524 @@ PL/pgSQL function update_updated_at_column() line 3 at assignment
 2025-11-06 13:52:52,782 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:52:52] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
 2025-11-06 13:52:52,798 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:52:52] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
 2025-11-06 13:52:52,799 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 13:52:52] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 19:17:43,449 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 19:17:43,451 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 19:17:43,451 - __main__ - INFO - Environment: development
+2025-11-06 19:17:43,492 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.225:5000
+2025-11-06 19:17:43,493 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-06 19:17:43,493 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 19:17:45,074 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 19:17:45,075 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 19:17:45,075 - __main__ - INFO - Environment: development
+2025-11-06 19:17:45,079 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 19:17:45,099 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 19:18:37,431 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\scrapers\\scraping_gs.py', reloading
+2025-11-06 19:18:37,598 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 19:18:39,557 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 19:18:39,560 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 19:18:39,560 - __main__ - INFO - Environment: development
+2025-11-06 19:18:39,567 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 19:18:39,593 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 19:20:41,598 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:20:41] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:20:41,610 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:20:41] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:20:41,923 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:20:41] "[31m[1mGET /api/dashboard/stats HTTP/1.1[0m" 401 -
+2025-11-06 19:20:42,184 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:20:42] "[31m[1mGET /api/dashboard/stats HTTP/1.1[0m" 401 -
+2025-11-06 19:20:49,461 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:20:49] "OPTIONS /auth/login HTTP/1.1" 200 -
+2025-11-06 19:20:50,460 - routes.auth - INFO - User logged in: hariharto.surya@gmail.com (ID: 1)
+2025-11-06 19:20:50,462 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:20:50] "POST /auth/login HTTP/1.1" 200 -
+2025-11-06 19:20:50,851 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:20:50] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:20:50,854 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:20:50] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:20:51,998 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:20:51] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:20:52,775 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:20:52] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:21:48,359 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:21:48] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 19:21:48,666 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:21:48] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 19:21:48,674 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:21:48] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 19:21:48,938 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:21:48] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 19:21:49,177 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:21:49] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 19:21:49,364 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:21:49] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 19:21:49,581 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:21:49] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 19:22:02,887 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:02] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:22:02,888 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:02] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:22:03,470 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:03] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:22:04,571 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:04] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:22:09,595 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:09] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 19:22:09,914 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:09] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 19:22:09,916 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:09] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 19:22:09,922 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:09] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 19:22:10,426 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:10] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 19:22:10,929 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:10] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 19:22:11,077 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:11] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 19:22:12,244 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:12] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 19:22:13,045 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:13] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 19:22:16,613 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:16] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:22:16,615 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:16] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:22:17,167 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:17] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:22:18,210 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:18] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:22:35,738 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:35] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:22:36,057 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:36] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:22:36,963 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:36] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:22:37,551 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:22:37] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:49:47,274 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 19:49:47,275 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 19:49:47,275 - __main__ - INFO - Environment: development
+2025-11-06 19:49:47,295 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.225:5000
+2025-11-06 19:49:47,295 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-06 19:49:47,296 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 19:49:54,686 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 19:49:54,687 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 19:49:54,688 - __main__ - INFO - Environment: development
+2025-11-06 19:49:54,693 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 19:49:54,713 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 19:50:41,538 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:50:41] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:50:41,540 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:50:41] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:50:42,759 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:50:42] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 19:50:43,484 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 19:50:43] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:04:16,134 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:04:16] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:04:16,137 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:04:16] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:04:16,894 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:04:16] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:04:17,400 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:04:17] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:12:03,613 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-06 20:12:03,748 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 20:12:05,685 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 20:12:05,686 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 20:12:05,686 - __main__ - INFO - Environment: development
+2025-11-06 20:12:05,692 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 20:12:05,716 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 20:13:04,289 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:13:04] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:13:04,303 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:13:04] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:13:05,454 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:13:05] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:13:06,688 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:13:06] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:13:17,828 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-06 20:13:18,028 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 20:13:19,483 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 20:13:19,484 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 20:13:19,484 - __main__ - INFO - Environment: development
+2025-11-06 20:13:19,489 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 20:13:19,511 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 20:13:19,553 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:13:19] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:13:20,515 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:13:20] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:13:25,904 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-06 20:13:26,014 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 20:13:27,402 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 20:13:27,403 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 20:13:27,404 - __main__ - INFO - Environment: development
+2025-11-06 20:13:27,411 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 20:13:27,435 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 20:20:37,689 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:20:37] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 20:20:37,691 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:20:37] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 20:20:37,692 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:20:37] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 20:20:37,694 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:20:37] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 20:20:38,209 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:20:38] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 20:20:38,222 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:20:38] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 20:20:38,404 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:20:38] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-06 20:20:38,617 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:20:38] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-06 20:20:50,863 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:20:50] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:20:51,178 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:20:51] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:20:51,382 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:20:51] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:20:52,248 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:20:52] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:29:34,067 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-06 20:29:34,192 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 20:29:35,818 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 20:29:35,818 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 20:29:35,819 - __main__ - INFO - Environment: development
+2025-11-06 20:29:35,824 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 20:29:35,849 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 20:30:08,866 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:30:08] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:30:08,868 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:30:08] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:30:10,534 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:30:10] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:30:11,768 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:30:11] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:30:29,582 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-06 20:30:29,760 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 20:30:30,959 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 20:30:30,960 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 20:30:30,960 - __main__ - INFO - Environment: development
+2025-11-06 20:30:30,964 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 20:30:30,982 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 20:30:31,021 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:30:31] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:30:32,120 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:30:32] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:46:50,584 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-06 20:46:50,677 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 20:46:52,809 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 20:46:52,810 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 20:46:52,811 - __main__ - INFO - Environment: development
+2025-11-06 20:46:52,818 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 20:46:52,848 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 20:48:26,119 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-06 20:48:26,227 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 20:48:27,870 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 20:48:27,871 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 20:48:27,872 - __main__ - INFO - Environment: development
+2025-11-06 20:48:27,876 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 20:48:27,900 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 20:48:51,161 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:48:51] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:48:51,163 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:48:51] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:48:53,934 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:48:53] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:48:55,472 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:48:55] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:49:03,810 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:49:03] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 20:49:04,009 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-06 20:49:04,125 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 20:49:05,730 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 20:49:05,731 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 20:49:05,731 - __main__ - INFO - Environment: development
+2025-11-06 20:49:05,736 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 20:49:05,757 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 20:49:07,020 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 20:49:07] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:12:22,216 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-06 21:12:22,346 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 21:12:23,685 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 21:12:23,686 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 21:12:23,687 - __main__ - INFO - Environment: development
+2025-11-06 21:12:23,692 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 21:12:23,718 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 21:12:23,761 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:12:23] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:12:23,763 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:12:23] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:12:25,190 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:12:25] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:12:26,142 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:12:26] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:13:18,814 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-06 21:13:19,043 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 21:13:20,834 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 21:13:20,834 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 21:13:20,834 - __main__ - INFO - Environment: development
+2025-11-06 21:13:20,841 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 21:13:20,870 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 21:13:47,740 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:13:47] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:13:47,742 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:13:47] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:13:49,887 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:13:49] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:13:51,199 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:13:51] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:14:01,499 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:14:01] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:14:01,864 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-06 21:14:02,007 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 21:14:03,004 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 21:14:03,005 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 21:14:03,005 - __main__ - INFO - Environment: development
+2025-11-06 21:14:03,010 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 21:14:03,027 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 21:20:04,464 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-06 21:20:04,594 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 21:20:05,885 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 21:20:05,885 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 21:20:05,885 - __main__ - INFO - Environment: development
+2025-11-06 21:20:05,888 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 21:20:05,907 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 21:21:24,615 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-06 21:21:24,786 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 21:21:26,714 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 21:21:26,716 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 21:21:26,717 - __main__ - INFO - Environment: development
+2025-11-06 21:21:26,723 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 21:21:26,747 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 21:21:46,843 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:21:46] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:21:46,845 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:21:46] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:21:49,654 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:21:49] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:21:51,272 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:21:51] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:22:10,904 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:22:10] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:22:11,334 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-06 21:22:11,470 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 21:22:12,658 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 21:22:12,659 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 21:22:12,659 - __main__ - INFO - Environment: development
+2025-11-06 21:22:12,663 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 21:22:12,682 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 21:41:43,216 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:41:43] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:41:43,217 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:41:43] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:41:45,175 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:41:45] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 21:41:46,341 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 21:41:46] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:37:08,060 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:37:08] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:37:08,072 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:37:08] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:37:10,967 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:37:10] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:37:14,770 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:37:14] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:38:33,845 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-06 22:38:34,083 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:38:35,718 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-06 22:38:35,718 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-06 22:38:35,719 - __main__ - INFO - Environment: development
+2025-11-06 22:38:35,723 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:38:35,749 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-06 22:38:44,241 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:38:44] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:38:44,243 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:38:44] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:38:44,246 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:38:44] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:38:44,248 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:38:44] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:38:45,156 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:38:45] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:38:45,525 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:38:45] "GET /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:38:45,633 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:38:45] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:38:46,741 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:38:46] "GET /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:38:47,966 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:38:47] "GET /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:39:42,557 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:42] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search=S HTTP/1.1" 200 -
+2025-11-06 22:39:42,869 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:42] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search=S HTTP/1.1" 200 -
+2025-11-06 22:39:43,013 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:43] "GET /api/sinta/publikasi?page=1&per_page=20&search=S HTTP/1.1" 200 -
+2025-11-06 22:39:43,289 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:43] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search=SI HTTP/1.1" 200 -
+2025-11-06 22:39:43,311 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:43] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search=SI HTTP/1.1" 200 -
+2025-11-06 22:39:43,449 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:43] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search=SIN HTTP/1.1" 200 -
+2025-11-06 22:39:43,451 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:43] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search=SIN HTTP/1.1" 200 -
+2025-11-06 22:39:43,513 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:43] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search=SINR HTTP/1.1" 200 -
+2025-11-06 22:39:43,542 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:43] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search=SINR HTTP/1.1" 200 -
+2025-11-06 22:39:43,643 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:43] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search=SINRA HTTP/1.1" 200 -
+2025-11-06 22:39:43,645 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:43] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search=SINRA HTTP/1.1" 200 -
+2025-11-06 22:39:44,012 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:44] "GET /api/sinta/publikasi?page=1&per_page=10000&search=S HTTP/1.1" 200 -
+2025-11-06 22:39:44,400 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:44] "GET /api/sinta/publikasi?page=1&per_page=20&search=SINR HTTP/1.1" 200 -
+2025-11-06 22:39:44,465 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:44] "GET /api/sinta/publikasi?page=1&per_page=20&search=SI HTTP/1.1" 200 -
+2025-11-06 22:39:44,479 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:44] "GET /api/sinta/publikasi?page=1&per_page=20&search=SIN HTTP/1.1" 200 -
+2025-11-06 22:39:44,700 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:44] "GET /api/sinta/publikasi?page=1&per_page=10000&search=SIN HTTP/1.1" 200 -
+2025-11-06 22:39:44,863 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:44] "GET /api/sinta/publikasi?page=1&per_page=10000&search=SINR HTTP/1.1" 200 -
+2025-11-06 22:39:44,871 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:44] "GET /api/sinta/publikasi?page=1&per_page=10000&search=SI HTTP/1.1" 200 -
+2025-11-06 22:39:45,135 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:45] "GET /api/sinta/publikasi?page=1&per_page=20&search=SINRA HTTP/1.1" 200 -
+2025-11-06 22:39:45,153 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:45] "GET /api/sinta/publikasi?page=1&per_page=10000&search=SINRA HTTP/1.1" 200 -
+2025-11-06 22:39:47,164 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:47] "GET /api/sinta/publikasi?page=1&per_page=10000&search=SINR HTTP/1.1" 200 -
+2025-11-06 22:39:47,305 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:47] "GET /api/sinta/publikasi?page=1&per_page=20&search=SINR HTTP/1.1" 200 -
+2025-11-06 22:39:47,350 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:47] "GET /api/sinta/publikasi?page=1&per_page=20&search=SIN HTTP/1.1" 200 -
+2025-11-06 22:39:47,386 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:39:47] "GET /api/sinta/publikasi?page=1&per_page=10000&search=SIN HTTP/1.1" 200 -
+2025-11-06 22:40:00,102 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:40:00] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:40:00,105 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:40:00] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:40:00,999 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:40:00] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:40:01,023 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:40:01] "GET /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:40:05,039 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:40:05] "OPTIONS /api/sinta/publikasi?page=182&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:40:05,789 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:40:05] "GET /api/sinta/publikasi?page=182&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:40:07,587 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:40:07] "OPTIONS /api/sinta/publikasi?page=179&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:40:07,974 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:40:07] "GET /api/sinta/publikasi?page=179&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:40:09,877 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:40:09] "OPTIONS /api/sinta/publikasi?page=177&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:40:10,553 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:40:10] "GET /api/sinta/publikasi?page=177&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:42:11,772 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:42:11] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:42:11,776 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:42:11] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:42:14,803 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:42:14] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:42:17,824 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:42:17] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:43:04,914 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:04] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:43:05,224 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:05] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:43:05,225 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:05] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:43:05,228 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:05] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:43:05,611 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:05] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:43:06,266 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:06] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:43:06,718 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:06] "GET /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:43:08,201 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:08] "GET /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:43:09,468 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:09] "GET /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:43:12,195 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:12] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search=&tipe=artikel HTTP/1.1" 200 -
+2025-11-06 22:43:12,197 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:12] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search=&tipe=artikel HTTP/1.1" 200 -
+2025-11-06 22:43:12,511 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:12] "GET /api/sinta/publikasi?page=1&per_page=20&search=&tipe=artikel HTTP/1.1" 200 -
+2025-11-06 22:43:13,393 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:13] "GET /api/sinta/publikasi?page=1&per_page=10000&search=&tipe=artikel HTTP/1.1" 200 -
+2025-11-06 22:43:14,525 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:14] "OPTIONS /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:43:14,837 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:14] "OPTIONS /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:43:15,210 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:15] "GET /api/sinta/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:43:15,744 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:15] "GET /api/sinta/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:43:19,479 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:19] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:43:19,481 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:19] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:43:20,903 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:20] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:43:22,591 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:22] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:43:25,566 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:25] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:43:25,884 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:25] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:43:27,206 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:27] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:43:28,674 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:43:28] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:44:16,628 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:44:16] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:44:16,630 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:44:16] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:44:16,633 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:44:16] "OPTIONS /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:44:16,635 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:44:16] "OPTIONS /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:44:17,327 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:44:17] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:44:17,692 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:44:17] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:44:17,788 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:44:17] "GET /api/scholar/publikasi?page=1&per_page=20&search= HTTP/1.1" 200 -
+2025-11-06 22:44:18,531 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:44:18] "GET /api/scholar/publikasi?page=1&per_page=10000&search= HTTP/1.1" 200 -
+2025-11-06 22:44:28,867 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:44:28] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:44:29,167 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:44:29] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:44:30,620 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:44:30] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:44:32,284 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:44:32] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:59:54,113 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:59:54] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:59:54,115 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:59:54] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:59:55,890 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:59:55] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-06 22:59:57,024 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:59:57] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:11:30,056 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:11:30] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:11:30,079 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:11:30] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:11:32,607 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:11:32] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:11:33,922 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:11:33] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:13:41,662 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:13:41] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:13:43,678 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:13:43] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:13:48,456 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:13:48] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:13:49,678 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:13:49] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:16:19,926 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\scrapers\\scraping_gs.py', reloading
+2025-11-07 07:16:20,271 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 07:16:21,999 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 07:16:21,999 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 07:16:22,001 - __main__ - INFO - Environment: development
+2025-11-07 07:16:22,009 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 07:16:22,037 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 07:23:53,901 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-07 07:23:54,015 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 07:23:55,972 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 07:23:55,973 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 07:23:55,974 - __main__ - INFO - Environment: development
+2025-11-07 07:23:55,980 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 07:23:56,005 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 07:24:06,711 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-07 07:24:06,874 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 07:24:08,747 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 07:24:08,748 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 07:24:08,748 - __main__ - INFO - Environment: development
+2025-11-07 07:24:08,754 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 07:24:08,784 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 07:24:20,696 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-07 07:24:20,858 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 07:24:22,614 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 07:24:22,615 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 07:24:22,615 - __main__ - INFO - Environment: development
+2025-11-07 07:24:22,618 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 07:24:22,636 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 07:24:23,984 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:24:23] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:24:23,985 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:24:23] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:24:23,986 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:24:23] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:24:23,988 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:24:23] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:24:24,556 - __main__ - ERROR - Get SINTA dosen error: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta = dm."...
+                               ^
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 492, in get_sinta_dosen
+    cur.execute(count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.UndefinedTable: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta = dm."...
+                               ^
+
+
+2025-11-07 07:24:24,560 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:24:24] "[35m[1mGET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-11-07 07:24:24,564 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:24:24] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:24:24,789 - __main__ - ERROR - Get SINTA dosen error: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta = dm."...
+                               ^
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 492, in get_sinta_dosen
+    cur.execute(count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.UndefinedTable: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta = dm."...
+                               ^
+
+
+2025-11-07 07:24:24,798 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:24:24] "[35m[1mGET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-11-07 07:24:25,091 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:24:25] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:24:44,168 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:24:44] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:24:44,474 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:24:44] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:24:44,484 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:24:44] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:24:44,491 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:24:44] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:24:44,718 - __main__ - ERROR - Get SINTA dosen error: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta = dm."...
+                               ^
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 492, in get_sinta_dosen
+    cur.execute(count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.UndefinedTable: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta = dm."...
+                               ^
+
+
+2025-11-07 07:24:44,720 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:24:44] "[35m[1mGET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-11-07 07:24:45,003 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:24:45] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:24:45,007 - __main__ - ERROR - Get SINTA dosen error: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta = dm."...
+                               ^
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 492, in get_sinta_dosen
+    cur.execute(count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.UndefinedTable: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta = dm."...
+                               ^
+
+
+2025-11-07 07:24:45,009 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:24:45] "[35m[1mGET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-11-07 07:24:45,256 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:24:45] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:25:20,180 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:25:20] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:25:20,181 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:25:20] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:25:20,182 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:25:20] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:25:20,184 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:25:20] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:25:20,434 - __main__ - ERROR - Get SINTA dosen error: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta = dm."...
+                               ^
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 492, in get_sinta_dosen
+    cur.execute(count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.UndefinedTable: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta = dm."...
+                               ^
+
+
+2025-11-07 07:25:20,436 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:25:20] "[35m[1mGET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-11-07 07:25:20,670 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:25:20] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:25:20,914 - __main__ - ERROR - Get SINTA dosen error: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta = dm."...
+                               ^
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 492, in get_sinta_dosen
+    cur.execute(count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.UndefinedTable: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta = dm."...
+                               ^
+
+
+2025-11-07 07:25:20,916 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:25:20] "[35m[1mGET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-11-07 07:25:21,223 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:25:21] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:25:26,090 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-07 07:25:26,254 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 07:25:28,439 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 07:25:28,440 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 07:25:28,441 - __main__ - INFO - Environment: development
+2025-11-07 07:25:28,448 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 07:25:28,479 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 07:25:32,853 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-07 07:25:33,015 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 07:25:34,756 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 07:25:34,756 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 07:25:34,757 - __main__ - INFO - Environment: development
+2025-11-07 07:25:34,763 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 07:25:34,789 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 07:25:45,359 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-07 07:25:45,501 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 07:25:47,564 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 07:25:47,565 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 07:25:47,565 - __main__ - INFO - Environment: development
+2025-11-07 07:25:47,570 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 07:25:47,598 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 07:25:50,817 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-07 07:25:50,961 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 07:25:52,532 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 07:25:52,532 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 07:25:52,533 - __main__ - INFO - Environment: development
+2025-11-07 07:25:52,538 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 07:25:52,561 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 07:25:59,953 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-07 07:26:00,107 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 07:26:01,921 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 07:26:01,922 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 07:26:01,923 - __main__ - INFO - Environment: development
+2025-11-07 07:26:01,930 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 07:26:01,954 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 07:26:08,372 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-07 07:26:08,484 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 07:26:09,992 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 07:26:09,993 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 07:26:09,993 - __main__ - INFO - Environment: development
+2025-11-07 07:26:09,997 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 07:26:10,022 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 07:26:13,248 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:13] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:26:13,250 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:13] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:26:13,255 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:13] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:26:13,265 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:13] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:26:13,804 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:26:13,813 - __main__ - ERROR - Get SINTA dosen error: current transaction is aborted, commands ignored until end of transaction block
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 491, in get_sinta_dosen
+    cur.execute(count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.UndefinedTable: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 502, in get_sinta_dosen
+    cur.execute(fallback_count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.InFailedSqlTransaction: current transaction is aborted, commands ignored until end of transaction block
+
+
+2025-11-07 07:26:13,816 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:13] "[35m[1mGET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-11-07 07:26:13,918 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:13] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:26:14,073 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:26:14,078 - __main__ - ERROR - Get SINTA dosen error: current transaction is aborted, commands ignored until end of transaction block
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 491, in get_sinta_dosen
+    cur.execute(count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.UndefinedTable: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 502, in get_sinta_dosen
+    cur.execute(fallback_count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.InFailedSqlTransaction: current transaction is aborted, commands ignored until end of transaction block
+
+
+2025-11-07 07:26:14,080 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:14] "[35m[1mGET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-11-07 07:26:14,285 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:14] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:26:42,853 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 07:26:42,855 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 07:26:42,855 - __main__ - INFO - Environment: development
+2025-11-07 07:26:42,898 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.140:5000
+2025-11-07 07:26:42,899 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-07 07:26:42,899 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 07:26:44,613 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 07:26:44,614 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 07:26:44,614 - __main__ - INFO - Environment: development
+2025-11-07 07:26:44,619 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 07:26:44,636 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 07:26:53,455 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:53] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:26:53,458 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:53] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:26:53,460 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:53] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:26:53,464 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:53] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:26:54,027 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:54] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:26:54,047 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:26:54,057 - __main__ - ERROR - Get SINTA dosen error: current transaction is aborted, commands ignored until end of transaction block
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 491, in get_sinta_dosen
+    cur.execute(count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.UndefinedTable: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 502, in get_sinta_dosen
+    cur.execute(fallback_count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.InFailedSqlTransaction: current transaction is aborted, commands ignored until end of transaction block
+
+
+2025-11-07 07:26:54,062 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:54] "[35m[1mGET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-11-07 07:26:54,243 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:54] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:26:54,437 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:26:54,439 - __main__ - ERROR - Get SINTA dosen error: current transaction is aborted, commands ignored until end of transaction block
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 491, in get_sinta_dosen
+    cur.execute(count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.UndefinedTable: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 502, in get_sinta_dosen
+    cur.execute(fallback_count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.InFailedSqlTransaction: current transaction is aborted, commands ignored until end of transaction block
+
+
+2025-11-07 07:26:54,441 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:54] "[35m[1mGET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-11-07 07:26:56,376 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:56] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:26:56,693 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:56] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:26:57,783 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:57] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:26:59,532 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:26:59] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:38:57,253 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:38:57] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:38:57,255 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:38:57] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:38:57,256 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:38:57] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:38:57,257 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:38:57] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:38:57,719 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:38:57] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:38:57,754 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:38:57] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:38:57,961 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:38:57] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:38:58,166 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:38:58] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:38:59,227 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:38:59] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:38:59,482 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:38:59,486 - __main__ - ERROR - Get SINTA dosen error: current transaction is aborted, commands ignored until end of transaction block
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 491, in get_sinta_dosen
+    cur.execute(count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.UndefinedTable: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 502, in get_sinta_dosen
+    cur.execute(fallback_count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.InFailedSqlTransaction: current transaction is aborted, commands ignored until end of transaction block
+
+
+2025-11-07 07:38:59,488 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:38:59] "[35m[1mGET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-11-07 07:38:59,536 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:38:59] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:38:59,544 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:38:59] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:38:59,549 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:38:59] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:39:00,002 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:00] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:39:00,010 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:39:00,017 - __main__ - ERROR - Get SINTA dosen error: current transaction is aborted, commands ignored until end of transaction block
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 491, in get_sinta_dosen
+    cur.execute(count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.UndefinedTable: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 502, in get_sinta_dosen
+    cur.execute(fallback_count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.InFailedSqlTransaction: current transaction is aborted, commands ignored until end of transaction block
+
+
+2025-11-07 07:39:00,021 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:00] "[35m[1mGET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-11-07 07:39:00,230 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:00] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:39:06,622 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:06] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:39:06,624 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:06] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:39:06,625 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:06] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:39:06,627 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:06] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:39:06,788 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:39:06,790 - __main__ - ERROR - Get SINTA dosen error: current transaction is aborted, commands ignored until end of transaction block
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 491, in get_sinta_dosen
+    cur.execute(count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.UndefinedTable: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 502, in get_sinta_dosen
+    cur.execute(fallback_count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.InFailedSqlTransaction: current transaction is aborted, commands ignored until end of transaction block
+
+
+2025-11-07 07:39:06,793 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:06] "[35m[1mGET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-11-07 07:39:07,071 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:07] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:39:07,239 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:39:07,245 - __main__ - ERROR - Get SINTA dosen error: current transaction is aborted, commands ignored until end of transaction block
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 491, in get_sinta_dosen
+    cur.execute(count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.UndefinedTable: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 502, in get_sinta_dosen
+    cur.execute(fallback_count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.InFailedSqlTransaction: current transaction is aborted, commands ignored until end of transaction block
+
+
+2025-11-07 07:39:07,247 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:07] "[35m[1mGET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-11-07 07:39:07,556 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:07] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:39:57,729 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:57] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:39:58,051 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:58] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:39:58,053 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:58] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:39:58,057 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:58] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:39:58,278 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:39:58,281 - __main__ - ERROR - Get SINTA dosen error: current transaction is aborted, commands ignored until end of transaction block
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 491, in get_sinta_dosen
+    cur.execute(count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.UndefinedTable: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 502, in get_sinta_dosen
+    cur.execute(fallback_count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.InFailedSqlTransaction: current transaction is aborted, commands ignored until end of transaction block
+
+
+2025-11-07 07:39:58,282 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:58] "[35m[1mGET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-11-07 07:39:58,496 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:58] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:39:58,576 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:39:58,599 - __main__ - ERROR - Get SINTA dosen error: current transaction is aborted, commands ignored until end of transaction block
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 491, in get_sinta_dosen
+    cur.execute(count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.UndefinedTable: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Project\WebProDS2Revisi\ProDS-System\backend\app.py", line 502, in get_sinta_dosen
+    cur.execute(fallback_count_query, params)
+  File "C:\Users\harih\AppData\Local\Programs\Python\Python310\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.InFailedSqlTransaction: current transaction is aborted, commands ignored until end of transaction block
+
+
+2025-11-07 07:39:58,602 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:58] "[35m[1mGET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1[0m" 500 -
+2025-11-07 07:39:58,889 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:39:58] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:53:30,633 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 07:53:30,634 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 07:53:30,634 - __main__ - INFO - Environment: development
+2025-11-07 07:53:30,663 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.101.60.140:5000
+2025-11-07 07:53:30,664 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-07 07:53:30,664 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 07:53:32,170 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 07:53:32,170 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 07:53:32,171 - __main__ - INFO - Environment: development
+2025-11-07 07:53:32,174 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 07:53:32,191 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 07:53:47,909 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:53:47] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:53:47,912 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:53:47] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:53:47,913 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:53:47] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:53:47,916 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:53:47] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:53:48,471 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:53:48,501 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 07:53:48,524 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:53:48] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:53:48,526 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:53:48] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:53:48,709 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:53:48,726 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 07:53:48,743 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:53:48] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:53:48,950 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:53:48] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:54:06,194 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:06] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:54:06,660 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:54:06,670 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 07:54:06,683 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:06] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:54:09,577 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:54:09,601 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 07:54:09,624 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:09] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:54:09,632 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:09] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:54:09,656 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:09] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:54:10,091 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:54:10,092 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:10] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:54:10,109 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 07:54:10,130 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:10] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:54:10,630 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:10] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:54:34,885 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:34] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:54:35,200 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:35] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:54:36,573 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:36] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:54:37,929 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:37] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:54:43,286 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:43] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:54:43,288 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:43] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:54:43,290 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:43] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:54:43,291 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:43] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:54:43,783 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:43] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:54:43,783 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:54:43,806 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 07:54:43,838 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:43] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:54:44,011 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:44] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:54:44,199 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:54:44,213 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 07:54:44,227 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:44] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:54:51,427 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:51] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:54:51,702 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:51] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:54:51,749 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:51] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:54:51,761 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:51] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:54:51,767 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:51] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:54:52,257 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:52] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:54:52,277 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:52] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:54:52,436 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:52] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:54:54,773 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:54] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:54:54,774 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:54] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:54:54,776 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:54] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:54:54,777 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:54] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:54:54,919 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:54:54,932 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 07:54:54,942 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:54] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:54:55,334 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:55] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:54:55,401 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:54:55,413 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 07:54:55,426 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:55] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:54:55,834 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:54:55] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:59:49,840 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:59:49] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:59:49,843 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:59:49] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:59:51,776 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:59:51] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:59:53,027 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:59:53] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 07:59:54,275 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:59:54] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:59:54,603 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:59:54] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:59:54,609 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:59:54] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:59:54,612 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:59:54] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:59:54,836 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:59:54,853 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 07:59:54,868 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:59:54] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:59:55,023 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:59:55] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 07:59:55,082 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 07:59:55,092 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 07:59:55,102 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:59:55] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 07:59:55,293 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 07:59:55] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:38:05,873 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:38:05] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:38:05,874 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:38:05] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:38:05,875 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:38:05] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:38:05,876 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:38:05] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:38:06,274 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:38:06,283 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:38:06,288 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:38:06] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:38:06,294 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:38:06] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:38:06,546 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:38:06] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:38:06,673 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:38:06,678 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:38:06,684 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:38:06] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:38:07,518 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:38:07] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 08:38:07,823 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:38:07] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 08:38:08,563 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:38:08] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 08:38:09,674 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:38:09,680 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:38:09,689 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:38:09] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:38:09,694 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:38:09] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:38:09,813 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:38:09] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 08:38:10,068 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:38:10,073 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:38:10,079 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:38:10] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:38:10,087 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:38:10] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:43:50,614 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:43:50] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:43:50,617 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:43:50] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:43:50,620 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:43:50] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:43:50,622 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:43:50] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:43:51,043 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:43:51] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:43:51,055 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:43:51,067 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:43:51,086 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:43:51] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:43:51,326 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:43:51] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:43:51,435 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:43:51,441 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:43:51,449 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:43:51] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:43:52,338 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:43:52,349 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:43:52,359 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:43:52] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:43:52,761 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:43:52] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:43:56,242 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:43:56] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:43:56,551 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:43:56] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:43:56,628 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:43:56,634 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:43:56,640 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:43:56] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:43:56,955 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:43:56] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:44:02,549 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:02] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:44:02,553 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:02] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:44:02,691 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:44:02,698 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:44:02,705 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:02] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:44:03,104 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:03] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:44:23,254 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:23] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:44:23,566 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:23] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:44:23,786 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:44:23,794 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:44:23,800 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:23] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:44:23,912 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:23] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:44:32,720 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:32] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:44:32,721 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:32] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:44:32,722 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:32] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:44:32,723 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:32] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:44:32,900 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:44:32,907 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:44:32,921 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:32] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:44:33,132 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:33] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:44:33,528 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:44:33,565 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:44:33,594 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:33] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:44:33,680 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:33] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:44:48,357 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:48] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:44:48,781 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:44:48,789 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:44:48,799 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:48] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:44:56,705 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:56] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:44:56,709 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:56] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:44:56,714 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:56] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:44:56,717 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:56] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:44:56,880 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:56] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:44:57,121 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:57] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:44:57,294 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:57] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:44:57,601 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:44:57] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:45:01,730 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:45:01] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:45:02,051 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:45:02] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:45:02,058 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:45:02] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:45:02,061 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:45:02] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:45:02,396 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:45:02,414 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:45:02,430 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:45:02] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:45:02,487 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:45:02] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:45:02,571 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:45:02,577 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:45:02,584 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:45:02] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:45:03,052 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:45:03] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:45:18,549 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:45:18] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:45:18,553 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:45:18] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:45:18,556 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:45:18] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:45:18,557 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:45:18] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:45:19,237 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:45:19,255 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:45:19] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:45:19,256 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:45:19,277 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:45:19] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:45:19,536 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:45:19] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:45:19,712 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:45:19,722 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:45:19,733 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:45:19] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:47:13,125 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:47:13] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:47:13,127 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:47:13] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:47:13,129 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:47:13] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:47:13,130 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:47:13] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:47:13,768 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:47:13] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:47:13,769 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:47:13,781 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:47:13,788 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:47:13] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:47:13,872 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:47:13] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:47:14,282 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:47:14,290 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:47:14,298 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:47:14] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:11,631 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:11] "OPTIONS /api/sinta/dosen?page=5&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:12,199 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:48:12,210 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:48:12,222 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:12] "GET /api/sinta/dosen?page=5&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:14,345 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-07 08:48:14,459 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 08:48:15,749 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 08:48:15,749 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 08:48:15,750 - __main__ - INFO - Environment: development
+2025-11-07 08:48:15,753 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 08:48:15,771 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 08:48:16,897 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-07 08:48:17,050 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 08:48:18,384 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 08:48:18,384 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 08:48:18,385 - __main__ - INFO - Environment: development
+2025-11-07 08:48:18,387 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 08:48:18,401 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 08:48:19,842 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:19] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:20,277 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:48:20,284 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:48:20,293 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:20] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:26,891 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-07 08:48:27,011 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 08:48:28,448 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 08:48:28,449 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 08:48:28,449 - __main__ - INFO - Environment: development
+2025-11-07 08:48:28,455 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 08:48:28,480 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 08:48:29,980 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:29] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:29,981 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:29] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:29,982 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:29] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:29,984 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:29] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:30,449 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:48:30,465 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:48:30,481 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:30] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:30,496 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:30] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:30,688 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-07 08:48:30,794 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 08:48:32,181 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 08:48:32,181 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 08:48:32,182 - __main__ - INFO - Environment: development
+2025-11-07 08:48:32,187 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 08:48:32,218 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 08:48:32,407 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:32] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:33,540 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:48:33,558 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:48:33,594 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:33] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:33,770 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:33] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:34,041 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:48:34,052 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:48:34,061 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:34] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:34,186 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:34] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:35,396 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:48:35,405 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:48:35,414 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:35] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:35,425 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:35] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:35,821 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:48:35,831 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:48:35,840 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:35] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:35,885 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:35] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:38,064 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:38] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:38,065 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:38] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:38,068 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:38] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:38,069 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:38] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:38,180 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:48:38,187 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:48:38,197 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:38] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:38,505 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:38] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:38,623 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:48:38,635 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:48:38,643 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:38] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:38,984 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:38] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:40,064 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:40] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:40,076 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:48:40,085 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:48:40,097 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:40] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:40,335 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:40] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:40,488 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:48:40,495 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:48:40,503 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:40] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:46,555 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:46] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:46,733 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:48:46,744 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:48:46,752 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:46] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:46,878 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:46] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:46,886 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:46] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:46,892 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:46] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:47,431 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:48:47,433 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:47] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:47,446 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:48:47,454 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:47] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:47,574 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:47] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:48,121 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:48:48,138 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:48:48,149 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:48] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:48,320 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:48] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:48,604 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:48:48,613 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:48:48,622 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:48] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:48,741 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:48] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:50,090 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:48:50,099 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:48:50,106 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:50] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:50,120 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:50] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:50,335 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:48:50,345 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:48:50,356 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:50] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:48:50,540 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:48:50] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:48:51,630 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-07 08:48:51,717 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 08:48:52,933 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 08:48:52,933 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 08:48:52,933 - __main__ - INFO - Environment: development
+2025-11-07 08:48:52,937 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 08:48:52,952 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 08:49:02,489 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-07 08:49:02,632 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 08:49:03,931 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 08:49:03,931 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 08:49:03,932 - __main__ - INFO - Environment: development
+2025-11-07 08:49:03,935 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 08:49:03,952 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 08:49:13,415 - werkzeug - INFO -  * Detected change in 'D:\\Project\\WebProDS2Revisi\\ProDS-System\\backend\\app.py', reloading
+2025-11-07 08:49:13,513 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 08:49:15,100 - __main__ - INFO - Starting ProDS Flask Application with SocketIO
+2025-11-07 08:49:15,100 - __main__ - INFO - Database: ProDSGabungan@localhost:5432
+2025-11-07 08:49:15,101 - __main__ - INFO - Environment: development
+2025-11-07 08:49:15,105 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 08:49:15,120 - werkzeug - INFO -  * Debugger PIN: 141-167-565
+2025-11-07 08:49:15,155 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:49:15] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:49:15,157 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:49:15] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:49:15,161 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:49:15] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:49:15,164 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:49:15] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:49:15,681 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:49:15] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:49:15,697 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:49:15,707 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:49:15,717 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:49:15] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:49:15,833 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:49:15] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:49:16,264 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:49:16,276 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:49:16,287 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:49:16] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:50:21,175 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:50:21] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:50:21,178 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:50:21] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:50:21,181 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:50:21] "OPTIONS /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:50:21,184 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:50:21] "OPTIONS /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:50:21,768 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:50:21] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:50:21,781 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:50:21] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:50:21,918 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:50:21] "GET /api/scholar/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:50:22,312 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:50:22] "GET /api/scholar/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:50:48,132 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:50:48] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:50:48,451 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:50:48] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:50:48,453 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:50:48] "OPTIONS /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:50:48,455 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:50:48] "OPTIONS /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:50:48,684 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:50:48,690 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:50:48,701 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:50:48] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:50:48,847 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:50:48] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:50:48,919 - __main__ - WARNING - Count query with DataMaster failed: relation "DataMaster" does not exist
+LINE 14:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback
+2025-11-07 08:50:48,928 - __main__ - WARNING - Query with DataMaster failed: relation "DataMaster" does not exist
+LINE 25:             LEFT JOIN "DataMaster" dm ON d.v_id_sinta IS NOT...
+                               ^
+, trying fallback query
+2025-11-07 08:50:48,938 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:50:48] "GET /api/sinta/dosen?page=1&perPage=20&search= HTTP/1.1" 200 -
+2025-11-07 08:50:49,105 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:50:49] "GET /api/sinta/dosen/stats?search= HTTP/1.1" 200 -
+2025-11-07 08:51:00,835 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:51:00] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 08:51:00,840 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:51:00] "OPTIONS /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 08:51:02,163 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:51:02] "GET /api/dashboard/stats HTTP/1.1" 200 -
+2025-11-07 08:51:03,590 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 08:51:03] "GET /api/dashboard/stats HTTP/1.1" 200 -
