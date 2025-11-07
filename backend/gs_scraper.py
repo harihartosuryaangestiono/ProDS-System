@@ -31,7 +31,7 @@ class GoogleScholarScraper:
     ACCOUNT_POOL = [
         {"email": "6182101017@student.unpar.ac.id", "password": "618017SH"},
         {"email": "6182101045@student.unpar.ac.id", "password": "6180145CD"},
-        {"email": "61821010559@student.unpar.ac.id", "password": "618059SJ"},
+        {"email": "6182101059@student.unpar.ac.id", "password": "618059SJ"},
         {"email": "6182101063@student.unpar.ac.id", "password": "618063XJ"},
     ]
     
