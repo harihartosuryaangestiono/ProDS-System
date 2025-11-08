@@ -621,7 +621,7 @@ useEffect(() => {
                 <button
                   onClick={handleSintaDosen}
                   disabled={isLoading || !credentials.username || !credentials.password}
-                  className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {isLoading ? (
                     <>
@@ -638,8 +638,12 @@ useEffect(() => {
                 {isLoading && currentJobId && (
                   <button
                     onClick={cancelCurrentJob}
-                    className={`inline-flex items-center px-4 py-2 rounded-lg text-white ${isCancelling ? 'bg-gray-400 cursor-wait' : 'bg-red-600 hover:bg-red-700'}`}
                     disabled={isCancelling}
+                    className={`inline-flex items-center px-4 py-3 rounded-md text-white text-sm font-medium transition-colors ${
+                      isCancelling 
+                        ? 'bg-gray-400 cursor-wait' 
+                        : 'bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
+                    }`}
                   >
                     {isCancelling ? (
                       <>
@@ -673,23 +677,48 @@ useEffect(() => {
                 </div>
               </div>
 
-              <button
-                onClick={handleSintaScopus}
-                disabled={isLoading || !credentials.username || !credentials.password}
-                className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader className="animate-spin -ml-1 mr-3 h-5 w-5" />
-                    Sedang Scraping...
-                  </>
-                ) : (
-                  <>
-                    <Play className="-ml-1 mr-3 h-5 w-5" />
-                    Mulai Scraping Scopus
-                  </>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={handleSintaScopus}
+                  disabled={isLoading || !credentials.username || !credentials.password}
+                  className="flex-1 flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader className="animate-spin -ml-1 mr-3 h-5 w-5" />
+                      Sedang Scraping...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="-ml-1 mr-3 h-5 w-5" />
+                      Mulai Scraping Scopus
+                    </>
+                  )}
+                </button>
+                {isLoading && currentJobId && (
+                  <button
+                    onClick={cancelCurrentJob}
+                    disabled={isCancelling}
+                    className={`inline-flex items-center px-4 py-3 rounded-md text-white text-sm font-medium transition-colors ${
+                      isCancelling 
+                        ? 'bg-gray-400 cursor-wait' 
+                        : 'bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
+                    }`}
+                  >
+                    {isCancelling ? (
+                      <>
+                        <Loader className="w-4 h-4 mr-2 animate-spin" />
+                        Menghentikan...
+                      </>
+                    ) : (
+                      <>
+                        <Square className="w-4 h-4 mr-2" />
+                        Stop
+                      </>
+                    )}
+                  </button>
                 )}
-              </button>
+              </div>
             </div>
           )}
 
@@ -708,23 +737,48 @@ useEffect(() => {
                 </div>
               </div>
 
-              <button
-                onClick={handleSintaGoogleScholar}
-                disabled={isLoading || !credentials.username || !credentials.password}
-                className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader className="animate-spin -ml-1 mr-3 h-5 w-5" />
-                    Sedang Scraping...
-                  </>
-                ) : (
-                  <>
-                    <Play className="-ml-1 mr-3 h-5 w-5" />
-                    Mulai Scraping Google Scholar
-                  </>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={handleSintaGoogleScholar}
+                  disabled={isLoading || !credentials.username || !credentials.password}
+                  className="flex-1 flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader className="animate-spin -ml-1 mr-3 h-5 w-5" />
+                      Sedang Scraping...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="-ml-1 mr-3 h-5 w-5" />
+                      Mulai Scraping Google Scholar
+                    </>
+                  )}
+                </button>
+                {isLoading && currentJobId && (
+                  <button
+                    onClick={cancelCurrentJob}
+                    disabled={isCancelling}
+                    className={`inline-flex items-center px-4 py-3 rounded-md text-white text-sm font-medium transition-colors ${
+                      isCancelling 
+                        ? 'bg-gray-400 cursor-wait' 
+                        : 'bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
+                    }`}
+                  >
+                    {isCancelling ? (
+                      <>
+                        <Loader className="w-4 h-4 mr-2 animate-spin" />
+                        Menghentikan...
+                      </>
+                    ) : (
+                      <>
+                        <Square className="w-4 h-4 mr-2" />
+                        Stop
+                      </>
+                    )}
+                  </button>
                 )}
-              </button>
+              </div>
             </div>
           )}
 
@@ -743,23 +797,48 @@ useEffect(() => {
                 </div>
               </div>
 
-              <button
-                onClick={handleSintaGaruda}
-                disabled={isLoading || !credentials.username || !credentials.password}
-                className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader className="animate-spin -ml-1 mr-3 h-5 w-5" />
-                    Sedang Scraping...
-                  </>
-                ) : (
-                  <>
-                    <Play className="-ml-1 mr-3 h-5 w-5" />
-                    Mulai Scraping Garuda
-                  </>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={handleSintaGaruda}
+                  disabled={isLoading || !credentials.username || !credentials.password}
+                  className="flex-1 flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader className="animate-spin -ml-1 mr-3 h-5 w-5" />
+                      Sedang Scraping...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="-ml-1 mr-3 h-5 w-5" />
+                      Mulai Scraping Garuda
+                    </>
+                  )}
+                </button>
+                {isLoading && currentJobId && (
+                  <button
+                    onClick={cancelCurrentJob}
+                    disabled={isCancelling}
+                    className={`inline-flex items-center px-4 py-3 rounded-md text-white text-sm font-medium transition-colors ${
+                      isCancelling 
+                        ? 'bg-gray-400 cursor-wait' 
+                        : 'bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
+                    }`}
+                  >
+                    {isCancelling ? (
+                      <>
+                        <Loader className="w-4 h-4 mr-2 animate-spin" />
+                        Menghentikan...
+                      </>
+                    ) : (
+                      <>
+                        <Square className="w-4 h-4 mr-2" />
+                        Stop
+                      </>
+                    )}
+                  </button>
                 )}
-              </button>
+              </div>
             </div>
           )}
 
@@ -810,23 +889,48 @@ useEffect(() => {
                 </div>
               </div>
 
-              <button
-                onClick={handleGoogleScholar}
-                disabled={isLoading}
-                className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader className="animate-spin -ml-1 mr-3 h-5 w-5" />
-                    Sedang Scraping...
-                  </>
-                ) : (
-                  <>
-                    <Play className="-ml-1 mr-3 h-5 w-5" />
-                    Mulai Scraping Google Scholar
-                  </>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={handleGoogleScholar}
+                  disabled={isLoading}
+                  className="flex-1 flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader className="animate-spin -ml-1 mr-3 h-5 w-5" />
+                      Sedang Scraping...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="-ml-1 mr-3 h-5 w-5" />
+                      Mulai Scraping Google Scholar
+                    </>
+                  )}
+                </button>
+                {isLoading && currentJobId && (
+                  <button
+                    onClick={cancelCurrentJob}
+                    disabled={isCancelling}
+                    className={`inline-flex items-center px-4 py-3 rounded-md text-white text-sm font-medium transition-colors ${
+                      isCancelling 
+                        ? 'bg-gray-400 cursor-wait' 
+                        : 'bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
+                    }`}
+                  >
+                    {isCancelling ? (
+                      <>
+                        <Loader className="w-4 h-4 mr-2 animate-spin" />
+                        Menghentikan...
+                      </>
+                    ) : (
+                      <>
+                        <Square className="w-4 h-4 mr-2" />
+                        Stop
+                      </>
+                    )}
+                  </button>
                 )}
-              </button>
+              </div>
             </div>
           )}
         </div>
