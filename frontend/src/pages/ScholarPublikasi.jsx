@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Award, Calendar, ExternalLink, Building2, GraduationCap } from 'lucide-react';
+import { FileText, Award, Calendar, ExternalLink, Building2, GraduationCap, RefreshCw, Search } from 'lucide-react';
 import apiService from '../services/apiService';
-import DataTable from '../components/DataTable';
 import { toast } from 'react-hot-toast';
 
 const ScholarPublikasi = () => {
@@ -13,6 +12,7 @@ const ScholarPublikasi = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState(null);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [filterTipe, setFilterTipe] = useState('all');
   const [yearStart, setYearStart] = useState('');
   const [yearEnd, setYearEnd] = useState('');
@@ -119,12 +119,9 @@ const ScholarPublikasi = () => {
       if (selectedFaculty) params.faculty = selectedFaculty;
       if (selectedDepartment) params.department = selectedDepartment;
       
-      console.log('📊 Fetching aggregate stats with params:', params);
-      
       const response = await apiService.getScholarPublikasiStats(params);
 
       if (response.success) {
-        // Get recent publications count from full data
         const fullParams = {
           page: 1,
           per_page: 10000,
@@ -222,11 +219,7 @@ const ScholarPublikasi = () => {
       if (selectedFaculty) params.faculty = selectedFaculty;
       if (selectedDepartment) params.department = selectedDepartment;
       
-      console.log('📤 Fetching Scholar publikasi with params:', params);
-      
       const response = await apiService.getScholarPublikasi(params);
-      
-      console.log('📥 Scholar publikasi response:', response);
 
       if (response.success) {
         setPublikasiData(response.data.data || []);
@@ -253,8 +246,8 @@ const ScholarPublikasi = () => {
     }
   };
 
-  const handleSearchChange = (value) => {
-    setSearchTerm(value);
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
     setCurrentPage(1);
   };
 
@@ -300,164 +293,36 @@ const ScholarPublikasi = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const columns = [
-    {
-      key: 'authors',
-      title: 'Author',
-      render: (value) => (
-        <div className="max-w-xs">
-          <p className="text-sm text-gray-900 truncate" title={value}>
-            {value || 'N/A'}
-          </p>
-        </div>
-      )
-    },
-    {
-      key: 'v_nama_jurusan',
-      title: 'Jurusan',
-      sortable: true,
-      render: (value) => (
-        <div className="max-w-xs">
-          <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800">
-            <Building2 className="w-3 h-3 mr-1" />
-            {value || 'N/A'}
-          </span>
-        </div>
-      )
-    },
-    {
-      key: 'v_judul',
-      title: 'Judul Publikasi',
-      render: (value) => (
-        <div className="max-w-lg">
-          <p className="font-medium text-gray-900 line-clamp-2" title={value}>
-            {value || 'N/A'}
-          </p>
-        </div>
-      )
-    },
-    {
-      key: 'tipe',
-      title: 'Tipe',
-      render: (value) => (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          value === 'Artikel' ? 'bg-green-100 text-green-800' :
-          value === 'Prosiding' ? 'bg-yellow-100 text-yellow-800' :
-          value === 'Buku' ? 'bg-purple-100 text-purple-800' :
-          value === 'Penelitian' ? 'bg-blue-100 text-blue-800' :
-          value === 'Lainnya' ? 'bg-indigo-100 text-indigo-800' :
-          'bg-gray-100 text-gray-800'
-        }`}>
-          {value || 'N/A'}
-        </span>
-      )
-    },
-    {
-      key: 'v_tahun_publikasi',
-      title: 'Tahun',
-      type: 'number',
-      className: 'text-center',
-      cellClassName: 'text-center',
-      render: (value) => (
-        <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
-          {value || 'N/A'}
-        </span>
-      )
-    },
-    {
-      key: 'venue',
-      title: 'Venue/Jurnal',
-      render: (value) => (
-        <div className="max-w-xs">
-          <p className="text-sm text-gray-900 truncate" title={value}>
-            {value || 'N/A'}
-          </p>
-        </div>
-      )
-    },
-    {
-      key: 'publisher',
-      title: 'Publisher',
-      render: (value) => (
-        <div className="max-w-xs">
-          <p className="text-sm text-gray-700 truncate" title={value}>
-            {value || '-'}
-          </p>
-        </div>
-      )
-    },
-    {
-      key: 'vol_issue',
-      title: 'Vol/Issue',
-      sortable: false,
-      className: 'text-center',
-      cellClassName: 'text-center',
-      render: (value) => (
-        <span className="text-sm text-gray-600">
-          {value || '-'}
-        </span>
-      )
-    },
-    {
-      key: 'pages',
-      title: 'Pages',
-      sortable: false,
-      className: 'text-center',
-      cellClassName: 'text-center',
-      render: (value) => (
-        <span className="text-sm text-gray-600">
-          {value ? `pp. ${value}` : '-'}
-        </span>
-      )
-    },
-    {
-      key: 'n_total_sitasi',
-      title: 'Sitasi',
-      type: 'number',
-      className: 'text-center',
-      cellClassName: 'text-center',
-      render: (value) => (
-        <span className={`font-semibold ${
-          (value || 0) > 100 ? 'text-red-600' :
-          (value || 0) > 50 ? 'text-orange-600' :
-          (value || 0) > 10 ? 'text-yellow-600' :
-          'text-gray-600'
-        }`}>
-          {(value || 0).toLocaleString()}
-        </span>
-      )
-    },
-    {
-      key: 't_tanggal_unduh',
-      title: 'Last Updated',
-      type: 'date',
-      className: 'text-center',
-      cellClassName: 'text-center text-sm text-gray-500'
-    },
-    {
-      key: 'actions',
-      title: 'Aksi',
-      sortable: false,
-      className: 'text-center',
-      cellClassName: 'text-center',
-      render: (_, row) => (
-        <div className="flex items-center justify-center space-x-2">
-          {row.v_link_url && (
-            <a
-              href={row.v_link_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-red-600 hover:text-red-900 inline-flex items-center text-sm"
-              title="Lihat di Google Scholar"
-            >
-              <ExternalLink className="w-4 h-4 mr-1" />
-              Scholar
-            </a>
-          )}
-        </div>
-      )
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
     }
-  ];
+    setSortConfig({ key, direction });
+  };
+
+  const getSortedData = () => {
+    if (!sortConfig.key) return publikasiData;
+
+    return [...publikasiData].sort((a, b) => {
+      const aVal = a[sortConfig.key];
+      const bVal = b[sortConfig.key];
+
+      if (aVal === null || aVal === undefined) return 1;
+      if (bVal === null || bVal === undefined) return -1;
+
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
+      }
+
+      const aStr = String(aVal).toLowerCase();
+      const bStr = String(bVal).toLowerCase();
+      
+      if (aStr < bStr) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aStr > bStr) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  };
 
   const StatCard = ({ title, value, icon: Icon, color, subtitle, loading }) => (
     <div className="bg-white rounded-lg shadow-md p-6 border-l-4" style={{ borderColor: color }}>
@@ -484,9 +349,12 @@ const ScholarPublikasi = () => {
     </div>
   );
 
+  const sortedData = getSortedData();
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Data Publikasi Google Scholar</h1>
           <p className="mt-2 text-sm text-gray-600">
@@ -494,88 +362,7 @@ const ScholarPublikasi = () => {
           </p>
         </div>
 
-        {/* Faculty Filter Section */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex items-center mb-4">
-            <Building2 className="h-5 w-5 text-gray-500 mr-2" />
-            <h2 className="text-lg font-semibold text-gray-900">Filter Fakultas & Jurusan</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label htmlFor="faculty" className="block text-sm font-medium text-gray-700 mb-2">
-                Fakultas
-              </label>
-              <select
-                id="faculty"
-                value={selectedFaculty}
-                onChange={handleFacultyChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              >
-                <option value="">Semua Fakultas</option>
-                {faculties.map((faculty) => (
-                  <option key={faculty} value={faculty}>
-                    {faculty}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-2">
-                Jurusan
-              </label>
-              <select
-                id="department"
-                value={selectedDepartment}
-                onChange={handleDepartmentChange}
-                disabled={!selectedFaculty || loadingDepartments}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-              >
-                <option value="">
-                  {!selectedFaculty ? 'Pilih fakultas terlebih dahulu' : 'Semua Jurusan'}
-                </option>
-                {departments.map((dept) => (
-                  <option key={dept} value={dept}>
-                    {dept}
-                  </option>
-                ))}
-              </select>
-              {loadingDepartments && (
-                <p className="text-xs text-gray-500 mt-1">Memuat jurusan...</p>
-              )}
-            </div>
-
-            <div className="flex items-end">
-              <button
-                onClick={handleResetFilters}
-                disabled={!selectedFaculty && !selectedDepartment && !searchTerm && !yearStart && !yearEnd && filterTipe === 'all'}
-                className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Reset Semua Filter
-              </button>
-            </div>
-          </div>
-
-          {(selectedFaculty || selectedDepartment) && (
-            <div className="mt-4 flex items-center flex-wrap gap-2">
-              <span className="text-sm text-gray-600">Filter aktif:</span>
-              {selectedFaculty && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                  <Building2 className="w-4 h-4 mr-1" />
-                  {selectedFaculty}
-                </span>
-              )}
-              {selectedDepartment && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                  <GraduationCap className="w-4 h-4 mr-1" />
-                  {selectedDepartment}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-
+        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Publikasi"
@@ -609,78 +396,442 @@ const ScholarPublikasi = () => {
           />
         </div>
 
-        <DataTable
-          title="Daftar Publikasi Google Scholar"
-          data={publikasiData}
-          columns={columns}
-          loading={loading}
-          searchTerm={searchTerm}
-          onSearchChange={handleSearchChange}
-          onRefresh={fetchPublikasiData}
-          pagination={pagination}
-          onPageChange={handlePageChange}
-          emptyMessage="Tidak ada data publikasi Google Scholar ditemukan"
-          emptyIcon={<FileText className="h-12 w-12" />}
-          additionalFilters={
-            <div className="flex items-center gap-3">
-              <select
-                id="filter-tipe"
-                value={filterTipe}
-                onChange={handleFilterChange}
-                className="px-3 py-1.5 bg-white border-2 border-red-300 rounded-md shadow-sm 
-                         text-sm text-gray-800 font-semibold
-                         hover:border-red-400 hover:shadow-md
-                         focus:border-red-500 focus:ring-2 focus:ring-red-200 focus:outline-none
-                         transition-all duration-200 cursor-pointer
-                         bg-gradient-to-br from-white to-red-50"
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23dc2626'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'right 0.5rem center',
-                  backgroundSize: '1.5em 1.5em',
-                  paddingRight: '2.5rem',
-                  appearance: 'none'
-                }}
+        {/* Data Table with Integrated Filters */}
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          {/* Table Header */}
+          <div className="px-6 py-4 border-b border-gray-200">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-gray-900">Daftar Publikasi Google Scholar</h2>
+              <button
+                onClick={fetchPublikasiData}
+                className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                disabled={loading}
               >
-                {publikasiTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-
-              <div className="flex items-center gap-2 bg-white border-2 border-blue-300 rounded-md px-3 py-1.5 shadow-sm">
-                <Calendar className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium text-gray-700">Tahun Publikasi:</span>
-                <select
-                  value={yearStart}
-                  onChange={handleYearStartChange}
-                  className="px-2 py-0.5 border border-gray-300 rounded text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
-                >
-                  <option value="">Dari</option>
-                  {yearOptions.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
-                <span className="text-gray-500">-</span>
-                <select
-                  value={yearEnd}
-                  onChange={handleYearEndChange}
-                  className="px-2 py-0.5 border border-gray-300 rounded text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
-                >
-                  <option value="">Sampai</option>
-                  {yearOptions.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </button>
             </div>
-          }
-        />
+
+            {/* Filters Section */}
+            <div className="space-y-4">
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Cari publikasi..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Type and Year Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Type Filter */}
+                <div className="relative">
+                  <label htmlFor="filter-tipe" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                    <FileText className="w-4 h-4 mr-1.5 text-red-600" />
+                    Tipe Publikasi
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="filter-tipe"
+                      value={filterTipe}
+                      onChange={handleFilterChange}
+                      className="w-full pl-4 pr-10 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white hover:border-gray-400 transition-all duration-200 appearance-none cursor-pointer shadow-sm"
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                        backgroundPosition: 'right 0.5rem center',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundSize: '1.5em 1.5em'
+                      }}
+                    >
+                      {publikasiTypes.map((type) => (
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Year Range Filter */}
+                <div className="relative md:col-span-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                    <Calendar className="w-4 h-4 mr-1.5 text-purple-600" />
+                    Rentang Tahun
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={yearStart}
+                      onChange={handleYearStartChange}
+                      className="flex-1 pl-4 pr-10 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white hover:border-gray-400 transition-all duration-200 appearance-none cursor-pointer shadow-sm"
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                        backgroundPosition: 'right 0.5rem center',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundSize: '1.5em 1.5em'
+                      }}
+                    >
+                      <option value="">📅 Dari Tahun</option>
+                      {yearOptions.map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="text-gray-500 font-medium">—</span>
+                    <select
+                      value={yearEnd}
+                      onChange={handleYearEndChange}
+                      className="flex-1 pl-4 pr-10 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white hover:border-gray-400 transition-all duration-200 appearance-none cursor-pointer shadow-sm"
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                        backgroundPosition: 'right 0.5rem center',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundSize: '1.5em 1.5em'
+                      }}
+                    >
+                      <option value="">📅 Sampai Tahun</option>
+                      {yearOptions.map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Faculty and Department Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Faculty Filter */}
+                <div className="relative">
+                  <label htmlFor="faculty" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                    <Building2 className="w-4 h-4 mr-1.5 text-orange-600" />
+                    Fakultas
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="faculty"
+                      value={selectedFaculty}
+                      onChange={handleFacultyChange}
+                      className="w-full pl-4 pr-10 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white hover:border-gray-400 transition-all duration-200 appearance-none cursor-pointer shadow-sm"
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                        backgroundPosition: 'right 0.5rem center',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundSize: '1.5em 1.5em'
+                      }}
+                    >
+                      <option value="">✨ Semua Fakultas</option>
+                      {faculties.map((faculty) => (
+                        <option key={faculty} value={faculty}>
+                          {faculty}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Department Filter */}
+                <div className="relative">
+                  <label htmlFor="department" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                    <GraduationCap className="w-4 h-4 mr-1.5 text-emerald-600" />
+                    Jurusan
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="department"
+                      value={selectedDepartment}
+                      onChange={handleDepartmentChange}
+                      disabled={!selectedFaculty || loadingDepartments}
+                      className="w-full pl-4 pr-10 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white hover:border-gray-400 transition-all duration-200 appearance-none cursor-pointer shadow-sm disabled:bg-gray-50 disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-500"
+                      style={{
+                        backgroundImage: !selectedFaculty || loadingDepartments ? 'none' : `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                        backgroundPosition: 'right 0.5rem center',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundSize: '1.5em 1.5em'
+                      }}
+                    >
+                      <option value="">
+                        {!selectedFaculty ? '🔒 Pilih fakultas terlebih dahulu' : loadingDepartments ? '⏳ Memuat...' : '✨ Semua Jurusan'}
+                      </option>
+                      {departments.map((dept) => (
+                        <option key={dept} value={dept}>
+                          {dept}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {loadingDepartments && (
+                    <div className="flex items-center mt-2">
+                      <RefreshCw className="w-3 h-3 text-emerald-500 animate-spin mr-1" />
+                      <p className="text-xs text-emerald-600 font-medium">Memuat jurusan...</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Reset Button */}
+                <div className="flex items-end">
+                  <button
+                    onClick={handleResetFilters}
+                    disabled={!selectedFaculty && !selectedDepartment && !searchTerm && filterTipe === 'all' && !yearStart && !yearEnd}
+                    className="w-full px-4 py-2.5 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 rounded-lg hover:from-gray-200 hover:to-gray-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-sm flex items-center justify-center group"
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2 group-hover:rotate-180 transition-transform duration-300" />
+                    Reset Filter
+                  </button>
+                </div>
+              </div>
+
+              {/* Active Filters Display */}
+              {(selectedFaculty || selectedDepartment || filterTipe !== 'all' || yearStart || yearEnd) && (
+                <div className="flex items-center flex-wrap gap-2">
+                  <span className="text-sm text-gray-600">Filter aktif:</span>
+                  {selectedFaculty && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
+                      <Building2 className="w-4 h-4 mr-1" />
+                      {selectedFaculty}
+                    </span>
+                  )}
+                  {selectedDepartment && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-800">
+                      <GraduationCap className="w-4 h-4 mr-1" />
+                      {selectedDepartment}
+                    </span>
+                  )}
+                  {filterTipe !== 'all' && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                      <FileText className="w-4 h-4 mr-1" />
+                      {publikasiTypes.find(t => t.value === filterTipe)?.label}
+                    </span>
+                  )}
+                  {(yearStart || yearEnd) && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                      <Calendar className="w-4 h-4 mr-1" />
+                      {yearStart || '...'} - {yearEnd || '...'}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Table Content */}
+          <div className="overflow-x-auto">
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <RefreshCw className="h-8 w-8 text-gray-400 animate-spin" />
+                <span className="ml-2 text-gray-500">Memuat data...</span>
+              </div>
+            ) : sortedData.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <FileText className="h-12 w-12 text-gray-400 mb-4" />
+                <p className="text-gray-500">Tidak ada data publikasi Google Scholar ditemukan</p>
+              </div>
+            ) : (
+              <>
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('authors')}>
+                        Author {sortConfig.key === 'authors' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Jurusan
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('v_judul')}>
+                        Judul Publikasi {sortConfig.key === 'v_judul' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Tipe
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('v_tahun_publikasi')}>
+                        Tahun {sortConfig.key === 'v_tahun_publikasi' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Venue/Jurnal
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Publisher
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Vol/Issue
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Pages
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('n_total_sitasi')}>
+                        Sitasi {sortConfig.key === 'n_total_sitasi' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Last Updated
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Aksi
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {sortedData.map((row, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="max-w-xs">
+                            <p className="text-sm text-gray-900 truncate" title={row.authors}>
+                              {row.authors || 'N/A'}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="max-w-xs">
+                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800">
+                              <Building2 className="w-3 h-3 mr-1" />
+                              {row.v_nama_jurusan || 'N/A'}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="max-w-lg">
+                            <p className="font-medium text-gray-900 line-clamp-2" title={row.v_judul}>
+                              {row.v_judul || 'N/A'}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            row.tipe === 'Artikel' ? 'bg-green-100 text-green-800' :
+                            row.tipe === 'Prosiding' ? 'bg-yellow-100 text-yellow-800' :
+                            row.tipe === 'Buku' ? 'bg-purple-100 text-purple-800' :
+                            row.tipe === 'Penelitian' ? 'bg-blue-100 text-blue-800' :
+                            row.tipe === 'Lainnya' ? 'bg-indigo-100 text-indigo-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {row.tipe || 'N/A'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                            {row.v_tahun_publikasi || 'N/A'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="max-w-xs">
+                            <p className="text-sm text-gray-900 truncate" title={row.venue}>
+                              {row.venue || 'N/A'}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="max-w-xs">
+                            <p className="text-sm text-gray-700 truncate" title={row.publisher}>
+                              {row.publisher || '-'}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          <span className="text-sm text-gray-600">
+                            {row.vol_issue || '-'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          <span className="text-sm text-gray-600">
+                            {row.pages ? `pp. ${row.pages}` : '-'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          <span className={`font-semibold ${
+                            (row.n_total_sitasi || 0) > 100 ? 'text-red-600' :
+                            (row.n_total_sitasi || 0) > 50 ? 'text-orange-600' :
+                            (row.n_total_sitasi || 0) > 10 ? 'text-yellow-600' :
+                            'text-gray-600'
+                          }`}>
+                            {(row.n_total_sitasi || 0).toLocaleString()}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                          {row.t_tanggal_unduh ? new Date(row.t_tanggal_unduh).toLocaleDateString('id-ID') : 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          <div className="flex items-center justify-center space-x-2">
+                            {row.v_link_url && (
+                              <a
+                                href={row.v_link_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-red-600 hover:text-red-900 inline-flex items-center text-sm"
+                                title="Lihat di Google Scholar"
+                              >
+                                <ExternalLink className="w-4 h-4 mr-1" />
+                                Scholar
+                              </a>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {/* Pagination */}
+                {pagination && pagination.totalPages > 1 && (
+                  <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+                    <div className="text-sm text-gray-700">
+                      Menampilkan <span className="font-medium">{((pagination.currentPage - 1) * pagination.perPage) + 1}</span> - <span className="font-medium">{Math.min(pagination.currentPage * pagination.perPage, pagination.totalRecords)}</span> dari <span className="font-medium">{pagination.totalRecords}</span> data
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handlePageChange(pagination.currentPage - 1)}
+                        disabled={pagination.currentPage === 1}
+                        className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Previous
+                      </button>
+                      
+                      {[...Array(pagination.totalPages)].map((_, i) => {
+                        const page = i + 1;
+                        if (
+                          page === 1 ||
+                          page === pagination.totalPages ||
+                          (page >= pagination.currentPage - 1 && page <= pagination.currentPage + 1)
+                        ) {
+                          return (
+                            <button
+                              key={page}
+                              onClick={() => handlePageChange(page)}
+                              className={`px-4 py-2 border rounded-md text-sm font-medium ${
+                                page === pagination.currentPage
+                                  ? 'bg-red-600 text-white border-red-600'
+                                  : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+                              }`}
+                            >
+                              {page}
+                            </button>
+                          );
+                        } else if (
+                          page === pagination.currentPage - 2 ||
+                          page === pagination.currentPage + 2
+                        ) {
+                          return <span key={page} className="px-2">...</span>;
+                        }
+                        return null;
+                      })}
+
+                      <button
+                        onClick={() => handlePageChange(pagination.currentPage + 1)}
+                        disabled={pagination.currentPage === pagination.totalPages}
+                        className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
