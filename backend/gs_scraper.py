@@ -29,10 +29,10 @@ class GoogleScholarScraper:
     
     # Multi-account pool
     ACCOUNT_POOL = [
-        {"email": "xxxx@student.unpar.ac.id", "password": "xxxx"},
-        {"email": "xxxx@student.unpar.ac.id", "password": "xxxx"},
-        {"email": "xxxx@student.unpar.ac.id", "password": "xxxx"},
-        {"email": "xxxx@student.unpar.ac.id", "password": "xxxx"},
+        {"email": "6182101017@student.unpar.ac.id", "password": "618017SH"},
+        {"email": "6182101045@student.unpar.ac.id", "password": "6180145CD"},
+        {"email": "6182101059@student.unpar.ac.id", "password": "618059SJ"},
+        {"email": "6182101063@student.unpar.ac.id", "password": "618063XJ"},
     ]
     
     def __init__(self, db_config, job_id=None, progress_callback=None, email=None, password=None):
@@ -245,7 +245,7 @@ class GoogleScholarScraper:
                     })
                     print("Step 1: Opening https://scholar.google.com/")
                     self.driver.get("https://scholar.google.com/")
-                    time.sleep(random.uniform(3, 5))
+                    time.sleep(random.uniform(11, 29))
                     
                     # Step 2: Click Login button
                     self.emit_progress({
@@ -258,7 +258,7 @@ class GoogleScholarScraper:
                             EC.element_to_be_clickable((By.ID, "gs_hdr_act_s"))
                         )
                         login_button.click()
-                        time.sleep(random.uniform(3, 5))
+                        time.sleep(random.uniform(21, 25))
                     except Exception as e:
                         print(f"Could not find login button: {e}")
                         if self.check_if_logged_in():
@@ -278,7 +278,7 @@ class GoogleScholarScraper:
                     )
                     email_input.clear()
                     email_input.send_keys(self.email)
-                    time.sleep(random.uniform(1, 2))
+                    time.sleep(random.uniform(21, 23))
                     
                     # Step 4: Click Next button (Google)
                     self.emit_progress({
@@ -291,7 +291,7 @@ class GoogleScholarScraper:
                         EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Selanjutnya')]"))
                     )
                     next_button.click()
-                    time.sleep(random.uniform(3, 5))
+                    time.sleep(random.uniform(13, 28))
                     
                     # Step 5: Check for CAPTCHA
                     self.emit_progress({
@@ -323,7 +323,7 @@ class GoogleScholarScraper:
                     )
                     sso_email_input.clear()
                     sso_email_input.send_keys(self.email)
-                    time.sleep(random.uniform(1, 2))
+                    time.sleep(random.uniform(13, 25))
                     
                     # Step 7: Click Next on SSO
                     self.emit_progress({
@@ -336,7 +336,7 @@ class GoogleScholarScraper:
                         EC.element_to_be_clickable((By.ID, "next_login"))
                     )
                     sso_next_button.click()
-                    time.sleep(random.uniform(2, 4))
+                    time.sleep(random.uniform(14, 27))
                     
                     # Step 8: Enter password
                     self.emit_progress({
@@ -350,7 +350,7 @@ class GoogleScholarScraper:
                     )
                     password_input.clear()
                     password_input.send_keys(self.password)
-                    time.sleep(random.uniform(1, 2))
+                    time.sleep(random.uniform(10, 23))
                     
                     # Step 9: Click Login button
                     self.emit_progress({
@@ -363,7 +363,7 @@ class GoogleScholarScraper:
                         EC.element_to_be_clickable((By.CSS_SELECTOR, "button.login__submit2"))
                     )
                     login_submit.click()
-                    time.sleep(random.uniform(4, 6))
+                    time.sleep(random.uniform(13, 27))
                     
                     # Step 10: Click Continue on confirmation page
                     self.emit_progress({
@@ -377,7 +377,7 @@ class GoogleScholarScraper:
                             EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Lanjutkan')]"))
                         )
                         continue_button.click()
-                        time.sleep(random.uniform(4, 6))
+                        time.sleep(random.uniform(12, 18))
                     except TimeoutException:
                         print("Continue button not found or already passed")
                     
@@ -1033,16 +1033,17 @@ class GoogleScholarScraper:
             
             cursor.execute(sql.SQL("""
                 INSERT INTO tmp_dosen_dt (
-                    v_nama_dosen, n_total_publikasi, n_total_sitasi_gs,
+                    v_nama_dosen, n_total_publikasi, n_total_sitasi_gs, n_total_sitasi_gs2020,
                     v_id_googlescholar, n_h_index_gs, n_h_index_gs2020,
                     n_i10_index_gs, n_i10_index_gs2020, v_sumber, t_tanggal_unduh,
                     v_link_url
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING v_id_dosen
             """), (
                 profile_data.get('name', ''),
                 len(profile_data.get('publications', [])),
                 int(profile_data['citation_stats'].get('Citations_all', 0)) if 'Citations_all' in profile_data['citation_stats'] else 0,
+                int(profile_data['citation_stats'].get('Citations_since2020', 0)) if 'Citations_since2020' in profile_data['citation_stats'] else 0,
                 scholar_id,
                 int(profile_data['citation_stats'].get('h-index_all', 0)) if 'h-index_all' in profile_data['citation_stats'] else 0,
                 int(profile_data['citation_stats'].get('h-index_since2020', 0)) if 'h-index_since2020' in profile_data['citation_stats'] else 0,
@@ -1402,17 +1403,17 @@ def normalize_publication_type(pub_type):
 # Example usage
 if __name__ == "__main__":
     DB_CONFIG = {
-        'dbname': 'ProDSGabungan',
-        'user': 'postgres',
-        'password': 'password123',
+        'dbname': 'SKM_PUBLIKASI',
+        'user': 'rayhanadjisantoso',
+        'password': 'rayhan123',
         'host': 'localhost',
         'port': '5432'
     } 
     
     scraper = GoogleScholarScraper(
         db_config=DB_CONFIG,
-        email="6182101045@student.unpar.ac.id",
-        password="618045CD"
+        email="6182101017@student.unpar.ac.id",
+        password="618017SH"
     )
     
     result = scraper.run(max_authors=5, scrape_from_beginning=False)

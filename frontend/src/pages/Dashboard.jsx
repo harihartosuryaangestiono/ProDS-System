@@ -8,6 +8,9 @@ const Dashboard = () => {
     total_dosen: 0,
     total_publikasi: 0,
     total_sitasi: 0,
+    total_sitasi_gs: 0,
+    total_sitasi_gs_sinta: 0,
+    total_sitasi_scopus: 0,
     avg_h_index: 0,
     median_h_index: 0,
     publikasi_by_year: [],
@@ -119,6 +122,7 @@ const Dashboard = () => {
           <StatCard
             title="Total Sitasi"
             value={stats.total_sitasi.toLocaleString()}
+            subtitle={`GS: ${stats.total_sitasi_gs?.toLocaleString() || 0} | GS-SINTA: ${stats.total_sitasi_gs_sinta?.toLocaleString() || 0} | Scopus: ${stats.total_sitasi_scopus?.toLocaleString() || 0}`}
             icon={Award}
             color="#F59E0B"
           />
@@ -329,8 +333,6 @@ const Dashboard = () => {
 
         {/* Summary Statistics */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Removed Trend Publikasi line chart to keep a single visualization as requested */}
-
           {/* Summary Card Column */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Ringkasan Statistik</h2>
@@ -489,12 +491,12 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Top 10 Dosen Nasional (Sinta 1-4) - styled like GS table */}
+        {/* Top 10 Dosen Nasional (Sinta 1-6) - styled like GS table */}
         <div className="bg-white rounded-lg shadow-md p-6 mt-8">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <Search className="w-5 h-5 text-indigo-600 mr-2" />
-              <h2 className="text-lg font-semibold text-gray-900">Top 10 Dosen Berdasarkan Publikasi Nasional (Sinta 1–4)</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Top 10 Dosen Berdasarkan Publikasi Nasional (Sinta 1–6)</h2>
             </div>
           </div>
           <div className="overflow-x-auto">

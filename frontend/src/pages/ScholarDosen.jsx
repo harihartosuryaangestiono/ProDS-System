@@ -150,6 +150,18 @@ const ScholarDosen = () => {
       )
     },
     {
+      key: 'n_total_sitasi_gs2020',
+      title: 'Sitasi (2020)',
+      type: 'number',
+      className: 'text-center',
+      cellClassName: 'text-center',
+      render: (value) => (
+        <span className="font-semibold text-teal-600">
+          {(value || 0).toLocaleString()}
+        </span>
+      )
+    },
+    {
       key: 'n_h_index_gs',
       title: 'H-Index',
       type: 'number',
