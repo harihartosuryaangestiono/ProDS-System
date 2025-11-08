@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Award, Calendar, ExternalLink, Building2 } from 'lucide-react';
+import { FileText, Award, Calendar, ExternalLink, Building2, GraduationCap } from 'lucide-react';
 import apiService from '../services/apiService';
 import DataTable from '../components/DataTable';
 import { toast } from 'react-hot-toast';
@@ -16,6 +16,14 @@ const ScholarPublikasi = () => {
   const [filterTipe, setFilterTipe] = useState('all');
   const [yearStart, setYearStart] = useState('');
   const [yearEnd, setYearEnd] = useState('');
+  
+  // Faculty and Department filters
+  const [faculties, setFaculties] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [selectedFaculty, setSelectedFaculty] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState('');
+  const [loadingDepartments, setLoadingDepartments] = useState(false);
+  
   const [aggregateStats, setAggregateStats] = useState({
     totalPublikasi: 0,
     totalSitasi: 0,
@@ -40,6 +48,21 @@ const ScholarPublikasi = () => {
     yearOptions.push(year);
   }
 
+  // Fetch faculties on component mount
+  useEffect(() => {
+    fetchFaculties();
+  }, []);
+
+  // Fetch departments when faculty changes
+  useEffect(() => {
+    if (selectedFaculty) {
+      fetchDepartments(selectedFaculty);
+    } else {
+      setDepartments([]);
+      setSelectedDepartment('');
+    }
+  }, [selectedFaculty]);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -47,11 +70,42 @@ const ScholarPublikasi = () => {
       return;
     }
     fetchPublikasiData();
-  }, [currentPage, searchTerm, filterTipe, yearStart, yearEnd]);
+  }, [currentPage, searchTerm, filterTipe, yearStart, yearEnd, selectedFaculty, selectedDepartment]);
 
   useEffect(() => {
     fetchAggregateStats();
-  }, [searchTerm, filterTipe, yearStart, yearEnd]);
+  }, [searchTerm, filterTipe, yearStart, yearEnd, selectedFaculty, selectedDepartment]);
+
+  const fetchFaculties = async () => {
+    try {
+      const response = await apiService.getScholarFaculties();
+      if (response.success) {
+        setFaculties(response.data.faculties || []);
+      } else {
+        console.error('Error fetching faculties:', response.error);
+      }
+    } catch (error) {
+      console.error('Error fetching faculties:', error);
+    }
+  };
+
+  const fetchDepartments = async (faculty) => {
+    try {
+      setLoadingDepartments(true);
+      const response = await apiService.getScholarDepartments(faculty);
+      if (response.success) {
+        setDepartments(response.data.departments || []);
+      } else {
+        console.error('Error fetching departments:', response.error);
+        setDepartments([]);
+      }
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+      setDepartments([]);
+    } finally {
+      setLoadingDepartments(false);
+    }
+  };
 
   const fetchAggregateStats = async () => {
     try {
@@ -59,17 +113,11 @@ const ScholarPublikasi = () => {
       
       const params = { search: searchTerm };
       
-      if (filterTipe !== 'all') {
-        params.tipe = filterTipe;
-      }
-      
-      if (yearStart) {
-        params.year_start = yearStart;
-      }
-      
-      if (yearEnd) {
-        params.year_end = yearEnd;
-      }
+      if (filterTipe !== 'all') params.tipe = filterTipe;
+      if (yearStart) params.year_start = yearStart;
+      if (yearEnd) params.year_end = yearEnd;
+      if (selectedFaculty) params.faculty = selectedFaculty;
+      if (selectedDepartment) params.department = selectedDepartment;
       
       console.log('📊 Fetching aggregate stats with params:', params);
       
@@ -86,6 +134,8 @@ const ScholarPublikasi = () => {
         if (filterTipe !== 'all') fullParams.tipe = filterTipe;
         if (yearStart) fullParams.year_start = yearStart;
         if (yearEnd) fullParams.year_end = yearEnd;
+        if (selectedFaculty) fullParams.faculty = selectedFaculty;
+        if (selectedDepartment) fullParams.department = selectedDepartment;
         
         const fullResponse = await apiService.getScholarPublikasi(fullParams);
         const allData = fullResponse.success ? (fullResponse.data.data || []) : [];
@@ -102,7 +152,6 @@ const ScholarPublikasi = () => {
           recentPublikasi
         });
       } else {
-        // Fallback to old method
         await fetchAllDataForStats();
       }
     } catch (error) {
@@ -121,17 +170,11 @@ const ScholarPublikasi = () => {
         search: searchTerm
       };
       
-      if (filterTipe !== 'all') {
-        params.tipe = filterTipe;
-      }
-      
-      if (yearStart) {
-        params.year_start = yearStart;
-      }
-      
-      if (yearEnd) {
-        params.year_end = yearEnd;
-      }
+      if (filterTipe !== 'all') params.tipe = filterTipe;
+      if (yearStart) params.year_start = yearStart;
+      if (yearEnd) params.year_end = yearEnd;
+      if (selectedFaculty) params.faculty = selectedFaculty;
+      if (selectedDepartment) params.department = selectedDepartment;
       
       const response = await apiService.getScholarPublikasi(params);
 
@@ -173,17 +216,11 @@ const ScholarPublikasi = () => {
         search: searchTerm
       };
       
-      if (filterTipe !== 'all') {
-        params.tipe = filterTipe;
-      }
-      
-      if (yearStart) {
-        params.year_start = yearStart;
-      }
-      
-      if (yearEnd) {
-        params.year_end = yearEnd;
-      }
+      if (filterTipe !== 'all') params.tipe = filterTipe;
+      if (yearStart) params.year_start = yearStart;
+      if (yearEnd) params.year_end = yearEnd;
+      if (selectedFaculty) params.faculty = selectedFaculty;
+      if (selectedDepartment) params.department = selectedDepartment;
       
       console.log('📤 Fetching Scholar publikasi with params:', params);
       
@@ -236,10 +273,25 @@ const ScholarPublikasi = () => {
     setCurrentPage(1);
   };
 
+  const handleFacultyChange = (e) => {
+    const faculty = e.target.value;
+    setSelectedFaculty(faculty);
+    setSelectedDepartment('');
+    setCurrentPage(1);
+  };
+
+  const handleDepartmentChange = (e) => {
+    setSelectedDepartment(e.target.value);
+    setCurrentPage(1);
+  };
+
   const handleResetFilters = () => {
     setYearStart('');
     setYearEnd('');
     setFilterTipe('all');
+    setSelectedFaculty('');
+    setSelectedDepartment('');
+    setSearchTerm('');
     setCurrentPage(1);
   };
 
@@ -442,6 +494,88 @@ const ScholarPublikasi = () => {
           </p>
         </div>
 
+        {/* Faculty Filter Section */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <div className="flex items-center mb-4">
+            <Building2 className="h-5 w-5 text-gray-500 mr-2" />
+            <h2 className="text-lg font-semibold text-gray-900">Filter Fakultas & Jurusan</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label htmlFor="faculty" className="block text-sm font-medium text-gray-700 mb-2">
+                Fakultas
+              </label>
+              <select
+                id="faculty"
+                value={selectedFaculty}
+                onChange={handleFacultyChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              >
+                <option value="">Semua Fakultas</option>
+                {faculties.map((faculty) => (
+                  <option key={faculty} value={faculty}>
+                    {faculty}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-2">
+                Jurusan
+              </label>
+              <select
+                id="department"
+                value={selectedDepartment}
+                onChange={handleDepartmentChange}
+                disabled={!selectedFaculty || loadingDepartments}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+              >
+                <option value="">
+                  {!selectedFaculty ? 'Pilih fakultas terlebih dahulu' : 'Semua Jurusan'}
+                </option>
+                {departments.map((dept) => (
+                  <option key={dept} value={dept}>
+                    {dept}
+                  </option>
+                ))}
+              </select>
+              {loadingDepartments && (
+                <p className="text-xs text-gray-500 mt-1">Memuat jurusan...</p>
+              )}
+            </div>
+
+            <div className="flex items-end">
+              <button
+                onClick={handleResetFilters}
+                disabled={!selectedFaculty && !selectedDepartment && !searchTerm && !yearStart && !yearEnd && filterTipe === 'all'}
+                className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Reset Semua Filter
+              </button>
+            </div>
+          </div>
+
+          {(selectedFaculty || selectedDepartment) && (
+            <div className="mt-4 flex items-center flex-wrap gap-2">
+              <span className="text-sm text-gray-600">Filter aktif:</span>
+              {selectedFaculty && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                  <Building2 className="w-4 h-4 mr-1" />
+                  {selectedFaculty}
+                </span>
+              )}
+              {selectedDepartment && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                  <GraduationCap className="w-4 h-4 mr-1" />
+                  {selectedDepartment}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Publikasi"
@@ -517,7 +651,7 @@ const ScholarPublikasi = () => {
 
               <div className="flex items-center gap-2 bg-white border-2 border-blue-300 rounded-md px-3 py-1.5 shadow-sm">
                 <Calendar className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium text-gray-700">Tahun:</span>
+                <span className="text-sm font-medium text-gray-700">Tahun Publikasi:</span>
                 <select
                   value={yearStart}
                   onChange={handleYearStartChange}
@@ -544,16 +678,6 @@ const ScholarPublikasi = () => {
                   ))}
                 </select>
               </div>
-
-              {(yearStart || yearEnd || filterTipe !== 'all') && (
-                <button
-                  onClick={handleResetFilters}
-                  className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-md transition-colors duration-200"
-                  title="Reset semua filter"
-                >
-                  Reset Filter
-                </button>
-              )}
             </div>
           }
         />

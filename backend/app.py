@@ -447,7 +447,7 @@ def dashboard_stats(current_user_id):
 @app.route('/api/sinta/dosen', methods=['GET'])
 @token_required
 def get_sinta_dosen(current_user_id):
-    """Get SINTA dosen data with pagination and search - only latest version per dosen"""
+    """Get SINTA dosen data with pagination, search, and faculty/department filters"""
     conn = None
     cur = None
     print(f"🔑 Authenticated user ID: {current_user_id}")
@@ -456,10 +456,12 @@ def get_sinta_dosen(current_user_id):
         page = int(request.args.get('page', 1))
         per_page = int(request.args.get('per_page', 20))
         search = request.args.get('search', '').strip()
+        faculty = request.args.get('faculty', '').strip()
+        department = request.args.get('department', '').strip()
         offset = (page - 1) * per_page
         
         # Debug logging
-        print(f"📥 SINTA Dosen - page: {page}, per_page: {per_page}, search: '{search}'")
+        print(f"📥 SINTA Dosen - page: {page}, per_page: {per_page}, search: '{search}', faculty: '{faculty}', department: '{department}'")
         
         conn = get_db_connection()
         if not conn:
@@ -467,7 +469,7 @@ def get_sinta_dosen(current_user_id):
         
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         
-        # Build query with proper table names
+        # Build query for SINTA data
         where_clause = "WHERE (d.v_sumber = 'SINTA' OR d.v_sumber IS NULL)"
         params = []
         
@@ -478,23 +480,6 @@ def get_sinta_dosen(current_user_id):
         
         print(f"🗃️ WHERE clause: {where_clause}")
         print(f"🗃️ Params: {params}")
-        
-        # Debug: Check raw data from database before CTE
-        debug_query = """
-            SELECT v_nama_dosen, n_total_publikasi, v_id_sinta, v_sumber, t_tanggal_unduh
-            FROM tmp_dosen_dt 
-            WHERE (v_sumber = 'SINTA' OR v_sumber IS NULL)
-            ORDER BY t_tanggal_unduh DESC
-            LIMIT 5
-        """
-        try:
-            cur.execute(debug_query)
-            debug_data = cur.fetchall()
-            print(f"🔍 Debug - Raw data from tmp_dosen_dt (first 5 rows):")
-            for row in debug_data:
-                print(f"   - {row.get('v_nama_dosen', 'N/A')}: n_total_publikasi = {row.get('n_total_publikasi', 'NULL')}, v_id_sinta = {row.get('v_id_sinta', 'NULL')}")
-        except Exception as debug_error:
-            print(f"⚠️ Debug query failed: {debug_error}")
         
         # Create CTE to get only latest version of each dosen (by nama_dosen)
         latest_dosen_cte = f"""
@@ -507,19 +492,45 @@ def get_sinta_dosen(current_user_id):
             )
         """
         
-        # Get total count from CTE
+        # Build faculty/department filter for the main query
+        faculty_filter = ""
+        faculty_params = []
+        
+        if department:
+            # Specific department selected
+            faculty_filter = "WHERE LOWER(TRIM(dm.v_nama_homebase_unpar)) = LOWER(%s)"
+            faculty_params.append(department.lower())
+            print(f"🏢 Filtering by department: {department}")
+        elif faculty:
+            # Only faculty selected, filter by all departments in that faculty
+            departments_in_faculty = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+            if departments_in_faculty:
+                # Create LIKE conditions for each department
+                like_conditions = []
+                for dept in departments_in_faculty:
+                    like_conditions.append("LOWER(TRIM(dm.v_nama_homebase_unpar)) LIKE LOWER(%s)")
+                    faculty_params.append(f"%{dept.lower()}%")
+                
+                faculty_filter = f"WHERE ({' OR '.join(like_conditions)})"
+                print(f"🏛️ Filtering by faculty: {faculty} (departments: {departments_in_faculty})")
+                print(f"🔍 Faculty filter SQL: {faculty_filter}")
+                print(f"🔍 Faculty params: {faculty_params}")
+        
+        # Get total count from CTE with faculty filter
         count_query = f"""
             {latest_dosen_cte}
             SELECT COUNT(*) as total
-            FROM latest_dosen
+            FROM latest_dosen d
+            LEFT JOIN datamaster dm ON d.v_id_sinta IS NOT NULL 
+                AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta)
+            {faculty_filter}
         """
-        cur.execute(count_query, params)
+        cur.execute(count_query, params + faculty_params)
         total = cur.fetchone()['total']
         
         print(f"📊 Total unique SINTA dosen found: {total}")
         
         # Get data from CTE with jurusan from datamaster
-        # Join using v_id_sinta (tmp_dosen_dt) = id_sinta (datamaster)
         data_query = f"""
             {latest_dosen_cte}
             SELECT
@@ -541,27 +552,37 @@ def get_sinta_dosen(current_user_id):
             FROM latest_dosen d
             LEFT JOIN datamaster dm ON d.v_id_sinta IS NOT NULL 
                 AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta)
+            {faculty_filter}
             ORDER BY (COALESCE(d.n_sitasi_gs, 0) + COALESCE(d.n_sitasi_scopus, 0)) DESC, d.t_tanggal_unduh DESC
             LIMIT %s OFFSET %s
         """
-        params.extend([per_page, offset])
+        params_full = params + faculty_params + [per_page, offset]
         
         try:
-            cur.execute(data_query, params)
-            dosen_data = [dict(row) for row in cur.fetchall()]
+            cur.execute(data_query, params_full)
+            sinta_data = [dict(row) for row in cur.fetchall()]
+            
+            # Add faculty information to each record based on department
+            for dosen in sinta_data:
+                department_name = dosen.get('v_nama_jurusan')
+                if department_name:
+                    faculty_name = get_faculty_from_department(department_name)
+                    dosen['v_nama_fakultas'] = faculty_name
+                else:
+                    dosen['v_nama_fakultas'] = None
             
             # Debug: Log jurusan sources
-            if dosen_data and len(dosen_data) > 0:
-                print(f"📤 Returning {len(dosen_data)} SINTA dosen records")
-                for i, dosen in enumerate(dosen_data[:5]):
+            if sinta_data and len(sinta_data) > 0:
+                print(f"📤 Returning {len(sinta_data)} SINTA dosen records")
+                for i, dosen in enumerate(sinta_data[:5]):
                     sinta_id = dosen.get('v_id_sinta', 'N/A')
                     jurusan = dosen.get('v_nama_jurusan', 'N/A')
-                    pub_count = dosen.get('n_total_publikasi', 'NOT FOUND')
-                    print(f"   Record {i+1}: {dosen.get('v_nama_dosen', 'N/A')} | SINTA_ID: {sinta_id} | Jurusan: {jurusan} | Publikasi: {pub_count}")
+                    fakultas = dosen.get('v_nama_fakultas', 'N/A')
+                    print(f"   Record {i+1}: {dosen.get('v_nama_dosen', 'N/A')} | SINTA_ID: {sinta_id} | Fakultas: {fakultas} | Jurusan: {jurusan}")
         
         except Exception as query_error:
-            # If datamaster join fails, return data without jurusan
-            logger.warning(f"Query with datamaster failed: {query_error}, trying fallback query")
+            # If DataMaster join fails, return data without jurusan
+            logger.warning(f"Query with DataMaster failed: {query_error}, trying fallback query")
             # Rollback the failed transaction before trying fallback
             conn.rollback()
             
@@ -582,20 +603,21 @@ def get_sinta_dosen(current_user_id):
                     d.n_skor_sinta_3yr,
                     d.t_tanggal_unduh, 
                     d.v_link_url,
-                    NULL AS v_nama_jurusan
+                    NULL AS v_nama_jurusan,
+                    NULL AS v_nama_fakultas
                 FROM latest_dosen d
                 ORDER BY (COALESCE(d.n_sitasi_gs, 0) + COALESCE(d.n_sitasi_scopus, 0)) DESC, d.t_tanggal_unduh DESC
                 LIMIT %s OFFSET %s
             """
-            cur.execute(fallback_query, params)
-            dosen_data = [dict(row) for row in cur.fetchall()]
-            print(f"⚠️ Using fallback query without datamaster join")
+            cur.execute(fallback_query, params + [per_page, offset])
+            sinta_data = [dict(row) for row in cur.fetchall()]
+            print(f"⚠️ Using fallback query without DataMaster join")
         
         # Commit the transaction after successful queries
         conn.commit()
         
         return jsonify({
-            'data': dosen_data,
+            'data': sinta_data,
             'pagination': {
                 'page': page,
                 'per_page': per_page,
@@ -615,7 +637,7 @@ def get_sinta_dosen(current_user_id):
                 conn.rollback()
             except:
                 pass
-        return jsonify({'error': f'Failed to fetch SINTA dosen data: {str(e)}'}), 500
+        return jsonify({'error': 'Failed to fetch SINTA dosen data'}), 500
     finally:
         if cur:
             cur.close()
@@ -625,14 +647,16 @@ def get_sinta_dosen(current_user_id):
 @app.route('/api/sinta/dosen/stats', methods=['GET'])
 @token_required
 def get_sinta_dosen_stats(current_user_id):
-    """Get SINTA dosen aggregate statistics - only latest version per dosen"""
+    """Get SINTA dosen aggregate statistics with faculty/department filter"""
     conn = None
     cur = None
     
     try:
         search = request.args.get('search', '').strip()
+        faculty = request.args.get('faculty', '').strip()
+        department = request.args.get('department', '').strip()
         
-        print(f"📊 SINTA Dosen Stats - search: '{search}'")
+        print(f"📊 SINTA Dosen Stats - search: '{search}', faculty: '{faculty}', department: '{department}'")
         
         conn = get_db_connection()
         if not conn:
@@ -640,7 +664,7 @@ def get_sinta_dosen_stats(current_user_id):
         
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         
-        # Build query with proper table names
+        # Build query for SINTA data
         where_clause = "WHERE (d.v_sumber = 'SINTA' OR d.v_sumber IS NULL)"
         params = []
         
@@ -659,7 +683,28 @@ def get_sinta_dosen_stats(current_user_id):
             )
         """
         
-        # Get aggregate statistics from CTE with separate GS and Scopus
+        # Build faculty/department filter
+        faculty_filter = ""
+        faculty_params = []
+        
+        if department:
+            # Specific department selected
+            faculty_filter = "WHERE LOWER(TRIM(dm.v_nama_homebase_unpar)) = LOWER(%s)"
+            faculty_params.append(department.lower())
+        elif faculty:
+            # Only faculty selected, filter by all departments in that faculty
+            departments_in_faculty = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+            if departments_in_faculty:
+                # Create LIKE conditions for each department
+                like_conditions = []
+                for dept in departments_in_faculty:
+                    like_conditions.append("LOWER(TRIM(dm.v_nama_homebase_unpar)) LIKE LOWER(%s)")
+                    faculty_params.append(f"%{dept.lower()}%")
+                
+                faculty_filter = f"WHERE ({' OR '.join(like_conditions)})"
+                print(f"🏛️ Stats filtering by faculty: {faculty} with {len(departments_in_faculty)} departments")
+        
+        # Get aggregate statistics from CTE with median
         stats_query = f"""
             {latest_dosen_cte}
             SELECT
@@ -670,9 +715,11 @@ def get_sinta_dosen_stats(current_user_id):
                 COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY d.n_h_index_gs_sinta), 0) as median_h_index,
                 COALESCE(SUM(d.n_total_publikasi), 0) as total_publikasi
             FROM latest_dosen d
-            LEFT JOIN stg_jurusan_mt j ON d.v_id_jurusan = j.v_id_jurusan
+            LEFT JOIN datamaster dm ON d.v_id_sinta IS NOT NULL 
+                AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta)
+            {faculty_filter}
         """
-        cur.execute(stats_query, params)
+        cur.execute(stats_query, params + faculty_params)
         stats = cur.fetchone()
         
         print(f"📊 Stats result: {stats}")
@@ -691,13 +738,185 @@ def get_sinta_dosen_stats(current_user_id):
         error_details = traceback.format_exc()
         print("❌ SINTA Dosen stats error:\n", error_details)
         logger.error(f"Get SINTA dosen stats error: {e}\n{error_details}")
-        # Rollback any failed transaction
-        if conn:
-            try:
-                conn.rollback()
-            except:
-                pass
         return jsonify({'error': 'Failed to fetch SINTA dosen statistics'}), 500
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+@app.route('/api/sinta/dosen/faculties', methods=['GET'])
+@token_required
+def get_sinta_faculties(current_user_id):
+    """Get list of faculties with SINTA dosen"""
+    conn = None
+    cur = None
+    
+    try:
+        print(f"🔑 Fetching faculties for user: {current_user_id}")
+        
+        conn = get_db_connection()
+        if not conn:
+            print("❌ Database connection failed")
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        try:
+            # Get all departments from datamaster that have SINTA data
+            query = """
+                SELECT DISTINCT 
+                    TRIM(dm.v_nama_homebase_unpar) as jurusan
+                FROM datamaster dm
+                WHERE dm.id_sinta IS NOT NULL 
+                    AND dm.v_nama_homebase_unpar IS NOT NULL
+                    AND TRIM(dm.v_nama_homebase_unpar) != ''
+            """
+            
+            print(f"🔍 Executing department query to derive faculties...")
+            cur.execute(query)
+            results = cur.fetchall()
+            departments = [row['jurusan'] for row in results if row['jurusan']]
+            
+            print(f"📋 Found {len(departments)} departments with SINTA data")
+            
+            # Map departments to faculties
+            faculties_set = set()
+            for dept in departments:
+                faculty = get_faculty_from_department(dept)
+                if faculty:
+                    faculties_set.add(faculty)
+                    print(f"  • {dept} → {faculty}")
+            
+            faculties = sorted(list(faculties_set))
+            
+            print(f"📚 Derived {len(faculties)} faculties from departments")
+            
+            # If no faculties found, return all possible faculties
+            if not faculties:
+                print("⚠️ No faculties derived, using complete list")
+                faculties = sorted(list(FACULTY_DEPARTMENT_MAPPING.keys()))
+            
+            return jsonify({
+                'faculties': faculties
+            }), 200
+            
+        except Exception as query_error:
+            import traceback
+            print(f"❌ Query error: {query_error}")
+            print(traceback.format_exc())
+            # Return all faculties if query fails
+            faculties = sorted(list(FACULTY_DEPARTMENT_MAPPING.keys()))
+            print(f"⚠️ Using complete faculty list ({len(faculties)} faculties)")
+            return jsonify({
+                'faculties': faculties
+            }), 200
+        
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print("❌ Get faculties error:\n", error_details)
+        logger.error(f"Get faculties error: {e}\n{error_details}")
+        
+        # Return all faculties even on major error
+        faculties = sorted(list(FACULTY_DEPARTMENT_MAPPING.keys()))
+        return jsonify({
+            'faculties': faculties
+        }), 200
+        
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+@app.route('/api/sinta/dosen/departments', methods=['GET'])
+@token_required
+def get_sinta_departments(current_user_id):
+    """Get list of departments in a faculty with SINTA dosen"""
+    conn = None
+    cur = None
+    
+    try:
+        faculty = request.args.get('faculty', '').strip()
+        
+        print(f"🔑 Fetching departments for user: {current_user_id}, faculty: {faculty}")
+        
+        if not faculty:
+            return jsonify({'error': 'Faculty parameter is required'}), 400
+        
+        # Get departments from mapping first
+        mapped_departments = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+        print(f"📋 Mapped departments for {faculty}: {mapped_departments}")
+        
+        conn = get_db_connection()
+        if not conn:
+            print("❌ Database connection failed, using mapped departments")
+            return jsonify({
+                'departments': mapped_departments
+            }), 200
+        
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        try:
+            # Get all departments from datamaster that have SINTA data
+            query = """
+                SELECT DISTINCT 
+                    TRIM(dm.v_nama_homebase_unpar) as jurusan
+                FROM datamaster dm
+                WHERE dm.id_sinta IS NOT NULL 
+                    AND dm.v_nama_homebase_unpar IS NOT NULL
+                    AND TRIM(dm.v_nama_homebase_unpar) != ''
+                ORDER BY jurusan
+            """
+            
+            print(f"🔍 Executing department query...")
+            cur.execute(query)
+            results = cur.fetchall()
+            all_departments = [row['jurusan'] for row in results if row['jurusan']]
+            
+            print(f"📊 Found {len(all_departments)} total departments with SINTA data")
+            
+            # Filter departments that belong to the selected faculty
+            filtered_departments = []
+            for dept in all_departments:
+                dept_faculty = get_faculty_from_department(dept)
+                if dept_faculty == faculty:
+                    filtered_departments.append(dept)
+                    print(f"  ✓ {dept} belongs to {faculty}")
+            
+            print(f"🏢 Found {len(filtered_departments)} departments for {faculty}")
+            
+            # If no departments found, use mapped departments
+            if not filtered_departments:
+                print(f"⚠️ No departments found in DB, using mapped list")
+                filtered_departments = mapped_departments
+            
+            return jsonify({
+                'departments': sorted(filtered_departments)
+            }), 200
+            
+        except Exception as query_error:
+            import traceback
+            print(f"❌ Query error: {query_error}")
+            print(traceback.format_exc())
+            # Return mapped departments if query fails
+            print(f"⚠️ Using mapped departments for {faculty}")
+            return jsonify({
+                'departments': mapped_departments
+            }), 200
+        
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print("❌ Get departments error:\n", error_details)
+        logger.error(f"Get departments error: {e}\n{error_details}")
+        # Return mapped departments even on major error
+        mapped_departments = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+        return jsonify({
+            'departments': mapped_departments
+        }), 200
+        
     finally:
         if cur:
             cur.close()
@@ -707,7 +926,7 @@ def get_sinta_dosen_stats(current_user_id):
 @app.route('/api/sinta/publikasi', methods=['GET'])
 @token_required
 def get_sinta_publikasi(current_user_id):
-    """Get SINTA publikasi data with pagination, search, tipe and year range filter - only latest version per publication"""
+    """Get SINTA publikasi data with pagination, search, tipe, year range, and faculty/department filter"""
     conn = None
     cur = None
     print(f"🔑 Authenticated user ID: {current_user_id}")
@@ -719,10 +938,12 @@ def get_sinta_publikasi(current_user_id):
         tipe_filter = request.args.get('tipe', '').strip().lower()
         year_start = request.args.get('year_start', '').strip()
         year_end = request.args.get('year_end', '').strip()
+        faculty = request.args.get('faculty', '').strip()
+        department = request.args.get('department', '').strip()
         offset = (page - 1) * per_page
         
         # Debug logging
-        print(f"📥 Request params - page: {page}, per_page: {per_page}, search: '{search}', tipe: '{tipe_filter}', year_start: '{year_start}', year_end: '{year_end}'")
+        print(f"📥 Request params - page: {page}, per_page: {per_page}, search: '{search}', tipe: '{tipe_filter}', year_start: '{year_start}', year_end: '{year_end}', faculty: '{faculty}', department: '{department}'")
         
         conn = get_db_connection()
         if not conn:
@@ -751,30 +972,21 @@ def get_sinta_publikasi(current_user_id):
             params.append(int(year_end))
             print(f"🔍 Adding year_end filter: {year_end}")
         
-        # Expand search to include author, title, publisher, and jurusan
+        # Expand search to include author, title, and publisher
         if search:
             where_clause += """ AND (
                 LOWER(p.v_judul) LIKE LOWER(%s) OR
                 LOWER(p.v_authors) LIKE LOWER(%s) OR
-                LOWER(p.v_publisher) LIKE LOWER(%s) OR
-                EXISTS (
-                    SELECT 1 
-                    FROM stg_publikasi_dosen_dt pd2
-                    JOIN tmp_dosen_dt d2 ON pd2.v_id_dosen = d2.v_id_dosen
-                    LEFT JOIN datamaster dm2 ON d2.v_id_sinta IS NOT NULL 
-                        AND TRIM(d2.v_id_sinta) = TRIM(dm2.id_sinta)
-                    WHERE pd2.v_id_publikasi = p.v_id_publikasi
-                    AND (LOWER(d2.v_nama_dosen) LIKE LOWER(%s) OR LOWER(dm2.v_nama_homebase_unpar) LIKE LOWER(%s))
-                )
+                LOWER(p.v_publisher) LIKE LOWER(%s)
             )"""
             search_param = f"%{search}%"
-            params.extend([search_param, search_param, search_param, search_param, search_param])
+            params.extend([search_param, search_param, search_param])
             print(f"🔍 Adding search filter: {search}")
         
         print(f"🗃️ WHERE clause: {where_clause}")
-        print(f"🗃️ Params: {params}")
         
-        # Create CTE to get only latest version of each publication (by title and year)
+        # Create CTE to get only latest version of each publication
+        # Parse authors from v_authors field and match with datamaster using SINTA ID
         latest_publikasi_cte = f"""
             WITH latest_publikasi AS (
                 SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
@@ -782,34 +994,70 @@ def get_sinta_publikasi(current_user_id):
                 FROM stg_publikasi_tr p
                 {where_clause}
                 ORDER BY LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi, p.t_tanggal_unduh DESC NULLS LAST
+            ),
+            -- Parse authors from v_authors field and match with datamaster using SINTA ID
+            publikasi_with_jurusan AS (
+                SELECT 
+                    p.v_id_publikasi,
+                    p.v_authors,
+                    STRING_AGG(DISTINCT dm.v_nama_homebase_unpar, ', ' ORDER BY dm.v_nama_homebase_unpar) 
+                        FILTER (WHERE dm.v_nama_homebase_unpar IS NOT NULL) as jurusan_names
+                FROM latest_publikasi p
+                CROSS JOIN LATERAL (
+                    -- Split authors by comma and trim spaces
+                    SELECT TRIM(unnest(string_to_array(p.v_authors, ','))) as author_name
+                ) authors
+                LEFT JOIN tmp_dosen_dt d ON LOWER(TRIM(d.v_nama_dosen)) = LOWER(TRIM(authors.author_name))
+                    AND d.v_id_sinta IS NOT NULL 
+                    AND TRIM(d.v_id_sinta) <> ''
+                LEFT JOIN datamaster dm ON TRIM(d.v_id_sinta) = TRIM(dm.id_sinta)
+                GROUP BY p.v_id_publikasi, p.v_authors
             )
         """
         
-        # Get total count from CTE
+        # Build faculty/department filter
+        faculty_filter = ""
+        faculty_params = []
+        
+        if department:
+            # Specific department selected
+            faculty_filter = "WHERE LOWER(TRIM(pj.jurusan_names)) LIKE LOWER(%s)"
+            faculty_params.append(f"%{department}%")
+            print(f"🏢 Filtering by department: {department}")
+        elif faculty:
+            # Only faculty selected, filter by all departments in that faculty
+            departments_in_faculty = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+            if departments_in_faculty:
+                # Create LIKE conditions for each department
+                like_conditions = []
+                for dept in departments_in_faculty:
+                    like_conditions.append("LOWER(TRIM(pj.jurusan_names)) LIKE LOWER(%s)")
+                    faculty_params.append(f"%{dept.lower()}%")
+                
+                faculty_filter = f"WHERE ({' OR '.join(like_conditions)})"
+                print(f"🏛️ Filtering by faculty: {faculty} (departments: {departments_in_faculty})")
+        
+        # Get total count from CTE with faculty filter
         count_query = f"""
             {latest_publikasi_cte}
             SELECT COUNT(*) as total
-            FROM latest_publikasi
+            FROM latest_publikasi p
+            LEFT JOIN publikasi_with_jurusan pj ON p.v_id_publikasi = pj.v_id_publikasi
+            {faculty_filter}
         """
-        cur.execute(count_query, params)
+        cur.execute(count_query, params + faculty_params)
         count_result = cur.fetchone()
-        total = 0
-        if count_result:
-            total = count_result.get('total', 0) or 0
+        total = count_result.get('total', 0) or 0 if count_result else 0
         
         print(f"📊 Total unique records found: {total}")
         
-        # Get data from CTE with jurusan from datamaster
-        # Use id_sinta from datamaster to match v_id_sinta from tmp_dosen_dt
+        # Get data from CTE with proper jurusan join and faculty filter
         data_query = f"""
             {latest_publikasi_cte}
             SELECT
                 p.v_id_publikasi,
-                COALESCE(
-                    NULLIF(p.v_authors, ''),
-                    STRING_AGG(DISTINCT d.v_nama_dosen, ', ')
-                ) AS authors,
-                STRING_AGG(DISTINCT COALESCE(dm.v_nama_homebase_unpar, ju.v_nama_jurusan), ', ') AS v_nama_jurusan,
+                COALESCE(NULLIF(TRIM(p.v_authors), ''), 'N/A') AS authors,
+                COALESCE(pj.jurusan_names, 'N/A') AS v_nama_jurusan,
                 p.v_judul,
                 p.v_jenis AS tipe,
                 p.v_tahun_publikasi,
@@ -829,98 +1077,49 @@ def get_sinta_publikasi(current_user_id):
                 p.t_tanggal_unduh,
                 p.v_link_url
             FROM latest_publikasi p
+            LEFT JOIN publikasi_with_jurusan pj ON p.v_id_publikasi = pj.v_id_publikasi
             LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
             LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
             LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
-            LEFT JOIN stg_buku_dr b ON p.v_id_publikasi = b.v_id_publikasi
-            LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
-            LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
-            LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-            LEFT JOIN datamaster dm ON d.v_id_sinta IS NOT NULL 
-                AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta)
-            LEFT JOIN stg_jurusan_mt ju ON d.v_id_jurusan = ju.v_id_jurusan
-            GROUP BY
-                p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
-                p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
-                p.v_authors, p.v_publisher,
-                j.v_nama_jurnal, pr.v_nama_konferensi,
-                a.v_volume, a.v_issue, a.v_pages, a.v_terindeks, a.v_ranking
+            {faculty_filter}
             ORDER BY p.n_total_sitasi DESC NULLS LAST, p.t_tanggal_unduh DESC
             LIMIT %s OFFSET %s
         """
-        final_params = params + [per_page, offset]
+        final_params = params + faculty_params + [per_page, offset]
         
-        try:
-            cur.execute(data_query, final_params)
-            rows = cur.fetchall()
-            
-            # Debug: Log jurusan for first few records
-            if rows and len(rows) > 0:
-                print(f"📤 Retrieved {len(rows)} SINTA publikasi records")
-                for i, row in enumerate(rows[:3]):
-                    jurusan = row.get('v_nama_jurusan', 'NULL')
-                    authors = row.get('authors', 'N/A')
-                    print(f"   Record {i+1}: {row.get('v_judul', 'N/A')[:50]}... | Authors: {authors[:30]}... | Jurusan: {jurusan}")
+        cur.execute(data_query, final_params)
+        rows = cur.fetchall()
         
-        except Exception as query_error:
-            # Fallback query without datamaster
-            logger.warning(f"Query with datamaster failed: {query_error}, trying fallback query")
-            conn.rollback()
+        # Debug: Log jurusan for first few records
+        if rows and len(rows) > 0:
+            print(f"📤 Retrieved {len(rows)} SINTA publikasi records")
             
-            fallback_query = f"""
-                {latest_publikasi_cte}
-                SELECT
-                    p.v_id_publikasi,
-                    COALESCE(
-                        NULLIF(p.v_authors, ''),
-                        STRING_AGG(DISTINCT d.v_nama_dosen, ', ')
-                    ) AS authors,
-                    STRING_AGG(DISTINCT ju.v_nama_jurusan, ', ') AS v_nama_jurusan,
-                    p.v_judul,
-                    p.v_jenis AS tipe,
-                    p.v_tahun_publikasi,
-                    COALESCE(
-                        j.v_nama_jurnal,
-                        pr.v_nama_konferensi,
-                        'N/A'
-                    ) AS venue,
-                    COALESCE(p.v_publisher, '') AS publisher,
-                    COALESCE(a.v_volume, '') AS volume,
-                    COALESCE(a.v_issue, '') AS issue,
-                    COALESCE(a.v_pages, '') AS pages,
-                    COALESCE(a.v_terindeks, '') AS v_terindeks,
-                    COALESCE(a.v_ranking, '') AS v_ranking,
-                    p.n_total_sitasi,
-                    p.v_sumber,
-                    p.t_tanggal_unduh,
-                    p.v_link_url
-                FROM latest_publikasi p
-                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
-                LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
-                LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
-                LEFT JOIN stg_buku_dr b ON p.v_id_publikasi = b.v_id_publikasi
-                LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
-                LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
-                LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-                LEFT JOIN stg_jurusan_mt ju ON d.v_id_jurusan = ju.v_id_jurusan
-                GROUP BY
-                    p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
-                    p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
-                    p.v_authors, p.v_publisher,
-                    j.v_nama_jurnal, pr.v_nama_konferensi,
-                    a.v_volume, a.v_issue, a.v_pages, a.v_terindeks, a.v_ranking
-                ORDER BY p.n_total_sitasi DESC NULLS LAST, p.t_tanggal_unduh DESC
-                LIMIT %s OFFSET %s
-            """
-            cur.execute(fallback_query, final_params)
-            rows = cur.fetchall()
-            print(f"⚠️ Using fallback query without datamaster join")
+            for i, row in enumerate(rows[:5]):
+                jurusan = row.get('v_nama_jurusan', 'N/A')
+                authors = row.get('authors', 'N/A')
+                print(f"   Record {i+1}: {row.get('v_judul', 'N/A')[:40]}...")
+                print(f"      Authors: {authors[:50]}...")
+                print(f"      Jurusan: {jurusan}")
+            
+            # Count total with jurusan
+            total_with_jurusan = sum(1 for r in rows if r.get('v_nama_jurusan') and r.get('v_nama_jurusan') != 'N/A')
+            print(f"   📊 Summary: {total_with_jurusan}/{len(rows)} records have jurusan data")
         
         # Format data untuk response
         publikasi_data = []
         if rows:
             for row in rows:
                 row_dict = dict(row)
+                
+                # Add faculty information based on jurusan
+                jurusan_names = row_dict.get('v_nama_jurusan', 'N/A')
+                if jurusan_names and jurusan_names != 'N/A':
+                    # Get first jurusan if multiple
+                    first_jurusan = jurusan_names.split(',')[0].strip()
+                    faculty_name = get_faculty_from_department(first_jurusan)
+                    row_dict['v_nama_fakultas'] = faculty_name
+                else:
+                    row_dict['v_nama_fakultas'] = None
                 
                 # Format vol/issue
                 vol = row_dict.get('volume', '').strip()
@@ -1006,7 +1205,7 @@ def get_sinta_publikasi(current_user_id):
 @app.route('/api/sinta/publikasi/stats', methods=['GET'])
 @token_required
 def get_sinta_publikasi_stats(current_user_id):
-    """Get SINTA publikasi aggregate statistics with median"""
+    """Get SINTA publikasi aggregate statistics with faculty/department filter"""
     conn = None
     cur = None
     
@@ -1015,8 +1214,10 @@ def get_sinta_publikasi_stats(current_user_id):
         tipe_filter = request.args.get('tipe', '').strip().lower()
         year_start = request.args.get('year_start', '').strip()
         year_end = request.args.get('year_end', '').strip()
+        faculty = request.args.get('faculty', '').strip()
+        department = request.args.get('department', '').strip()
         
-        print(f"📊 SINTA Publikasi Stats - search: '{search}', tipe: '{tipe_filter}', year_start: '{year_start}', year_end: '{year_end}'")
+        print(f"📊 SINTA Publikasi Stats - search: '{search}', tipe: '{tipe_filter}', year_start: '{year_start}', year_end: '{year_end}', faculty: '{faculty}', department: '{department}'")
         
         conn = get_db_connection()
         if not conn:
@@ -1044,21 +1245,12 @@ def get_sinta_publikasi_stats(current_user_id):
             where_clause += """ AND (
                 LOWER(p.v_judul) LIKE LOWER(%s) OR
                 LOWER(p.v_authors) LIKE LOWER(%s) OR
-                LOWER(p.v_publisher) LIKE LOWER(%s) OR
-                EXISTS (
-                    SELECT 1 
-                    FROM stg_publikasi_dosen_dt pd2
-                    JOIN tmp_dosen_dt d2 ON pd2.v_id_dosen = d2.v_id_dosen
-                    LEFT JOIN datamaster dm2 ON d2.v_id_sinta IS NOT NULL 
-                        AND TRIM(d2.v_id_sinta) = TRIM(dm2.id_sinta)
-                    WHERE pd2.v_id_publikasi = p.v_id_publikasi
-                    AND (LOWER(d2.v_nama_dosen) LIKE LOWER(%s) OR LOWER(dm2.v_nama_homebase_unpar) LIKE LOWER(%s))
-                )
+                LOWER(p.v_publisher) LIKE LOWER(%s)
             )"""
             search_param = f"%{search}%"
-            params.extend([search_param, search_param, search_param, search_param, search_param])
+            params.extend([search_param, search_param, search_param])
         
-        # Create CTE for latest publikasi
+        # Create CTE for latest publikasi with jurusan
         latest_publikasi_cte = f"""
             WITH latest_publikasi AS (
                 SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
@@ -1066,20 +1258,54 @@ def get_sinta_publikasi_stats(current_user_id):
                 FROM stg_publikasi_tr p
                 {where_clause}
                 ORDER BY LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi, p.t_tanggal_unduh DESC NULLS LAST
+            ),
+            publikasi_with_jurusan AS (
+                SELECT 
+                    p.v_id_publikasi,
+                    p.n_total_sitasi,
+                    STRING_AGG(DISTINCT dm.v_nama_homebase_unpar, ', ' ORDER BY dm.v_nama_homebase_unpar) 
+                        FILTER (WHERE dm.v_nama_homebase_unpar IS NOT NULL) as jurusan_names
+                FROM latest_publikasi p
+                CROSS JOIN LATERAL (
+                    SELECT TRIM(unnest(string_to_array(p.v_authors, ','))) as author_name
+                ) authors
+                LEFT JOIN tmp_dosen_dt d ON LOWER(TRIM(d.v_nama_dosen)) = LOWER(TRIM(authors.author_name))
+                    AND d.v_id_sinta IS NOT NULL 
+                    AND TRIM(d.v_id_sinta) <> ''
+                LEFT JOIN datamaster dm ON TRIM(d.v_id_sinta) = TRIM(dm.id_sinta)
+                GROUP BY p.v_id_publikasi, p.n_total_sitasi
             )
         """
         
-        # Get aggregate statistics with median
+        # Build faculty/department filter
+        faculty_filter = ""
+        faculty_params = []
+        
+        if department:
+            faculty_filter = "WHERE LOWER(TRIM(pj.jurusan_names)) LIKE LOWER(%s)"
+            faculty_params.append(f"%{department}%")
+        elif faculty:
+            departments_in_faculty = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+            if departments_in_faculty:
+                like_conditions = []
+                for dept in departments_in_faculty:
+                    like_conditions.append("LOWER(TRIM(pj.jurusan_names)) LIKE LOWER(%s)")
+                    faculty_params.append(f"%{dept.lower()}%")
+                
+                faculty_filter = f"WHERE ({' OR '.join(like_conditions)})"
+        
+        # Get aggregate statistics with median and faculty filter
         stats_query = f"""
             {latest_publikasi_cte}
             SELECT
                 COUNT(*) as total_publikasi,
-                COALESCE(SUM(n_total_sitasi), 0) as total_sitasi,
-                COALESCE(AVG(n_total_sitasi), 0) as avg_sitasi,
-                COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY n_total_sitasi), 0) as median_sitasi
-            FROM latest_publikasi
+                COALESCE(SUM(pj.n_total_sitasi), 0) as total_sitasi,
+                COALESCE(AVG(pj.n_total_sitasi), 0) as avg_sitasi,
+                COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY pj.n_total_sitasi), 0) as median_sitasi
+            FROM publikasi_with_jurusan pj
+            {faculty_filter}
         """
-        cur.execute(stats_query, params)
+        cur.execute(stats_query, params + faculty_params)
         stats = cur.fetchone()
         
         print(f"📊 Stats result: {stats}")
@@ -1108,11 +1334,203 @@ def get_sinta_publikasi_stats(current_user_id):
         if conn:
             conn.close()
 
+@app.route('/api/sinta/publikasi/faculties', methods=['GET'])
+@token_required
+def get_sinta_publikasi_faculties(current_user_id):
+    """Get list of faculties with SINTA publikasi"""
+    conn = None
+    cur = None
+    
+    try:
+        print(f"🔑 Fetching publikasi faculties for user: {current_user_id}")
+        
+        conn = get_db_connection()
+        if not conn:
+            print("❌ Database connection failed")
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        try:
+            # Get all departments from publications via authors
+            query = """
+                SELECT DISTINCT 
+                    TRIM(dm.v_nama_homebase_unpar) as jurusan
+                FROM stg_publikasi_tr p
+                CROSS JOIN LATERAL (
+                    SELECT TRIM(unnest(string_to_array(p.v_authors, ','))) as author_name
+                ) authors
+                LEFT JOIN tmp_dosen_dt d ON LOWER(TRIM(d.v_nama_dosen)) = LOWER(TRIM(authors.author_name))
+                    AND d.v_id_sinta IS NOT NULL 
+                    AND TRIM(d.v_id_sinta) <> ''
+                LEFT JOIN datamaster dm ON TRIM(d.v_id_sinta) = TRIM(dm.id_sinta)
+                WHERE (p.v_sumber ILIKE '%SINTA%' OR p.v_sumber IS NULL)
+                    AND dm.v_nama_homebase_unpar IS NOT NULL
+                    AND TRIM(dm.v_nama_homebase_unpar) != ''
+            """
+            
+            print(f"🔍 Executing department query to derive faculties...")
+            cur.execute(query)
+            results = cur.fetchall()
+            departments = [row['jurusan'] for row in results if row['jurusan']]
+            
+            print(f"📋 Found {len(departments)} departments with SINTA publikasi data")
+            
+            # Map departments to faculties
+            faculties_set = set()
+            for dept in departments:
+                faculty = get_faculty_from_department(dept)
+                if faculty:
+                    faculties_set.add(faculty)
+                    print(f"  • {dept} → {faculty}")
+            
+            faculties = sorted(list(faculties_set))
+            
+            print(f"📚 Derived {len(faculties)} faculties from departments")
+            
+            # If no faculties found, return all possible faculties
+            if not faculties:
+                print("⚠️ No faculties derived, using complete list")
+                faculties = sorted(list(FACULTY_DEPARTMENT_MAPPING.keys()))
+            
+            return jsonify({
+                'faculties': faculties
+            }), 200
+            
+        except Exception as query_error:
+            import traceback
+            print(f"❌ Query error: {query_error}")
+            print(traceback.format_exc())
+            # Return all faculties if query fails
+            faculties = sorted(list(FACULTY_DEPARTMENT_MAPPING.keys()))
+            print(f"⚠️ Using complete faculty list ({len(faculties)} faculties)")
+            return jsonify({
+                'faculties': faculties
+            }), 200
+        
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print("❌ Get publikasi faculties error:\n", error_details)
+        logger.error(f"Get publikasi faculties error: {e}\n{error_details}")
+        
+        # Return all faculties even on major error
+        faculties = sorted(list(FACULTY_DEPARTMENT_MAPPING.keys()))
+        return jsonify({
+            'faculties': faculties
+        }), 200
+        
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+@app.route('/api/sinta/publikasi/departments', methods=['GET'])
+@token_required
+def get_sinta_publikasi_departments(current_user_id):
+    """Get list of departments in a faculty with SINTA publikasi"""
+    conn = None
+    cur = None
+    
+    try:
+        faculty = request.args.get('faculty', '').strip()
+        
+        print(f"🔑 Fetching publikasi departments for user: {current_user_id}, faculty: {faculty}")
+        
+        if not faculty:
+            return jsonify({'error': 'Faculty parameter is required'}), 400
+        
+        # Get departments from mapping first
+        mapped_departments = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+        print(f"📋 Mapped departments for {faculty}: {mapped_departments}")
+        
+        conn = get_db_connection()
+        if not conn:
+            print("❌ Database connection failed, using mapped departments")
+            return jsonify({
+                'departments': mapped_departments
+            }), 200
+        
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        try:
+            # Get all departments from publications via authors
+            query = """
+                SELECT DISTINCT 
+                    TRIM(dm.v_nama_homebase_unpar) as jurusan
+                FROM stg_publikasi_tr p
+                CROSS JOIN LATERAL (
+                    SELECT TRIM(unnest(string_to_array(p.v_authors, ','))) as author_name
+                ) authors
+                LEFT JOIN tmp_dosen_dt d ON LOWER(TRIM(d.v_nama_dosen)) = LOWER(TRIM(authors.author_name))
+                    AND d.v_id_sinta IS NOT NULL 
+                    AND TRIM(d.v_id_sinta) <> ''
+                LEFT JOIN datamaster dm ON TRIM(d.v_id_sinta) = TRIM(dm.id_sinta)
+                WHERE (p.v_sumber ILIKE '%SINTA%' OR p.v_sumber IS NULL)
+                    AND dm.v_nama_homebase_unpar IS NOT NULL
+                    AND TRIM(dm.v_nama_homebase_unpar) != ''
+                ORDER BY jurusan
+            """
+            
+            print(f"🔍 Executing department query...")
+            cur.execute(query)
+            results = cur.fetchall()
+            all_departments = [row['jurusan'] for row in results if row['jurusan']]
+            
+            print(f"📊 Found {len(all_departments)} total departments with SINTA publikasi data")
+            
+            # Filter departments that belong to the selected faculty
+            filtered_departments = []
+            for dept in all_departments:
+                dept_faculty = get_faculty_from_department(dept)
+                if dept_faculty == faculty:
+                    filtered_departments.append(dept)
+                    print(f"  ✓ {dept} belongs to {faculty}")
+            
+            print(f"🏢 Found {len(filtered_departments)} departments for {faculty}")
+            
+            # If no departments found, use mapped departments
+            if not filtered_departments:
+                print(f"⚠️ No departments found in DB, using mapped list")
+                filtered_departments = mapped_departments
+            
+            return jsonify({
+                'departments': sorted(filtered_departments)
+            }), 200
+            
+        except Exception as query_error:
+            import traceback
+            print(f"❌ Query error: {query_error}")
+            print(traceback.format_exc())
+            # Return mapped departments if query fails
+            print(f"⚠️ Using mapped departments for {faculty}")
+            return jsonify({
+                'departments': mapped_departments
+            }), 200
+        
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print("❌ Get publikasi departments error:\n", error_details)
+        logger.error(f"Get publikasi departments error: {e}\n{error_details}")
+        # Return mapped departments even on major error
+        mapped_departments = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+        return jsonify({
+            'departments': mapped_departments
+        }), 200
+        
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
 # Google Scholar Routes
 @app.route('/api/scholar/dosen', methods=['GET'])
 @token_required
 def get_scholar_dosen(current_user_id):
-    """Get Google Scholar dosen data with pagination and search - only latest version per dosen"""
+    """Get Google Scholar dosen data with pagination, search, and faculty/department filters"""
     conn = None
     cur = None
     print(f"🔑 Authenticated user ID: {current_user_id}")
@@ -1121,10 +1539,12 @@ def get_scholar_dosen(current_user_id):
         page = int(request.args.get('page', 1))
         per_page = int(request.args.get('per_page', 20))
         search = request.args.get('search', '').strip()
+        faculty = request.args.get('faculty', '').strip()
+        department = request.args.get('department', '').strip()
         offset = (page - 1) * per_page
         
         # Debug logging
-        print(f"📥 Scholar Dosen - page: {page}, per_page: {per_page}, search: '{search}'")
+        print(f"📥 Scholar Dosen - page: {page}, per_page: {per_page}, search: '{search}', faculty: '{faculty}', department: '{department}'")
         
         conn = get_db_connection()
         if not conn:
@@ -1155,19 +1575,45 @@ def get_scholar_dosen(current_user_id):
             )
         """
         
-        # Get total count from CTE
+        # Build faculty/department filter for the main query
+        faculty_filter = ""
+        faculty_params = []
+        
+        if department:
+            # Specific department selected
+            faculty_filter = "WHERE LOWER(TRIM(dm.v_nama_homebase_unpar)) = LOWER(%s)"
+            faculty_params.append(department.lower())
+            print(f"🏢 Filtering by department: {department}")
+        elif faculty:
+            # Only faculty selected, filter by all departments in that faculty
+            departments_in_faculty = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+            if departments_in_faculty:
+                # Create LIKE conditions for each department
+                like_conditions = []
+                for dept in departments_in_faculty:
+                    like_conditions.append("LOWER(TRIM(dm.v_nama_homebase_unpar)) LIKE LOWER(%s)")
+                    faculty_params.append(f"%{dept.lower()}%")
+                
+                faculty_filter = f"WHERE ({' OR '.join(like_conditions)})"
+                print(f"🏛️ Filtering by faculty: {faculty} (departments: {departments_in_faculty})")
+                print(f"🔍 Faculty filter SQL: {faculty_filter}")
+                print(f"🔍 Faculty params: {faculty_params}")
+        
+        # Get total count from CTE with faculty filter
         count_query = f"""
             {latest_dosen_cte}
             SELECT COUNT(*) as total
-            FROM latest_dosen
+            FROM latest_dosen d
+            LEFT JOIN datamaster dm ON d.v_id_googleScholar IS NOT NULL 
+                AND TRIM(d.v_id_googleScholar) = TRIM(dm.id_gs)
+            {faculty_filter}
         """
-        cur.execute(count_query, params)
+        cur.execute(count_query, params + faculty_params)
         total = cur.fetchone()['total']
         
         print(f"📊 Total unique Scholar dosen found: {total}")
         
         # Get data from CTE with jurusan from datamaster
-        # Join using v_id_googleScholar (id_gs) since v_id_jurusan is empty
         data_query = f"""
             {latest_dosen_cte}
             SELECT
@@ -1187,14 +1633,24 @@ def get_scholar_dosen(current_user_id):
             FROM latest_dosen d
             LEFT JOIN datamaster dm ON d.v_id_googleScholar IS NOT NULL 
                 AND TRIM(d.v_id_googleScholar) = TRIM(dm.id_gs)
+            {faculty_filter}
             ORDER BY d.n_total_sitasi_gs DESC NULLS LAST, d.t_tanggal_unduh DESC
             LIMIT %s OFFSET %s
         """
-        params.extend([per_page, offset])
+        params_full = params + faculty_params + [per_page, offset]
         
         try:
-            cur.execute(data_query, params)
+            cur.execute(data_query, params_full)
             scholar_data = [dict(row) for row in cur.fetchall()]
+            
+            # Add faculty information to each record based on department
+            for dosen in scholar_data:
+                department_name = dosen.get('v_nama_jurusan')
+                if department_name:
+                    faculty_name = get_faculty_from_department(department_name)
+                    dosen['v_nama_fakultas'] = faculty_name
+                else:
+                    dosen['v_nama_fakultas'] = None
             
             # Debug: Log jurusan sources
             if scholar_data and len(scholar_data) > 0:
@@ -1202,7 +1658,8 @@ def get_scholar_dosen(current_user_id):
                 for i, dosen in enumerate(scholar_data[:5]):
                     gs_id = dosen.get('v_id_googlescholar', 'N/A')
                     jurusan = dosen.get('v_nama_jurusan', 'N/A')
-                    print(f"   Record {i+1}: {dosen.get('v_nama_dosen', 'N/A')} | GS_ID: {gs_id} | Jurusan: {jurusan}")
+                    fakultas = dosen.get('v_nama_fakultas', 'N/A')
+                    print(f"   Record {i+1}: {dosen.get('v_nama_dosen', 'N/A')} | GS_ID: {gs_id} | Fakultas: {fakultas} | Jurusan: {jurusan}")
         
         except Exception as query_error:
             # If DataMaster join fails, return data without jurusan
@@ -1225,12 +1682,13 @@ def get_scholar_dosen(current_user_id):
                     d.n_i10_index_gs2020,
                     d.v_link_url, 
                     d.t_tanggal_unduh,
-                    NULL AS v_nama_jurusan
+                    NULL AS v_nama_jurusan,
+                    NULL AS v_nama_fakultas
                 FROM latest_dosen d
                 ORDER BY d.n_total_sitasi_gs DESC NULLS LAST, d.t_tanggal_unduh DESC
                 LIMIT %s OFFSET %s
             """
-            cur.execute(fallback_query, params)
+            cur.execute(fallback_query, params + [per_page, offset])
             scholar_data = [dict(row) for row in cur.fetchall()]
             print(f"⚠️ Using fallback query without DataMaster join")
         
@@ -1268,14 +1726,16 @@ def get_scholar_dosen(current_user_id):
 @app.route('/api/scholar/dosen/stats', methods=['GET'])
 @token_required
 def get_scholar_dosen_stats(current_user_id):
-    """Get Google Scholar dosen aggregate statistics - only latest version per dosen"""
+    """Get Google Scholar dosen aggregate statistics with faculty/department filter"""
     conn = None
     cur = None
     
     try:
         search = request.args.get('search', '').strip()
+        faculty = request.args.get('faculty', '').strip()
+        department = request.args.get('department', '').strip()
         
-        print(f"📊 Scholar Dosen Stats - search: '{search}'")
+        print(f"📊 Scholar Dosen Stats - search: '{search}', faculty: '{faculty}', department: '{department}'")
         
         conn = get_db_connection()
         if not conn:
@@ -1302,6 +1762,27 @@ def get_scholar_dosen_stats(current_user_id):
             )
         """
         
+        # Build faculty/department filter
+        faculty_filter = ""
+        faculty_params = []
+        
+        if department:
+            # Specific department selected
+            faculty_filter = "WHERE LOWER(TRIM(dm.v_nama_homebase_unpar)) = LOWER(%s)"
+            faculty_params.append(department.lower())
+        elif faculty:
+            # Only faculty selected, filter by all departments in that faculty
+            departments_in_faculty = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+            if departments_in_faculty:
+                # Create LIKE conditions for each department
+                like_conditions = []
+                for dept in departments_in_faculty:
+                    like_conditions.append("LOWER(TRIM(dm.v_nama_homebase_unpar)) LIKE LOWER(%s)")
+                    faculty_params.append(f"%{dept.lower()}%")
+                
+                faculty_filter = f"WHERE ({' OR '.join(like_conditions)})"
+                print(f"🏛️ Stats filtering by faculty: {faculty} with {len(departments_in_faculty)} departments")
+        
         # Get aggregate statistics from CTE with median
         stats_query = f"""
             {latest_dosen_cte}
@@ -1315,8 +1796,11 @@ def get_scholar_dosen_stats(current_user_id):
                 COALESCE(AVG(d.n_h_index_gs2020), 0) as avg_h_index_2020,
                 COALESCE(AVG(d.n_i10_index_gs2020), 0) as avg_i10_index_2020
             FROM latest_dosen d
+            LEFT JOIN datamaster dm ON d.v_id_googleScholar IS NOT NULL 
+                AND TRIM(d.v_id_googleScholar) = TRIM(dm.id_gs)
+            {faculty_filter}
         """
-        cur.execute(stats_query, params)
+        cur.execute(stats_query, params + faculty_params)
         stats = cur.fetchone()
         
         print(f"📊 Stats result: {stats}")
@@ -1344,10 +1828,261 @@ def get_scholar_dosen_stats(current_user_id):
         if conn:
             conn.close()
 
+# Faculty mapping based on department names
+FACULTY_DEPARTMENT_MAPPING = {
+    'Fakultas Ekonomi': [
+        'Ekonomi Pembangunan',
+        'Ilmu Ekonomi',
+        'Manajemen',
+        'Akuntansi'
+    ],
+    'Fakultas Hukum': [
+        'Ilmu Hukum',
+        'Hukum'
+    ],
+    'Fakultas Ilmu Sosial dan Ilmu Politik': [
+        'Administrasi Publik',
+        'Administrasi Bisnis',
+        'Hubungan Internasional',
+        'Ilmu Administrasi Publik',
+        'Ilmu Administrasi Bisnis',
+        'Ilmu Hubungan Internasional'
+    ],
+    'Fakultas Teknik': [
+        'Teknik Sipil',
+        'Arsitektur',
+        'Teknik Industri',
+        'Teknik Kimia',
+        'Teknik Mekatronika'
+    ],
+    'Fakultas Filsafat': [
+        'Filsafat',
+        'Ilmu Filsafat',
+        'Studi Humanitas'
+    ],
+    'Fakultas Teknologi Informasi dan Sains': [
+        'Matematika',
+        'Fisika',
+        'Informatika',
+        'Teknik Informatika',
+        'Ilmu Komputer'
+    ],
+    'Fakultas Kedokteran': [
+        'Kedokteran',
+        'Pendidikan Dokter'
+    ],
+    'Fakultas Keguruan dan Ilmu Pendidikan': [
+        'Pendidikan Kimia',
+        'Pendidikan Fisika',
+        'Pendidikan Matematika',
+        'Pendidikan Teknik Informatika dan Komputer',
+        'Pendidikan Bahasa Inggris',
+        'Pendidikan Guru Sekolah Dasar',
+        'PGSD'
+    ],
+    'Fakultas Vokasi': [
+        'Teknologi Rekayasa Pangan',
+        'Bisnis Kreatif',
+        'Agribisnis Pangan'
+    ]
+}
+
+def get_faculty_from_department(department):
+    """Get faculty name from department name"""
+    if not department:
+        return None
+    
+    department_lower = department.lower().strip()
+    
+    for faculty, departments in FACULTY_DEPARTMENT_MAPPING.items():
+        for dept in departments:
+            if dept.lower() in department_lower or department_lower in dept.lower():
+                return faculty
+    
+    return None
+
+@app.route('/api/scholar/dosen/faculties', methods=['GET'])
+@token_required
+def get_scholar_faculties(current_user_id):
+    """Get list of faculties with Scholar dosen"""
+    conn = None
+    cur = None
+    
+    try:
+        print(f"🔑 Fetching faculties for user: {current_user_id}")
+        
+        conn = get_db_connection()
+        if not conn:
+            print("❌ Database connection failed")
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        try:
+            # Get all departments from datamaster that have Scholar data
+            query = """
+                SELECT DISTINCT 
+                    TRIM(dm.v_nama_homebase_unpar) as jurusan
+                FROM datamaster dm
+                WHERE dm.id_gs IS NOT NULL 
+                    AND dm.v_nama_homebase_unpar IS NOT NULL
+                    AND TRIM(dm.v_nama_homebase_unpar) != ''
+            """
+            
+            print(f"🔍 Executing department query to derive faculties...")
+            cur.execute(query)
+            results = cur.fetchall()
+            departments = [row['jurusan'] for row in results if row['jurusan']]
+            
+            print(f"📋 Found {len(departments)} departments with Scholar data")
+            
+            # Map departments to faculties
+            faculties_set = set()
+            for dept in departments:
+                faculty = get_faculty_from_department(dept)
+                if faculty:
+                    faculties_set.add(faculty)
+                    print(f"  • {dept} → {faculty}")
+            
+            faculties = sorted(list(faculties_set))
+            
+            print(f"📚 Derived {len(faculties)} faculties from departments")
+            
+            # If no faculties found, return all possible faculties
+            if not faculties:
+                print("⚠️ No faculties derived, using complete list")
+                faculties = sorted(list(FACULTY_DEPARTMENT_MAPPING.keys()))
+            
+            return jsonify({
+                'faculties': faculties
+            }), 200
+            
+        except Exception as query_error:
+            import traceback
+            print(f"❌ Query error: {query_error}")
+            print(traceback.format_exc())
+            # Return all faculties if query fails
+            faculties = sorted(list(FACULTY_DEPARTMENT_MAPPING.keys()))
+            print(f"⚠️ Using complete faculty list ({len(faculties)} faculties)")
+            return jsonify({
+                'faculties': faculties
+            }), 200
+        
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print("❌ Get faculties error:\n", error_details)
+        logger.error(f"Get faculties error: {e}\n{error_details}")
+        
+        # Return all faculties even on major error
+        faculties = sorted(list(FACULTY_DEPARTMENT_MAPPING.keys()))
+        return jsonify({
+            'faculties': faculties
+        }), 200
+        
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+@app.route('/api/scholar/dosen/departments', methods=['GET'])
+@token_required
+def get_scholar_departments(current_user_id):
+    """Get list of departments in a faculty with Scholar dosen"""
+    conn = None
+    cur = None
+    
+    try:
+        faculty = request.args.get('faculty', '').strip()
+        
+        print(f"🔑 Fetching departments for user: {current_user_id}, faculty: {faculty}")
+        
+        if not faculty:
+            return jsonify({'error': 'Faculty parameter is required'}), 400
+        
+        # Get departments from mapping first
+        mapped_departments = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+        print(f"📋 Mapped departments for {faculty}: {mapped_departments}")
+        
+        conn = get_db_connection()
+        if not conn:
+            print("❌ Database connection failed, using mapped departments")
+            return jsonify({
+                'departments': mapped_departments
+            }), 200
+        
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        try:
+            # Get all departments from datamaster that have Scholar data
+            query = """
+                SELECT DISTINCT 
+                    TRIM(dm.v_nama_homebase_unpar) as jurusan
+                FROM datamaster dm
+                WHERE dm.id_gs IS NOT NULL 
+                    AND dm.v_nama_homebase_unpar IS NOT NULL
+                    AND TRIM(dm.v_nama_homebase_unpar) != ''
+                ORDER BY jurusan
+            """
+            
+            print(f"🔍 Executing department query...")
+            cur.execute(query)
+            results = cur.fetchall()
+            all_departments = [row['jurusan'] for row in results if row['jurusan']]
+            
+            print(f"📊 Found {len(all_departments)} total departments with Scholar data")
+            
+            # Filter departments that belong to the selected faculty
+            filtered_departments = []
+            for dept in all_departments:
+                dept_faculty = get_faculty_from_department(dept)
+                if dept_faculty == faculty:
+                    filtered_departments.append(dept)
+                    print(f"  ✓ {dept} belongs to {faculty}")
+            
+            print(f"🏢 Found {len(filtered_departments)} departments for {faculty}")
+            
+            # If no departments found, use mapped departments
+            if not filtered_departments:
+                print(f"⚠️ No departments found in DB, using mapped list")
+                filtered_departments = mapped_departments
+            
+            return jsonify({
+                'departments': sorted(filtered_departments)
+            }), 200
+            
+        except Exception as query_error:
+            import traceback
+            print(f"❌ Query error: {query_error}")
+            print(traceback.format_exc())
+            # Return mapped departments if query fails
+            print(f"⚠️ Using mapped departments for {faculty}")
+            return jsonify({
+                'departments': mapped_departments
+            }), 200
+        
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print("❌ Get departments error:\n", error_details)
+        logger.error(f"Get departments error: {e}\n{error_details}")
+        # Return mapped departments even on major error
+        mapped_departments = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+        return jsonify({
+            'departments': mapped_departments
+        }), 200
+        
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
 @app.route('/api/scholar/publikasi', methods=['GET'])
 @token_required
 def get_scholar_publikasi(current_user_id):
-    """Get Google Scholar publikasi data with pagination, search, tipe and year range filter - only latest version per publication"""
+    """Get Google Scholar publikasi data with pagination, search, tipe, year range, and faculty/department filter"""
     conn = None
     cur = None
     print(f"🔑 Authenticated user ID: {current_user_id}")
@@ -1359,10 +2094,12 @@ def get_scholar_publikasi(current_user_id):
         tipe_filter = request.args.get('tipe', '').strip().lower()
         year_start = request.args.get('year_start', '').strip()
         year_end = request.args.get('year_end', '').strip()
+        faculty = request.args.get('faculty', '').strip()
+        department = request.args.get('department', '').strip()
         offset = (page - 1) * per_page
         
         # Debug logging
-        print(f"📥 Request params - page: {page}, per_page: {per_page}, search: '{search}', tipe: '{tipe_filter}', year_start: '{year_start}', year_end: '{year_end}'")
+        print(f"📥 Request params - page: {page}, per_page: {per_page}, search: '{search}', tipe: '{tipe_filter}', year_start: '{year_start}', year_end: '{year_end}', faculty: '{faculty}', department: '{department}'")
         
         conn = get_db_connection()
         if not conn:
@@ -1391,28 +2128,40 @@ def get_scholar_publikasi(current_user_id):
             params.append(int(year_end))
             print(f"🔍 Adding year_end filter: {year_end}")
         
-        # Expand search to include author, title, publisher, and jurusan
+        # Expand search to include author, title, publisher
         if search:
             where_clause += """ AND (
                 LOWER(p.v_judul) LIKE LOWER(%s) OR
                 LOWER(p.v_authors) LIKE LOWER(%s) OR
-                LOWER(p.v_publisher) LIKE LOWER(%s) OR
-                EXISTS (
-                    SELECT 1 
-                    FROM stg_publikasi_dosen_dt pd2
-                    JOIN tmp_dosen_dt d2 ON pd2.v_id_dosen = d2.v_id_dosen
-                    LEFT JOIN datamaster dm2 ON d2.v_id_googlescholar IS NOT NULL 
-                        AND TRIM(d2.v_id_googlescholar) = TRIM(dm2.id_gs)
-                    WHERE pd2.v_id_publikasi = p.v_id_publikasi
-                    AND (LOWER(d2.v_nama_dosen) LIKE LOWER(%s) OR LOWER(dm2.v_nama_homebase_unpar) LIKE LOWER(%s))
-                )
+                LOWER(p.v_publisher) LIKE LOWER(%s)
             )"""
             search_param = f"%{search}%"
-            params.extend([search_param, search_param, search_param, search_param, search_param])
+            params.extend([search_param, search_param, search_param])
             print(f"🔍 Adding search filter: {search}")
         
         print(f"🗃️ WHERE clause: {where_clause}")
-        print(f"🗃️ Params: {params}")
+        
+        # Build faculty/department filter for jurusan
+        jurusan_filter = ""
+        jurusan_params = []
+        
+        if department:
+            # Specific department selected
+            jurusan_filter = "AND LOWER(TRIM(dm.v_nama_homebase_unpar)) = LOWER(%s)"
+            jurusan_params.append(department.lower())
+            print(f"🏢 Filtering by department: {department}")
+        elif faculty:
+            # Only faculty selected, filter by all departments in that faculty
+            departments_in_faculty = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+            if departments_in_faculty:
+                # Create LIKE conditions for each department
+                like_conditions = []
+                for dept in departments_in_faculty:
+                    like_conditions.append("LOWER(TRIM(dm.v_nama_homebase_unpar)) LIKE LOWER(%s)")
+                    jurusan_params.append(f"%{dept.lower()}%")
+                
+                jurusan_filter = f"AND ({' OR '.join(like_conditions)})"
+                print(f"🏛️ Filtering by faculty: {faculty} (departments: {departments_in_faculty})")
         
         # Create CTE to get only latest version of each publication (by title and year)
         latest_publikasi_cte = f"""
@@ -1422,98 +2171,62 @@ def get_scholar_publikasi(current_user_id):
                 FROM stg_publikasi_tr p
                 {where_clause}
                 ORDER BY LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi, p.t_tanggal_unduh DESC NULLS LAST
+            ),
+            -- Parse authors from v_authors field and match with datamaster
+            publikasi_with_jurusan AS (
+                SELECT 
+                    p.v_id_publikasi,
+                    p.v_authors,
+                    STRING_AGG(DISTINCT dm.v_nama_homebase_unpar, ', ' ORDER BY dm.v_nama_homebase_unpar) 
+                        FILTER (WHERE dm.v_nama_homebase_unpar IS NOT NULL) as jurusan_names
+                FROM latest_publikasi p
+                CROSS JOIN LATERAL (
+                    -- Split authors by comma and trim spaces
+                    SELECT TRIM(unnest(string_to_array(p.v_authors, ','))) as author_name
+                ) authors
+                LEFT JOIN tmp_dosen_dt d ON LOWER(TRIM(d.v_nama_dosen)) = LOWER(TRIM(authors.author_name))
+                    AND d.v_id_googlescholar IS NOT NULL 
+                    AND TRIM(d.v_id_googlescholar) <> ''
+                LEFT JOIN datamaster dm ON TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs)
+                    {jurusan_filter}
+                GROUP BY p.v_id_publikasi, p.v_authors
             )
         """
         
-        # Get total count from CTE
-        count_query = f"""
-            {latest_publikasi_cte}
-            SELECT COUNT(*) AS total
-            FROM latest_publikasi
-        """
-        cur.execute(count_query, params)
+        # Combine all params for CTE
+        cte_params = params + jurusan_params
+        
+        # Get total count from CTE - only count publications that have matching jurusan if filter applied
+        if jurusan_filter:
+            count_query = f"""
+                {latest_publikasi_cte}
+                SELECT COUNT(*) AS total
+                FROM latest_publikasi p
+                INNER JOIN publikasi_with_jurusan pj ON p.v_id_publikasi = pj.v_id_publikasi
+                WHERE pj.jurusan_names IS NOT NULL AND pj.jurusan_names != ''
+            """
+        else:
+            count_query = f"""
+                {latest_publikasi_cte}
+                SELECT COUNT(*) AS total
+                FROM latest_publikasi
+            """
+        
+        cur.execute(count_query, cte_params)
         count_result = cur.fetchone()
-        total = 0
-        if count_result:
-            total = count_result.get('total', 0) or 0
+        total = count_result.get('total', 0) or 0 if count_result else 0
         
         print(f"📊 Total unique records found: {total}")
         
-        # Get data from CTE with jurusan from datamaster
-        # Use id_gs from datamaster to match v_id_googlescholar from tmp_dosen_dt
-        data_query = f"""
-            {latest_publikasi_cte}
-            SELECT
-                p.v_id_publikasi,
-                COALESCE(
-                    NULLIF(p.v_authors, ''),
-                    STRING_AGG(DISTINCT d.v_nama_dosen, ', ')
-                ) AS authors,
-                STRING_AGG(DISTINCT COALESCE(dm.v_nama_homebase_unpar, ju.v_nama_jurusan), ', ') AS v_nama_jurusan,
-                p.v_judul,
-                p.v_jenis AS tipe,
-                p.v_tahun_publikasi,
-                COALESCE(
-                    j.v_nama_jurnal,
-                    pr.v_nama_konferensi,
-                    'N/A'
-                ) AS venue,
-                COALESCE(p.v_publisher, '') AS publisher,
-                COALESCE(a.v_volume, '') AS volume,
-                COALESCE(a.v_issue, '') AS issue,
-                COALESCE(a.v_pages, '') AS pages,
-                p.n_total_sitasi,
-                p.v_sumber,
-                p.t_tanggal_unduh,
-                p.v_link_url
-            FROM latest_publikasi p
-            LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
-            LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
-            LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
-            LEFT JOIN stg_buku_dr b ON p.v_id_publikasi = b.v_id_publikasi
-            LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
-            LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
-            LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-            LEFT JOIN datamaster dm ON d.v_id_googlescholar IS NOT NULL 
-                AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs)
-            LEFT JOIN stg_jurusan_mt ju ON d.v_id_jurusan = ju.v_id_jurusan
-            GROUP BY
-                p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
-                p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
-                p.v_authors, p.v_publisher,
-                j.v_nama_jurnal, pr.v_nama_konferensi,
-                a.v_volume, a.v_issue, a.v_pages
-            ORDER BY p.n_total_sitasi DESC NULLS LAST, p.t_tanggal_unduh DESC
-            LIMIT %s OFFSET %s
-        """
-        final_params = params + [per_page, offset]
-        
-        try:
-            cur.execute(data_query, final_params)
-            rows = cur.fetchall()
-            
-            # Debug: Log jurusan for first few records
-            if rows and len(rows) > 0:
-                print(f"📤 Retrieved {len(rows)} Scholar publikasi records")
-                for i, row in enumerate(rows[:3]):
-                    jurusan = row.get('v_nama_jurusan', 'NULL')
-                    authors = row.get('authors', 'N/A')
-                    print(f"   Record {i+1}: {row.get('v_judul', 'N/A')[:50]}... | Authors: {authors[:30]}... | Jurusan: {jurusan}")
-        
-        except Exception as query_error:
-            # Fallback query without datamaster
-            logger.warning(f"Query with datamaster failed: {query_error}, trying fallback query")
-            conn.rollback()
-            
-            fallback_query = f"""
+        # Get data from CTE with proper jurusan join
+        if jurusan_filter:
+            # If faculty/department filter applied, only show publications with matching jurusan
+            data_query = f"""
                 {latest_publikasi_cte}
                 SELECT
                     p.v_id_publikasi,
-                    COALESCE(
-                        NULLIF(p.v_authors, ''),
-                        STRING_AGG(DISTINCT d.v_nama_dosen, ', ')
-                    ) AS authors,
-                    STRING_AGG(DISTINCT ju.v_nama_jurusan, ', ') AS v_nama_jurusan,
+                    COALESCE(NULLIF(TRIM(p.v_authors), ''), 'N/A') AS authors,
+                    COALESCE(pj.jurusan_names, 'N/A') AS v_nama_jurusan,
                     p.v_judul,
                     p.v_jenis AS tipe,
                     p.v_tahun_publikasi,
@@ -1531,26 +2244,78 @@ def get_scholar_publikasi(current_user_id):
                     p.t_tanggal_unduh,
                     p.v_link_url
                 FROM latest_publikasi p
+                INNER JOIN publikasi_with_jurusan pj ON p.v_id_publikasi = pj.v_id_publikasi
                 LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
                 LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
                 LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
-                LEFT JOIN stg_buku_dr b ON p.v_id_publikasi = b.v_id_publikasi
-                LEFT JOIN stg_penelitian_dr pn ON p.v_id_publikasi = pn.v_id_publikasi
-                LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
-                LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-                LEFT JOIN stg_jurusan_mt ju ON d.v_id_jurusan = ju.v_id_jurusan
-                GROUP BY
-                    p.v_id_publikasi, p.v_judul, p.v_jenis, p.v_tahun_publikasi,
-                    p.n_total_sitasi, p.v_sumber, p.t_tanggal_unduh, p.v_link_url,
-                    p.v_authors, p.v_publisher,
-                    j.v_nama_jurnal, pr.v_nama_konferensi,
-                    a.v_volume, a.v_issue, a.v_pages
+                WHERE pj.jurusan_names IS NOT NULL AND pj.jurusan_names != ''
                 ORDER BY p.n_total_sitasi DESC NULLS LAST, p.t_tanggal_unduh DESC
                 LIMIT %s OFFSET %s
             """
-            cur.execute(fallback_query, final_params)
-            rows = cur.fetchall()
-            print(f"⚠️ Using fallback query without datamaster join")
+        else:
+            # No filter, show all publications
+            data_query = f"""
+                {latest_publikasi_cte}
+                SELECT
+                    p.v_id_publikasi,
+                    COALESCE(NULLIF(TRIM(p.v_authors), ''), 'N/A') AS authors,
+                    COALESCE(pj.jurusan_names, 'N/A') AS v_nama_jurusan,
+                    p.v_judul,
+                    p.v_jenis AS tipe,
+                    p.v_tahun_publikasi,
+                    COALESCE(
+                        j.v_nama_jurnal,
+                        pr.v_nama_konferensi,
+                        'N/A'
+                    ) AS venue,
+                    COALESCE(p.v_publisher, '') AS publisher,
+                    COALESCE(a.v_volume, '') AS volume,
+                    COALESCE(a.v_issue, '') AS issue,
+                    COALESCE(a.v_pages, '') AS pages,
+                    p.n_total_sitasi,
+                    p.v_sumber,
+                    p.t_tanggal_unduh,
+                    p.v_link_url
+                FROM latest_publikasi p
+                LEFT JOIN publikasi_with_jurusan pj ON p.v_id_publikasi = pj.v_id_publikasi
+                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+                LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
+                LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
+                ORDER BY p.n_total_sitasi DESC NULLS LAST, p.t_tanggal_unduh DESC
+                LIMIT %s OFFSET %s
+            """
+        
+        final_params = cte_params + [per_page, offset]
+        
+        cur.execute(data_query, final_params)
+        rows = cur.fetchall()
+        
+        # Add fakultas information to each record based on department
+        for row in rows:
+            jurusan_names = row.get('v_nama_jurusan', '')
+            if jurusan_names and jurusan_names != 'N/A':
+                # Get first jurusan for fakultas mapping
+                first_jurusan = jurusan_names.split(',')[0].strip()
+                fakultas = get_faculty_from_department(first_jurusan)
+                row['v_nama_fakultas'] = fakultas
+            else:
+                row['v_nama_fakultas'] = None
+        
+        # Debug: Log jurusan for first few records
+        if rows and len(rows) > 0:
+            print(f"📤 Retrieved {len(rows)} Scholar publikasi records")
+            
+            for i, row in enumerate(rows[:5]):
+                jurusan = row.get('v_nama_jurusan', 'N/A')
+                fakultas = row.get('v_nama_fakultas', 'N/A')
+                authors = row.get('authors', 'N/A')
+                print(f"   Record {i+1}: {row.get('v_judul', 'N/A')[:40]}...")
+                print(f"      Authors: {authors[:50]}...")
+                print(f"      Fakultas: {fakultas} | Jurusan: {jurusan}")
+            
+            # Count total with jurusan
+            total_with_jurusan = sum(1 for r in rows if r.get('v_nama_jurusan') and r.get('v_nama_jurusan') != 'N/A')
+            print(f"   📊 Summary: {total_with_jurusan}/{len(rows)} records have jurusan data")
         
         # Format data untuk response
         publikasi_data = []
@@ -1644,7 +2409,7 @@ def get_scholar_publikasi(current_user_id):
 @app.route('/api/scholar/publikasi/stats', methods=['GET'])
 @token_required
 def get_scholar_publikasi_stats(current_user_id):
-    """Get Google Scholar publikasi aggregate statistics with median"""
+    """Get Google Scholar publikasi aggregate statistics with median and faculty/department filter"""
     conn = None
     cur = None
     
@@ -1653,8 +2418,10 @@ def get_scholar_publikasi_stats(current_user_id):
         tipe_filter = request.args.get('tipe', '').strip().lower()
         year_start = request.args.get('year_start', '').strip()
         year_end = request.args.get('year_end', '').strip()
+        faculty = request.args.get('faculty', '').strip()
+        department = request.args.get('department', '').strip()
         
-        print(f"📊 Scholar Publikasi Stats - search: '{search}', tipe: '{tipe_filter}', year_start: '{year_start}', year_end: '{year_end}'")
+        print(f"📊 Scholar Publikasi Stats - search: '{search}', tipe: '{tipe_filter}', year_start: '{year_start}', year_end: '{year_end}', faculty: '{faculty}', department: '{department}'")
         
         conn = get_db_connection()
         if not conn:
@@ -1682,21 +2449,29 @@ def get_scholar_publikasi_stats(current_user_id):
             where_clause += """ AND (
                 LOWER(p.v_judul) LIKE LOWER(%s) OR
                 LOWER(p.v_authors) LIKE LOWER(%s) OR
-                LOWER(p.v_publisher) LIKE LOWER(%s) OR
-                EXISTS (
-                    SELECT 1 
-                    FROM stg_publikasi_dosen_dt pd2
-                    JOIN tmp_dosen_dt d2 ON pd2.v_id_dosen = d2.v_id_dosen
-                    LEFT JOIN datamaster dm2 ON d2.v_id_googlescholar IS NOT NULL 
-                        AND TRIM(d2.v_id_googlescholar) = TRIM(dm2.id_gs)
-                    WHERE pd2.v_id_publikasi = p.v_id_publikasi
-                    AND (LOWER(d2.v_nama_dosen) LIKE LOWER(%s) OR LOWER(dm2.v_nama_homebase_unpar) LIKE LOWER(%s))
-                )
+                LOWER(p.v_publisher) LIKE LOWER(%s)
             )"""
             search_param = f"%{search}%"
-            params.extend([search_param, search_param, search_param, search_param, search_param])
+            params.extend([search_param, search_param, search_param])
         
-        # Create CTE for latest publikasi
+        # Build faculty/department filter for jurusan
+        jurusan_filter = ""
+        jurusan_params = []
+        
+        if department:
+            jurusan_filter = "AND LOWER(TRIM(dm.v_nama_homebase_unpar)) = LOWER(%s)"
+            jurusan_params.append(department.lower())
+        elif faculty:
+            departments_in_faculty = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+            if departments_in_faculty:
+                like_conditions = []
+                for dept in departments_in_faculty:
+                    like_conditions.append("LOWER(TRIM(dm.v_nama_homebase_unpar)) LIKE LOWER(%s)")
+                    jurusan_params.append(f"%{dept.lower()}%")
+                
+                jurusan_filter = f"AND ({' OR '.join(like_conditions)})"
+        
+        # Create CTE for latest publikasi with jurusan filter
         latest_publikasi_cte = f"""
             WITH latest_publikasi AS (
                 SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
@@ -1704,20 +2479,52 @@ def get_scholar_publikasi_stats(current_user_id):
                 FROM stg_publikasi_tr p
                 {where_clause}
                 ORDER BY LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi, p.t_tanggal_unduh DESC NULLS LAST
+            ),
+            publikasi_with_jurusan AS (
+                SELECT 
+                    p.v_id_publikasi,
+                    p.n_total_sitasi
+                FROM latest_publikasi p
+                CROSS JOIN LATERAL (
+                    SELECT TRIM(unnest(string_to_array(p.v_authors, ','))) as author_name
+                ) authors
+                LEFT JOIN tmp_dosen_dt d ON LOWER(TRIM(d.v_nama_dosen)) = LOWER(TRIM(authors.author_name))
+                    AND d.v_id_googlescholar IS NOT NULL 
+                    AND TRIM(d.v_id_googlescholar) <> ''
+                LEFT JOIN datamaster dm ON TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs)
+                    {jurusan_filter}
+                WHERE dm.v_nama_homebase_unpar IS NOT NULL
+                GROUP BY p.v_id_publikasi, p.n_total_sitasi
             )
         """
         
+        cte_params = params + jurusan_params
+        
         # Get aggregate statistics with median
-        stats_query = f"""
-            {latest_publikasi_cte}
-            SELECT
-                COUNT(*) as total_publikasi,
-                COALESCE(SUM(n_total_sitasi), 0) as total_sitasi,
-                COALESCE(AVG(n_total_sitasi), 0) as avg_sitasi,
-                COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY n_total_sitasi), 0) as median_sitasi
-            FROM latest_publikasi
-        """
-        cur.execute(stats_query, params)
+        if jurusan_filter:
+            # Only count publications with matching jurusan
+            stats_query = f"""
+                {latest_publikasi_cte}
+                SELECT
+                    COUNT(*) as total_publikasi,
+                    COALESCE(SUM(n_total_sitasi), 0) as total_sitasi,
+                    COALESCE(AVG(n_total_sitasi), 0) as avg_sitasi,
+                    COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY n_total_sitasi), 0) as median_sitasi
+                FROM publikasi_with_jurusan
+            """
+        else:
+            # Count all publications
+            stats_query = f"""
+                {latest_publikasi_cte}
+                SELECT
+                    COUNT(*) as total_publikasi,
+                    COALESCE(SUM(n_total_sitasi), 0) as total_sitasi,
+                    COALESCE(AVG(n_total_sitasi), 0) as avg_sitasi,
+                    COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY n_total_sitasi), 0) as median_sitasi
+                FROM latest_publikasi
+            """
+        
+        cur.execute(stats_query, cte_params)
         stats = cur.fetchone()
         
         print(f"📊 Stats result: {stats}")
