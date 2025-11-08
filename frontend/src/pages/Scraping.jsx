@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Play, User, Lock, Database, AlertCircle, CheckCircle, Clock, Target, RefreshCw, Download, Globe, FileText, Loader } from 'lucide-react';
+import { Play, User, Lock, Database, AlertCircle, CheckCircle, Clock, Target, RefreshCw, Download, Globe, FileText, Loader, Square } from 'lucide-react';
 
 const ScrapingDashboard = () => {
   const [activeTab, setActiveTab] = useState('sinta-dosen');
@@ -21,6 +21,7 @@ const ScrapingDashboard = () => {
   const [scrapingProgress, setScrapingProgress] = useState(null);
   const [scrapingResults, setScrapingResults] = useState(null);
   const [currentJobId, setCurrentJobId] = useState(null);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   // WebSocket/Polling for progress updates
   // REPLACE useEffect untuk WebSocket/Polling di Scraping.jsx
@@ -59,12 +60,25 @@ useEffect(() => {
           
           // Check for completion
           if (job.status === 'completed') {
-            console.log('✅ Job completed!');
-            setScrapingResults({
-              success: true,
-              message: job.message || 'Scraping completed successfully!',
-              summary: job.result
-            });
+            console.log('✅ Job completed!', job.result);
+            // Check if result indicates success or failure
+            const result = job.result || {};
+            if (result.success === false) {
+              // Job completed but with error
+              console.error('❌ Job completed with error:', result.error);
+              setScrapingResults({
+                success: false,
+                error: result.error || result.message || job.message || 'Scraping failed',
+                traceback: result.traceback
+              });
+            } else {
+              // Job completed successfully
+              setScrapingResults({
+                success: true,
+                message: result.message || job.message || 'Scraping completed successfully!',
+                summary: result
+              });
+            }
             setIsLoading(false);
             setCurrentJobId(null);
             clearInterval(pollInterval);
@@ -72,9 +86,19 @@ useEffect(() => {
             console.error('❌ Job failed:', job.error);
             setScrapingResults({
               success: false,
-              error: job.error || job.message || 'Scraping failed'
+              error: job.error || job.message || 'Scraping failed',
+              traceback: job.traceback
             });
             setIsLoading(false);
+            setCurrentJobId(null);
+            clearInterval(pollInterval);
+          } else if (job.status === 'cancelled') {
+            setScrapingResults({
+              success: false,
+              error: job.message || 'Scraping cancelled by user'
+            });
+            setIsLoading(false);
+            setIsCancelling(false);
             setCurrentJobId(null);
             clearInterval(pollInterval);
           }
@@ -290,6 +314,25 @@ useEffect(() => {
     }
   };
 
+  const cancelCurrentJob = async () => {
+    if (!currentJobId) return;
+    try {
+      setIsCancelling(true);
+      const response = await fetch(`/api/scraping/jobs/${currentJobId}/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await response.json();
+      if (!data.success) {
+        setIsCancelling(false);
+        alert(data.error || 'Gagal mengirim perintah cancel');
+      }
+    } catch (e) {
+      setIsCancelling(false);
+      alert('Network error saat membatalkan: ' + e.message);
+    }
+  };
+
   const TabButton = ({ id, label, icon: Icon, isActive, onClick }) => (
     <button
       onClick={onClick}
@@ -429,8 +472,18 @@ useEffect(() => {
                 }`}>
                   {scrapingResults.success ? scrapingResults.message : scrapingResults.error}
                 </p>
-                {scrapingResults.summary && (
-                  <pre className="mt-2 text-sm bg-white rounded p-2 overflow-auto">
+                {scrapingResults.traceback && (
+                  <details className="mt-2">
+                    <summary className="text-xs text-gray-600 cursor-pointer hover:text-gray-800">
+                      Show error details
+                    </summary>
+                    <pre className="mt-2 text-xs bg-white rounded p-2 overflow-auto max-h-40 border border-gray-300">
+                      {scrapingResults.traceback}
+                    </pre>
+                  </details>
+                )}
+                {scrapingResults.summary && scrapingResults.success && (
+                  <pre className="mt-2 text-sm bg-white rounded p-2 overflow-auto border border-gray-300">
                     {JSON.stringify(scrapingResults.summary, null, 2)}
                   </pre>
                 )}
@@ -564,23 +617,44 @@ useEffect(() => {
                 </div>
               </div>
 
-              <button
-                onClick={handleSintaDosen}
-                disabled={isLoading || !credentials.username || !credentials.password}
-                className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader className="animate-spin -ml-1 mr-3 h-5 w-5" />
-                    Sedang Scraping...
-                  </>
-                ) : (
-                  <>
-                    <Play className="-ml-1 mr-3 h-5 w-5" />
-                    Mulai Scraping SINTA Dosen
-                  </>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={handleSintaDosen}
+                  disabled={isLoading || !credentials.username || !credentials.password}
+                  className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader className="animate-spin -ml-1 mr-3 h-5 w-5" />
+                      Sedang Scraping...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="-ml-1 mr-3 h-5 w-5" />
+                      Mulai Scraping SINTA Dosen
+                    </>
+                  )}
+                </button>
+                {isLoading && currentJobId && (
+                  <button
+                    onClick={cancelCurrentJob}
+                    className={`inline-flex items-center px-4 py-2 rounded-lg text-white ${isCancelling ? 'bg-gray-400 cursor-wait' : 'bg-red-600 hover:bg-red-700'}`}
+                    disabled={isCancelling}
+                  >
+                    {isCancelling ? (
+                      <>
+                        <Loader className="w-4 h-4 mr-2 animate-spin" />
+                        Menghentikan...
+                      </>
+                    ) : (
+                      <>
+                        <Square className="w-4 h-4 mr-2" />
+                        Stop
+                      </>
+                    )}
+                  </button>
                 )}
-              </button>
+              </div>
             </div>
           )}
 

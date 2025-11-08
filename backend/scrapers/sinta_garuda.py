@@ -16,7 +16,7 @@ import csv
 from time import sleep
 import random
 import os
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 from datetime import datetime
 import logging
 import re
@@ -315,10 +315,10 @@ class SintaGarudaScraper:
         for url in login_urls:
             logger.info(f"Trying login URL: {url}")
             if self._try_login(url):
-                logger.info(f"✅ Login successful with URL: {url}")
+                logger.info(f"Login successful with URL: {url}")
                 return True
         
-        logger.error("❌ All login URLs failed")
+        logger.error("All login URLs failed")
         return False
         
     def _try_login(self, login_url):
@@ -329,55 +329,79 @@ class SintaGarudaScraper:
             # Get the login page
             response = self.session.get(login_url, headers=self.headers)
             response.raise_for_status()
-            
+
             soup = BeautifulSoup(response.text, 'html.parser')
-            
+
             # Extract CSRF token if present
             csrf_token = soup.find('input', {'name': '_token'})
-            
+
             # Find the form
             form = soup.find('form', {'id': 'loginform'}) or soup.find('form', {'method': 'post'}) or soup.find('form', {'action': True})
-            
+
             post_url = login_url
             if form and form.has_attr('action'):
                 post_url = urljoin(login_url, form['action'])
                 logger.info(f"Found form action URL: {post_url}")
-            
-            # Prepare login data
+
+            # Prepare login data similar to Scopus scraper
             login_data = {}
-            
-            # Add hidden inputs from the form
+
             if form:
                 for input_tag in form.find_all('input'):
-                    if input_tag.has_attr('name') and input_tag.has_attr('value') and input_tag.get('type') == 'hidden':
-                        login_data[input_tag['name']] = input_tag['value']
-            
-            # Add credentials
+                    input_name = input_tag.get('name')
+                    if not input_name:
+                        continue
+
+                    input_type = (input_tag.get('type') or '').lower()
+                    input_value = input_tag.get('value') or ''
+
+                    if input_type in ('submit', 'image'):
+                        continue
+
+                    if input_type == 'checkbox':
+                        if input_tag.has_attr('checked'):
+                            login_data[input_name] = input_value or 'on'
+                        else:
+                            login_data.setdefault(input_name, input_value or 'on')
+                        continue
+
+                    if input_type == 'hidden':
+                        login_data[input_name] = input_value
+
             email_field = soup.find('input', {'type': 'email'}) or soup.find('input', {'name': 'email'})
+            username_field = soup.find('input', {'name': 'username'})
+
             if email_field and email_field.has_attr('name'):
                 login_data[email_field['name']] = self.username
+            elif username_field and username_field.has_attr('name'):
+                login_data[username_field['name']] = self.username
             else:
                 login_data['email'] = self.username
-            
-            # Add password
+                login_data['username'] = self.username
+
             password_field = soup.find('input', {'type': 'password'})
             if password_field and password_field.has_attr('name'):
                 login_data[password_field['name']] = self.password
             else:
                 login_data['password'] = self.password
-            
-            # Add CSRF token if found
+
             if csrf_token:
                 login_data['_token'] = csrf_token['value']
-            
-            # Set headers
+
+            submit_button = soup.find('button', {'type': 'submit'}) or soup.find('input', {'type': 'submit'})
+            if submit_button and submit_button.has_attr('name') and submit_button.has_attr('value'):
+                login_data[submit_button['name']] = submit_button['value']
+
+            login_data.setdefault('remember', 'on')
+            login_data.setdefault('login', 'Login')
+
             login_headers = self.headers.copy()
             login_headers['Referer'] = login_url
             login_headers['Origin'] = 'https://sinta.kemdikbud.go.id'
             login_headers['Content-Type'] = 'application/x-www-form-urlencoded'
-            
+
             logger.info(f"Posting to: {post_url}")
-            
+
             # Perform login
             response = self.session.post(
                 post_url, 
@@ -386,11 +410,11 @@ class SintaGarudaScraper:
                 allow_redirects=True
             )
             response.raise_for_status()
-            
+
             # Check if login was successful
             success_indicators = ["dashboard", "authors/profile"]
             failure_indicators = ["logins", "login", "signin", "sign-in"]
-            
+
             if any(indicator in response.url for indicator in success_indicators) or \
                not any(indicator in response.url for indicator in failure_indicators):
                 self.logged_in = True
@@ -398,8 +422,12 @@ class SintaGarudaScraper:
                 return True
             else:
                 logger.warning(f"Login attempt failed. Current URL: {response.url}")
+                error_soup = BeautifulSoup(response.text, 'html.parser')
+                error_msg = error_soup.find('div', class_='alert-danger') or error_soup.find('div', class_='invalid-feedback')
+                if error_msg:
+                    logger.warning(f"Error message: {error_msg.text.strip()}")
                 return False
-                
+
         except Exception as e:
             logger.error(f"Login error at {login_url}: {e}")
             return False

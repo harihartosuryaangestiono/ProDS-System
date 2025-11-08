@@ -1408,7 +1408,7 @@ if __name__ == "__main__":
         'password': 'rayhan123',
         'host': 'localhost',
         'port': '5432'
-    }
+    } 
     
     scraper = GoogleScholarScraper(
         db_config=DB_CONFIG,
