@@ -717,9 +717,9 @@ class SintaDosenScraper:
 if __name__ == '__main__':
     # Konfigurasi database PostgreSQL - sesuai dengan database baru
     db_config = {
-        'dbname': 'ProDSGabungan',  # Nama database baru
-        'user': 'postgres',        
-        'password': 'password123',    
+        'dbname': 'SKM_PUBLIKASI',  # Nama database baru
+        'user': 'rayhanadjisantoso',        
+        'password': 'rayhan123',    
         'host': 'localhost',            
         'port': '5432'                  
     }

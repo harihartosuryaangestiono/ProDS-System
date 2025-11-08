@@ -114,7 +114,9 @@ apiService.getSintaDosen = async (params) => {
 
 apiService.getSintaDosenStats = async (params = {}) => {
   const queryParams = {
-    search: params?.search || ''
+    search: params?.search || '',
+    ...(params.faculty && { faculty: params.faculty }),
+    ...(params.department && { department: params.department })
   };
   return handleResponse(
     () => apiService.get('/api/sinta/dosen/stats', { params: queryParams }),
@@ -126,6 +128,62 @@ apiService.getSintaPublikasi = async (params) => {
   return handleResponse(
     () => apiService.get('/api/sinta/publikasi', { params }),
     'Error fetching SINTA publikasi'
+  );
+};
+
+apiService.getSintaPublikasiStats = async (params = {}) => {
+  const queryParams = {
+    search: params?.search || '',
+    ...(params.tipe && params.tipe !== 'all' && { tipe: params.tipe }),
+    ...(params.year_start && { year_start: params.year_start }),
+    ...(params.year_end && { year_end: params.year_end }),
+    ...(params.faculty && { faculty: params.faculty }),
+    ...(params.department && { department: params.department })
+  };
+  
+  return handleResponse(
+    () => apiService.get('/api/sinta/publikasi/stats', { params: queryParams }),
+    'Error fetching SINTA publikasi statistics'
+  );
+};
+
+// ===================================
+// ✨ SINTA Publikasi Faculty & Department
+// ===================================
+
+apiService.getSintaPublikasiFaculties = async () => {
+  return handleResponse(
+    () => apiService.get('/api/sinta/publikasi/faculties'),
+    'Error fetching SINTA publikasi faculties'
+  );
+};
+
+apiService.getSintaPublikasiDepartments = async (faculty) => {
+  return handleResponse(
+    () => apiService.get('/api/sinta/publikasi/departments', { 
+      params: { faculty } 
+    }),
+    'Error fetching SINTA publikasi departments'
+  );
+};
+
+// ===================================
+// ✨ TAMBAHAN BARU: SINTA Faculty & Department
+// ===================================
+
+apiService.getSintaFaculties = async () => {
+  return handleResponse(
+    () => apiService.get('/api/sinta/dosen/faculties'),
+    'Error fetching SINTA faculties'
+  );
+};
+
+apiService.getSintaDepartments = async (faculty) => {
+  return handleResponse(
+    () => apiService.get('/api/sinta/dosen/departments', { 
+      params: { faculty } 
+    }),
+    'Error fetching SINTA departments'
   );
 };
 
@@ -142,7 +200,9 @@ apiService.getScholarDosen = async (params) => {
 
 apiService.getScholarDosenStats = async (params = {}) => {
   const queryParams = {
-    search: params?.search || ''
+    search: params?.search || '',
+    ...(params.faculty && { faculty: params.faculty }),
+    ...(params.department && { department: params.department })
   };
   return handleResponse(
     () => apiService.get('/api/scholar/dosen/stats', { params: queryParams }),
@@ -154,6 +214,42 @@ apiService.getScholarPublikasi = async (params) => {
   return handleResponse(
     () => apiService.get('/api/scholar/publikasi', { params }),
     'Error fetching Scholar publikasi'
+  );
+};
+
+apiService.getScholarPublikasiStats = async (params = {}) => {
+  const queryParams = {
+    search: params?.search || '',
+    ...(params.tipe && params.tipe !== 'all' && { tipe: params.tipe }),
+    ...(params.year_start && { year_start: params.year_start }),
+    ...(params.year_end && { year_end: params.year_end }),
+    ...(params.faculty && { faculty: params.faculty }),
+    ...(params.department && { department: params.department })
+  };
+  
+  return handleResponse(
+    () => apiService.get('/api/scholar/publikasi/stats', { params: queryParams }),
+    'Error fetching Scholar publikasi statistics'
+  );
+};
+
+// ===================================
+// ✨ Scholar Faculty & Department
+// ===================================
+
+apiService.getScholarFaculties = async () => {
+  return handleResponse(
+    () => apiService.get('/api/scholar/dosen/faculties'),
+    'Error fetching Scholar faculties'
+  );
+};
+
+apiService.getScholarDepartments = async (faculty) => {
+  return handleResponse(
+    () => apiService.get('/api/scholar/dosen/departments', { 
+      params: { faculty } 
+    }),
+    'Error fetching Scholar departments'
   );
 };
 
@@ -169,13 +265,12 @@ apiService.getDashboardStats = async () => {
 };
 
 // ===================================
-// Authentication API Functions (FIXED)
+// Authentication API Functions
 // ===================================
 
 apiService.login = async (email, password) => {
   return handleResponse(
     async () => {
-      // FIXED: Changed from /api/auth/login to /auth/login
       const response = await apiService.post('/auth/login', {
         v_email: email,
         v_password_hash: password
@@ -198,7 +293,6 @@ apiService.logout = async () => {
 
 apiService.register = async (userData) => {
   return handleResponse(
-    // FIXED: Changed from /api/auth/register to /auth/register
     () => apiService.post('/auth/register', userData),
     'Error during registration'
   );
