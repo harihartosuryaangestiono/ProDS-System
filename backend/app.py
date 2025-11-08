@@ -133,9 +133,20 @@ def dashboard_stats(current_user_id):
         
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         
-        # CTE for latest dosen data (by nama_dosen)
-        latest_dosen_cte = """
-            WITH latest_dosen AS (
+        # CTE 1: Latest dosen WITH Google Scholar filter (untuk sitasi GS)
+        latest_dosen_gs_cte = """
+            WITH latest_dosen_gs AS (
+                SELECT DISTINCT ON (LOWER(TRIM(d.v_nama_dosen)))
+                    d.*
+                FROM tmp_dosen_dt d
+                WHERE (d.v_sumber = 'Google Scholar' OR d.v_id_googleScholar IS NOT NULL)
+                ORDER BY LOWER(TRIM(d.v_nama_dosen)), d.t_tanggal_unduh DESC NULLS LAST
+            )
+        """
+        
+        # CTE 2: Latest dosen WITHOUT filter (untuk sitasi GS-SINTA dan Scopus)
+        latest_dosen_all_cte = """
+            WITH latest_dosen_all AS (
                 SELECT DISTINCT ON (LOWER(TRIM(d.v_nama_dosen)))
                     d.*
                 FROM tmp_dosen_dt d
@@ -143,7 +154,7 @@ def dashboard_stats(current_user_id):
             )
         """
         
-        # CTE for latest publikasi data (by judul and tahun)
+        # CTE for latest publikasi data (unchanged)
         latest_publikasi_cte = """
             WITH latest_publikasi AS (
                 SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
@@ -153,14 +164,14 @@ def dashboard_stats(current_user_id):
             )
         """
         
-        # Get total dosen from latest data only
+        # Get total dosen from latest data (with GS filter)
         cur.execute(f"""
-            {latest_dosen_cte}
-            SELECT COUNT(*) as total FROM latest_dosen
+            {latest_dosen_gs_cte}
+            SELECT COUNT(*) as total FROM latest_dosen_gs
         """)
         total_dosen = cur.fetchone()['total']
         
-        print(f"📊 Total unique dosen: {total_dosen}")
+        print(f"📊 Total unique dosen (with GS): {total_dosen}")
         
         # Get total publikasi from latest data only
         cur.execute(f"""
@@ -171,37 +182,42 @@ def dashboard_stats(current_user_id):
         
         print(f"📊 Total unique publikasi: {total_publikasi}")
         
-        # Get total sitasi from ALL three sources with breakdown and h-index statistics from latest dosen data only
+        # Get sitasi GS from dosen WITH Google Scholar filter
         cur.execute(f"""
-            {latest_dosen_cte}
+            {latest_dosen_gs_cte}
             SELECT 
                 COALESCE(SUM(COALESCE(n_total_sitasi_gs, 0)), 0) as total_sitasi_gs,
-                COALESCE(SUM(COALESCE(n_sitasi_gs, 0)), 0) as total_sitasi_gs_sinta,
-                COALESCE(SUM(COALESCE(n_sitasi_scopus, 0)), 0) as total_sitasi_scopus,
-                COALESCE(SUM(
-                    COALESCE(n_total_sitasi_gs, 0) + 
-                    COALESCE(n_sitasi_gs, 0) + 
-                    COALESCE(n_sitasi_scopus, 0)
-                ), 0) as total_sitasi,
                 COALESCE(AVG(n_h_index_gs), 0) as avg_h_index,
                 COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY n_h_index_gs), 0) as median_h_index
-            FROM latest_dosen
+            FROM latest_dosen_gs
         """)
-        sitasi_stats = cur.fetchone()
-        total_sitasi = int(sitasi_stats['total_sitasi'] or 0)
-        total_sitasi_gs = int(sitasi_stats['total_sitasi_gs'] or 0)
-        total_sitasi_gs_sinta = int(sitasi_stats['total_sitasi_gs_sinta'] or 0)
-        total_sitasi_scopus = int(sitasi_stats['total_sitasi_scopus'] or 0)
-        avg_h_index = sitasi_stats['avg_h_index']
-        median_h_index = sitasi_stats['median_h_index']
+        gs_stats = cur.fetchone()
+        total_sitasi_gs = int(gs_stats['total_sitasi_gs'] or 0)
+        avg_h_index = gs_stats['avg_h_index']
+        median_h_index = gs_stats['median_h_index']
+        
+        # Get sitasi GS-SINTA dan Scopus from ALL dosen (no filter)
+        cur.execute(f"""
+            {latest_dosen_all_cte}
+            SELECT 
+                COALESCE(SUM(COALESCE(n_sitasi_gs, 0)), 0) as total_sitasi_gs_sinta,
+                COALESCE(SUM(COALESCE(n_sitasi_scopus, 0)), 0) as total_sitasi_scopus
+            FROM latest_dosen_all
+        """)
+        other_stats = cur.fetchone()
+        total_sitasi_gs_sinta = int(other_stats['total_sitasi_gs_sinta'] or 0)
+        total_sitasi_scopus = int(other_stats['total_sitasi_scopus'] or 0)
+        
+        # Total sitasi = GS (filtered) + GS-SINTA (all) + Scopus (all)
+        total_sitasi = total_sitasi_gs + total_sitasi_gs_sinta + total_sitasi_scopus
         
         print(f"📊 Total sitasi: {total_sitasi}")
-        print(f"   - Google Scholar (n_total_sitasi_gs): {total_sitasi_gs}")
-        print(f"   - Google Scholar SINTA (n_sitasi_gs): {total_sitasi_gs_sinta}")
-        print(f"   - Scopus (n_sitasi_scopus): {total_sitasi_scopus}")
+        print(f"   - Google Scholar (filtered): {total_sitasi_gs}")
+        print(f"   - Google Scholar SINTA (all): {total_sitasi_gs_sinta}")
+        print(f"   - Scopus (all): {total_sitasi_scopus}")
         print(f"📊 Avg H-Index: {avg_h_index}, Median H-Index: {median_h_index}")
         
-        # Get publikasi by year (last 15 years) from latest publikasi data only
+        # Get publikasi by year (unchanged)
         current_year = datetime.now().year
         start_year = current_year - 15
 
@@ -219,35 +235,36 @@ def dashboard_stats(current_user_id):
             ORDER BY yr.year_num ASC
         """, (start_year, current_year))
         publikasi_by_year = [dict(row) for row in cur.fetchall()]
-        print(f"📊 Publikasi by year (15 years): {publikasi_by_year}")
         
         print(f"📊 Publikasi by year (15 years): {len(publikasi_by_year)} years")
         
-        # Get top authors by h-index (Scopus)
+        # Get top authors by h-index (Scopus) - use GS filtered CTE
         cur.execute(f"""
-            {latest_dosen_cte}
+            {latest_dosen_gs_cte}
             SELECT
                 v_nama_dosen,
                 COALESCE(n_h_index_scopus, 0) AS n_h_index_scopus
-            FROM latest_dosen
+            FROM latest_dosen_gs
             ORDER BY n_h_index_scopus DESC NULLS LAST
             LIMIT 10
         """)
         top_authors_scopus = [dict(row) for row in cur.fetchall()]
 
-        # Get top authors by h-index (Google Scholar)
+        # Get top authors by h-index (Google Scholar) - use GS filtered CTE
         cur.execute(f"""
-            {latest_dosen_cte}
+            {latest_dosen_gs_cte}
             SELECT
                 v_nama_dosen,
                 COALESCE(n_h_index_gs, 0) AS n_h_index_gs
-            FROM latest_dosen
+            FROM latest_dosen_gs
             ORDER BY n_h_index_gs DESC NULLS LAST
             LIMIT 10
         """)
         top_authors_gs = [dict(row) for row in cur.fetchall()]
         
         print(f"📊 Top authors (Scopus h-index): {len(top_authors_scopus)} | (GS h-index): {len(top_authors_gs)}")
+        
+        # ... (sisanya tetap sama, gunakan latest_publikasi_cte untuk publikasi)
         
         # Get publikasi by type from latest publikasi data only
         cur.execute(f"""
