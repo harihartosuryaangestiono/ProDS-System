@@ -54,9 +54,9 @@ socketio = SocketIO(app,
 
 # Database configuration
 DB_CONFIG = {
-    'dbname': os.environ.get('DB_NAME', 'SKM_PUBLIKASI'),
-    'user': os.environ.get('DB_USER', 'rayhanadjisantoso'),
-    'password': os.environ.get('DB_PASSWORD', 'rayhan123'),
+    'dbname': os.environ.get('DB_NAME', 'ProDSGabungan'),
+    'user': os.environ.get('DB_USER', 'postgres'),
+    'password': os.environ.get('DB_PASSWORD', 'password123'),
     'host': os.environ.get('DB_HOST', 'localhost'),
     'port': os.environ.get('DB_PORT', '5432')
 }
@@ -133,6 +133,25 @@ def dashboard_stats(current_user_id):
         
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         
+        # Get latest and previous scraping dates
+        cur.execute("""
+            SELECT DISTINCT DATE(t_tanggal_unduh) as tanggal
+            FROM tmp_dosen_dt
+            WHERE t_tanggal_unduh IS NOT NULL
+            UNION
+            SELECT DISTINCT DATE(t_tanggal_unduh) as tanggal
+            FROM stg_publikasi_tr
+            WHERE t_tanggal_unduh IS NOT NULL
+            ORDER BY tanggal DESC
+            LIMIT 2
+        """)
+        dates = cur.fetchall()
+        latest_date = dates[0]['tanggal'] if dates and len(dates) > 0 else None
+        previous_date = dates[1]['tanggal'] if dates and len(dates) > 1 else None
+        
+        print(f"📅 Latest scraping date: {latest_date}")
+        print(f"📅 Previous scraping date: {previous_date}")
+        
         # CTE 1: Latest dosen WITH Google Scholar filter (untuk sitasi GS)
         latest_dosen_gs_cte = """
             WITH latest_dosen_gs AS (
@@ -164,14 +183,46 @@ def dashboard_stats(current_user_id):
             )
         """
         
-        # Get total dosen from latest data (with GS filter)
+        # CTE for previous dosen data (for comparison)
+        previous_dosen_gs_cte = f"""
+            WITH previous_dosen_gs AS (
+                SELECT DISTINCT ON (LOWER(TRIM(d.v_nama_dosen)))
+                    d.*
+                FROM tmp_dosen_dt d
+                WHERE (d.v_sumber = 'Google Scholar' OR d.v_id_googleScholar IS NOT NULL)
+                  AND DATE(d.t_tanggal_unduh) = %s
+                ORDER BY LOWER(TRIM(d.v_nama_dosen)), d.t_tanggal_unduh DESC NULLS LAST
+            )
+        """ if previous_date else "WITH previous_dosen_gs AS (SELECT * FROM tmp_dosen_dt WHERE 1=0)"
+        
+        previous_dosen_all_cte = f"""
+            WITH previous_dosen_all AS (
+                SELECT DISTINCT ON (LOWER(TRIM(d.v_nama_dosen)))
+                    d.*
+                FROM tmp_dosen_dt d
+                WHERE DATE(d.t_tanggal_unduh) = %s
+                ORDER BY LOWER(TRIM(d.v_nama_dosen)), d.t_tanggal_unduh DESC NULLS LAST
+            )
+        """ if previous_date else "WITH previous_dosen_all AS (SELECT * FROM tmp_dosen_dt WHERE 1=0)"
+        
+        previous_publikasi_cte = f"""
+            WITH previous_publikasi AS (
+                SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
+                    p.*
+                FROM stg_publikasi_tr p
+                WHERE DATE(p.t_tanggal_unduh) = %s
+                ORDER BY LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi, p.t_tanggal_unduh DESC NULLS LAST
+            )
+        """ if previous_date else "WITH previous_publikasi AS (SELECT * FROM stg_publikasi_tr WHERE 1=0)"
+        
+        # Get total dosen from latest data (GS and SINTA)
         cur.execute(f"""
-            {latest_dosen_gs_cte}
-            SELECT COUNT(*) as total FROM latest_dosen_gs
+            {latest_dosen_all_cte}
+            SELECT COUNT(*) as total FROM latest_dosen_all
         """)
         total_dosen = cur.fetchone()['total']
         
-        print(f"📊 Total unique dosen (with GS): {total_dosen}")
+        print(f"📊 Total unique dosen (GS and SINTA): {total_dosen}")
         
         # Get total publikasi from latest data only
         cur.execute(f"""
@@ -238,13 +289,14 @@ def dashboard_stats(current_user_id):
         
         print(f"📊 Publikasi by year (15 years): {len(publikasi_by_year)} years")
         
-        # Get top authors by h-index (Scopus) - use GS filtered CTE
+        # Get top authors by h-index (Scopus) - use all dosen (GS and SINTA)
         cur.execute(f"""
-            {latest_dosen_gs_cte}
+            {latest_dosen_all_cte}
             SELECT
                 v_nama_dosen,
                 COALESCE(n_h_index_scopus, 0) AS n_h_index_scopus
-            FROM latest_dosen_gs
+            FROM latest_dosen_all
+            WHERE COALESCE(n_h_index_scopus, 0) > 0
             ORDER BY n_h_index_scopus DESC NULLS LAST
             LIMIT 10
         """)
@@ -422,6 +474,132 @@ def dashboard_stats(current_user_id):
         """)
         top_dosen_national = [dict(row) for row in cur.fetchall()]
 
+        # Calculate previous values for comparison
+        prev_total_dosen = 0
+        prev_total_publikasi = 0
+        prev_total_sitasi = 0
+        prev_total_sitasi_gs = 0
+        prev_total_sitasi_gs_sinta = 0
+        prev_total_sitasi_scopus = 0
+        prev_avg_h_index = 0
+        prev_median_h_index = 0
+        prev_publikasi_internasional_q12 = 0
+        prev_publikasi_internasional_q34_noq = 0
+        prev_publikasi_nasional_sinta12 = 0
+        prev_publikasi_nasional_sinta34 = 0
+        prev_publikasi_nasional_sinta5 = 0
+        prev_publikasi_nasional_sinta6 = 0
+
+        if previous_date:
+            # Previous total dosen
+            cur.execute(f"""
+                {previous_dosen_all_cte}
+                SELECT COUNT(*) as total FROM previous_dosen_all
+            """, (previous_date,))
+            prev_total_dosen = cur.fetchone()['total'] or 0
+
+            # Previous total publikasi
+            cur.execute(f"""
+                {previous_publikasi_cte}
+                SELECT COUNT(*) as total FROM previous_publikasi
+            """, (previous_date,))
+            prev_total_publikasi = cur.fetchone()['total'] or 0
+
+            # Previous sitasi GS
+            cur.execute(f"""
+                {previous_dosen_gs_cte}
+                SELECT 
+                    COALESCE(SUM(COALESCE(n_total_sitasi_gs, 0)), 0) as total_sitasi_gs,
+                    COALESCE(AVG(n_h_index_gs), 0) as avg_h_index,
+                    COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY n_h_index_gs), 0) as median_h_index
+                FROM previous_dosen_gs
+            """, (previous_date,))
+            prev_gs_stats = cur.fetchone()
+            prev_total_sitasi_gs = int(prev_gs_stats['total_sitasi_gs'] or 0) if prev_gs_stats else 0
+            prev_avg_h_index = float(prev_gs_stats['avg_h_index'] or 0) if prev_gs_stats else 0
+            prev_median_h_index = float(prev_gs_stats['median_h_index'] or 0) if prev_gs_stats else 0
+
+            # Previous sitasi GS-SINTA dan Scopus
+            cur.execute(f"""
+                {previous_dosen_all_cte}
+                SELECT 
+                    COALESCE(SUM(COALESCE(n_sitasi_gs, 0)), 0) as total_sitasi_gs_sinta,
+                    COALESCE(SUM(COALESCE(n_sitasi_scopus, 0)), 0) as total_sitasi_scopus
+                FROM previous_dosen_all
+            """, (previous_date,))
+            prev_other_stats = cur.fetchone()
+            prev_total_sitasi_gs_sinta = int(prev_other_stats['total_sitasi_gs_sinta'] or 0) if prev_other_stats else 0
+            prev_total_sitasi_scopus = int(prev_other_stats['total_sitasi_scopus'] or 0) if prev_other_stats else 0
+            prev_total_sitasi = prev_total_sitasi_gs + prev_total_sitasi_gs_sinta + prev_total_sitasi_scopus
+
+            # Previous publikasi internasional Q1-Q2
+            cur.execute(f"""
+                {previous_publikasi_cte}
+                SELECT COUNT(*) AS cnt
+                FROM previous_publikasi p
+                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+                WHERE LOWER(COALESCE(a.v_terindeks, '')) = 'scopus'
+                  AND COALESCE(a.v_ranking, '') IN ('Q1','Q2')
+            """, (previous_date,))
+            prev_publikasi_internasional_q12 = cur.fetchone()['cnt'] or 0
+
+            # Previous publikasi internasional Q3-Q4/noQ
+            cur.execute(f"""
+                {previous_publikasi_cte}
+                SELECT COUNT(*) AS cnt
+                FROM previous_publikasi p
+                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+                WHERE LOWER(COALESCE(a.v_terindeks, '')) = 'scopus'
+                  AND (
+                        COALESCE(a.v_ranking, '') IN ('Q3','Q4')
+                     OR COALESCE(a.v_ranking, '') = ''
+                  )
+            """, (previous_date,))
+            prev_publikasi_internasional_q34_noq = cur.fetchone()['cnt'] or 0
+
+            # Previous publikasi nasional Sinta 1-2
+            cur.execute(f"""
+                {previous_publikasi_cte}
+                SELECT COUNT(*) AS cnt
+                FROM previous_publikasi p
+                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+                WHERE LOWER(COALESCE(a.v_ranking, '')) IN ('sinta 1','sinta 2')
+            """, (previous_date,))
+            prev_publikasi_nasional_sinta12 = cur.fetchone()['cnt'] or 0
+
+            # Previous publikasi nasional Sinta 3-4
+            cur.execute(f"""
+                {previous_publikasi_cte}
+                SELECT COUNT(*) AS cnt
+                FROM previous_publikasi p
+                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+                WHERE LOWER(COALESCE(a.v_ranking, '')) IN ('sinta 3','sinta 4')
+            """, (previous_date,))
+            prev_publikasi_nasional_sinta34 = cur.fetchone()['cnt'] or 0
+
+            # Previous publikasi nasional Sinta 5
+            cur.execute(f"""
+                {previous_publikasi_cte}
+                SELECT COUNT(*) AS cnt
+                FROM previous_publikasi p
+                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+                WHERE LOWER(COALESCE(a.v_ranking, '')) = 'sinta 5'
+            """, (previous_date,))
+            prev_publikasi_nasional_sinta5 = cur.fetchone()['cnt'] or 0
+
+            # Previous publikasi nasional Sinta 6
+            cur.execute(f"""
+                {previous_publikasi_cte}
+                SELECT COUNT(*) AS cnt
+                FROM previous_publikasi p
+                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+                WHERE LOWER(COALESCE(a.v_ranking, '')) = 'sinta 6'
+            """, (previous_date,))
+            prev_publikasi_nasional_sinta6 = cur.fetchone()['cnt'] or 0
+
+        # Format previous date for display
+        prev_date_str = previous_date.strftime('%d/%m/%Y') if previous_date else None
+
         return jsonify({
             'total_dosen': total_dosen,
             'total_publikasi': total_publikasi,
@@ -445,7 +623,25 @@ def dashboard_stats(current_user_id):
             'publikasi_by_type': publikasi_by_type,
             'recent_publications': recent_publications,
             'top_dosen_international': top_dosen_international,
-            'top_dosen_national': top_dosen_national
+            'top_dosen_national': top_dosen_national,
+            # Comparison data
+            'previous_date': prev_date_str,
+            'previous_values': {
+                'total_dosen': prev_total_dosen,
+                'total_publikasi': prev_total_publikasi,
+                'total_sitasi': prev_total_sitasi,
+                'total_sitasi_gs': prev_total_sitasi_gs,
+                'total_sitasi_gs_sinta': prev_total_sitasi_gs_sinta,
+                'total_sitasi_scopus': prev_total_sitasi_scopus,
+                'avg_h_index': prev_avg_h_index,
+                'median_h_index': prev_median_h_index,
+                'publikasi_internasional_q12': prev_publikasi_internasional_q12,
+                'publikasi_internasional_q34_noq': prev_publikasi_internasional_q34_noq,
+                'publikasi_nasional_sinta12': prev_publikasi_nasional_sinta12,
+                'publikasi_nasional_sinta34': prev_publikasi_nasional_sinta34,
+                'publikasi_nasional_sinta5': prev_publikasi_nasional_sinta5,
+                'publikasi_nasional_sinta6': prev_publikasi_nasional_sinta6
+            }
         }), 200
         
     except Exception as e:
@@ -2868,6 +3064,6 @@ if __name__ == '__main__':
         app,
         debug=debug_mode,
         host='0.0.0.0',
-        port=int(os.environ.get('PORT', 5002)),
+        port=int(os.environ.get('PORT', 0)),
         allow_unsafe_werkzeug=True
     )
