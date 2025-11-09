@@ -14,6 +14,7 @@ const SintaPublikasi = () => {
   const [pagination, setPagination] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [filterTipe, setFilterTipe] = useState('all');
+  const [filterTerindeks, setFilterTerindeks] = useState('all');
   const [yearStart, setYearStart] = useState('');
   const [yearEnd, setYearEnd] = useState('');
   
@@ -40,6 +41,16 @@ const SintaPublikasi = () => {
     { value: 'buku', label: 'Buku' },
     { value: 'penelitian', label: 'Penelitian' },
     { value: 'lainnya', label: 'Lainnya' }
+  ];
+
+  const terindeksOptions = [
+    { value: 'all', label: 'Semua Terindeks' },
+    { value: 'Scopus', label: 'Scopus' },
+    { value: 'WoS', label: 'Web of Science' },
+    { value: 'DOAJ', label: 'DOAJ' },
+    { value: 'Garuda', label: 'Garuda' },
+    { value: 'SINTA', label: 'SINTA' },
+    { value: 'Other', label: 'Lainnya' }
   ];
 
   const currentYear = new Date().getFullYear();
@@ -71,12 +82,12 @@ const SintaPublikasi = () => {
   // Fetch data when filters change
   useEffect(() => {
     fetchPublikasiData();
-  }, [currentPage, searchTerm, filterTipe, yearStart, yearEnd, selectedFaculty, selectedDepartment]);
+  }, [currentPage, searchTerm, filterTipe, filterTerindeks, yearStart, yearEnd, selectedFaculty, selectedDepartment]);
 
   // Fetch stats when filters change
   useEffect(() => {
     fetchAggregateStats();
-  }, [searchTerm, filterTipe, yearStart, yearEnd, selectedFaculty, selectedDepartment]);
+  }, [searchTerm, filterTipe, filterTerindeks, yearStart, yearEnd, selectedFaculty, selectedDepartment]);
 
   const fetchFaculties = async () => {
     try {
@@ -119,6 +130,10 @@ const SintaPublikasi = () => {
         params.tipe = filterTipe;
       }
       
+      if (filterTerindeks !== 'all') {
+        params.terindeks = filterTerindeks;
+      }
+      
       if (yearStart) {
         params.year_start = yearStart;
       }
@@ -145,6 +160,7 @@ const SintaPublikasi = () => {
         };
         
         if (filterTipe !== 'all') fullParams.tipe = filterTipe;
+        if (filterTerindeks !== 'all') fullParams.terindeks = filterTerindeks;
         if (yearStart) fullParams.year_start = yearStart;
         if (yearEnd) fullParams.year_end = yearEnd;
         if (selectedFaculty) fullParams.faculty = selectedFaculty;
@@ -185,6 +201,10 @@ const SintaPublikasi = () => {
       
       if (filterTipe !== 'all') {
         params.tipe = filterTipe;
+      }
+      
+      if (filterTerindeks !== 'all') {
+        params.terindeks = filterTerindeks;
       }
       
       if (yearStart) {
@@ -297,6 +317,11 @@ const SintaPublikasi = () => {
 
   const handleFilterChange = (e) => {
     setFilterTipe(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleTerindeksChange = (e) => {
+    setFilterTerindeks(e.target.value);
     setCurrentPage(1);
   };
 
@@ -470,8 +495,8 @@ const SintaPublikasi = () => {
                 />
               </div>
 
-              {/* Type and Year Filters */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Type, Terindeks and Year Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 {/* Type Filter */}
                 <div className="relative">
                   <label htmlFor="filter-tipe" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
@@ -494,6 +519,34 @@ const SintaPublikasi = () => {
                       {publikasiTypes.map((type) => (
                         <option key={type.value} value={type.value}>
                           {type.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Terindeks Filter */}
+                <div className="relative">
+                  <label htmlFor="filter-terindeks" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                    <Award className="w-4 h-4 mr-1.5 text-green-600" />
+                    Terindeks
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="filter-terindeks"
+                      value={filterTerindeks}
+                      onChange={handleTerindeksChange}
+                      className="w-full pl-4 pr-10 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white hover:border-gray-400 transition-all duration-200 appearance-none cursor-pointer shadow-sm"
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                        backgroundPosition: 'right 0.5rem center',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundSize: '1.5em 1.5em'
+                      }}
+                    >
+                      {terindeksOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
                         </option>
                       ))}
                     </select>

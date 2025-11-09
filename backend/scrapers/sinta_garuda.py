@@ -165,18 +165,38 @@ class DatabaseManager:
     def create_artikel_details(self, id_publikasi, id_jurnal=None, volume=None, issue=None, pages=None, terindeks=None, ranking=None):
         """Create artikel details in stg_artikel_dr"""
         try:
-            insert_query = """
-                INSERT INTO stg_artikel_dr 
-                (v_id_publikasi, v_id_jurnal, v_volume, v_issue, v_pages, v_terindeks, v_ranking) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-            """
-            self.cursor.execute(insert_query, (id_publikasi, id_jurnal, volume, issue, pages, terindeks, ranking))
-            self.connection.commit()
-            logger.info(f"Created artikel details for publikasi ID: {id_publikasi}")
+            # Check if artikel details already exist
+            check_query = "SELECT v_id_publikasi FROM stg_artikel_dr WHERE v_id_publikasi = %s"
+            self.cursor.execute(check_query, (id_publikasi,))
+            existing = self.cursor.fetchone()
+            
+            if existing:
+                # Update existing record
+                update_query = """
+                    UPDATE stg_artikel_dr 
+                    SET v_id_jurnal = %s, v_volume = %s, v_issue = %s, v_pages = %s, 
+                        v_terindeks = %s, v_ranking = %s
+                    WHERE v_id_publikasi = %s
+                """
+                self.cursor.execute(update_query, (id_jurnal, volume, issue, pages, terindeks, ranking, id_publikasi))
+                self.connection.commit()
+                logger.info(f"Updated artikel details for publikasi ID: {id_publikasi}")
+            else:
+                # Insert new record
+                insert_query = """
+                    INSERT INTO stg_artikel_dr 
+                    (v_id_publikasi, v_id_jurnal, v_volume, v_issue, v_pages, v_terindeks, v_ranking) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """
+                self.cursor.execute(insert_query, (id_publikasi, id_jurnal, volume, issue, pages, terindeks, ranking))
+                self.connection.commit()
+                logger.info(f"Created artikel details for publikasi ID: {id_publikasi} (jurnal: {id_jurnal}, terindeks: {terindeks}, ranking: {ranking})")
             return True
             
         except Exception as e:
-            logger.error(f"Error creating artikel details: {e}")
+            logger.error(f"Error creating artikel details for publikasi ID {id_publikasi}: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
             self.connection.rollback()
             return False
     
@@ -638,44 +658,64 @@ class SintaGarudaScraper:
                 # Extract journal details (volume, issue, pages)
                 volume = issue = pages = terindeks = ranking = None
                 
+                # Get full text of the item for better extraction
+                full_item_text = item.get_text().lower()
+                
                 # Look for details container
-                detail_selectors = ['.ar-detail', '.pub-details', '.article-info']
+                detail_selectors = ['.ar-detail', '.pub-details', '.article-info', '.publication-detail', '.detail']
+                detail_text = ""
                 for selector in detail_selectors:
                     detail_elem = item.select_one(selector)
                     if detail_elem:
                         detail_text = self.extract_clean_text(detail_elem)
-                        
-                        # Extract volume
-                        vol_match = re.search(r'[Vv]ol\.?\s*(\d+)', detail_text)
-                        if vol_match:
-                            volume = vol_match.group(1)
-                        
-                        # Extract issue
-                        issue_match = re.search(r'[Ii]ssue\.?\s*(\d+)', detail_text)
-                        if issue_match:
-                            issue = issue_match.group(1)
-                        
-                        # Extract pages
-                        pages_match = re.search(r'[Pp]\.?\s*(\d+-\d+)', detail_text)
-                        if pages_match:
-                            pages = pages_match.group(1)
-                        
-                        # Extract indexing
-                        if 'scopus' in detail_text.lower():
-                            terindeks = 'Scopus'
-                        elif 'wos' in detail_text.lower() or 'web of science' in detail_text.lower():
-                            terindeks = 'WoS'
-                        elif 'doaj' in detail_text.lower():
-                            terindeks = 'DOAJ'
-                        
-                        # Extract ranking
-                        rank_match = re.search(r'[Qq]([1-4])', detail_text)
-                        if rank_match:
-                            ranking = f"Q{rank_match.group(1)}"
-                        elif 'sinta' in detail_text.lower():
-                            sinta_match = re.search(r'[Ss]inta\s*([1-6])', detail_text)
-                            if sinta_match:
-                                ranking = f"Sinta {sinta_match.group(1)}"
+                        break
+                
+                # If no detail container found, use full item text
+                if not detail_text:
+                    detail_text = item.get_text()
+                
+                # Extract volume
+                vol_match = re.search(r'[Vv]ol\.?\s*(\d+)', detail_text)
+                if vol_match:
+                    volume = vol_match.group(1)
+                
+                # Extract issue
+                issue_match = re.search(r'[Ii]ssue\.?\s*(\d+)|[Nn]o\.?\s*(\d+)', detail_text)
+                if issue_match:
+                    issue = issue_match.group(1) or issue_match.group(2)
+                
+                # Extract pages
+                pages_match = re.search(r'[Pp]\.?\s*(\d+[-–]\d+)|[Pp]ages?[:\s]+(\d+[-–]\d+)', detail_text)
+                if pages_match:
+                    pages = pages_match.group(1) or pages_match.group(2)
+                
+                # Extract indexing - for SINTA Garuda, check for various indexing sources
+                if 'scopus' in full_item_text:
+                    terindeks = 'Scopus'
+                elif 'wos' in full_item_text or 'web of science' in full_item_text:
+                    terindeks = 'WoS'
+                elif 'doaj' in full_item_text:
+                    terindeks = 'DOAJ'
+                elif 'garuda' in full_item_text:
+                    terindeks = 'Garuda'
+                elif 'sinta' in full_item_text:
+                    terindeks = 'SINTA'
+                else:
+                    # Default to Garuda for SINTA Garuda publications
+                    terindeks = 'Garuda'
+                
+                # Extract ranking - check for Q ranking or SINTA ranking
+                rank_match = re.search(r'[Qq]([1-4])', detail_text, re.IGNORECASE)
+                if rank_match:
+                    ranking = f"Q{rank_match.group(1)}"
+                else:
+                    # Check for SINTA ranking
+                    sinta_match = re.search(r'[Ss]inta\s*([1-6])', detail_text, re.IGNORECASE)
+                    if sinta_match:
+                        ranking = f"Sinta {sinta_match.group(1)}"
+                
+                # Log extracted data for debugging
+                logger.debug(f"Extracted details for '{title[:50]}...': jurnal={journal_name}, terindeks={terindeks}, ranking={ranking}, volume={volume}, issue={issue}, pages={pages}")
                 
                 # Extract total citations (if available)
                 citation_selectors = ['.ar-cited', '.citations', '.cite-count', '.citation-count']
@@ -703,9 +743,14 @@ class SintaGarudaScraper:
                 id_jurnal = None
                 if journal_name and journal_name != "N/A":
                     id_jurnal = self.db.get_jurnal_id(journal_name)
+                    if not id_jurnal:
+                        logger.warning(f"Failed to get/create jurnal: {journal_name}")
                 
                 # Create artikel details
-                self.db.create_artikel_details(id_publikasi, id_jurnal, volume, issue, pages, terindeks, ranking)
+                artikel_success = self.db.create_artikel_details(id_publikasi, id_jurnal, volume, issue, pages, terindeks, ranking)
+                if not artikel_success:
+                    logger.error(f"Failed to create artikel details for publikasi ID: {id_publikasi}")
+                    # Continue anyway, publikasi record is already created
                 
                 # Link publikasi with dosen
                 self.db.link_publikasi_dosen(id_publikasi, id_dosen)

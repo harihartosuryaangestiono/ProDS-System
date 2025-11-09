@@ -1149,6 +1149,7 @@ def get_sinta_publikasi(current_user_id):
         per_page = int(request.args.get('per_page', 20))
         search = request.args.get('search', '').strip()
         tipe_filter = request.args.get('tipe', '').strip().lower()
+        terindeks_filter = request.args.get('terindeks', '').strip()
         year_start = request.args.get('year_start', '').strip()
         year_end = request.args.get('year_end', '').strip()
         faculty = request.args.get('faculty', '').strip()
@@ -1156,7 +1157,7 @@ def get_sinta_publikasi(current_user_id):
         offset = (page - 1) * per_page
         
         # Debug logging
-        print(f"📥 Request params - page: {page}, per_page: {per_page}, search: '{search}', tipe: '{tipe_filter}', year_start: '{year_start}', year_end: '{year_end}', faculty: '{faculty}', department: '{department}'")
+        print(f"📥 Request params - page: {page}, per_page: {per_page}, search: '{search}', tipe: '{tipe_filter}', terindeks: '{terindeks_filter}', year_start: '{year_start}', year_end: '{year_end}', faculty: '{faculty}', department: '{department}'")
         
         conn = get_db_connection()
         if not conn:
@@ -1250,55 +1251,120 @@ def get_sinta_publikasi(current_user_id):
                 faculty_filter = f"WHERE ({' OR '.join(like_conditions)})"
                 print(f"🏛️ Filtering by faculty: {faculty} (departments: {departments_in_faculty})")
         
+        # Build terindeks filter
+        terindeks_filter_clause = ""
+        terindeks_params = []
+        if terindeks_filter and terindeks_filter != 'all':
+            if terindeks_filter == 'Other':
+                # Filter for terindeks that is not in the common list
+                terindeks_filter_clause = "AND (a.v_terindeks IS NULL OR a.v_terindeks = '' OR LOWER(TRIM(a.v_terindeks)) NOT IN ('scopus', 'wos', 'doaj', 'garuda', 'sinta'))"
+            else:
+                terindeks_filter_clause = "AND LOWER(TRIM(COALESCE(a.v_terindeks, ''))) = LOWER(%s)"
+                terindeks_params.append(terindeks_filter)
+            print(f"🔍 Adding terindeks filter: {terindeks_filter}")
+        
         # Get total count from CTE with faculty filter
-        count_query = f"""
-            {latest_publikasi_cte}
-            SELECT COUNT(*) as total
-            FROM latest_publikasi p
-            LEFT JOIN publikasi_with_jurusan pj ON p.v_id_publikasi = pj.v_id_publikasi
-            {faculty_filter}
-        """
-        cur.execute(count_query, params + faculty_params)
+        if faculty_filter:
+            # If faculty filter applied, only count publications with matching jurusan
+            count_query = f"""
+                {latest_publikasi_cte}
+                SELECT COUNT(*) as total
+                FROM latest_publikasi p
+                LEFT JOIN publikasi_with_jurusan pj ON p.v_id_publikasi = pj.v_id_publikasi
+                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+                {faculty_filter}
+                {terindeks_filter_clause}
+            """
+        else:
+            # No filter, count all publikasi
+            count_query = f"""
+                {latest_publikasi_cte}
+                SELECT COUNT(*) as total
+                FROM latest_publikasi p
+                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+                WHERE 1=1
+                {terindeks_filter_clause}
+            """
+        cur.execute(count_query, params + faculty_params + terindeks_params)
         count_result = cur.fetchone()
         total = count_result.get('total', 0) or 0 if count_result else 0
         
         print(f"📊 Total unique records found: {total}")
         
         # Get data from CTE with proper jurusan join and faculty filter
-        data_query = f"""
-            {latest_publikasi_cte}
-            SELECT
-                p.v_id_publikasi,
-                COALESCE(NULLIF(TRIM(p.v_authors), ''), 'N/A') AS authors,
-                COALESCE(pj.jurusan_names, 'N/A') AS v_nama_jurusan,
-                p.v_judul,
-                p.v_jenis AS tipe,
-                p.v_tahun_publikasi,
-                COALESCE(
-                    j.v_nama_jurnal,
-                    pr.v_nama_konferensi,
-                    'N/A'
-                ) AS venue,
-                COALESCE(p.v_publisher, '') AS publisher,
-                COALESCE(a.v_volume, '') AS volume,
-                COALESCE(a.v_issue, '') AS issue,
-                COALESCE(a.v_pages, '') AS pages,
-                COALESCE(a.v_terindeks, '') AS v_terindeks,
-                COALESCE(a.v_ranking, '') AS v_ranking,
-                p.n_total_sitasi,
-                p.v_sumber,
-                p.t_tanggal_unduh,
-                p.v_link_url
-            FROM latest_publikasi p
-            LEFT JOIN publikasi_with_jurusan pj ON p.v_id_publikasi = pj.v_id_publikasi
-            LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
-            LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
-            LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
-            {faculty_filter}
-            ORDER BY p.n_total_sitasi DESC NULLS LAST, p.t_tanggal_unduh DESC
-            LIMIT %s OFFSET %s
-        """
-        final_params = params + faculty_params + [per_page, offset]
+        if faculty_filter:
+            # If faculty filter applied, only show publications with matching jurusan
+            data_query = f"""
+                {latest_publikasi_cte}
+                SELECT
+                    p.v_id_publikasi,
+                    COALESCE(NULLIF(TRIM(p.v_authors), ''), 'N/A') AS authors,
+                    COALESCE(pj.jurusan_names, 'N/A') AS v_nama_jurusan,
+                    p.v_judul,
+                    p.v_jenis AS tipe,
+                    p.v_tahun_publikasi,
+                    COALESCE(
+                        j.v_nama_jurnal,
+                        pr.v_nama_konferensi,
+                        'N/A'
+                    ) AS venue,
+                    COALESCE(p.v_publisher, '') AS publisher,
+                    COALESCE(a.v_volume, '') AS volume,
+                    COALESCE(a.v_issue, '') AS issue,
+                    COALESCE(a.v_pages, '') AS pages,
+                    COALESCE(a.v_terindeks, '') AS v_terindeks,
+                    COALESCE(a.v_ranking, '') AS v_ranking,
+                    COALESCE(p.n_total_sitasi, 0) AS n_total_sitasi,
+                    p.v_sumber,
+                    p.t_tanggal_unduh,
+                    p.v_link_url
+                FROM latest_publikasi p
+                LEFT JOIN publikasi_with_jurusan pj ON p.v_id_publikasi = pj.v_id_publikasi
+                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+                LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
+                LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
+                {faculty_filter}
+                {terindeks_filter_clause}
+                ORDER BY p.n_total_sitasi DESC NULLS LAST, p.t_tanggal_unduh DESC
+                LIMIT %s OFFSET %s
+            """
+        else:
+            # No filter, show all publikasi
+            data_query = f"""
+                {latest_publikasi_cte}
+                SELECT
+                    p.v_id_publikasi,
+                    COALESCE(NULLIF(TRIM(p.v_authors), ''), 'N/A') AS authors,
+                    COALESCE(pj.jurusan_names, 'N/A') AS v_nama_jurusan,
+                    p.v_judul,
+                    p.v_jenis AS tipe,
+                    p.v_tahun_publikasi,
+                    COALESCE(
+                        j.v_nama_jurnal,
+                        pr.v_nama_konferensi,
+                        'N/A'
+                    ) AS venue,
+                    COALESCE(p.v_publisher, '') AS publisher,
+                    COALESCE(a.v_volume, '') AS volume,
+                    COALESCE(a.v_issue, '') AS issue,
+                    COALESCE(a.v_pages, '') AS pages,
+                    COALESCE(a.v_terindeks, '') AS v_terindeks,
+                    COALESCE(a.v_ranking, '') AS v_ranking,
+                    COALESCE(p.n_total_sitasi, 0) AS n_total_sitasi,
+                    p.v_sumber,
+                    p.t_tanggal_unduh,
+                    p.v_link_url
+                FROM latest_publikasi p
+                LEFT JOIN publikasi_with_jurusan pj ON p.v_id_publikasi = pj.v_id_publikasi
+                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+                LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
+                LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
+                WHERE 1=1
+                {terindeks_filter_clause}
+                ORDER BY p.n_total_sitasi DESC NULLS LAST, p.t_tanggal_unduh DESC
+                LIMIT %s OFFSET %s
+            """
+        final_params = params + faculty_params + terindeks_params + [per_page, offset]
         
         cur.execute(data_query, final_params)
         rows = cur.fetchall()
@@ -1507,18 +1573,48 @@ def get_sinta_publikasi_stats(current_user_id):
                 
                 faculty_filter = f"WHERE ({' OR '.join(like_conditions)})"
         
+        # Build terindeks filter for stats
+        terindeks_filter_clause = ""
+        terindeks_params = []
+        if terindeks_filter and terindeks_filter != 'all':
+            if terindeks_filter == 'Other':
+                terindeks_filter_clause = "AND (a.v_terindeks IS NULL OR a.v_terindeks = '' OR LOWER(TRIM(a.v_terindeks)) NOT IN ('scopus', 'wos', 'doaj', 'garuda', 'sinta'))"
+            else:
+                terindeks_filter_clause = "AND LOWER(TRIM(COALESCE(a.v_terindeks, ''))) = LOWER(%s)"
+                terindeks_params.append(terindeks_filter)
+        
         # Get aggregate statistics with median and faculty filter
-        stats_query = f"""
-            {latest_publikasi_cte}
-            SELECT
-                COUNT(*) as total_publikasi,
-                COALESCE(SUM(pj.n_total_sitasi), 0) as total_sitasi,
-                COALESCE(AVG(pj.n_total_sitasi), 0) as avg_sitasi,
-                COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY pj.n_total_sitasi), 0) as median_sitasi
-            FROM publikasi_with_jurusan pj
-            {faculty_filter}
-        """
-        cur.execute(stats_query, params + faculty_params)
+        # Count all publikasi, not just those with jurusan
+        if faculty_filter:
+            # If faculty filter applied, only count publications with matching jurusan
+            stats_query = f"""
+                {latest_publikasi_cte}
+                SELECT
+                    COUNT(*) as total_publikasi,
+                    COALESCE(SUM(p.n_total_sitasi), 0) as total_sitasi,
+                    COALESCE(AVG(p.n_total_sitasi), 0) as avg_sitasi,
+                    COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY p.n_total_sitasi), 0) as median_sitasi
+                FROM latest_publikasi p
+                LEFT JOIN publikasi_with_jurusan pj ON p.v_id_publikasi = pj.v_id_publikasi
+                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+                {faculty_filter}
+                {terindeks_filter_clause}
+            """
+        else:
+            # No filter, count all publikasi
+            stats_query = f"""
+                {latest_publikasi_cte}
+                SELECT
+                    COUNT(*) as total_publikasi,
+                    COALESCE(SUM(p.n_total_sitasi), 0) as total_sitasi,
+                    COALESCE(AVG(p.n_total_sitasi), 0) as avg_sitasi,
+                    COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY p.n_total_sitasi), 0) as median_sitasi
+                FROM latest_publikasi p
+                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+                WHERE 1=1
+                {terindeks_filter_clause}
+            """
+        cur.execute(stats_query, params + faculty_params + terindeks_params)
         stats = cur.fetchone()
         
         print(f"📊 Stats result: {stats}")
@@ -2452,12 +2548,12 @@ def get_scholar_publikasi(current_user_id):
                     COALESCE(a.v_volume, '') AS volume,
                     COALESCE(a.v_issue, '') AS issue,
                     COALESCE(a.v_pages, '') AS pages,
-                    p.n_total_sitasi,
+                    COALESCE(p.n_total_sitasi, 0) AS n_total_sitasi,
                     p.v_sumber,
                     p.t_tanggal_unduh,
                     p.v_link_url
                 FROM latest_publikasi p
-                INNER JOIN publikasi_with_jurusan pj ON p.v_id_publikasi = pj.v_id_publikasi
+                LEFT JOIN publikasi_with_jurusan pj ON p.v_id_publikasi = pj.v_id_publikasi
                 LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
                 LEFT JOIN stg_jurnal_mt j ON a.v_id_jurnal = j.v_id_jurnal
                 LEFT JOIN stg_prosiding_dr pr ON p.v_id_publikasi = pr.v_id_publikasi
@@ -2485,7 +2581,7 @@ def get_scholar_publikasi(current_user_id):
                     COALESCE(a.v_volume, '') AS volume,
                     COALESCE(a.v_issue, '') AS issue,
                     COALESCE(a.v_pages, '') AS pages,
-                    p.n_total_sitasi,
+                    COALESCE(p.n_total_sitasi, 0) AS n_total_sitasi,
                     p.v_sumber,
                     p.t_tanggal_unduh,
                     p.v_link_url
@@ -2714,28 +2810,16 @@ def get_scholar_publikasi_stats(current_user_id):
         cte_params = params + jurusan_params
         
         # Get aggregate statistics with median
-        if jurusan_filter:
-            # Only count publications with matching jurusan
-            stats_query = f"""
-                {latest_publikasi_cte}
-                SELECT
-                    COUNT(*) as total_publikasi,
-                    COALESCE(SUM(n_total_sitasi), 0) as total_sitasi,
-                    COALESCE(AVG(n_total_sitasi), 0) as avg_sitasi,
-                    COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY n_total_sitasi), 0) as median_sitasi
-                FROM publikasi_with_jurusan
-            """
-        else:
-            # Count all publications
-            stats_query = f"""
-                {latest_publikasi_cte}
-                SELECT
-                    COUNT(*) as total_publikasi,
-                    COALESCE(SUM(n_total_sitasi), 0) as total_sitasi,
-                    COALESCE(AVG(n_total_sitasi), 0) as avg_sitasi,
-                    COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY n_total_sitasi), 0) as median_sitasi
-                FROM latest_publikasi
-            """
+        # Always count all publikasi, not just those with jurusan
+        stats_query = f"""
+            {latest_publikasi_cte}
+            SELECT
+                COUNT(*) as total_publikasi,
+                COALESCE(SUM(p.n_total_sitasi), 0) as total_sitasi,
+                COALESCE(AVG(p.n_total_sitasi), 0) as avg_sitasi,
+                COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY p.n_total_sitasi), 0) as median_sitasi
+            FROM latest_publikasi p
+        """
         
         cur.execute(stats_query, cte_params)
         stats = cur.fetchone()
