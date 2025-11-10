@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Users, FileText, TrendingUp, Award, Calendar, BookOpen, Search } from 'lucide-react';
+import { Users, FileText, TrendingUp, Award, Calendar, BookOpen, Search, ArrowUp, ArrowDown } from 'lucide-react';
 import apiService from '../services/apiService';
 
 const Dashboard = () => {
@@ -25,7 +25,9 @@ const Dashboard = () => {
     scopus_q_breakdown: [],
     sinta_rank_breakdown: [],
     top_dosen_international: [],
-    top_dosen_national: []
+    top_dosen_national: [],
+    previous_date: null,
+    previous_values: {}
   });
   const [loading, setLoading] = useState(true);
   const [yearRange, setYearRange] = useState(10);
@@ -54,28 +56,69 @@ const Dashboard = () => {
   // Colors for charts
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
-  const StatCard = ({ title, value, icon: Icon, color, trend, subtitle }) => (
-    <div className="bg-white rounded-lg shadow-md p-6 border-l-4" style={{ borderColor: color }}>
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
-          {subtitle && (
-            <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
-          )}
-          {trend && (
-            <p className="text-sm text-green-600 mt-1">
-              <TrendingUp className="inline w-4 h-4 mr-1" />
-              {trend}
-            </p>
-          )}
-        </div>
-        <div className="p-3 rounded-full" style={{ backgroundColor: `${color}20` }}>
-          <Icon className="w-8 h-8" style={{ color }} />
+  const StatCard = ({ title, value, icon: Icon, color, subtitle, previousValue, previousDate, valueKey }) => {
+    // Extract numeric value from string (remove commas and parse)
+    const getNumericValue = (val) => {
+      if (typeof val === 'number') return val;
+      if (typeof val === 'string') {
+        // Remove commas and parse
+        const cleaned = val.replace(/,/g, '');
+        return parseFloat(cleaned) || 0;
+      }
+      return 0;
+    };
+    
+    const currentValue = getNumericValue(value);
+    const prevValue = previousValue || 0;
+    const isIncreased = currentValue > prevValue;
+    const isDecreased = currentValue < prevValue;
+    const isEqual = Math.abs(currentValue - prevValue) < 0.01; // For floating point comparison
+    
+    // Format previous value for display
+    const formatPrevValue = (val) => {
+      if (typeof val === 'number') {
+        // Check if it's a decimal (like h-index)
+        if (val % 1 !== 0) {
+          return val.toFixed(1);
+        }
+        return val.toLocaleString('id-ID');
+      }
+      return val || '0';
+    };
+    
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 border-l-4" style={{ borderColor: color }}>
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <p className="text-sm font-medium text-gray-600">{title}</p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-2xl font-bold text-gray-900">{value}</p>
+              {previousDate && !isEqual && (
+                <div className="flex items-center">
+                  {isIncreased ? (
+                    <ArrowUp className="w-5 h-5 text-green-600" />
+                  ) : isDecreased ? (
+                    <ArrowDown className="w-5 h-5 text-red-600" />
+                  ) : null}
+                </div>
+              )}
+            </div>
+            {subtitle && (
+              <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
+            )}
+            {previousDate && (
+              <p className="text-xs text-gray-500 mt-2">
+                sebelumnya {previousDate}: {formatPrevValue(prevValue)}
+              </p>
+            )}
+          </div>
+          <div className="p-3 rounded-full" style={{ backgroundColor: `${color}20` }}>
+            <Icon className="w-8 h-8" style={{ color }} />
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   if (loading) {
     return (
@@ -112,12 +155,18 @@ const Dashboard = () => {
             value={stats.total_dosen.toLocaleString()}
             icon={Users}
             color="#3B82F6"
+            previousValue={stats.previous_values?.total_dosen}
+            previousDate={stats.previous_date}
+            valueKey="total_dosen"
           />
           <StatCard
             title="Total Publikasi"
             value={stats.total_publikasi.toLocaleString()}
             icon={FileText}
             color="#10B981"
+            previousValue={stats.previous_values?.total_publikasi}
+            previousDate={stats.previous_date}
+            valueKey="total_publikasi"
           />
           <StatCard
             title="Total Sitasi"
@@ -125,6 +174,9 @@ const Dashboard = () => {
             subtitle={`GS: ${stats.total_sitasi_gs?.toLocaleString() || 0} | GS-SINTA: ${stats.total_sitasi_gs_sinta?.toLocaleString() || 0} | Scopus: ${stats.total_sitasi_scopus?.toLocaleString() || 0}`}
             icon={Award}
             color="#F59E0B"
+            previousValue={stats.previous_values?.total_sitasi}
+            previousDate={stats.previous_date}
+            valueKey="total_sitasi"
           />
           <StatCard
             title="H-Index Rata-rata"
@@ -132,6 +184,9 @@ const Dashboard = () => {
             subtitle={`Median: ${stats.median_h_index ? stats.median_h_index.toFixed(1) : '0.0'}`}
             icon={TrendingUp}
             color="#EF4444"
+            previousValue={stats.previous_values?.avg_h_index}
+            previousDate={stats.previous_date}
+            valueKey="avg_h_index"
           />
         </div>
 
@@ -142,24 +197,36 @@ const Dashboard = () => {
             value={stats.publikasi_internasional_q12.toLocaleString()}
             icon={Award}
             color="#059669"
+            previousValue={stats.previous_values?.publikasi_internasional_q12}
+            previousDate={stats.previous_date}
+            valueKey="publikasi_internasional_q12"
           />
           <StatCard
             title="Internasional (Q3-Q4/noQ)"
             value={stats.publikasi_internasional_q34_noq.toLocaleString()}
             icon={Award}
             color="#10B981"
+            previousValue={stats.previous_values?.publikasi_internasional_q34_noq}
+            previousDate={stats.previous_date}
+            valueKey="publikasi_internasional_q34_noq"
           />
           <StatCard
             title="Nasional (Sinta 1-2)"
             value={stats.publikasi_nasional_sinta12.toLocaleString()}
             icon={Award}
             color="#7C3AED"
+            previousValue={stats.previous_values?.publikasi_nasional_sinta12}
+            previousDate={stats.previous_date}
+            valueKey="publikasi_nasional_sinta12"
           />
           <StatCard
             title="Nasional (Sinta 3-4)"
             value={stats.publikasi_nasional_sinta34.toLocaleString()}
             icon={Award}
             color="#8B5CF6"
+            previousValue={stats.previous_values?.publikasi_nasional_sinta34}
+            previousDate={stats.previous_date}
+            valueKey="publikasi_nasional_sinta34"
           />
         </div>
 
@@ -170,6 +237,9 @@ const Dashboard = () => {
             value={(stats.publikasi_nasional_sinta5 + stats.publikasi_nasional_sinta6).toLocaleString()}
             icon={Award}
             color="#A78BFA"
+            previousValue={(stats.previous_values?.publikasi_nasional_sinta5 || 0) + (stats.previous_values?.publikasi_nasional_sinta6 || 0)}
+            previousDate={stats.previous_date}
+            valueKey="publikasi_nasional_sinta56"
           />
         </div>
 

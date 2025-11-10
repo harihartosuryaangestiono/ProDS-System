@@ -1403,17 +1403,17 @@ def normalize_publication_type(pub_type):
 # Example usage
 if __name__ == "__main__":
     DB_CONFIG = {
-        'dbname': 'SKM_PUBLIKASI',
-        'user': 'rayhanadjisantoso',
-        'password': 'rayhan123',
+        'dbname': 'ProDSGabungan',
+        'user': 'postgress',
+        'password': 'password123',
         'host': 'localhost',
         'port': '5432'
     } 
     
     scraper = GoogleScholarScraper(
         db_config=DB_CONFIG,
-        email="6182101017@student.unpar.ac.id",
-        password="618017SH"
+        email="6182101045@student.unpar.ac.id",
+        password="618045CD"
     )
     
     result = scraper.run(max_authors=5, scrape_from_beginning=False)
