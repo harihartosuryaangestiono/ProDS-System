@@ -29,9 +29,9 @@ import os
 
 # Database connection parameters
 DB_PARAMS = {
-    'dbname': 'ProDSGabungan',
-    'user': 'postgres',
-    'password': 'hari123',
+    'dbname': 'SKM_PUBLIKASI',
+    'user': 'rayhanadjisantoso',
+    'password': 'rayhan123',
     'host': 'localhost',
     'port': '5432'
 }

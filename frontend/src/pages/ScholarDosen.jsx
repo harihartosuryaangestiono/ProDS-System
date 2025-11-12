@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, TrendingUp, Award, Calendar, ExternalLink, Building2, GraduationCap, RefreshCw, Search } from 'lucide-react';
+import { Users, TrendingUp, Award, Calendar, ExternalLink, Building2, GraduationCap, RefreshCw, Search, ArrowUp, ArrowDown } from 'lucide-react';
 import apiService from '../services/apiService';
 import { toast } from 'react-hot-toast';
 
@@ -24,7 +24,9 @@ const ScholarDosen = () => {
     totalPublikasi: 0,
     totalSitasi: 0,
     avgHIndex: 0,
-    medianHIndex: 0
+    medianHIndex: 0,
+    previousDate: null,
+    previousValues: {}
   });
 
   const perPage = 20;
@@ -143,7 +145,9 @@ const ScholarDosen = () => {
           totalPublikasi: response.data.totalPublikasi || 0,
           totalSitasi: response.data.totalSitasi || 0,
           avgHIndex: response.data.avgHIndex || 0,
-          medianHIndex: response.data.medianHIndex || 0
+          medianHIndex: response.data.medianHIndex || 0,
+          previousDate: response.data.previousDate || null,
+          previousValues: response.data.previousValues || {}
         });
       } else {
         console.error('Error fetching Scholar dosen stats:', response.error);
@@ -215,30 +219,73 @@ const ScholarDosen = () => {
     });
   };
 
-  const StatCard = ({ title, value, icon: Icon, color, subtitle, loading }) => (
-    <div className="bg-white rounded-lg shadow-md p-6 border-l-4" style={{ borderColor: color }}>
-      <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          {loading ? (
-            <div className="mt-2 h-8 w-24 bg-gray-200 animate-pulse rounded"></div>
-          ) : (
-            <>
-              <p className="text-2xl font-bold text-gray-900">
-                {typeof value === 'string' ? value : value.toLocaleString()}
-              </p>
-              {subtitle && (
-                <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
-              )}
-            </>
-          )}
-        </div>
-        <div className="p-3 rounded-full" style={{ backgroundColor: `${color}20` }}>
-          <Icon className="w-8 h-8" style={{ color }} />
+  const StatCard = ({ title, value, icon: Icon, color, subtitle, loading, previousValue, previousDate }) => {
+    const getNumericValue = (val) => {
+      if (typeof val === 'number') return val;
+      if (typeof val === 'string') {
+        const cleaned = val.replace(/,/g, '');
+        return parseFloat(cleaned) || 0;
+      }
+      return 0;
+    };
+    
+    const currentValue = getNumericValue(value);
+    const prevValue = previousValue || 0;
+    const isIncreased = currentValue > prevValue;
+    const isDecreased = currentValue < prevValue;
+    const isEqual = Math.abs(currentValue - prevValue) < 0.01;
+    
+    const formatPrevValue = (val) => {
+      if (typeof val === 'number') {
+        if (val % 1 !== 0) {
+          return val.toFixed(1);
+        }
+        return val.toLocaleString('id-ID');
+      }
+      return val || '0';
+    };
+    
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 border-l-4" style={{ borderColor: color }}>
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <p className="text-sm font-medium text-gray-600">{title}</p>
+            {loading ? (
+              <div className="mt-2 h-8 w-24 bg-gray-200 animate-pulse rounded"></div>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-2xl font-bold text-gray-900">
+                    {typeof value === 'string' ? value : value.toLocaleString()}
+                  </p>
+                  {previousDate && !isEqual && (
+                    <div className="flex items-center">
+                      {isIncreased ? (
+                        <ArrowUp className="w-5 h-5 text-green-600" />
+                      ) : isDecreased ? (
+                        <ArrowDown className="w-5 h-5 text-red-600" />
+                      ) : null}
+                    </div>
+                  )}
+                </div>
+                {subtitle && (
+                  <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
+                )}
+                {previousDate && (
+                  <p className="text-xs text-gray-500 mt-2">
+                    sebelumnya {previousDate}: {formatPrevValue(prevValue)}
+                  </p>
+                )}
+              </>
+            )}
+          </div>
+          <div className="p-3 rounded-full" style={{ backgroundColor: `${color}20` }}>
+            <Icon className="w-8 h-8" style={{ color }} />
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const sortedData = getSortedData();
 
@@ -261,6 +308,8 @@ const ScholarDosen = () => {
             icon={Users}
             color="#DC2626"
             loading={statsLoading}
+            previousValue={stats.previousValues?.totalDosen}
+            previousDate={stats.previousDate}
           />
           <StatCard
             title="Total Publikasi"
@@ -268,6 +317,8 @@ const ScholarDosen = () => {
             icon={TrendingUp}
             color="#059669"
             loading={statsLoading}
+            previousValue={stats.previousValues?.totalPublikasi}
+            previousDate={stats.previousDate}
           />
           <StatCard
             title="Total Sitasi"
@@ -275,6 +326,8 @@ const ScholarDosen = () => {
             icon={Award}
             color="#D97706"
             loading={statsLoading}
+            previousValue={stats.previousValues?.totalSitasi}
+            previousDate={stats.previousDate}
           />
           <StatCard
             title="Rata-rata H-Index"
@@ -283,6 +336,8 @@ const ScholarDosen = () => {
             color="#7C3AED"
             subtitle={`Median: ${stats.medianHIndex}`}
             loading={statsLoading}
+            previousValue={stats.previousValues?.avgHIndex}
+            previousDate={stats.previousDate}
           />
         </div>
 

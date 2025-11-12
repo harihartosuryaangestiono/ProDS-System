@@ -79,10 +79,11 @@ apiService.interceptors.response.use(
 const handleResponse = async (apiCall, errorMessage = 'API request failed') => {
   try {
     const response = await apiCall();
-    return {
-      success: true,
-      data: response.data
-    };
+    
+    // Backend sudah return { success: true, data: {...} }
+    // Jadi langsung return response.data
+    return response.data;  // ✅ PERBAIKAN INI
+    
   } catch (error) {
     console.error(errorMessage, error);
     
@@ -257,10 +258,45 @@ apiService.getScholarDepartments = async (faculty) => {
 // Dashboard API Functions
 // ===================================
 
-apiService.getDashboardStats = async () => {
+apiService.getDashboardStats = async (faculty = '', department = '') => {
+  console.log('🔧 API Service - getDashboardStats called with:', { faculty, department });
+  
+  const params = {};
+  if (faculty) params.faculty = faculty;
+  if (department) params.department = department;
+  
+  console.log('🔧 API Service - params:', params);
+  
+  try {
+    const result = await handleResponse(
+      () => apiService.get('/api/dashboard/stats', { params }),
+      'Error fetching dashboard statistics'
+    );
+    
+    console.log('🔧 API Service - result:', result);
+    return result;
+  } catch (error) {
+    console.error('🔧 API Service - ERROR:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+};
+
+apiService.getDashboardFaculties = async () => {
   return handleResponse(
-    () => apiService.get('/api/dashboard/stats'),
-    'Error fetching dashboard stats'
+    () => apiService.get('/api/dashboard/faculties'),
+    'Error fetching dashboard faculties'
+  );
+};
+
+apiService.getDashboardDepartments = async (faculty) => {
+  return handleResponse(
+    () => apiService.get('/api/dashboard/departments', { 
+      params: { faculty } 
+    }),
+    'Error fetching dashboard departments'
   );
 };
 
