@@ -30,7 +30,9 @@ const SintaPublikasi = () => {
     totalSitasi: 0,
     avgSitasi: 0,
     medianSitasi: 0,
-    recentPublikasi: 0
+    recentPublikasi: 0,
+    previousDate: null,
+    previousValues: {}
   });
   const perPage = 20;
 
@@ -126,29 +128,12 @@ const SintaPublikasi = () => {
       
       const params = { search: searchTerm };
       
-      if (filterTipe !== 'all') {
-        params.tipe = filterTipe;
-      }
-      
-      if (filterTerindeks !== 'all') {
-        params.terindeks = filterTerindeks;
-      }
-      
-      if (yearStart) {
-        params.year_start = yearStart;
-      }
-      
-      if (yearEnd) {
-        params.year_end = yearEnd;
-      }
-
-      if (selectedFaculty) {
-        params.faculty = selectedFaculty;
-      }
-
-      if (selectedDepartment) {
-        params.department = selectedDepartment;
-      }
+      if (filterTipe !== 'all') params.tipe = filterTipe;
+      if (filterTerindeks !== 'all') params.terindeks = filterTerindeks;
+      if (yearStart) params.year_start = yearStart;
+      if (yearEnd) params.year_end = yearEnd;
+      if (selectedFaculty) params.faculty = selectedFaculty;
+      if (selectedDepartment) params.department = selectedDepartment;
       
       const response = await apiService.getSintaPublikasiStats(params);
 
@@ -178,14 +163,13 @@ const SintaPublikasi = () => {
           totalSitasi: response.data.totalSitasi || 0,
           avgSitasi: response.data.avgSitasi || 0,
           medianSitasi: response.data.medianSitasi || 0,
-          recentPublikasi
+          recentPublikasi,
+          previousDate: response.data.previousDate || null,
+          previousValues: response.data.previousValues || {}
         });
-      } else {
-        await fetchAllDataForStats();
       }
     } catch (error) {
       console.error('Error fetching aggregate stats:', error);
-      await fetchAllDataForStats();
     } finally {
       setStatsLoading(false);
     }
@@ -393,30 +377,73 @@ const SintaPublikasi = () => {
     });
   };
 
-  const StatCard = ({ title, value, icon: Icon, color, subtitle, loading }) => (
-    <div className="bg-white rounded-lg shadow-md p-6 border-l-4" style={{ borderColor: color }}>
-      <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          {loading ? (
-            <div className="mt-2 h-8 w-24 bg-gray-200 animate-pulse rounded"></div>
-          ) : (
-            <>
-              <p className="text-2xl font-bold text-gray-900">
-                {typeof value === 'string' ? value : value.toLocaleString()}
-              </p>
-              {subtitle && (
-                <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
-              )}
-            </>
-          )}
-        </div>
-        <div className="p-3 rounded-full" style={{ backgroundColor: `${color}20` }}>
-          <Icon className="w-8 h-8" style={{ color }} />
+  const StatCard = ({ title, value, icon: Icon, color, subtitle, loading, previousValue, previousDate }) => {
+    const getNumericValue = (val) => {
+      if (typeof val === 'number') return val;
+      if (typeof val === 'string') {
+        const cleaned = val.replace(/,/g, '');
+        return parseFloat(cleaned) || 0;
+      }
+      return 0;
+    };
+
+    const currentValue = getNumericValue(value);
+    const prevValue = previousValue || 0;
+    const isIncreased = currentValue > prevValue;
+    const isDecreased = currentValue < prevValue;
+    const isEqual = Math.abs(currentValue - prevValue) < 0.01;
+
+    const formatPrevValue = (val) => {
+      if (typeof val === 'number') {
+        if (val % 1 !== 0) {
+          return val.toFixed(1);
+        }
+        return val.toLocaleString('id-ID');
+      }
+      return val || '0';
+    };
+
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 border-l-4" style={{ borderColor: color }}>
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <p className="text-sm font-medium text-gray-600">{title}</p>
+            {loading ? (
+              <div className="mt-2 h-8 w-24 bg-gray-200 animate-pulse rounded"></div>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-2xl font-bold text-gray-900">
+                    {typeof value === 'string' ? value : value.toLocaleString()}
+                  </p>
+                  {previousDate && !isEqual && (
+                    <div className="flex items-center">
+                      {isIncreased ? (
+                        <ArrowUp className="w-5 h-5 text-green-600" />
+                      ) : isDecreased ? (
+                        <ArrowDown className="w-5 h-5 text-red-600" />
+                      ) : null}
+                    </div>
+                  )}
+                </div>
+                {subtitle && (
+                  <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
+                )}
+                {previousDate && (
+                  <p className="text-xs text-gray-500 mt-2">
+                    sebelumnya {previousDate}: {formatPrevValue(prevValue)}
+                  </p>
+                )}
+              </>
+            )}
+          </div>
+          <div className="p-3 rounded-full" style={{ backgroundColor: `${color}20` }}>
+            <Icon className="w-8 h-8" style={{ color }} />
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const sortedData = getSortedData();
 
@@ -439,6 +466,8 @@ const SintaPublikasi = () => {
             icon={FileText}
             color="#6366F1"
             loading={statsLoading}
+            previousValue={aggregateStats.previousValues?.totalPublikasi}
+            previousDate={aggregateStats.previousDate}
           />
           <StatCard
             title="Total Sitasi"
@@ -446,6 +475,8 @@ const SintaPublikasi = () => {
             icon={Award}
             color="#059669"
             loading={statsLoading}
+            previousValue={aggregateStats.previousValues?.totalSitasi}
+            previousDate={aggregateStats.previousDate}
           />
           <StatCard
             title="Rata-rata Sitasi"
@@ -454,6 +485,8 @@ const SintaPublikasi = () => {
             color="#D97706"
             subtitle={`Median: ${aggregateStats.medianSitasi}`}
             loading={statsLoading}
+            previousValue={aggregateStats.previousValues?.avgSitasi}
+            previousDate={aggregateStats.previousDate}
           />
           <StatCard
             title="Publikasi Terbaru"
@@ -462,6 +495,8 @@ const SintaPublikasi = () => {
             color="#7C3AED"
             subtitle="2 tahun terakhir"
             loading={statsLoading}
+            previousValue={aggregateStats.previousValues?.recentPublikasi}
+            previousDate={aggregateStats.previousDate}
           />
         </div>
 

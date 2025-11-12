@@ -1403,9 +1403,9 @@ def normalize_publication_type(pub_type):
 # Example usage
 if __name__ == "__main__":
     DB_CONFIG = {
-        'dbname': 'ProDSGabungan',
-        'user': 'postgress',
-        'password': 'password123',
+        'dbname': 'SKM_PUBLIKASI',
+        'user': 'rayhanadjisantoso',
+        'password': 'rayhan123',
         'host': 'localhost',
         'port': '5432'
     } 

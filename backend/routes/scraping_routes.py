@@ -461,6 +461,311 @@ def scrape_google_scholar():
             'error': str(e),
             'traceback': traceback.format_exc()
         }), 500
+    
+def run_google_scholar_dosen_scraping(job_id, max_pages, search_query):
+    """Run Google Scholar dosen scraping in background thread with auto-login"""
+    try:
+        # Import fungsi dari dosen_unpar.py
+        from dosen_unpar import get_all_unpar_scholars
+        
+        active_jobs[job_id] = {
+            'status': 'running',
+            'current': 0,
+            'total': max_pages * 10,  # Estimasi 10 dosen per halaman
+            'message': 'Initializing scraper with auto-login...',
+            'started_at': datetime.now().isoformat()
+        }
+        
+        emit_progress(job_id, active_jobs[job_id])
+        
+        # Update status: auto-login in progress
+        active_jobs[job_id]['status'] = 'logging_in'
+        active_jobs[job_id]['message'] = 'Auto-login in progress... This may take a few minutes.'
+        emit_progress(job_id, active_jobs[job_id])
+        
+        # Run scraping dengan auto-login (driver dibuat otomatis di dalam fungsi)
+        # Fungsi akan membuat driver sendiri dengan auto-login
+        scholars_data = get_all_unpar_scholars(
+            max_pages=max_pages,
+            driver=None,  # Driver akan dibuat otomatis
+            search_query=search_query
+        )
+        
+        # Process results
+        if scholars_data:
+            import pandas as pd
+            df = pd.DataFrame(scholars_data)
+            
+            # Remove duplicates
+            df_clean = df.drop_duplicates(subset=["Profile URL"])
+            
+            # Update status: saving to database
+            active_jobs[job_id]['status'] = 'saving'
+            active_jobs[job_id]['message'] = f'Scraping complete. Saving {len(df_clean)} scholars to database...'
+            emit_progress(job_id, active_jobs[job_id])
+            
+            # Save to database
+            from utils.database import get_db_connection
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            inserted = 0
+            updated = 0
+            
+            for idx, row in df_clean.iterrows():
+                try:
+                    # Check if scholar already exists
+                    cursor.execute(
+                        "SELECT id FROM dosen WHERE id_google_scholar = %s",
+                        (row['ID Google Scholar'],)
+                    )
+                    existing = cursor.fetchone()
+                    
+                    if existing:
+                        # Update existing record
+                        cursor.execute("""
+                            UPDATE dosen 
+                            SET nama = %s, citations = %s, profile_url_gs = %s, updated_at = NOW()
+                            WHERE id_google_scholar = %s
+                        """, (row['Name'], row['Citations'], row['Profile URL'], row['ID Google Scholar']))
+                        updated += 1
+                    else:
+                        # Insert new record
+                        cursor.execute("""
+                            INSERT INTO dosen (id_google_scholar, nama, afiliasi, citations, profile_url_gs, created_at)
+                            VALUES (%s, %s, %s, %s, %s, NOW())
+                        """, (row['ID Google Scholar'], row['Name'], row['Affiliation'], 
+                              row['Citations'], row['Profile URL']))
+                        inserted += 1
+                    
+                    # Update progress
+                    current = inserted + updated
+                    active_jobs[job_id]['current'] = current
+                    active_jobs[job_id]['message'] = f'Saving: {current}/{len(df_clean)} scholars'
+                    emit_progress(job_id, active_jobs[job_id])
+                    
+                except Exception as e:
+                    print(f"Warning: Error processing scholar {row.get('Name', 'Unknown')}: {e}")
+                    continue
+            
+            conn.commit()
+            cursor.close()
+            conn.close()
+            
+            result = {
+                'success': True,
+                'message': f'Successfully scraped and saved {len(df_clean)} scholars',
+                'summary': {
+                    'total_scraped': len(df_clean),
+                    'inserted': inserted,
+                    'updated': updated
+                }
+            }
+        else:
+            result = {
+                'success': False,
+                'message': 'No scholars data found. This might be due to login failure or no results.',
+                'summary': {
+                    'total_scraped': 0,
+                    'inserted': 0,
+                    'updated': 0
+                }
+            }
+        
+        active_jobs[job_id]['status'] = 'completed'
+        active_jobs[job_id]['message'] = result['message']
+        active_jobs[job_id]['completed_at'] = datetime.now().isoformat()
+        active_jobs[job_id]['result'] = result
+        
+        emit_progress(job_id, {
+            'status': 'completed',
+            'message': result['message'],
+            'summary': result.get('summary', {})
+        })
+        
+    except Exception as e:
+        import traceback
+        error_msg = str(e)
+        traceback_msg = traceback.format_exc()
+        
+        print(f"\n❌ ERROR: {error_msg}")
+        print(f"Traceback:\n{traceback_msg}")
+        
+        active_jobs[job_id]['status'] = 'failed'
+        active_jobs[job_id]['message'] = error_msg
+        active_jobs[job_id]['error'] = error_msg
+        active_jobs[job_id]['traceback'] = traceback_msg
+        active_jobs[job_id]['failed_at'] = datetime.now().isoformat()
+        
+        emit_progress(job_id, {
+            'status': 'failed',
+            'error': error_msg
+        })
+
+@scraping_bp.route('/api/scraping/googlescholar/dosen', methods=['POST'])
+def scrape_google_scholar_dosen():
+    """
+    Endpoint to start Google Scholar dosen profile scraping with auto-login
+    
+    Request Body:
+    {
+        "max_pages": 100,  // optional, default: 100
+        "search_query": "..." // optional, default: UNPAR query
+    }
+    
+    Response:
+    {
+        "success": true,
+        "message": "...",
+        "job_id": "gs_dosen_20250110_123456",
+        "instructions": "..."
+    }
+    """
+    try:
+        data = request.get_json() or {}
+        max_pages = data.get('max_pages', 100)
+        search_query = data.get('search_query', '"Universitas Katolik Parahyangan" OR "Parahyangan Catholic University" OR "unpar"')
+        
+        # Validate input
+        if not isinstance(max_pages, int) or max_pages <= 0:
+            return jsonify({
+                'success': False,
+                'error': 'max_pages must be a positive integer'
+            }), 400
+        
+        # Limit max_pages to prevent abuse
+        if max_pages > 500:
+            return jsonify({
+                'success': False,
+                'error': 'max_pages cannot exceed 500'
+            }), 400
+        
+        if not search_query or not isinstance(search_query, str):
+            return jsonify({
+                'success': False,
+                'error': 'search_query must be a non-empty string'
+            }), 400
+        
+        # Generate job ID
+        job_id = f"gs_dosen_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        # Initialize job
+        active_jobs[job_id] = {
+            'status': 'starting',
+            'current': 0,
+            'total': max_pages * 10,
+            'message': 'Initializing Google Scholar dosen scraping with auto-login...',
+            'started_at': datetime.now().isoformat()
+        }
+        
+        # Start scraping in background thread
+        thread = threading.Thread(
+            target=run_google_scholar_dosen_scraping,
+            args=(job_id, max_pages, search_query)
+        )
+        thread.daemon = True
+        thread.start()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Google Scholar dosen scraping started with auto-login.',
+            'job_id': job_id,
+            'instructions': 'The scraper will automatically login using the configured accounts. No manual action required.',
+            'max_pages': max_pages,
+            'search_query': search_query
+        }), 200
+    
+    except Exception as e:
+        import traceback
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }), 500
+
+
+@scraping_bp.route('/api/scraping/googlescholar/dosen/status/<job_id>', methods=['GET'])
+def get_scraping_status(job_id):
+    """
+    Get status of a scraping job
+    
+    Response:
+    {
+        "success": true,
+        "job_id": "gs_dosen_20250110_123456",
+        "status": "running|completed|failed",
+        "current": 50,
+        "total": 1000,
+        "message": "...",
+        "started_at": "2025-01-10T12:34:56",
+        "completed_at": "2025-01-10T12:45:30",  // if completed
+        "result": {...}  // if completed
+    }
+    """
+    try:
+        if job_id not in active_jobs:
+            return jsonify({
+                'success': False,
+                'error': f'Job {job_id} not found'
+            }), 404
+        
+        job_data = active_jobs[job_id]
+        
+        return jsonify({
+            'success': True,
+            'job_id': job_id,
+            **job_data
+        }), 200
+    
+    except Exception as e:
+        import traceback
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }), 500
+
+
+@scraping_bp.route('/api/scraping/googlescholar/dosen/jobs', methods=['GET'])
+def list_scraping_jobs():
+    """
+    List all scraping jobs
+    
+    Response:
+    {
+        "success": true,
+        "jobs": [
+            {
+                "job_id": "gs_dosen_20250110_123456",
+                "status": "completed",
+                "message": "...",
+                ...
+            }
+        ]
+    }
+    """
+    try:
+        jobs_list = [
+            {'job_id': job_id, **job_data}
+            for job_id, job_data in active_jobs.items()
+        ]
+        
+        # Sort by started_at (newest first)
+        jobs_list.sort(key=lambda x: x.get('started_at', ''), reverse=True)
+        
+        return jsonify({
+            'success': True,
+            'jobs': jobs_list,
+            'total': len(jobs_list)
+        }), 200
+    
+    except Exception as e:
+        import traceback
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }), 500
 
 # ============================================================================
 # JOB MANAGEMENT ROUTES - CRITICAL FIX!

@@ -17,6 +17,10 @@ const ScrapingDashboard = () => {
     maxAuthors: 473,
     scrapeFromBeginning: false
   });
+  const [gsDosenConfig, setGsDosenConfig] = useState({
+    maxPages: 100,
+    searchQuery: '"Universitas Katolik Parahyangan" OR "Parahyangan Catholic University" OR "unpar"'
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [scrapingProgress, setScrapingProgress] = useState(null);
   const [scrapingResults, setScrapingResults] = useState(null);
@@ -137,6 +141,14 @@ useEffect(() => {
     setDosenConfig(prev => ({
       ...prev,
       [name]: numValue
+    }));
+  };
+
+  const handleGsDosenConfigChange = (e) => {
+    const { name, value } = e.target;
+    setGsDosenConfig(prev => ({
+      ...prev,
+      [name]: name === 'maxPages' ? parseInt(value) || 1 : value
     }));
   };
 
@@ -314,6 +326,51 @@ useEffect(() => {
     }
   };
 
+  const handleGoogleScholarDosen = async () => {
+    setIsLoading(true);
+    setScrapingResults(null);
+    setScrapingProgress({
+      status: 'starting',
+      message: 'Memulai scraping dosen Google Scholar...',
+      currentCount: 0,
+      targetCount: gsDosenConfig.maxPages * 10 // Estimasi 10 dosen per halaman
+    });
+
+    try {
+      const response = await fetch('/api/scraping/googlescholar/dosen', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          max_pages: gsDosenConfig.maxPages,
+          search_query: gsDosenConfig.searchQuery
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setCurrentJobId(data.job_id);
+        if (data.instructions) {
+          alert(data.instructions);
+        }
+      } else {
+        setScrapingResults({
+          success: false,
+          error: data.error
+        });
+        setIsLoading(false);
+      }
+    } catch (error) {
+      setScrapingResults({
+        success: false,
+        error: 'Network error: ' + error.message
+      });
+      setIsLoading(false);
+    }
+  };
+
   const cancelCurrentJob = async () => {
     if (!currentJobId) return;
     try {
@@ -416,8 +473,15 @@ useEffect(() => {
               onClick={() => setActiveTab('sinta-garuda')}
             />
             <TabButton
+              id="gs-dosen"
+              label="GS Dosen"
+              icon={User}
+              isActive={activeTab === 'gs-dosen'}
+              onClick={() => setActiveTab('gs-dosen')}
+            />
+            <TabButton
               id="google-scholar"
-              label="Google Scholar"
+              label="GS Publikasi"
               icon={Globe}
               isActive={activeTab === 'google-scholar'}
               onClick={() => setActiveTab('google-scholar')}
@@ -493,7 +557,7 @@ useEffect(() => {
         )}
 
         {/* SINTA Credentials (Common for SINTA tabs) */}
-        {activeTab !== 'google-scholar' && (
+        {activeTab !== 'google-scholar' && activeTab !== 'gs-dosen' && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Kredensial SINTA</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -842,6 +906,89 @@ useEffect(() => {
             </div>
           )}
 
+          {activeTab === 'gs-dosen' && (
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Scraping Google Scholar Dosen</h3>
+              
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                <div className="flex">
+                  <AlertCircle className="h-5 w-5 text-blue-400" />
+                  <div className="ml-3">
+                    <p className="text-sm text-blue-700">
+                      Scraping profil dosen langsung dari Google Scholar. 
+                      Browser akan terbuka untuk scraping ke Google Scholar.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Target className="w-4 h-4 inline mr-1" />
+                    Max Pages
+                  </label>
+                  <input
+                    type="number"
+                    name="maxPages"
+                    value={gsDosenConfig.maxPages}
+                    onChange={handleGsDosenConfigChange}
+                    min="1"
+                    max="1000"
+                    disabled={isLoading}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Maksimal halaman yang akan di-scrape (setiap halaman berisi ~10 profil)
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={handleGoogleScholarDosen}
+                  disabled={isLoading}
+                  className="flex-1 flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader className="animate-spin -ml-1 mr-3 h-5 w-5" />
+                      Sedang Scraping...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="-ml-1 mr-3 h-5 w-5" />
+                      Mulai Scraping Dosen
+                    </>
+                  )}
+                </button>
+                {isLoading && currentJobId && (
+                  <button
+                    onClick={cancelCurrentJob}
+                    disabled={isCancelling}
+                    className={`inline-flex items-center px-4 py-3 rounded-md text-white text-sm font-medium transition-colors ${
+                      isCancelling 
+                        ? 'bg-gray-400 cursor-wait' 
+                        : 'bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
+                    }`}
+                  >
+                    {isCancelling ? (
+                      <>
+                        <Loader className="w-4 h-4 mr-2 animate-spin" />
+                        Menghentikan...
+                      </>
+                    ) : (
+                      <>
+                        <Square className="w-4 h-4 mr-2" />
+                        Stop
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {activeTab === 'google-scholar' && (
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Scraping Google Scholar</h3>
@@ -852,7 +999,7 @@ useEffect(() => {
                   <div className="ml-3">
                     <p className="text-sm text-blue-700">
                       Scraping langsung dari Google Scholar (tidak melalui SINTA).
-                      Browser akan terbuka untuk login manual ke Google Scholar.
+                      Browser akan terbuka untuk scraping ke Google Scholar.
                     </p>
                   </div>
                 </div>
