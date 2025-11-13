@@ -31,7 +31,7 @@ import os
 DB_PARAMS = {
     'dbname': 'ProDSGabungan',
     'user': 'postgres',
-    'password': 'password123',
+    'password': 'hari123',
     'host': 'localhost',
     'port': '5432'
 }
@@ -125,24 +125,31 @@ def setup_driver():
     
     # Gunakan ChromeDriverManager
     try:
-        service = Service(ChromeDriverManager().install())
-        
-        # For macOS: Remove quarantine attribute if needed
+        driver_path = ChromeDriverManager().install()
+
+        # webdriver_manager may return a metadata file; correct it to the actual binary if needed
+        if os.path.basename(driver_path) != 'chromedriver':
+            driver_dir = os.path.dirname(driver_path)
+            candidate_path = os.path.join(driver_dir, 'chromedriver')
+            if os.path.exists(candidate_path):
+                driver_path = candidate_path
+
+        # Ensure proper permissions and remove quarantine attribute on macOS
         import platform
         import subprocess
+        try:
+            os.chmod(driver_path, 0o755)
+        except Exception as chmod_error:
+            print(f"Warning: Tidak dapat mengatur permission chromedriver: {chmod_error}")
+
         if platform.system() == 'Darwin':  # macOS
-            driver_path = service.path
             try:
-                # Remove quarantine attribute
-                subprocess.run(['xattr', '-d', 'com.apple.quarantine', driver_path], 
-                             capture_output=True, check=False)
-                # Set executable permission
-                subprocess.run(['chmod', '+x', driver_path], 
-                             capture_output=True, check=False)
-                print(f"✓ Fixed ChromeDriver permissions for macOS")
+                subprocess.run(['xattr', '-d', 'com.apple.quarantine', driver_path],
+                               capture_output=True, check=False)
             except Exception as perm_error:
-                print(f"Warning: Could not fix permissions: {perm_error}")
+                print(f"Warning: Tidak dapat menghapus atribut quarantine: {perm_error}")
         
+        service = Service(driver_path)
         driver = webdriver.Chrome(service=service, options=chrome_options)
         
     except Exception as e:

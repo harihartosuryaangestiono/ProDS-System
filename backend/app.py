@@ -56,7 +56,7 @@ socketio = SocketIO(app,
 DB_CONFIG = {
     'dbname': os.environ.get('DB_NAME', 'ProDSGabungan'),
     'user': os.environ.get('DB_USER', 'postgres'),
-    'password': os.environ.get('DB_PASSWORD', 'password123'),
+    'password': os.environ.get('DB_PASSWORD', 'hari123'),
     'host': os.environ.get('DB_HOST', 'localhost'),
     'port': os.environ.get('DB_PORT', '5432')
 }
