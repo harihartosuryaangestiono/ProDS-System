@@ -45,7 +45,7 @@ except ImportError as e:
     DB_CONFIG = {
         'dbname': 'ProDSGabungan',
         'user': 'postgres',
-        'password': 'password123',
+        'password': 'hari123',
         'host': 'localhost',
         'port': '5432'
     }
@@ -78,8 +78,8 @@ def print_footer(title, success=True):
 # SINTA DOSEN SCRAPING TASK
 # ============================================================================
 
-def scrape_sinta_dosen_task(username, password, affiliation_id, target_dosen, 
-                            max_pages, max_cycles, job_id=None):
+def scrape_sinta_dosen_task(username, password, affiliation_id=None, target_dosen=None,
+                            max_pages=None, max_cycles=None, job_id=None):
     """
     Real scraping task for SINTA Dosen
     
@@ -102,11 +102,19 @@ def scrape_sinta_dosen_task(username, password, affiliation_id, target_dosen,
     
     print_header("SINTA DOSEN SCRAPING TASK - REAL MODE", job_id)
     
+    affiliation_id = affiliation_id or '1397'
+    target_dosen = int(target_dosen) if target_dosen not in (None, '') else None
+    max_pages = int(max_pages) if max_pages not in (None, '') else None
+    max_cycles = int(max_cycles) if max_cycles not in (None, '') else 20
+
+    target_display = target_dosen if target_dosen is not None else 'auto (metadata)'
+    pages_display = max_pages if max_pages is not None else 'auto (metadata)'
+
     print(f"📊 Configuration:")
     print(f"   - Username: {username}")
     print(f"   - Affiliation ID: {affiliation_id}")
-    print(f"   - Target Dosen: {target_dosen}")
-    print(f"   - Max Pages/Cycle: {max_pages}")
+    print(f"   - Target Dosen: {target_display}")
+    print(f"   - Max Pages/Cycle: {pages_display}")
     print(f"   - Max Cycles: {max_cycles}")
     print(f"   - Database: {DB_CONFIG['dbname']}\n")
     
@@ -137,7 +145,7 @@ def scrape_sinta_dosen_task(username, password, affiliation_id, target_dosen,
                 'status': 'running',
                 'message': 'Importing scraper modules...',
                 'current': 0,
-                'total': target_dosen
+                'total': target_dosen or 0
             })
             emit_progress(job_id, active_jobs[job_id])
         if cancel_requested():
@@ -165,7 +173,7 @@ def scrape_sinta_dosen_task(username, password, affiliation_id, target_dosen,
         # Update progress
         if job_id and active_jobs and emit_progress:
             active_jobs[job_id].update({
-                'message': f'Starting scraping process (target: {target_dosen} dosen)...'
+                'message': f'Starting scraping process (target: {target_display})...'
             })
             emit_progress(job_id, active_jobs[job_id])
         if cancel_requested():
@@ -184,18 +192,53 @@ def scrape_sinta_dosen_task(username, password, affiliation_id, target_dosen,
         if job_id and active_jobs and emit_progress:
             active_jobs[job_id].update({
                 'current': current_count,
-                'message': f'Current: {current_count}/{target_dosen} dosen. Starting scraping...'
+                'message': f'Current: {current_count}/{target_display} dosen. Starting scraping...'
             })
             emit_progress(job_id, active_jobs[job_id])
         if cancel_requested():
             return finalize_cancel()
         
+        def report_progress(event, payload):
+            if not (job_id and active_jobs and emit_progress):
+                return
+            job_state = active_jobs.get(job_id, {})
+            if event == 'metadata_detected':
+                detected_target = payload.get('target_dosen')
+                detected_pages = payload.get('max_pages')
+                message_parts = []
+                if detected_target:
+                    message_parts.append(f"Target otomatis: {detected_target} dosen")
+                    job_state['total'] = detected_target
+                else:
+                    message_parts.append("Target otomatis tidak ditemukan")
+                if detected_pages:
+                    message_parts.append(f"{detected_pages} halaman per siklus")
+                job_state['message'] = ' | '.join(message_parts)
+            elif event == 'cycle_update':
+                job_state['current'] = payload.get('current_count', job_state.get('current', 0))
+                job_state['message'] = payload.get('message', job_state.get('message'))
+            active_jobs[job_id] = job_state
+            emit_progress(job_id, job_state)
+
+        # Pass cancel check function to scraper
         final_count = scraper.scrape_until_target_reached(
             affiliation_id=affiliation_id,
             target_dosen=target_dosen,
             max_pages=max_pages,
-            max_cycles=max_cycles
+            max_cycles=max_cycles,
+            progress_callback=report_progress,
+            cancel_check=cancel_requested
         )
+        
+        # Check if cancelled after scraping
+        if cancel_requested():
+            scraper.close()
+            return finalize_cancel('Scraping dihentikan oleh user')
+
+        detected_target = scraper.detected_target or target_dosen
+        detected_pages = scraper.detected_pages or max_pages
+        detected_target_display = detected_target if detected_target is not None else 'auto'
+        detected_pages_display = detected_pages if detected_pages is not None else 'auto'
         
         elapsed_time = time.time() - start_time
         
@@ -207,7 +250,8 @@ def scrape_sinta_dosen_task(username, password, affiliation_id, target_dosen,
         if job_id and active_jobs and emit_progress:
             active_jobs[job_id].update({
                 'current': final_count,
-                'message': f'Completed! {final_count} dosen scraped successfully'
+                'total': detected_target if isinstance(detected_target, int) else final_count,
+                'message': f'Completed! {final_count} dosen scraped successfully (target {detected_target_display}, pages {detected_pages_display})'
             })
             emit_progress(job_id, active_jobs[job_id])
         
@@ -220,8 +264,10 @@ def scrape_sinta_dosen_task(username, password, affiliation_id, target_dosen,
         # Prepare result
         result = {
             'success': True,
-            'message': f'✅ Scraping berhasil! Total {final_count} dosen unik tersimpan',
+            'message': f'✅ Scraping berhasil! Total {final_count} dosen unik tersimpan (target {detected_target_display})',
             'final_count': final_count,
+            'detected_target': detected_target,
+            'detected_pages': detected_pages,
             'elapsed_time_minutes': round(elapsed_time/60, 2),
             'summary': summary
         }

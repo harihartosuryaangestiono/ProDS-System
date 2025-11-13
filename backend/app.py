@@ -56,7 +56,7 @@ socketio = SocketIO(app,
 DB_CONFIG = {
     'dbname': os.environ.get('DB_NAME', 'ProDSGabungan'),
     'user': os.environ.get('DB_USER', 'postgres'),
-    'password': os.environ.get('DB_PASSWORD', 'password123'),
+    'password': os.environ.get('DB_PASSWORD', 'hari123'),
     'host': os.environ.get('DB_HOST', 'localhost'),
     'port': os.environ.get('DB_PORT', '5432')
 }
@@ -863,7 +863,8 @@ def dashboard_stats(current_user_id):
         # TOP DOSEN BERDASARKAN PUBLIKASI
         # ===================================
 
-        # Top 10 Dosen Internasional (Scopus)
+        # Top 10 Dosen Internasional (Scopus) - mengambil semua publikasi terindeks Scopus
+        # Tidak filter berdasarkan v_sumber, ambil semua publikasi yang terindeks Scopus
         if faculty_filter:
             query = f"""
                 {latest_publikasi_cte}
@@ -880,7 +881,12 @@ def dashboard_stats(current_user_id):
                     (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
-                WHERE LOWER(COALESCE(a.v_terindeks, '')) = 'scopus'
+                WHERE (
+                    LOWER(TRIM(COALESCE(a.v_terindeks, ''))) = 'scopus'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE 'scopus,%%'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE '%%,scopus,%%'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE '%%,scopus'
+                )
                     AND d.v_nama_dosen IS NOT NULL
                     AND dm.v_nama_homebase_unpar IS NOT NULL {faculty_filter}
                 GROUP BY d.v_nama_dosen
@@ -900,8 +906,18 @@ def dashboard_stats(current_user_id):
                     SELECT TRIM(unnest(string_to_array(p.v_authors, ','))) as author_name
                 ) authors
                 LEFT JOIN tmp_dosen_dt d ON LOWER(TRIM(d.v_nama_dosen)) = LOWER(TRIM(authors.author_name))
-                WHERE LOWER(COALESCE(a.v_terindeks, '')) = 'scopus'
+                LEFT JOIN datamaster dm ON (
+                    (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
+                    OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
+                )
+                WHERE (
+                    LOWER(TRIM(COALESCE(a.v_terindeks, ''))) = 'scopus'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE 'scopus,%%'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE '%%,scopus,%%'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE '%%,scopus'
+                )
                     AND d.v_nama_dosen IS NOT NULL
+                    AND dm.v_nama_homebase_unpar IS NOT NULL
                 GROUP BY d.v_nama_dosen
                 ORDER BY count_international DESC
                 LIMIT 10
@@ -2062,15 +2078,42 @@ def get_sinta_publikasi(current_user_id):
             )
         """
         
-        # Build terindeks filter
+        # Build terindeks filter - handle comma-separated values with exact word matching
+        # Mapping: SINTA Google Scholar → "GoogleScholar", SINTA Scopus → "Scopus", SINTA Garuda → "Garuda" or "SINTA"
         terindeks_filter_clause = ""
         terindeks_params = []
         if terindeks_filter and terindeks_filter != 'all':
             if terindeks_filter == 'Other':
-                terindeks_filter_clause = "AND (a.v_terindeks IS NULL OR a.v_terindeks = '' OR LOWER(TRIM(a.v_terindeks)) NOT IN ('scopus', 'wos', 'doaj', 'garuda', 'sinta'))"
+                terindeks_filter_clause = "AND (a.v_terindeks IS NULL OR a.v_terindeks = '' OR (LOWER(TRIM(a.v_terindeks)) NOT LIKE '%%scopus%%' AND LOWER(TRIM(a.v_terindeks)) NOT LIKE '%%wos%%' AND LOWER(TRIM(a.v_terindeks)) NOT LIKE '%%doaj%%' AND LOWER(TRIM(a.v_terindeks)) NOT LIKE '%%garuda%%' AND LOWER(TRIM(a.v_terindeks)) NOT LIKE '%%sinta%%' AND LOWER(TRIM(a.v_terindeks)) NOT LIKE '%%googlescholar%%'))"
+            elif terindeks_filter == 'Garuda' or terindeks_filter == 'SINTA':
+                # SINTA Garuda can be indexed as "Garuda" or "SINTA"
+                # Match both "Garuda" and "SINTA" for both filters
+                terindeks_filter_clause = """AND (
+                    LOWER(TRIM(COALESCE(a.v_terindeks, ''))) = 'garuda'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) = 'sinta'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE 'garuda,%%'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE '%%,garuda,%%'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE '%%,garuda'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE 'sinta,%%'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE '%%,sinta,%%'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE '%%,sinta'
+                )"""
             else:
-                terindeks_filter_clause = "AND LOWER(TRIM(COALESCE(a.v_terindeks, ''))) = LOWER(%s)"
-                terindeks_params.append(terindeks_filter)
+                # Use exact word matching for other filters (Scopus, WoS, DOAJ, GoogleScholar)
+                # Match: exact match, or at start (followed by comma), or in middle (surrounded by commas), or at end (preceded by comma)
+                # This prevents false matches like "GoogleScholar" matching "Scopus"
+                terindeks_filter_clause = """AND (
+                    LOWER(TRIM(COALESCE(a.v_terindeks, ''))) = LOWER(%s)
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE LOWER(%s)
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE LOWER(%s)
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE LOWER(%s)
+                )"""
+                terindeks_params.extend([
+                    terindeks_filter,  # Exact match
+                    f'{terindeks_filter},%',  # At start: "Scopus, ..."
+                    f'%,{terindeks_filter},%',  # In middle: "..., Scopus, ..."
+                    f'%,{terindeks_filter}'  # At end: "..., Scopus"
+                ])
             print(f"🔍 Adding terindeks filter: {terindeks_filter}")
         
         # ✅ PERBAIKAN: Combine params SAMA SEPERTI SCHOLAR
@@ -2416,15 +2459,41 @@ def get_sinta_publikasi_stats(current_user_id):
             )
         """
         
-        # Build terindeks filter
+        # Build terindeks filter - handle comma-separated values with exact word matching (same as publikasi endpoint)
+        # Mapping: SINTA Google Scholar → "GoogleScholar", SINTA Scopus → "Scopus", SINTA Garuda → "Garuda" or "SINTA"
         terindeks_filter_clause = ""
         terindeks_params = []
         if terindeks_filter and terindeks_filter != 'all':
             if terindeks_filter == 'Other':
-                terindeks_filter_clause = "AND (a.v_terindeks IS NULL OR a.v_terindeks = '' OR LOWER(TRIM(a.v_terindeks)) NOT IN ('scopus', 'wos', 'doaj', 'garuda', 'sinta'))"
+                terindeks_filter_clause = "AND (a.v_terindeks IS NULL OR a.v_terindeks = '' OR (LOWER(TRIM(a.v_terindeks)) NOT LIKE '%%scopus%%' AND LOWER(TRIM(a.v_terindeks)) NOT LIKE '%%wos%%' AND LOWER(TRIM(a.v_terindeks)) NOT LIKE '%%doaj%%' AND LOWER(TRIM(a.v_terindeks)) NOT LIKE '%%garuda%%' AND LOWER(TRIM(a.v_terindeks)) NOT LIKE '%%sinta%%' AND LOWER(TRIM(a.v_terindeks)) NOT LIKE '%%googlescholar%%'))"
+            elif terindeks_filter == 'Garuda' or terindeks_filter == 'SINTA':
+                # SINTA Garuda can be indexed as "Garuda" or "SINTA"
+                # Match both "Garuda" and "SINTA" for both filters
+                terindeks_filter_clause = """AND (
+                    LOWER(TRIM(COALESCE(a.v_terindeks, ''))) = 'garuda'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) = 'sinta'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE 'garuda,%%'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE '%%,garuda,%%'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE '%%,garuda'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE 'sinta,%%'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE '%%,sinta,%%'
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE '%%,sinta'
+                )"""
             else:
-                terindeks_filter_clause = "AND LOWER(TRIM(COALESCE(a.v_terindeks, ''))) = LOWER(%s)"
-                terindeks_params.append(terindeks_filter)
+                # Use exact word matching for other filters (Scopus, WoS, DOAJ, GoogleScholar)
+                # Match: exact match, or at start (followed by comma), or in middle (surrounded by commas), or at end (preceded by comma)
+                terindeks_filter_clause = """AND (
+                    LOWER(TRIM(COALESCE(a.v_terindeks, ''))) = LOWER(%s)
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE LOWER(%s)
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE LOWER(%s)
+                    OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE LOWER(%s)
+                )"""
+                terindeks_params.extend([
+                    terindeks_filter,  # Exact match
+                    f'{terindeks_filter},%',  # At start: "Scopus, ..."
+                    f'%,{terindeks_filter},%',  # In middle: "..., Scopus, ..."
+                    f'%,{terindeks_filter}'  # At end: "..., Scopus"
+                ])
         
         cte_params = params + jurusan_params
         

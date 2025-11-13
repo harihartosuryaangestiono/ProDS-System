@@ -127,15 +127,21 @@ def scrape_sinta_dosen():
         data = request.get_json()
         print(f"📋 Request data: {data}")
         
-        # Validasi input
-        required_fields = ['username', 'password', 'affiliation_id', 'target_dosen', 'max_pages', 'max_cycles']
+        # Validasi input minimal
+        required_fields = ['username', 'password']
         for field in required_fields:
-            if field not in data:
+            if field not in data or not data[field]:
                 print(f"❌ Missing field: {field}")
                 return jsonify({
                     'success': False,
                     'error': f'Field {field} is required'
                 }), 400
+        
+        # Default configuration (optional overrides from request)
+        affiliation_id = data.get('affiliation_id') or '1397'
+        max_cycles = int(data.get('max_cycles') or 20)
+        max_pages = data.get('max_pages')  # akan ditentukan otomatis jika None
+        target_dosen = data.get('target_dosen')  # akan ditentukan otomatis jika None
         
         # Generate job ID
         job_id = f"sinta_dosen_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
@@ -145,7 +151,7 @@ def scrape_sinta_dosen():
         active_jobs[job_id] = {
             'status': 'starting',
             'current': 0,
-            'total': data['target_dosen'],
+            'total': target_dosen or 0,
             'message': 'Initializing SINTA Dosen scraping...',
             'started_at': datetime.now().isoformat()
         }
@@ -155,10 +161,10 @@ def scrape_sinta_dosen():
         task_kwargs = {
             'username': data['username'],
             'password': data['password'],
-            'affiliation_id': data['affiliation_id'],
-            'target_dosen': data['target_dosen'],
-            'max_pages': data['max_pages'],
-            'max_cycles': data['max_cycles']
+            'affiliation_id': affiliation_id,
+            'target_dosen': target_dosen,
+            'max_pages': max_pages,
+            'max_cycles': max_cycles
         }
         
         # Start scraping task

@@ -32,7 +32,7 @@ logging.basicConfig(
 logger = logging.getLogger("SintaScraper")
 
 class DatabaseManager:
-    def __init__(self, dbname="ProDSGabungan", user="postgres", password="password123", host="localhost", port="5432"):
+    def __init__(self, dbname="ProDSGabungan", user="postgres", password="hari123", host="localhost", port="5432"):
         self.conn_params = {
             'dbname': dbname,
             'user': user,
@@ -981,7 +981,7 @@ def main():
     DB_CONFIG = {
         'dbname': 'ProDSGabungan',
         'user': 'postgres',
-        'password': 'password123',
+        'password': 'hari123',
         'host': 'localhost',
         'port': '5432'
     }

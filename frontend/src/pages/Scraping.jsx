@@ -1,17 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Play, User, Lock, Database, AlertCircle, CheckCircle, Clock, Target, RefreshCw, Download, Globe, FileText, Loader, Square } from 'lucide-react';
+import { Play, User, Lock, Database, AlertCircle, CheckCircle, Clock, Target, Globe, FileText, Loader, Square } from 'lucide-react';
 
 const ScrapingDashboard = () => {
   const [activeTab, setActiveTab] = useState('sinta-dosen');
   const [credentials, setCredentials] = useState({
     username: '',
     password: ''
-  });
-  const [dosenConfig, setDosenConfig] = useState({
-    affiliationId: '1397',
-    targetDosen: 473,  // Ubah nilai default ke number
-    maxPages: 50,     // Ubah nilai default ke number
-    maxCycles: 20     // Ubah nilai default ke number
   });
   const [gsConfig, setGsConfig] = useState({
     maxAuthors: 473,
@@ -132,18 +126,6 @@ useEffect(() => {
     }));
   };
 
-  const handleDosenConfigChange = (e) => {
-    const { name, value } = e.target;
-    
-    // Pastikan nilai yang diset adalah number yang valid
-    const numValue = name === 'affiliationId' ? value : parseInt(value) || 0;
-    
-    setDosenConfig(prev => ({
-      ...prev,
-      [name]: numValue
-    }));
-  };
-
   const handleGsDosenConfigChange = (e) => {
     const { name, value } = e.target;
     setGsDosenConfig(prev => ({
@@ -167,7 +149,7 @@ useEffect(() => {
       status: 'starting',
       message: 'Memulai scraping...',
       currentCount: 0,
-      targetCount: payload.target_dosen || payload.max_authors || 100
+      targetCount: payload.target_dosen || payload.max_authors || 0
     });
   
     try {
@@ -223,11 +205,7 @@ useEffect(() => {
 
     await startScraping('sinta/dosen', {
       username: credentials.username,
-      password: credentials.password,
-      affiliation_id: dosenConfig.affiliationId,
-      target_dosen: dosenConfig.targetDosen,
-      max_pages: dosenConfig.maxPages,
-      max_cycles: dosenConfig.maxCycles
+      password: credentials.password
     });
   };
 
@@ -617,68 +595,17 @@ useEffect(() => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Affiliation ID
-                  </label>
-                  <input
-                    type="text"
-                    name="affiliationId"
-                    value={dosenConfig.affiliationId}
-                    onChange={handleDosenConfigChange}
-                    disabled={isLoading}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">ID afiliasi (default: 1397 untuk Unpar)</p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Target className="w-4 h-4 inline mr-1" />
-                    Target Dosen
-                  </label>
-                  <input
-                    type="number"
-                    name="targetDosen"
-                    value={dosenConfig.targetDosen}
-                    onChange={handleDosenConfigChange}
-                    min="1"
-                    disabled={isLoading}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Max Pages per Cycle
-                  </label>
-                  <input
-                    type="number"
-                    name="maxPages"
-                    value={dosenConfig.maxPages}
-                    onChange={handleDosenConfigChange}
-                    min="1"
-                    disabled={isLoading}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <RefreshCw className="w-4 h-4 inline mr-1" />
-                    Max Cycles
-                  </label>
-                  <input
-                    type="number"
-                    name="maxCycles"
-                    value={dosenConfig.maxCycles}
-                    onChange={handleDosenConfigChange}
-                    min="1"
-                    disabled={isLoading}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                  />
-                </div>
+              <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6">
+                <h4 className="text-sm font-semibold text-blue-800 mb-2 flex items-center">
+                  <Database className="w-4 h-4 mr-2" />
+                  Konfigurasi Otomatis
+                </h4>
+                <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+                  <li>ID afiliasi otomatis menggunakan <strong>1397</strong>.</li>
+                  <li>Target dosen dan jumlah halaman per siklus dibaca langsung dari metadata halaman SINTA.</li>
+                  <li>Saat scraping dimulai, progres akan menampilkan target yang terdeteksi.</li>
+                  <li>Maksimal siklus scraping: <strong>20</strong> (default).</li>
+                </ul>
               </div>
 
               <div className="flex items-center space-x-3">

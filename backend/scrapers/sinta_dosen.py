@@ -7,6 +7,7 @@ Created on Tue Sep 23 11:01:48 2025
 """
 
 import time
+import os
 import psycopg2
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -33,6 +34,8 @@ class SintaDosenScraper:
         self.driver = None
         self.extraction_batch_id = self._generate_batch_id()
         self.extraction_timestamp = datetime.now()
+        self.detected_target = None
+        self.detected_pages = None
         
         self._connect_db()
         self._init_driver()
@@ -52,6 +55,320 @@ class SintaDosenScraper:
             logger.error(f"Gagal terhubung ke database: {e}")
             raise
 
+    def _fetch_affiliation_metadata(self, affiliation_id):
+        """
+        Ambil informasi metadata dari halaman afiliasi:
+        - Total halaman (Page X of Y)
+        - Total records (Total Records Z)
+        """
+        base_url = f"https://sinta.kemdiktisaintek.go.id/affiliations/authors/{affiliation_id}"
+        try:
+            self.driver.get(base_url)
+            time.sleep(3)
+
+            WebDriverWait(self.driver, 15).until(
+                EC.presence_of_element_located((By.TAG_NAME, "body"))
+            )
+
+            soup = BeautifulSoup(self.driver.page_source, "html.parser")
+            info_small = soup.find("small", string=re.compile(r"Page\s+\d+\s+of\s+\d+"))
+
+            total_pages = None
+            total_records = None
+
+            if info_small:
+                info_text = info_small.get_text(strip=True)
+                match = re.search(r"Page\s+\d+\s+of\s+(\d+)", info_text)
+                if match:
+                    total_pages = int(match.group(1))
+
+                match = re.search(r"Total\s+Records\s+(\d+)", info_text)
+                if match:
+                    total_records = int(match.group(1))
+
+            # Fallback jika tidak ditemukan
+            if total_pages is None:
+                total_pages = 1
+            if total_records is None:
+                total_records = 0
+
+            logger.info(f"Metadata afiliasi {affiliation_id}: total_pages={total_pages}, total_records={total_records}")
+
+            return {
+                "total_pages": total_pages,
+                "total_records": total_records,
+                "soup": soup
+            }
+        except Exception as e:
+            logger.error(f"Gagal mengambil metadata afiliasi {affiliation_id}: {e}")
+            return {
+                "total_pages": 1,
+                "total_records": 0,
+                "soup": None
+            }
+
+    def _parse_listing_page(self, soup):
+        """Parse halaman daftar dosen dan kembalikan list informasi dasar dosen."""
+        if soup is None:
+            return []
+
+        selectors = [
+            "div.au-item",
+            "div.author-item",
+            "div.card.author-card",
+            "div[class*='author']",
+            "div.row div.col-md-12",
+            "div.profile-card"
+        ]
+
+        author_blocks = []
+        for selector in selectors:
+            author_blocks = soup.select(selector)
+            if author_blocks:
+                logger.info(f"Menggunakan selector: {selector}")
+                break
+
+        if not author_blocks:
+            all_divs = soup.find_all("div")
+            for div in all_divs:
+                author_link = div.find("a", href=lambda x: x and "/authors/" in x)
+                if author_link:
+                    author_blocks.append(div)
+
+        records = []
+
+        for block in author_blocks:
+            name_element = block.find("a", href=lambda x: x and "/authors/" in x)
+            if not name_element:
+                all_links = block.find_all("a", href=True)
+                for link in all_links:
+                    if "/authors/" in link.get("href", ""):
+                        name_element = link
+                        break
+
+            if not name_element:
+                continue
+
+            name = name_element.text.strip()
+            profile_url = name_element.get("href", "")
+
+            if profile_url and not profile_url.startswith("http"):
+                profile_url = "https://sinta.kemdiktisaintek.go.id" + profile_url
+
+            sinta_id = None
+            if profile_url and "/authors/" in profile_url:
+                raw_id = profile_url.split("/authors/")[-1].split("?")[0]
+                sinta_id = self._clean_sinta_id(raw_id)
+
+            if not sinta_id:
+                continue
+
+            records.append({
+                "name": name,
+                "sinta_id": sinta_id,
+                "profile_url": profile_url
+            })
+
+        logger.info(f"Listing page menghasilkan {len(records)} records yang valid")
+        return records
+
+    def _upsert_basic_dosen(self, name, sinta_id, profile_url):
+        """
+        Simpan informasi dasar dosen (nama, SINTA ID, URL) ke database.
+        Mengembalikan True jika insert baru, False jika update.
+        """
+        try:
+            default_jurusan_id = self._get_default_jurusan_id()
+
+            # Cek apakah dosen dengan SINTA ID sudah ada
+            self.cur.execute("""
+                SELECT v_id_dosen FROM tmp_dosen_dt 
+                WHERE v_id_sinta = %s
+            """, (sinta_id,))
+            
+            existing = self.cur.fetchone()
+            
+            if existing:
+                # Update existing dosen
+                self.cur.execute("""
+                    UPDATE tmp_dosen_dt SET
+                        v_nama_dosen = %s,
+                        v_link_url = %s,
+                        t_tanggal_unduh = %s
+                    WHERE v_id_sinta = %s
+                """, (
+                    name,
+                    profile_url,
+                    self.extraction_timestamp,
+                    sinta_id
+                ))
+                self.conn.commit()
+                logger.info(f"♻️  Dosen diperbarui: {name} (SINTA ID: {sinta_id})")
+                return False  # Bukan insert baru
+            else:
+                # Insert dosen baru - double check untuk mencegah race condition
+                # Cek sekali lagi sebelum insert untuk memastikan tidak ada duplikasi
+                self.cur.execute("""
+                    SELECT v_id_dosen FROM tmp_dosen_dt 
+                    WHERE v_id_sinta = %s
+                """, (sinta_id,))
+                
+                if self.cur.fetchone():
+                    # Jika ternyata sudah ada (race condition), update saja
+                    self.cur.execute("""
+                        UPDATE tmp_dosen_dt SET
+                            v_nama_dosen = %s,
+                            v_link_url = %s,
+                            t_tanggal_unduh = %s
+                        WHERE v_id_sinta = %s
+                    """, (
+                        name,
+                        profile_url,
+                        self.extraction_timestamp,
+                        sinta_id
+                    ))
+                    self.conn.commit()
+                    logger.info(f"♻️  Dosen diperbarui (race condition): {name} (SINTA ID: {sinta_id})")
+                    return False
+                
+                # Insert dosen baru
+                self.cur.execute("""
+                    INSERT INTO tmp_dosen_dt (
+                        v_nama_dosen,
+                        v_id_jurusan,
+                        v_id_sinta,
+                        v_sumber,
+                        v_link_url,
+                        t_tanggal_unduh
+                    ) VALUES (%s, %s, %s, %s, %s, %s)
+                    RETURNING v_id_dosen
+                """, (
+                    name,
+                    default_jurusan_id,
+                    sinta_id,
+                    'SINTA',
+                    profile_url,
+                    self.extraction_timestamp
+                ))
+                self.conn.commit()
+                logger.info(f"✅ Dosen baru disimpan: {name} (SINTA ID: {sinta_id})")
+                return True  # Insert baru
+        except Exception as e:
+            logger.error(f"Gagal menyimpan data dasar dosen {name} ({sinta_id}): {e}")
+            self.conn.rollback()
+            return False
+
+    def _update_dosen_stats(self, sinta_id, stats, profile_url=None):
+        """Update statistik dosen berdasarkan hasil scraping detail."""
+        try:
+            # Disable trigger untuk menghindari error t_updated_at yang tidak ada
+            self.cur.execute("ALTER TABLE tmp_dosen_dt DISABLE TRIGGER update_tmp_dosen_updated_at")
+            
+            self.cur.execute("""
+                UPDATE tmp_dosen_dt SET
+                    n_total_publikasi = %s,
+                    n_total_sitasi_gs = %s,
+                    n_i10_index_gs = %s,
+                    n_i10_index_gs2020 = %s,
+                    n_h_index_gs = %s,
+                    n_h_index_gs2020 = %s,
+                    n_h_index_gs_sinta = %s,
+                    n_h_index_scopus = %s,
+                    n_g_index_gs_sinta = %s,
+                    n_g_index_scopus = %s,
+                    n_skor_sinta = %s,
+                    n_skor_sinta_3yr = %s,
+                    n_artikel_gs = %s,
+                    n_artikel_scopus = %s,
+                    n_sitasi_gs = %s,
+                    n_sitasi_scopus = %s,
+                    n_sitasi_dokumen_gs = %s,
+                    n_sitasi_dokumen_scopus = %s,
+                    v_sumber = %s,
+                    v_link_url = COALESCE(%s, v_link_url),
+                    t_tanggal_unduh = %s
+                WHERE v_id_sinta = %s
+            """, (
+                stats.get("total_publications", 0),
+                stats.get("citations_gs", 0),
+                stats.get("i10_index_gs", 0),
+                stats.get("i10_index_gs_2020", 0),
+                stats.get("hindex_gs", 0),
+                stats.get("hindex_gs_2020", 0),
+                stats.get("hindex_gs_sinta", 0),
+                stats.get("hindex_scopus", 0),
+                stats.get("gindex_gs_sinta", 0),
+                stats.get("gindex_scopus", 0),
+                stats.get("skor_sinta_overall", 0),
+                stats.get("skor_sinta_3yr", 0),
+                stats.get("articles_gs", 0),
+                stats.get("articles_scopus", 0),
+                stats.get("citations_gs", 0),
+                stats.get("citations_scopus", 0),
+                stats.get("cited_docs_gs", 0),
+                stats.get("cited_docs_scopus", 0),
+                'SINTA',
+                profile_url,
+                self.extraction_timestamp,
+                sinta_id
+            ))
+            self.conn.commit()
+            
+            # Enable trigger kembali
+            self.cur.execute("ALTER TABLE tmp_dosen_dt ENABLE TRIGGER update_tmp_dosen_updated_at")
+            self.conn.commit()
+            
+            logger.info(f"📊 Statistik dosen diperbarui untuk SINTA ID: {sinta_id}")
+        except Exception as e:
+            logger.error(f"Gagal memperbarui statistik dosen {sinta_id}: {e}")
+            self.conn.rollback()
+            # Pastikan trigger di-enable kembali meski error
+            try:
+                self.cur.execute("ALTER TABLE tmp_dosen_dt ENABLE TRIGGER update_tmp_dosen_updated_at")
+                self.conn.commit()
+            except:
+                pass
+
+    def _scrape_details_for_dosen(self, dosen_records, cancel_check=None):
+        """Scrape detail profil untuk setiap dosen dan perbarui database."""
+        seen_ids = set()
+        total_records = len(dosen_records)
+
+        for idx, record in enumerate(dosen_records, start=1):
+            # Cek cancel sebelum setiap dosen
+            if cancel_check and cancel_check():
+                logger.warning(f"🛑 Scraping detail dihentikan di dosen {idx}/{total_records} (cancel requested)")
+                return
+            
+            sinta_id = record.get("sinta_id")
+            if not sinta_id:
+                logger.warning(f"[DETAIL {idx}/{total_records}] Lewati record tanpa SINTA ID: {record}")
+                continue
+
+            if sinta_id in seen_ids:
+                continue
+            seen_ids.add(sinta_id)
+
+            profile_url = record.get("profile_url") or f"https://sinta.kemdiktisaintek.go.id/authors/profile/{sinta_id}"
+            logger.info(f"[DETAIL {idx}/{total_records}] Memproses SINTA ID: {sinta_id}")
+
+            stats = self._extract_profile_details(profile_url)
+            if not stats:
+                logger.warning(f"⚠️  Tidak ada statistik yang didapat untuk SINTA ID {sinta_id} - skip update")
+                continue
+
+            # Hitung total publikasi dari data yang tersedia (prioritaskan Google Scholar)
+            stats["total_publications"] = stats.get("articles_gs") or stats.get("articles_scopus") or 0
+
+            # Placeholder untuk nilai 2020 jika tidak tersedia
+            stats.setdefault("i10_index_gs_2020", 0)
+            stats.setdefault("hindex_gs_2020", 0)
+            stats.setdefault("hindex_gs_sinta", stats.get("hindex_gs", 0))
+
+            # Hanya update jika stats valid (tidak None)
+            self._update_dosen_stats(sinta_id, stats, profile_url)
+
+
     def _init_driver(self):
         """Inisialisasi WebDriver Chrome"""
         try:
@@ -68,13 +385,25 @@ class SintaDosenScraper:
             from webdriver_manager.core.os_manager import ChromeType
             from selenium.webdriver.chrome.service import Service
             
-            # Explicitly download win64 version
-            service = Service(ChromeDriverManager(chrome_type=ChromeType.GOOGLE).install())
-            
-            self.driver = webdriver.Chrome(
-                service=service,
-                options=options
-            )
+            # Explicitly download driver and ensure correct binary is used
+            driver_path = ChromeDriverManager(chrome_type=ChromeType.GOOGLE).install()
+
+            # webdriver_manager may return a metadata file; correct it to the actual binary if needed
+            if os.path.basename(driver_path) != 'chromedriver':
+                driver_dir = os.path.dirname(driver_path)
+                candidate_path = os.path.join(driver_dir, 'chromedriver')
+                if os.path.exists(candidate_path):
+                    driver_path = candidate_path
+
+            # Ensure the driver has execute permissions (especially on macOS)
+            try:
+                os.chmod(driver_path, 0o755)
+            except Exception as chmod_error:
+                logger.warning(f"Gagal mengatur permission chromedriver: {chmod_error}")
+
+            service = Service(driver_path)
+
+            self.driver = webdriver.Chrome(service=service, options=options)
             logger.info("WebDriver Chrome berhasil diinisialisasi")
         except Exception as e:
             logger.error(f"Gagal menginisialisasi WebDriver: {e}")
@@ -143,111 +472,40 @@ class SintaDosenScraper:
             logger.error(f"Gagal mengecek keberadaan dosen {sinta_id}: {e}")
             return False
 
-    def _insert_or_update_dosen(self, nama, sinta_id, profile_url, stats_data):
-        """Insert dosen baru atau update existing dosen ke tabel tmp_dosen_dt"""
+    def _load_basic_records_from_db(self, limit=None):
+        """
+        Ambil data dasar dosen (SINTA ID & URL) dari database.
+        
+        Args:
+            limit: Batasi jumlah record yang diambil (opsional)
+        """
         try:
-            # Cek apakah dosen sudah ada berdasarkan SINTA ID
-            self.cur.execute("""
-                SELECT v_id_dosen FROM tmp_dosen_dt WHERE v_id_sinta = %s
-            """, (sinta_id,))
-            
-            result = self.cur.fetchone()
-            default_jurusan_id = self._get_default_jurusan_id()
-            
-            if result:
-                # Update existing dosen dengan data terbaru
-                dosen_id = result[0]
-                self.cur.execute("""
-                    UPDATE tmp_dosen_dt SET
-                        v_nama_dosen = %s,
-                        n_total_sitasi_gs = %s,
-                        n_h_index_gs = %s,
-                        n_h_index_gs_sinta = %s,
-                        n_h_index_scopus = %s,
-                        n_g_index_gs_sinta = %s,
-                        n_g_index_scopus = %s,
-                        n_artikel_gs = %s,
-                        n_artikel_scopus = %s,
-                        n_sitasi_gs = %s,
-                        n_sitasi_scopus = %s,
-                        n_sitasi_dokumen_gs = %s,
-                        n_sitasi_dokumen_scopus = %s,
-                        n_i10_index_gs = %s,
-                        n_skor_sinta = %s,
-                        n_skor_sinta_3yr = %s,
-                        v_sumber = %s,
-                        v_link_url = %s,
-                        t_tanggal_unduh = %s
-                    WHERE v_id_dosen = %s
-                """, (
-                    nama,
-                    stats_data.get('citations_gs', 0),
-                    stats_data.get('hindex_gs', 0),
-                    stats_data.get('hindex_gs', 0),  # Gunakan GS untuk SINTA juga
-                    stats_data.get('hindex_scopus', 0),
-                    stats_data.get('gindex_gs_sinta', 0),  # NEW: G-Index GS SINTA
-                    stats_data.get('gindex_scopus', 0),    # NEW: G-Index Scopus
-                    stats_data.get('articles_gs', 0),
-                    stats_data.get('articles_scopus', 0),
-                    stats_data.get('citations_gs', 0),
-                    stats_data.get('citations_scopus', 0),
-                    stats_data.get('cited_docs_gs', 0),
-                    stats_data.get('cited_docs_scopus', 0),
-                    stats_data.get('i10_index_gs', 0),
-                    stats_data.get('skor_sinta_overall', 0),
-                    stats_data.get('skor_sinta_3yr', 0),
-                    'SINTA',
-                    profile_url,
-                    self.extraction_timestamp,
-                    dosen_id
-                ))
-                logger.info(f"Dosen berhasil diupdate: {nama} (ID: {dosen_id}) - SUDAH ADA")
-                return dosen_id, False
+            base_query = """
+                SELECT v_id_sinta, v_link_url
+                FROM tmp_dosen_dt
+                WHERE v_id_sinta IS NOT NULL
+                ORDER BY t_tanggal_unduh ASC, v_id_dosen ASC
+            """
+            if limit:
+                self.cur.execute(base_query + " LIMIT %s", (limit,))
             else:
-                # Insert dosen baru
-                self.cur.execute("""
-                    INSERT INTO tmp_dosen_dt (
-                        v_nama_dosen, v_id_jurusan, v_id_sinta,
-                        n_total_sitasi_gs, n_h_index_gs, n_h_index_gs_sinta, n_h_index_scopus,
-                        n_g_index_gs_sinta, n_g_index_scopus,
-                        n_artikel_gs, n_artikel_scopus, n_sitasi_gs, n_sitasi_scopus,
-                        n_sitasi_dokumen_gs, n_sitasi_dokumen_scopus, n_i10_index_gs,
-                        n_skor_sinta, n_skor_sinta_3yr, v_sumber, v_link_url, t_tanggal_unduh
-                    )
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    RETURNING v_id_dosen
-                """, (
-                    nama, default_jurusan_id, sinta_id,
-                    stats_data.get('citations_gs', 0),
-                    stats_data.get('hindex_gs', 0),
-                    stats_data.get('hindex_gs', 0),  # Gunakan GS untuk SINTA juga
-                    stats_data.get('hindex_scopus', 0),
-                    stats_data.get('gindex_gs_sinta', 0),  # NEW: G-Index GS SINTA
-                    stats_data.get('gindex_scopus', 0),    # NEW: G-Index Scopus
-                    stats_data.get('articles_gs', 0),
-                    stats_data.get('articles_scopus', 0),
-                    stats_data.get('citations_gs', 0),
-                    stats_data.get('citations_scopus', 0),
-                    stats_data.get('cited_docs_gs', 0),
-                    stats_data.get('cited_docs_scopus', 0),
-                    stats_data.get('i10_index_gs', 0),
-                    stats_data.get('skor_sinta_overall', 0),
-                    stats_data.get('skor_sinta_3yr', 0),
-                    'SINTA',
-                    profile_url,
-                    self.extraction_timestamp
-                ))
-                
-                dosen_id = self.cur.fetchone()[0]
-                logger.info(f"Dosen baru berhasil diinsert: {nama} (ID: {dosen_id}) - BARU")
+                self.cur.execute(base_query)
             
-            self.conn.commit()
-            return dosen_id, True
-            
+            rows = self.cur.fetchall()
+            records = []
+            for sinta_id, link_url in rows:
+                if not sinta_id:
+                    continue
+                profile_url = link_url or f"https://sinta.kemdiktisaintek.go.id/authors/profile/{sinta_id}"
+                records.append({
+                    "sinta_id": str(sinta_id),
+                    "profile_url": profile_url
+                })
+            logger.info(f"Memuat {len(records)} record dosen dari database untuk scraping detail")
+            return records
         except Exception as e:
-            logger.error(f"Gagal insert/update dosen {nama}: {e}")
-            self.conn.rollback()
-            return None, False
+            logger.error(f"Gagal memuat data dasar dosen dari database: {e}")
+            return []
 
     def _clean_sinta_id(self, sinta_id):
         """Membersihkan SINTA ID dari prefix 'profile/' dan karakter tidak diinginkan"""
@@ -274,6 +532,21 @@ class SintaDosenScraper:
             logger.warning(f"SINTA ID tidak valid (bukan numerik): {sinta_id}")
             return None
 
+    def _reinitialize_driver(self):
+        """Reinitialize WebDriver jika session invalid"""
+        try:
+            if self.driver:
+                try:
+                    self.driver.quit()
+                except:
+                    pass
+            self._init_driver()
+            logger.info("✅ WebDriver berhasil di-reinitialize")
+            return True
+        except Exception as e:
+            logger.error(f"❌ Gagal reinitialize WebDriver: {e}")
+            return False
+
     def _extract_profile_details(self, profile_url):
         """Ekstrak detail profil dari halaman individu dosen"""
         stats = {
@@ -287,62 +560,82 @@ class SintaDosenScraper:
             "skor_sinta_3yr": 0
         }
         
-        try:
-            self.driver.get(profile_url)
-            time.sleep(3)
-            
-            # Wait for page to load
-            WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.TAG_NAME, "body"))
-            )
-            
-            profile_soup = BeautifulSoup(self.driver.page_source, "html.parser")
-            
-            # Ekstrak i10-Index dari tabel
-            self._extract_i10_index(profile_soup, stats)
-            
-            # Ekstrak G-Index dari tabel (NEW)
-            self._extract_g_index(profile_soup, stats)
-            
-            # Ekstrak SINTA Scores
-            self._extract_sinta_scores(profile_soup, stats)
-            
-            # Cari tabel statistik untuk data lainnya
-            stats_table = profile_soup.find("table", class_="table")
-            if not stats_table:
-                stats_table = profile_soup.find("div", class_="table-responsive")
+        max_retries = 2
+        for attempt in range(max_retries):
+            try:
+                self.driver.get(profile_url)
+                time.sleep(3)
+                
+                # Wait for page to load
+                WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.TAG_NAME, "body"))
+                )
+                
+                profile_soup = BeautifulSoup(self.driver.page_source, "html.parser")
+                
+                # Ekstrak i10-Index dari tabel
+                self._extract_i10_index(profile_soup, stats)
+                
+                # Ekstrak G-Index dari tabel (NEW)
+                self._extract_g_index(profile_soup, stats)
+                
+                # Ekstrak SINTA Scores
+                self._extract_sinta_scores(profile_soup, stats)
+                
+                # Cari tabel statistik untuk data lainnya
+                stats_table = profile_soup.find("table", class_="table")
+                if not stats_table:
+                    stats_table = profile_soup.find("div", class_="table-responsive")
+                    if stats_table:
+                        stats_table = stats_table.find("table")
+                
                 if stats_table:
-                    stats_table = stats_table.find("table")
-            
-            if stats_table:
-                rows = stats_table.find_all("tr")
-                for row in rows:
-                    cols = row.find_all("td")
-                    if len(cols) >= 3:
-                        key = cols[0].text.strip().lower()
-                        scopus_value = self._parse_number(cols[1].text.strip())
-                        gs_value = self._parse_number(cols[2].text.strip())
-                        
-                        if "article" in key or "artikel" in key:
-                            stats["articles_scopus"] = scopus_value
-                            stats["articles_gs"] = gs_value
-                        elif "citation" in key or "sitasi" in key:
-                            stats["citations_scopus"] = scopus_value
-                            stats["citations_gs"] = gs_value
-                        elif "cited document" in key or "dokumen tersitasi" in key:
-                            stats["cited_docs_scopus"] = scopus_value
-                            stats["cited_docs_gs"] = gs_value
-                        elif "h-index" in key or "hindex" in key:
-                            stats["hindex_scopus"] = scopus_value
-                            stats["hindex_gs"] = gs_value
-            
-            logger.info(f"Berhasil mengekstrak detail profil dari {profile_url}")
-            logger.info(f"Stats: {stats}")
-            
-        except Exception as e:
-            logger.warning(f"Gagal mengekstrak detail profil dari {profile_url}: {e}")
+                    rows = stats_table.find_all("tr")
+                    for row in rows:
+                        cols = row.find_all("td")
+                        if len(cols) >= 3:
+                            key = cols[0].text.strip().lower()
+                            scopus_value = self._parse_number(cols[1].text.strip())
+                            gs_value = self._parse_number(cols[2].text.strip())
+                            
+                            if "article" in key or "artikel" in key:
+                                stats["articles_scopus"] = scopus_value
+                                stats["articles_gs"] = gs_value
+                            elif "citation" in key or "sitasi" in key:
+                                stats["citations_scopus"] = scopus_value
+                                stats["citations_gs"] = gs_value
+                            elif "cited document" in key or "dokumen tersitasi" in key:
+                                stats["cited_docs_scopus"] = scopus_value
+                                stats["cited_docs_gs"] = gs_value
+                            elif "h-index" in key or "hindex" in key:
+                                stats["hindex_scopus"] = scopus_value
+                                stats["hindex_gs"] = gs_value
+                
+                logger.info(f"Berhasil mengekstrak detail profil dari {profile_url}")
+                logger.info(f"Stats: {stats}")
+                return stats  # Return stats jika berhasil
+                
+            except Exception as e:
+                error_msg = str(e)
+                # Cek jika error karena invalid session
+                if "invalid session id" in error_msg.lower() or "session" in error_msg.lower():
+                    logger.warning(f"⚠️  Invalid session detected (attempt {attempt + 1}/{max_retries}): {error_msg}")
+                    if attempt < max_retries - 1:
+                        logger.info("🔄 Mencoba reinitialize WebDriver...")
+                        if self._reinitialize_driver():
+                            logger.info(f"🔄 Retry scraping detail untuk {profile_url}")
+                            continue
+                        else:
+                            logger.error(f"❌ Gagal reinitialize driver, skip dosen ini")
+                            return None  # Return None jika gagal reinitialize
+                    else:
+                        logger.error(f"❌ Gagal setelah {max_retries} attempts untuk {profile_url}")
+                        return None
+                else:
+                    logger.warning(f"⚠️  Error lain saat ekstrak detail dari {profile_url}: {error_msg}")
+                    return None  # Return None untuk error lainnya juga
         
-        return stats
+        return None  # Return None jika semua retry gagal
 
     def _extract_g_index(self, soup, stats):
         """Ekstrak nilai G-Index dari HTML (NEW FUNCTION)"""
@@ -455,7 +748,7 @@ class SintaDosenScraper:
         except:
             return 0.0
 
-    def scrape_until_target_reached(self, affiliation_id, target_dosen=473, max_pages=100, max_cycles=10):
+    def scrape_until_target_reached(self, affiliation_id, target_dosen=473, max_pages=100, max_cycles=10, progress_callback=None, cancel_check=None):
         """
         Scraping data dosen hingga mencapai target jumlah dosen unik
         
@@ -464,59 +757,150 @@ class SintaDosenScraper:
             target_dosen: Target jumlah dosen yang ingin dicapai (default: 473)
             max_pages: Maksimal halaman per cycle
             max_cycles: Maksimal siklus scraping
+            progress_callback: Callback function untuk progress updates
+            cancel_check: Function untuk mengecek apakah scraping harus dihentikan
         """
-        logger.info(f"🎯 TARGET: {target_dosen} dosen unik untuk afiliasi ID: {affiliation_id}")
+        logger.info(f"🎯 TARGET (awal): {target_dosen} dosen unik untuk afiliasi ID: {affiliation_id}")
         logger.info(f"Batch ID: {self.extraction_batch_id}, Extraction Time: {self.extraction_timestamp}")
-        
+
+        # Ambil metadata dari halaman afiliasi untuk menentukan target & halaman maksimal
+        metadata = self._fetch_affiliation_metadata(affiliation_id)
+        detected_pages = metadata.get("total_pages") if metadata else None
+        detected_records = metadata.get("total_records") if metadata else None
+
+        if detected_records and detected_records > 0:
+            logger.info(f"🎯 Target dosen disesuaikan berdasarkan metadata: {detected_records}")
+            target_dosen = detected_records
+        if detected_pages and detected_pages > 0:
+            logger.info(f"📄 Max pages per cycle disesuaikan berdasarkan metadata: {detected_pages}")
+            max_pages = detected_pages
+
+        self.detected_target = target_dosen
+        self.detected_pages = max_pages
+
+        if progress_callback:
+            progress_callback('metadata_detected', {
+                'target_dosen': target_dosen,
+                'max_pages': max_pages,
+                'total_records_found': detected_records,
+                'total_pages_found': detected_pages
+            })
+
+        collected_records = {}
         cycle = 1
-        
-        while cycle <= max_cycles:
-            current_count = self._get_current_dosen_count()
-            logger.info(f"\n🔄 CYCLE {cycle} - Saat ini: {current_count}/{target_dosen} dosen")
-            
-            if current_count >= target_dosen:
-                logger.info(f"🎉 TARGET TERCAPAI! Total dosen unik: {current_count}")
-                break
-                
-            remaining_needed = target_dosen - current_count
-            logger.info(f"📊 Masih membutuhkan: {remaining_needed} dosen lagi")
-            
-            # Jalankan scraping untuk cycle ini
-            new_dosen_count = self.scrape_and_store_dosen(
-                affiliation_id=affiliation_id, 
-                max_pages=max_pages,
-                cycle=cycle
-            )
-            
-            if new_dosen_count == 0:
-                logger.warning(f"⚠️  Tidak ada dosen baru ditemukan di cycle {cycle}")
-                if cycle >= 3:  # Jika sudah 3 cycle tidak ada dosen baru, hentikan
-                    logger.info("🛑 Menghentikan scraping karena tidak ada dosen baru dalam 3 cycle terakhir")
+        consecutive_empty_cycles = 0
+        cycles_completed = 0
+
+        current_count = self._get_current_dosen_count()
+        logger.info(f"📊 Jumlah dosen saat ini di database: {current_count}")
+
+        if current_count >= target_dosen:
+            logger.info(f"🎉 Target sudah tercapai sebelum scraping dimulai ({current_count}/{target_dosen})")
+            logger.info(f"⏭️  Melewati scraping halaman, langsung ke scraping detail...")
+            # Langsung load semua dosen dari database untuk scraping detail
+            collected_records = {}
+            for record in self._load_basic_records_from_db(limit=target_dosen):
+                collected_records[record["sinta_id"]] = record
+            logger.info(f"📋 Memuat {len(collected_records)} dosen dari database untuk scraping detail")
+        else:
+            while cycle <= max_cycles:
+                # Cek cancel sebelum setiap cycle
+                if cancel_check and cancel_check():
+                    logger.warning("🛑 Scraping dihentikan oleh user (cancel requested)")
+                    return current_count
+
+                current_count = self._get_current_dosen_count()
+                logger.info(f"\n🔄 CYCLE {cycle} - Saat ini: {current_count}/{target_dosen} dosen")
+
+                if current_count >= target_dosen:
+                    logger.info(f"🎉 TARGET TERCAPAI! Total dosen unik: {current_count}")
                     break
-            
-            cycle += 1
-            
-            # Jeda antar cycle
-            if cycle <= max_cycles:
-                logger.info(f"⏳ Jeda 10 detik sebelum cycle berikutnya...")
-                time.sleep(10)
-        
+
+                remaining_needed = target_dosen - current_count
+                logger.info(f"📊 Masih membutuhkan: {remaining_needed} dosen lagi")
+
+                new_dosen_count, detail_candidates = self.scrape_and_store_dosen(
+                    affiliation_id=affiliation_id,
+                    max_pages=max_pages,
+                    cycle=cycle,
+                    cancel_check=cancel_check
+                )
+                
+                # Cek cancel setelah cycle selesai
+                if cancel_check and cancel_check():
+                    logger.warning("🛑 Scraping dihentikan oleh user (cancel requested)")
+                    return current_count
+
+                for record in detail_candidates:
+                    collected_records[record["sinta_id"]] = record
+
+                cycles_completed += 1
+
+                if new_dosen_count == 0:
+                    consecutive_empty_cycles += 1
+                    logger.warning(f"⚠️ Tidak ada dosen baru ditemukan di cycle {cycle}")
+                else:
+                    consecutive_empty_cycles = 0
+
+                current_count = self._get_current_dosen_count()
+                if current_count >= target_dosen:
+                    logger.info(f"🎉 TARGET TERCAPAI! Total dosen unik: {current_count}")
+                    break
+
+                if consecutive_empty_cycles >= 3:
+                    logger.info("🛑 Menghentikan scraping karena tidak ada dosen baru dalam 3 cycle berturut-turut")
+                    break
+
+                cycle += 1
+                if cycle <= max_cycles:
+                    logger.info(f"⏳ Jeda 10 detik sebelum cycle berikutnya...")
+                    time.sleep(10)
+
         final_count = self._get_current_dosen_count()
         logger.info(f"\n✅ SCRAPING SELESAI!")
         logger.info(f"📈 Total dosen final: {final_count}/{target_dosen}")
-        logger.info(f"🔢 Total cycle: {cycle-1}")
-        
+        logger.info(f"🔢 Total cycle dijalankan: {cycles_completed}")
+
+        # Cek cancel sebelum scraping detail
+        if cancel_check and cancel_check():
+            logger.warning("🛑 Scraping dihentikan sebelum scraping detail (cancel requested)")
+            return final_count
+
+        # Pastikan kita memiliki daftar dosen untuk scraping detail
+        if not collected_records:
+            logger.info("ℹ️ Tidak ada kandidat detail dari proses terbaru. Menggunakan data dari database.")
+            for record in self._load_basic_records_from_db(limit=target_dosen):
+                collected_records[record["sinta_id"]] = record
+
+        # Cek cancel lagi sebelum memulai scraping detail
+        if cancel_check and cancel_check():
+            logger.warning("🛑 Scraping dihentikan sebelum scraping detail dimulai (cancel requested)")
+            return final_count
+
+        if collected_records:
+            logger.info(f"🔎 Memulai scraping detail untuk {len(collected_records)} dosen")
+            self._scrape_details_for_dosen(list(collected_records.values()), cancel_check=cancel_check)
+        else:
+            logger.warning("⚠️ Tidak ada data dosen yang tersedia untuk scraping detail.")
+
         return final_count
 
-    def scrape_and_store_dosen(self, affiliation_id, max_pages=100, cycle=1):
+    def scrape_and_store_dosen(self, affiliation_id, max_pages=100, cycle=1, cancel_check=None):
         """Scraping data dosen dari SINTA dan simpan ke database (per cycle)"""
         base_url = f"https://sinta.kemdikbud.go.id/affiliations/authors/{affiliation_id}"
         logger.info(f"📖 Cycle {cycle} - Scraping hingga {max_pages} halaman")
 
         new_dosen_count = 0
         total_processed = 0
+        detail_records = []
+        seen_detail_ids = set()
 
         for page in range(1, max_pages + 1):
+            # Cek cancel sebelum setiap halaman
+            if cancel_check and cancel_check():
+                logger.warning(f"🛑 Scraping dihentikan di halaman {page} (cancel requested)")
+                return new_dosen_count, detail_records
+            
             url = f"{base_url}?page={page}"
             logger.info(f"🔍 Cycle {cycle} - Halaman {page}")
             
@@ -599,26 +983,38 @@ class SintaDosenScraper:
                         
                         if not sinta_id:
                             continue
-                        
-                        # Cek apakah sudah ada di database
+
+                        # Cek apakah dosen sudah ada di database untuk skip lebih awal
                         if self._is_dosen_exists(sinta_id):
-                            logger.info(f"⏭️  Skip (sudah ada): {name} (SINTA ID: {sinta_id})")
+                            logger.debug(f"⏭️  Skip (sudah ada): {name} (SINTA ID: {sinta_id})")
                             total_processed += 1
+                            # Tetap tambahkan ke detail_records jika belum ada untuk scraping detail
+                            if sinta_id not in seen_detail_ids:
+                                detail_records.append({
+                                    "sinta_id": sinta_id,
+                                    "profile_url": profile_url
+                                })
+                                seen_detail_ids.add(sinta_id)
                             continue
-                        
-                        logger.info(f"🆕 Proses dosen baru: {name} (SINTA ID: {sinta_id})")
 
-                        # Ekstrak detail dari halaman profil
-                        profile_stats = self._extract_profile_details(profile_url)
-
-                        # Insert/update dosen ke database
-                        dosen_id, is_new = self._insert_or_update_dosen(name, sinta_id, profile_url, profile_stats)
-                        
-                        if dosen_id and is_new:
+                        # Simpan data dasar dosen (insert baru)
+                        inserted = self._upsert_basic_dosen(name, sinta_id, profile_url)
+                        if inserted:
                             new_dosen_count += 1
                             page_new_count += 1
-                            logger.info(f"✅ Dosen baru ditambahkan: {name} (ID: {dosen_id})")
-                        
+                            logger.info(f"✅ Dosen baru ditambahkan: {name} (SINTA ID: {sinta_id})")
+                        else:
+                            # Jika gagal insert (bukan karena sudah ada, tapi error lain)
+                            logger.warning(f"⚠️  Gagal menyimpan dosen: {name} (SINTA ID: {sinta_id})")
+
+                        # Tambahkan ke detail_records untuk scraping detail nanti
+                        if sinta_id not in seen_detail_ids:
+                            detail_records.append({
+                                "sinta_id": sinta_id,
+                                "profile_url": profile_url
+                            })
+                            seen_detail_ids.add(sinta_id)
+
                         total_processed += 1
 
                     except Exception as e:
@@ -636,7 +1032,7 @@ class SintaDosenScraper:
                 continue
 
         logger.info(f"🏁 Cycle {cycle} selesai - {new_dosen_count} dosen baru, {total_processed} total diproses")
-        return new_dosen_count
+        return new_dosen_count, detail_records
 
     def get_extraction_summary(self):
         """Mendapatkan ringkasan hasil extraction"""
@@ -719,7 +1115,7 @@ if __name__ == '__main__':
     db_config = {
         'dbname': 'ProDSGabungan',  # Nama database baru
         'user': 'postgres',        
-        'password': 'password123',    
+        'password': 'hari123',    
         'host': 'localhost',            
         'port': '5432'                  
     }

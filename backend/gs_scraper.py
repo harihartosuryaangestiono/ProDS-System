@@ -133,21 +133,29 @@ class GoogleScholarScraper:
         chrome_options.add_experimental_option("prefs", prefs)
         
         try:
-            service = Service(ChromeDriverManager().install())
-            
+            driver_path = ChromeDriverManager().install()
+
+            if os.path.basename(driver_path) != 'chromedriver':
+                driver_dir = os.path.dirname(driver_path)
+                candidate_path = os.path.join(driver_dir, 'chromedriver')
+                if os.path.exists(candidate_path):
+                    driver_path = candidate_path
+
             import platform
             import subprocess
+            try:
+                os.chmod(driver_path, 0o755)
+            except Exception as chmod_error:
+                print(f"Warning: Could not set chromedriver permissions: {chmod_error}")
+
             if platform.system() == 'Darwin':
-                driver_path = service.path
                 try:
-                    subprocess.run(['xattr', '-d', 'com.apple.quarantine', driver_path], 
-                                 capture_output=True, check=False)
-                    subprocess.run(['chmod', '+x', driver_path], 
-                                 capture_output=True, check=False)
-                    print(f"✓ Fixed ChromeDriver permissions for macOS")
+                    subprocess.run(['xattr', '-d', 'com.apple.quarantine', driver_path],
+                                   capture_output=True, check=False)
                 except Exception as perm_error:
-                    print(f"Warning: Could not fix permissions: {perm_error}")
+                    print(f"Warning: Could not remove quarantine attribute: {perm_error}")
             
+            service = Service(driver_path)
             driver = webdriver.Chrome(service=service, options=chrome_options)
             
         except Exception as e:
@@ -1405,7 +1413,7 @@ if __name__ == "__main__":
     DB_CONFIG = {
         'dbname': 'ProDSGabungan',
         'user': 'postgres',
-        'password': 'password123',
+        'password': 'hari123',
         'host': 'localhost',
         'port': '5432'
     } 

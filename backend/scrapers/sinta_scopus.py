@@ -1043,7 +1043,7 @@ def main():
     DB_CONFIG = {
         'dbname': 'ProDSGabungan',  # Changed to match your schema
         'user': 'postgres',
-        'password': 'password123',
+        'password': 'hari123',
         'host': 'localhost',
         'port': '5432'
     }
