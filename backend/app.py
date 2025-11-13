@@ -54,9 +54,9 @@ socketio = SocketIO(app,
 
 # Database configuration
 DB_CONFIG = {
-    'dbname': os.environ.get('DB_NAME', 'SKM_PUBLIKASI'),
-    'user': os.environ.get('DB_USER', 'rayhanadjisantoso'),
-    'password': os.environ.get('DB_PASSWORD', 'rayhan123'),
+    'dbname': os.environ.get('DB_NAME', 'ProDSGabungan'),
+    'user': os.environ.get('DB_USER', 'postgres'),
+    'password': os.environ.get('DB_PASSWORD', 'password123'),
     'host': os.environ.get('DB_HOST', 'localhost'),
     'port': os.environ.get('DB_PORT', '5432')
 }
@@ -996,6 +996,348 @@ def dashboard_stats(current_user_id):
             conn.close()
 
 
+@app.route('/api/dashboard/sinta-breakdown-per-fakultas', methods=['GET'])
+@token_required
+def get_sinta_breakdown_per_fakultas(current_user_id):
+    """Get Sinta Breakdown (S1–S6) - Per Fakultas
+    Filters: ranking Sinta 1-6 and Other, Terindeks SINTA or Garuda"""
+    conn = None
+    cur = None
+    
+    try:
+        print(f"📊 Sinta Breakdown Per Fakultas - Authenticated user ID: {current_user_id}")
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'success': False, 'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        # CTE for latest publikasi
+        latest_publikasi_cte = """
+            WITH latest_publikasi AS (
+                SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
+                    p.*
+                FROM stg_publikasi_tr p
+                ORDER BY LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi, p.t_tanggal_unduh DESC NULLS LAST
+            )
+        """
+        
+        # Query to get Sinta breakdown per faculty
+        # Filter: ranking Sinta 1-6 and Other, Terindeks SINTA or Garuda
+        query = f"""
+            {latest_publikasi_cte}
+            SELECT
+                COALESCE(dm_faculty.faculty_name, 'Lainnya') as faculty,
+                CASE
+                    WHEN LOWER(COALESCE(a.v_ranking,'')) = 'sinta 1' THEN 'Sinta 1'
+                    WHEN LOWER(COALESCE(a.v_ranking,'')) = 'sinta 2' THEN 'Sinta 2'
+                    WHEN LOWER(COALESCE(a.v_ranking,'')) = 'sinta 3' THEN 'Sinta 3'
+                    WHEN LOWER(COALESCE(a.v_ranking,'')) = 'sinta 4' THEN 'Sinta 4'
+                    WHEN LOWER(COALESCE(a.v_ranking,'')) = 'sinta 5' THEN 'Sinta 5'
+                    WHEN LOWER(COALESCE(a.v_ranking,'')) = 'sinta 6' THEN 'Sinta 6'
+                    ELSE 'Other'
+                END AS ranking,
+                COUNT(DISTINCT p.v_id_publikasi) AS count
+            FROM latest_publikasi p
+            LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+            CROSS JOIN LATERAL (
+                SELECT TRIM(unnest(string_to_array(p.v_authors, ','))) as author_name
+            ) authors
+            LEFT JOIN tmp_dosen_dt d ON LOWER(TRIM(d.v_nama_dosen)) = LOWER(TRIM(authors.author_name))
+            LEFT JOIN datamaster dm ON (
+                (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
+                OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
+            )
+            LEFT JOIN LATERAL (
+                SELECT CASE
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%ekonomi%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%manajemen%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%akuntansi%%' THEN 'Fakultas Ekonomi'
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%hukum%%' THEN 'Fakultas Hukum'
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%teknik%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%sipil%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%arsitektur%%' THEN 'Fakultas Teknik'
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%matematika%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%fisika%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%informatika%%' THEN 'Fakultas Teknologi Informasi dan Sains'
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%filsafat%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%humanitas%%' THEN 'Fakultas Filsafat'
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%kedokteran%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%dokter%%' THEN 'Fakultas Kedokteran'
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%pendidikan%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%pgsd%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%keguruan%%' THEN 'Fakultas Keguruan dan Ilmu Pendidikan'
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%vokasi%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%agribisnis%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%bisnis kreatif%%' THEN 'Fakultas Vokasi'
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%administrasi%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%hubungan internasional%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%ilmu sosial%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%politik%%' THEN 'Fakultas Ilmu Sosial dan Ilmu Politik'
+                    ELSE 'Lainnya'
+                END as faculty_name
+            ) dm_faculty ON TRUE
+            WHERE dm.v_nama_homebase_unpar IS NOT NULL
+                AND (
+                    -- Filter: Terindeks SINTA or Garuda (case-insensitive, handle comma-separated values)
+                    LOWER(COALESCE(a.v_terindeks, '')) LIKE '%%sinta%%'
+                    OR LOWER(COALESCE(a.v_terindeks, '')) LIKE '%%garuda%%'
+                )
+                -- Ranking filter: Include Sinta 1-6 and Other (handled by CASE statement above)
+            GROUP BY 1, 2
+            ORDER BY 1, 2
+        """
+        
+        cur.execute(query)
+        results = [dict(row) for row in cur.fetchall()]
+        
+        print(f"✅ Sinta Breakdown Per Fakultas - Found {len(results)} records")
+        
+        return jsonify({
+            'success': True,
+            'data': results
+        }), 200
+        
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"❌ Sinta Breakdown Per Fakultas error:\n{error_details}")
+        logger.error(f"Sinta Breakdown Per Fakultas error: {e}\n{error_details}")
+        return jsonify({'success': False, 'error': 'Failed to fetch Sinta breakdown per fakultas'}), 500
+    finally:
+        if 'cur' in locals():
+            cur.close()
+        if 'conn' in locals():
+            conn.close()
+
+
+@app.route('/api/dashboard/scopus-breakdown-per-fakultas', methods=['GET'])
+@token_required
+def get_scopus_breakdown_per_fakultas(current_user_id):
+    """Get Scopus Breakdown (Q) - Per Fakultas
+    Filters: ranking Q1-Q4 and no-Q, Terindeks Scopus"""
+    conn = None
+    cur = None
+    
+    try:
+        print(f"📊 Scopus Breakdown Per Fakultas - Authenticated user ID: {current_user_id}")
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'success': False, 'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        # CTE for latest publikasi
+        latest_publikasi_cte = """
+            WITH latest_publikasi AS (
+                SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
+                    p.*
+                FROM stg_publikasi_tr p
+                ORDER BY LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi, p.t_tanggal_unduh DESC NULLS LAST
+            )
+        """
+        
+        # Query to get Scopus breakdown per faculty
+        # Filter: ranking Q1-Q4 and no-Q, Terindeks Scopus (mirip dengan Sinta Breakdown)
+        query = f"""
+            {latest_publikasi_cte}
+            SELECT
+                COALESCE(dm_faculty.faculty_name, 'Lainnya') as faculty,
+                CASE
+                    WHEN COALESCE(a.v_ranking, '') IN ('Q1', 'Q2', 'Q3', 'Q4') THEN a.v_ranking
+                    ELSE 'noQ'
+                END AS ranking,
+                COUNT(DISTINCT p.v_id_publikasi) AS count
+            FROM latest_publikasi p
+            LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+            CROSS JOIN LATERAL (
+                SELECT TRIM(unnest(string_to_array(p.v_authors, ','))) as author_name
+            ) authors
+            LEFT JOIN tmp_dosen_dt d ON LOWER(TRIM(d.v_nama_dosen)) = LOWER(TRIM(authors.author_name))
+            LEFT JOIN datamaster dm ON (
+                (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
+                OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
+            )
+            LEFT JOIN LATERAL (
+                SELECT CASE
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%ekonomi%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%manajemen%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%akuntansi%%' THEN 'Fakultas Ekonomi'
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%hukum%%' THEN 'Fakultas Hukum'
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%teknik%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%sipil%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%arsitektur%%' THEN 'Fakultas Teknik'
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%matematika%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%fisika%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%informatika%%' THEN 'Fakultas Teknologi Informasi dan Sains'
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%filsafat%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%humanitas%%' THEN 'Fakultas Filsafat'
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%kedokteran%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%dokter%%' THEN 'Fakultas Kedokteran'
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%pendidikan%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%pgsd%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%keguruan%%' THEN 'Fakultas Keguruan dan Ilmu Pendidikan'
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%vokasi%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%agribisnis%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%bisnis kreatif%%' THEN 'Fakultas Vokasi'
+                    WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%administrasi%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%hubungan internasional%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%ilmu sosial%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%politik%%' THEN 'Fakultas Ilmu Sosial dan Ilmu Politik'
+                    ELSE 'Lainnya'
+                END as faculty_name
+            ) dm_faculty ON TRUE
+            WHERE dm.v_nama_homebase_unpar IS NOT NULL
+                AND (
+                    -- Filter: Terindeks Scopus (case-insensitive, handle comma-separated values)
+                    LOWER(COALESCE(a.v_terindeks, '')) LIKE '%%scopus%%'
+                )
+                -- Ranking filter: Include Q1-Q4 and no-Q (handled by CASE statement above)
+            GROUP BY 1, 2
+            ORDER BY 1, 2
+        """
+        
+        cur.execute(query)
+        results = [dict(row) for row in cur.fetchall()]
+        
+        print(f"✅ Scopus Breakdown Per Fakultas - Found {len(results)} records")
+        
+        return jsonify({
+            'success': True,
+            'data': results
+        }), 200
+        
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"❌ Scopus Breakdown Per Fakultas error:\n{error_details}")
+        logger.error(f"Scopus Breakdown Per Fakultas error: {e}\n{error_details}")
+        return jsonify({'success': False, 'error': 'Failed to fetch Scopus breakdown per fakultas'}), 500
+    finally:
+        if 'cur' in locals():
+            cur.close()
+        if 'conn' in locals():
+            conn.close()
+
+
+@app.route('/api/dashboard/top-dosen-international', methods=['GET'])
+@token_required
+def get_top_dosen_international(current_user_id):
+    """Get Top 10 Dosen Berdasarkan Publikasi Internasional (Scopus)"""
+    conn = None
+    cur = None
+    
+    try:
+        print(f"📊 Top Dosen International (Scopus) - Authenticated user ID: {current_user_id}")
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'success': False, 'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        # CTE for latest publikasi
+        latest_publikasi_cte = """
+            WITH latest_publikasi AS (
+                SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
+                    p.*
+                FROM stg_publikasi_tr p
+                ORDER BY LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi, p.t_tanggal_unduh DESC NULLS LAST
+            )
+        """
+        
+        # Query to get Top 10 Dosen based on Scopus publications
+        query = f"""
+            {latest_publikasi_cte}
+            SELECT 
+                d.v_nama_dosen,
+                COUNT(DISTINCT p.v_id_publikasi) as count_international
+            FROM latest_publikasi p
+            LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+            CROSS JOIN LATERAL (
+                SELECT TRIM(unnest(string_to_array(p.v_authors, ','))) as author_name
+            ) authors
+            LEFT JOIN tmp_dosen_dt d ON LOWER(TRIM(d.v_nama_dosen)) = LOWER(TRIM(authors.author_name))
+            LEFT JOIN datamaster dm ON (
+                (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
+                OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
+            )
+            WHERE LOWER(COALESCE(a.v_terindeks, '')) LIKE '%%scopus%%'
+                AND d.v_nama_dosen IS NOT NULL
+                AND dm.v_nama_homebase_unpar IS NOT NULL
+            GROUP BY d.v_nama_dosen
+            ORDER BY count_international DESC
+            LIMIT 10
+        """
+        
+        cur.execute(query)
+        results = [dict(row) for row in cur.fetchall()]
+        
+        print(f"✅ Top Dosen International (Scopus) - Found {len(results)} records")
+        
+        return jsonify({
+            'success': True,
+            'data': results
+        }), 200
+        
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"❌ Top Dosen International error:\n{error_details}")
+        logger.error(f"Top Dosen International error: {e}\n{error_details}")
+        return jsonify({'success': False, 'error': 'Failed to fetch top dosen international'}), 500
+    finally:
+        if 'cur' in locals():
+            cur.close()
+        if 'conn' in locals():
+            conn.close()
+
+
+@app.route('/api/dashboard/top-dosen-national', methods=['GET'])
+@token_required
+def get_top_dosen_national(current_user_id):
+    """Get Top 10 Dosen Berdasarkan Publikasi Nasional (Sinta 1-6)"""
+    conn = None
+    cur = None
+    
+    try:
+        print(f"📊 Top Dosen National (Sinta 1-6) - Authenticated user ID: {current_user_id}")
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'success': False, 'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        # CTE for latest publikasi
+        latest_publikasi_cte = """
+            WITH latest_publikasi AS (
+                SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
+                    p.*
+                FROM stg_publikasi_tr p
+                ORDER BY LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi, p.t_tanggal_unduh DESC NULLS LAST
+            )
+        """
+        
+        # Query to get Top 10 Dosen based on Sinta 1-6 publications
+        query = f"""
+            {latest_publikasi_cte}
+            SELECT 
+                d.v_nama_dosen,
+                COUNT(DISTINCT p.v_id_publikasi) as count_national
+            FROM latest_publikasi p
+            LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+            CROSS JOIN LATERAL (
+                SELECT TRIM(unnest(string_to_array(p.v_authors, ','))) as author_name
+            ) authors
+            LEFT JOIN tmp_dosen_dt d ON LOWER(TRIM(d.v_nama_dosen)) = LOWER(TRIM(authors.author_name))
+            LEFT JOIN datamaster dm ON (
+                (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
+                OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
+            )
+            WHERE LOWER(COALESCE(a.v_ranking, '')) IN ('sinta 1', 'sinta 2', 'sinta 3', 'sinta 4', 'sinta 5', 'sinta 6')
+                AND d.v_nama_dosen IS NOT NULL
+                AND dm.v_nama_homebase_unpar IS NOT NULL
+            GROUP BY d.v_nama_dosen
+            ORDER BY count_national DESC
+            LIMIT 10
+        """
+        
+        cur.execute(query)
+        results = [dict(row) for row in cur.fetchall()]
+        
+        print(f"✅ Top Dosen National (Sinta 1-6) - Found {len(results)} records")
+        
+        return jsonify({
+            'success': True,
+            'data': results
+        }), 200
+        
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"❌ Top Dosen National error:\n{error_details}")
+        logger.error(f"Top Dosen National error: {e}\n{error_details}")
+        return jsonify({'success': False, 'error': 'Failed to fetch top dosen national'}), 500
+    finally:
+        if 'cur' in locals():
+            cur.close()
+        if 'conn' in locals():
+            conn.close()
+
+
 # Get faculties for dashboard filter
 @app.route('/api/dashboard/faculties', methods=['GET'])
 @token_required
@@ -1699,16 +2041,22 @@ def get_sinta_publikasi(current_user_id):
                     p.v_id_publikasi,
                     p.v_authors,
                     STRING_AGG(DISTINCT dm.v_nama_homebase_unpar, ', ' ORDER BY dm.v_nama_homebase_unpar) 
-                        FILTER (WHERE dm.v_nama_homebase_unpar IS NOT NULL) as jurusan_names
+                        FILTER (WHERE dm.v_nama_homebase_unpar IS NOT NULL AND TRIM(dm.v_nama_homebase_unpar) != '') as jurusan_names
                 FROM latest_publikasi p
                 CROSS JOIN LATERAL (
                     -- Split authors by comma and trim spaces
-                    SELECT TRIM(unnest(string_to_array(p.v_authors, ','))) as author_name
+                    SELECT TRIM(unnest(string_to_array(COALESCE(p.v_authors, ''), ','))) as author_name
                 ) authors
-                LEFT JOIN tmp_dosen_dt d ON LOWER(TRIM(d.v_nama_dosen)) = LOWER(TRIM(authors.author_name))
+                LEFT JOIN tmp_dosen_dt d ON (
+                    LOWER(TRIM(d.v_nama_dosen)) = LOWER(TRIM(authors.author_name))
+                    OR LOWER(TRIM(d.v_nama_dosen)) LIKE LOWER(TRIM(authors.author_name)) || '%%'
+                    OR LOWER(TRIM(authors.author_name)) LIKE LOWER(TRIM(d.v_nama_dosen)) || '%%'
+                )
                     AND d.v_id_sinta IS NOT NULL 
                     AND TRIM(d.v_id_sinta) <> ''
                 LEFT JOIN datamaster dm ON TRIM(d.v_id_sinta) = TRIM(dm.id_sinta)
+                    AND dm.v_nama_homebase_unpar IS NOT NULL
+                    AND TRIM(dm.v_nama_homebase_unpar) != ''
                     {jurusan_filter}
                 GROUP BY p.v_id_publikasi, p.v_authors
             )
@@ -1793,13 +2141,13 @@ def get_sinta_publikasi(current_user_id):
                 LIMIT %s OFFSET %s
             """
         else:
-            # No filter, show all publications
+            # No filter, show all publications - always get authors from p.v_authors
             data_query = f"""
                 {latest_publikasi_cte}
                 SELECT
                     p.v_id_publikasi,
                     COALESCE(NULLIF(TRIM(p.v_authors), ''), 'N/A') AS authors,
-                    COALESCE(pj.jurusan_names, 'N/A') AS v_nama_jurusan,
+                    COALESCE(NULLIF(TRIM(pj.jurusan_names), ''), 'N/A') AS v_nama_jurusan,
                     p.v_judul,
                     p.v_jenis AS tipe,
                     p.v_tahun_publikasi,
@@ -1836,12 +2184,20 @@ def get_sinta_publikasi(current_user_id):
         
         # Add fakultas information to each record based on department
         for row in rows:
+            # Ensure authors field is populated
+            if not row.get('authors') or row.get('authors') == 'N/A':
+                # Try to get from v_authors if available in original data
+                pass  # Already handled in query with COALESCE
+            
             jurusan_names = row.get('v_nama_jurusan', '')
-            if jurusan_names and jurusan_names != 'N/A':
+            if jurusan_names and jurusan_names != 'N/A' and jurusan_names.strip():
                 # Get first jurusan for fakultas mapping
                 first_jurusan = jurusan_names.split(',')[0].strip()
-                fakultas = get_faculty_from_department(first_jurusan)
-                row['v_nama_fakultas'] = fakultas
+                if first_jurusan:
+                    fakultas = get_faculty_from_department(first_jurusan)
+                    row['v_nama_fakultas'] = fakultas if fakultas else None
+                else:
+                    row['v_nama_fakultas'] = None
             else:
                 row['v_nama_fakultas'] = None
         
@@ -1991,8 +2347,8 @@ def get_sinta_publikasi_stats(current_user_id):
         
         print(f"📅 SINTA Latest: {latest_date}, Previous: {previous_date}")
         
-        # Build query - filter untuk SINTA
-        where_clause = "WHERE (p.v_sumber ILIKE %s OR p.v_sumber IS NULL)"
+        # Build query - filter untuk SINTA (menggunakan format yang sama dengan scraper)
+        where_clause = "WHERE (p.v_sumber IN ('Sinta_Scopus', 'Sinta_GoogleScholar', 'SINTA_Garuda', 'SINTA') OR p.v_sumber ILIKE %s OR p.v_sumber IS NULL)"
         params = ['%SINTA%']
         
         if tipe_filter and tipe_filter != 'all':
@@ -2073,20 +2429,43 @@ def get_sinta_publikasi_stats(current_user_id):
         cte_params = params + jurusan_params
         
         # Get aggregate statistics (LATEST)
-        stats_query = f"""
-            {latest_publikasi_cte}
-            SELECT
-                COUNT(*) as total_publikasi,
-                COALESCE(SUM(p.n_total_sitasi), 0) as total_sitasi,
-                COALESCE(AVG(p.n_total_sitasi), 0) as avg_sitasi,
-                COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY p.n_total_sitasi), 0) as median_sitasi
-            FROM publikasi_with_jurusan p
-            LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
-            WHERE 1=1
-            {terindeks_filter_clause}
-        """
+        # Use latest_publikasi directly if no faculty/department filter, otherwise use publikasi_with_jurusan
+        if jurusan_filter:
+            # If there's a faculty/department filter, use publikasi_with_jurusan
+            stats_query = f"""
+                {latest_publikasi_cte}
+                SELECT
+                    COUNT(*) as total_publikasi,
+                    COALESCE(SUM(p.n_total_sitasi), 0) as total_sitasi,
+                    COALESCE(AVG(p.n_total_sitasi), 0) as avg_sitasi,
+                    COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY p.n_total_sitasi), 0) as median_sitasi
+                FROM publikasi_with_jurusan p
+                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+                WHERE 1=1
+                {terindeks_filter_clause}
+            """
+        else:
+            # If no faculty/department filter, use latest_publikasi directly to get all SINTA publications
+            stats_query = f"""
+                {latest_publikasi_cte}
+                SELECT
+                    COUNT(*) as total_publikasi,
+                    COALESCE(SUM(p.n_total_sitasi), 0) as total_sitasi,
+                    COALESCE(AVG(p.n_total_sitasi), 0) as avg_sitasi,
+                    COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY p.n_total_sitasi), 0) as median_sitasi
+                FROM latest_publikasi p
+                LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
+                WHERE 1=1
+                {terindeks_filter_clause}
+            """
         
-        cur.execute(stats_query, cte_params + terindeks_params)
+        # Use appropriate params based on whether jurusan_filter exists
+        if jurusan_filter:
+            stats_params = cte_params + terindeks_params
+        else:
+            stats_params = params + terindeks_params
+        
+        cur.execute(stats_query, stats_params)
         stats = cur.fetchone()
         
         print(f"📊 Stats result: {stats}")
