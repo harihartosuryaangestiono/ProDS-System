@@ -43,9 +43,9 @@ except ImportError as e:
     print(f"⚠️ Warning: Could not import DB_CONFIG: {e}")
     # Fallback config
     DB_CONFIG = {
-        'dbname': 'SKM_PUBLIKASI',
-        'user': 'rayhanadjisantoso',
-        'password': 'rayhan123',
+        'dbname': 'ProDSGabungan',
+        'user': 'postgres',
+        'password': 'password123',
         'host': 'localhost',
         'port': '5432'
     }

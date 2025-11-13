@@ -909,9 +909,9 @@ def main():
     
     # Database configuration
     print("Database Configuration:")
-    dbname = input("Database name (default: SKM_PUBLIKASI): ").strip() or "SKM_PUBLIKASI"
-    user = input("Database user (default: rayhanadjisantoso): ").strip() or "rayhanadjisantoso"
-    password = input("Database password: ").strip() or "rayhan123"
+    dbname = input("Database name (default: ProDSGabungan): ").strip() or "ProDSGabungan"
+    user = input("Database user (default: postgres): ").strip() or "postgres"
+    password = input("Database password: ").strip() or "password123"
     host = input("Database host (default: localhost): ").strip() or "localhost"
     port = input("Database port (default: 5432): ").strip() or "5432"
     
