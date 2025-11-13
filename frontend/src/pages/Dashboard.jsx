@@ -873,9 +873,6 @@ const Dashboard = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     h-index (GS)
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Persentase
-                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -896,10 +893,6 @@ const Dashboard = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {author.n_h_index_gs?.toLocaleString() || 0}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {stats.top_authors_gs.length > 0 ? 
-                        ((author.n_h_index_gs / Math.max(1, stats.top_authors_gs[0].n_h_index_gs)) * 100).toFixed(1) : 0}%
                     </td>
                   </tr>
                 ))}
@@ -923,7 +916,6 @@ const Dashboard = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ranking</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Dosen</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Publikasi</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Persentase</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -941,12 +933,6 @@ const Dashboard = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{author.v_nama_dosen}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{author.count_international?.toLocaleString() || 0}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {(() => {
-                        const maxVal = stats.top_dosen_international?.[0]?.count_international || 0;
-                        return maxVal > 0 ? ((author.count_international / maxVal) * 100).toFixed(1) : '0.0';
-                      })()}%
-                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -969,7 +955,6 @@ const Dashboard = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ranking</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Dosen</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Publikasi</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Persentase</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -987,12 +972,6 @@ const Dashboard = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{author.v_nama_dosen}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{author.count_national?.toLocaleString() || 0}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {(() => {
-                        const maxVal = stats.top_dosen_national?.[0]?.count_national || 0;
-                        return maxVal > 0 ? ((author.count_national / maxVal) * 100).toFixed(1) : '0.0';
-                      })()}%
-                    </td>
                   </tr>
                 ))}
               </tbody>
