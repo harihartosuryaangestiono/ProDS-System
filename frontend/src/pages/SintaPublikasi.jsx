@@ -47,12 +47,10 @@ const SintaPublikasi = () => {
 
   const terindeksOptions = [
     { value: 'all', label: 'Semua Terindeks' },
-    { value: 'Scopus', label: 'Scopus' },
-    { value: 'WoS', label: 'Web of Science' },
-    { value: 'DOAJ', label: 'DOAJ' },
     { value: 'Garuda', label: 'Garuda' },
-    { value: 'SINTA', label: 'SINTA' },
-    { value: 'Other', label: 'Lainnya' }
+    { value: 'GoogleScholar', label: 'Google Scholar' },
+    { value: 'Scopus', label: 'Scopus' },
+    { value: 'SINTA', label: 'SINTA' }
   ];
 
   const currentYear = new Date().getFullYear();
@@ -249,6 +247,10 @@ const SintaPublikasi = () => {
       
       if (filterTipe !== 'all') {
         params.tipe = filterTipe;
+      }
+
+      if (filterTerindeks !== 'all') {
+        params.terindeks = filterTerindeks;
       }
       
       if (yearStart) {
