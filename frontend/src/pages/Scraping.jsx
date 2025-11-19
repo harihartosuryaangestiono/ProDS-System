@@ -8,7 +8,7 @@ const ScrapingDashboard = () => {
     password: ''
   });
   const [gsConfig, setGsConfig] = useState({
-    maxAuthors: 473,
+    maxAuthors: 20,
     scrapeFromBeginning: false
   });
   const [gsDosenConfig, setGsDosenConfig] = useState({
@@ -918,7 +918,23 @@ useEffect(() => {
 
           {activeTab === 'google-scholar' && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Scraping Google Scholar</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Scraping Google Scholar Publikasi</h3>
+              
+              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                <div className="flex">
+                  <AlertCircle className="h-5 w-5 text-yellow-400" />
+                  <div className="ml-3">
+                    <p className="text-sm text-yellow-800 font-medium mb-1">
+                      ⚠️ Informasi Penting: Scraping Parsial
+                    </p>
+                    <p className="text-sm text-yellow-700">
+                      Scraping tidak dapat dilakukan untuk seluruh dosen karena akan memakan waktu berhari-hari. 
+                      Oleh karena itu, scraping dilakukan secara parsial dengan membatasi jumlah author yang di-scrape. 
+                      Default maksimal author adalah <strong>20</strong> untuk efisiensi waktu.
+                    </p>
+                  </div>
+                </div>
+              </div>
               
               <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
                 <div className="flex">

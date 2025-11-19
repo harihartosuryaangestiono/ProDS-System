@@ -2,10 +2,9 @@
 -- DROP TABLES (Dalam urutan yang benar untuk menghindari dependency issues)
 -- ========================
 
--- Drop tables dalam urutan terbalik dari pembuatan untuk menghindari masalah dependencies
 DROP TABLE IF EXISTS stg_publikasi_sitasi_tahunan_dr;
 DROP TABLE IF EXISTS stg_publikasi_dosen_dt;
-DROP TABLE IF EXISTS stg_lainnya_dr;  -- Tambahan: tabel lainnya
+DROP TABLE IF EXISTS stg_lainnya_dr;
 DROP TABLE IF EXISTS stg_prosiding_dr;
 DROP TABLE IF EXISTS stg_penelitian_dr;
 DROP TABLE IF EXISTS stg_buku_dr;
@@ -14,26 +13,39 @@ DROP TABLE IF EXISTS stg_publikasi_tr;
 DROP TABLE IF EXISTS stg_jurnal_mt;
 DROP TABLE IF EXISTS tmp_dosen_dt;
 DROP TABLE IF EXISTS stg_jurusan_mt;
+DROP TABLE IF EXISTS temp_dosengs_scraping;
+DROP TABLE IF EXISTS datamaster;
 DROP TABLE IF EXISTS users;
 
--- Jika ingin drop database juga (hati-hati!)
--- DROP DATABASE IF EXISTS "SKM_PUBLIKASI";
+-- ========================
+-- DROP FUNCTION
+-- ========================
+DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE;
 
-ALTER TABLE stg_publikasi_tr
-ADD COLUMN v_publisher VARCHAR(200);
-
-ALTER TABLE stg_publikasi_tr
-ADD COLUMN v_authors TEXT;
-
-ALTER TABLE stg_buku_dr 
-DROP COLUMN IF EXISTS v_penerbit;
+SELECT *
+FROM tmp_dosen_dt
 
 -- ========================
--- RECREATE DATABASE DAN TABLES DENGAN TIMESTAMP TRACKING
+-- 1. Tabel DataMaster
 -- ========================
+CREATE TABLE datamaster (
+    v_nip VARCHAR(20) PRIMARY KEY,
+    v_nama_lengkap VARCHAR(150),
+    v_nama_lengkap_gelar VARCHAR(200),
+    v_homebase_unpar VARCHAR(100),
+    v_nama_homebase_unpar VARCHAR(150),
+    v_homebase_dikti VARCHAR(100),
+    v_nama_homebase_dikti VARCHAR(150),
+    v_ket_jns_pegawai VARCHAR(50),
+    v_ket_kel_pegawai VARCHAR(50),
+    v_ket_kategori_status_peg VARCHAR(50),
+    id_sinta VARCHAR(20),
+    id_gs VARCHAR(50),
+    id_scopus VARCHAR(50)
+);
 
 -- ========================
--- 1. Tabel Jurusan dengan timestamp
+-- 2. Tabel Jurusan
 -- ========================
 CREATE TABLE stg_jurusan_mt (
     v_id_jurusan SERIAL PRIMARY KEY,
@@ -41,7 +53,7 @@ CREATE TABLE stg_jurusan_mt (
 );
 
 -- ========================
--- 2. Tabel Dosen dengan timestamp
+-- 3. Tabel Dosen
 -- ========================
 CREATE TABLE tmp_dosen_dt (
     v_id_dosen SERIAL PRIMARY KEY,
@@ -49,12 +61,13 @@ CREATE TABLE tmp_dosen_dt (
     v_id_jurusan INT, -- hanya kolom, tanpa FK
     n_total_publikasi INT DEFAULT 0,
     n_total_sitasi_gs INT DEFAULT 0, -- dari Google Scholar
-    v_id_googleScholar VARCHAR(100),
+    n_total_sitasi_gs2020 INT,
+    v_id_googlescholar VARCHAR(100),
     v_id_sinta VARCHAR(100),
     n_i10_index_gs INT,
     n_i10_index_gs2020 INT,
-    n_h_index_gs INT, -- dari Google Scholar 
-    n_h_index_gs2020 INT,
+    n_h_index_gs INT, -- dari Google Scholar
+    n_h_index_gs2020 INT, -- dari Google Scholar
     n_h_index_gs_sinta INT, -- dari SINTA
     n_h_index_scopus INT,
     n_g_index_gs_sinta INT,
@@ -72,49 +85,47 @@ CREATE TABLE tmp_dosen_dt (
     t_tanggal_unduh TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-SELECT *
-FROM stg_artikel_dr
-where  v_terindeks = ''
 -- ========================
--- 3. Tabel Jurnal dengan timestamp
+-- 4. Tabel Jurnal
 -- ========================
 CREATE TABLE stg_jurnal_mt (
     v_id_jurnal SERIAL PRIMARY KEY,
     v_nama_jurnal VARCHAR(255) NOT NULL
 );
 
-DROP TABLE IF EXISTS temp_dosenGS_scraping;
-
-CREATE TABLE temp_dosenGS_scraping (
+-- ========================
+-- 5. Tabel Temporary Dosen GS Scraping
+-- ========================
+CREATE TABLE temp_dosengs_scraping (
     v_id_gs VARCHAR(50) NOT NULL,
     v_nama VARCHAR(255) NOT NULL,
-    v_affiliation VARCHAR (100),
+    v_affiliation VARCHAR(100),
     n_citations INT DEFAULT 0,
-    v_link VARCHAR (255),
+    v_link VARCHAR(255),
     v_status VARCHAR(200) DEFAULT 'pending',
     v_error_message TEXT,
     t_last_updated TIMESTAMP
 );
 
-
 -- ========================
--- 4. Tabel Publikasi (Superclass) dengan timestamp
+-- 6. Tabel Publikasi (Superclass)
 -- ========================
 CREATE TABLE stg_publikasi_tr (
     v_id_publikasi SERIAL PRIMARY KEY,
-    v_judul TEXT NOT NULL,
     v_authors TEXT,
-    v_jenis VARCHAR(20) NOT NULL CHECK (v_jenis IN ('artikel','buku','penelitian','prosiding')),
+    v_judul TEXT NOT NULL,
+    v_jenis VARCHAR(20) NOT NULL CHECK (v_jenis IN ('artikel','buku','penelitian','prosiding','lainnya')),
     v_tahun_publikasi INT,
     n_total_sitasi INT DEFAULT 0,
     v_sumber VARCHAR(50),
     v_publisher VARCHAR(200),
     v_link_url VARCHAR(255),
-    t_tanggal_unduh TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    t_tanggal_unduh TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    t_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ========================
--- 5. Subclass Publikasi dengan timestamp
+-- 7. Subclass Publikasi
 -- ========================
 CREATE TABLE stg_artikel_dr (
     v_id_publikasi INT PRIMARY KEY,
@@ -122,45 +133,48 @@ CREATE TABLE stg_artikel_dr (
     v_volume VARCHAR(50),
     v_issue VARCHAR(50),
     v_pages VARCHAR(50),
-    v_terindeks VARCHAR(50), -- Scopus, WoS, DOAJ, dll
-    v_ranking VARCHAR(50) -- Q1-Q4, Sinta 1-6
+    v_terindeks VARCHAR(50), -- GARUDA, Google Scholar, Scopus, SINTA
+    v_ranking VARCHAR(50), -- Scopus (Q1-Q4) atau SINTA (S1-S6)
+    t_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE stg_buku_dr (
     v_id_publikasi INT PRIMARY KEY, -- hanya kolom, tanpa FK
-    v_isbn VARCHAR(50)
+    v_isbn VARCHAR(50),
+    t_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE stg_penelitian_dr (
     v_id_publikasi INT PRIMARY KEY, -- hanya kolom, tanpa FK
-    v_kategori_penelitian VARCHAR(100)
+    v_kategori_penelitian VARCHAR(100),
+    t_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE stg_prosiding_dr (
     v_id_publikasi INT PRIMARY KEY, -- hanya kolom, tanpa FK
     v_nama_konferensi VARCHAR(255),
-    f_terindeks_scopus BOOLEAN DEFAULT FALSE -- publikasi terindeks scopus atau tidak
+    f_terindeks_scopus BOOLEAN DEFAULT FALSE, -- publikasi terindeks scopus atau tidak
+    t_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE stg_lainnya_dr (
+    v_id_publikasi INT PRIMARY KEY, -- hanya kolom, tanpa FK
+    v_keterangan TEXT, -- Untuk catatan tambahan tentang publikasi ini
+    t_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ========================
--- TAMBAHAN: Tabel untuk publikasi kategori "Lainnya"
--- ========================
-CREATE TABLE stg_lainnya_dr (
-    v_id_publikasi INT PRIMARY KEY,
-    v_keterangan TEXT  -- Untuk catatan tambahan tentang publikasi ini
-);
--- ========================
--- 6. Relasi Many-to-Many Publikasi - Dosen dengan timestamp
+-- 8. Relasi Many-to-Many tabel Publikasi dengan tabel Dosen 
 -- ========================
 CREATE TABLE stg_publikasi_dosen_dt (
     v_id_publikasi INT NOT NULL,
     v_id_dosen INT NOT NULL,
-    v_author_order VARCHAR(100), -- 1 out of 4
+    v_author_order VARCHAR(100), -- misalnya 1 out of 4
     PRIMARY KEY (v_id_publikasi, v_id_dosen)
 );
 
 -- ========================
--- 7. Sitasi Tahunan per Publikasi dengan timestamp
+-- 9. Sitasi Tahunan per Publikasi
 -- ========================
 CREATE TABLE stg_publikasi_sitasi_tahunan_dr (
     v_id_sitasi SERIAL PRIMARY KEY,
@@ -172,7 +186,7 @@ CREATE TABLE stg_publikasi_sitasi_tahunan_dr (
 );
 
 -- ========================
--- 8. Tabel Users dengan timestamp
+-- 10. Tabel Users
 -- ========================
 CREATE TABLE users (
     v_id_user SERIAL PRIMARY KEY,
@@ -183,144 +197,97 @@ CREATE TABLE users (
     t_tanggal_bikin TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-ALTER TABLE tmp_dosen_dt
-ADD COLUMN n_total_sitasi_gs2020 integer;
-
-
---DATA MASTER
-CREATE TABLE DataMaster (
-    v_nip VARCHAR(20) PRIMARY KEY,
-    v_nama_lengkap VARCHAR(150),
-    v_nama_lengkap_gelar VARCHAR(200),
-    v_homebase_unpar VARCHAR(100),
-    v_nama_homebase_unpar VARCHAR(150),
-    v_homebase_dikti VARCHAR(100),
-    v_nama_homebase_dikti VARCHAR(150),
-    v_ket_jns_pegawai VARCHAR(50),
-    v_ket_kel_pegawai VARCHAR(50),
-    v_ket_kategori_status_peg VARCHAR(50),
-    ID_SINTA VARCHAR(20),
-    ID_GS VARCHAR(50),
-    ID_SCOPUS VARCHAR(50)
-);
-
 -- ========================
--- 9. TRIGGER FUNCTIONS UNTUK AUTO UPDATE t_updated_at
+-- 11. TRIGGER FUNCTION UNTUK AUTO UPDATE t_updated_at
 -- ========================
-
--- Function untuk update timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.t_updated_at = CURRENT_TIMESTAMP;
+    -- CRITICAL: Only execute on UPDATE operations
+    IF TG_OP != 'UPDATE' THEN
+        RETURN NEW;
+    END IF;
+    -- Try to update t_updated_at with exception handling
+    BEGIN
+        NEW.t_updated_at := CURRENT_TIMESTAMP;
+    EXCEPTION 
+        WHEN undefined_column THEN
+            -- Column doesn't exist, silently continue
+            RAISE NOTICE 'Table % does not have t_updated_at column', TG_TABLE_NAME;
+        WHEN OTHERS THEN
+            -- Any other error, log but continue
+            RAISE NOTICE 'Error updating t_updated_at for table %: %', TG_TABLE_NAME, SQLERRM;
+    END;
     RETURN NEW;
 END;
-$$ language 'plpgsql';
+$$ LANGUAGE plpgsql;
 
 -- ========================
--- 10. BUAT TRIGGERS UNTUK SETIAP TABEL
+-- 12. BUAT TRIGGERS UNTUK SETIAP TABEL
 -- ========================
 
--- Trigger untuk stg_jurusan
+-- Trigger untuk stg_jurusan_mt
 CREATE TRIGGER update_stg_jurusan_updated_at
     BEFORE UPDATE ON stg_jurusan_mt
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Trigger untuk tmp_dosen
+-- Trigger untuk tmp_dosen_dt
 CREATE TRIGGER update_tmp_dosen_updated_at
     BEFORE UPDATE ON tmp_dosen_dt
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Trigger untuk stg_jurnal
+-- Trigger untuk stg_jurnal_mt
 CREATE TRIGGER update_stg_jurnal_updated_at
     BEFORE UPDATE ON stg_jurnal_mt
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Trigger untuk stg_publikasi
+-- Trigger untuk stg_publikasi_tr
 CREATE TRIGGER update_stg_publikasi_updated_at
     BEFORE UPDATE ON stg_publikasi_tr
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Trigger untuk stg_artikel
+-- Trigger untuk stg_artikel_dr
 CREATE TRIGGER update_stg_artikel_updated_at
     BEFORE UPDATE ON stg_artikel_dr
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Trigger untuk stg_buku
+-- Trigger untuk stg_buku_dr
 CREATE TRIGGER update_stg_buku_updated_at
     BEFORE UPDATE ON stg_buku_dr
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Trigger untuk stg_penelitian
+-- Trigger untuk stg_penelitian_dr
 CREATE TRIGGER update_stg_penelitian_updated_at
     BEFORE UPDATE ON stg_penelitian_dr
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Trigger untuk stg_prosiding
+-- Trigger untuk stg_prosiding_dr
 CREATE TRIGGER update_stg_prosiding_updated_at
     BEFORE UPDATE ON stg_prosiding_dr
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Trigger untuk stg_publikasi_dosen
+-- Trigger untuk stg_lainnya_dr
+CREATE TRIGGER update_stg_lainnya_updated_at
+    BEFORE UPDATE ON stg_lainnya_dr
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- Trigger untuk stg_publikasi_dosen_dt
 CREATE TRIGGER update_stg_publikasi_dosen_updated_at
     BEFORE UPDATE ON stg_publikasi_dosen_dt
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Trigger untuk stg_publikasi_sitasi_tahunan
+-- Trigger untuk stg_publikasi_sitasi_tahunan_dr
 CREATE TRIGGER update_stg_publikasi_sitasi_tahunan_updated_at
     BEFORE UPDATE ON stg_publikasi_sitasi_tahunan_dr
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
-
-
--- ========================
--- 11. INDEXES UNTUK PERFORMA (OPSIONAL)
--- ========================
-
--- Index untuk timestamp columns (berguna untuk query berdasarkan waktu)
-CREATE INDEX idx_stg_jurusan_created_at ON stg_jurusan_mt(t_created_at);
-CREATE INDEX idx_stg_jurusan_updated_at ON stg_jurusan_mt(t_updated_at);
-
-CREATE INDEX idx_tmp_dosen_created_at ON tmp_dosen_dt(t_created_at);
-CREATE INDEX idx_tmp_dosen_updated_at ON tmp_dosen_dt(t_updated_at);
-
-CREATE INDEX idx_stg_publikasi_created_at ON stg_publikasi_tr(t_created_at);
-CREATE INDEX idx_stg_publikasi_updated_at ON stg_publikasi_tr(t_updated_at);
-
--- Index untuk kolom yang sering digunakan untuk join
-CREATE INDEX idx_tmp_dosen_jurusan ON tmp_dosen_dt(v_id_jurusan);
-CREATE INDEX idx_stg_artikel_jurnal ON stg_artikel_dr(v_id_jurnal);
-
--- ========================
--- 12. SAMPLE QUERIES UNTUK MONITORING
--- ========================
-
--- Contoh query untuk melihat data yang baru ditambahkan hari ini
--- SELECT * FROM tmp_dosen WHERE DATE(t_created_at) = CURRENT_DATE;
-
--- Contoh query untuk melihat data yang diupdate dalam 1 jam terakhir
--- SELECT * FROM stg_publikasi WHERE t_updated_at >= NOW() - INTERVAL '1 hour';
-
--- Contoh query untuk audit trail
--- SELECT 
---     'tmp_dosen' as table_name,
---     COUNT(*) as total_records,
---     COUNT(*) FILTER (WHERE DATE(t_created_at) = CURRENT_DATE) as created_today,
---     COUNT(*) FILTER (WHERE DATE(t_updated_at) = CURRENT_DATE AND DATE(t_created_at) != CURRENT_DATE) as updated_today
--- FROM tmp_dosen
--- UNION ALL
--- SELECT 
---     'stg_publikasi' as table_name,
---     COUNT(*) as total_records,
---     COUNT(*) FILTER (WHERE DATE(t_created_at) = CURRENT_DATE) as created_today,
---     COUNT(*) FILTER (WHERE DATE(t_updated_at) = CURRENT_DATE AND DATE(t_created_at) != CURRENT_DATE) as updated_today
--- FROM stg_publikasi;

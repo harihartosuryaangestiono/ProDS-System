@@ -1041,9 +1041,9 @@ def main():
     """Main function with command line options"""
     # Database configuration - modify these values as needed
     DB_CONFIG = {
-        'dbname': 'SKM_PUBLIKASI',  # Changed to match your schema
-        'user': 'rayhanadjisantoso',
-        'password': 'rayhan123',
+        'dbname': 'ProDSGabungan',  # Changed to match your schema
+        'user': 'postgres',
+        'password': 'password123',
         'host': 'localhost',
         'port': '5432'
     }
