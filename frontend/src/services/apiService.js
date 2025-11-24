@@ -255,6 +255,173 @@ apiService.getScholarDepartments = async (faculty) => {
 };
 
 // ===================================
+// Export to Excel Functions
+// ===================================
+
+apiService.exportSintaDosen = async (params = {}) => {
+  try {
+    const token = localStorage.getItem('token');
+    const queryParams = new URLSearchParams();
+    
+    if (params.search) queryParams.append('search', params.search);
+    if (params.faculty) queryParams.append('faculty', params.faculty);
+    if (params.department) queryParams.append('department', params.department);
+    
+    const url = `${API_BASE_URL}/api/sinta/dosen/export?${queryParams.toString()}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Export failed');
+    }
+    
+    const blob = await response.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `sinta_dosen_${new Date().toISOString().split('T')[0]}.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl);
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Export error:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+apiService.exportSintaPublikasi = async (params = {}) => {
+  try {
+    const token = localStorage.getItem('token');
+    const queryParams = new URLSearchParams();
+    
+    if (params.search) queryParams.append('search', params.search);
+    if (params.tipe && params.tipe !== 'all') queryParams.append('tipe', params.tipe);
+    if (params.terindeks && params.terindeks !== 'all') queryParams.append('terindeks', params.terindeks);
+    if (params.year_start) queryParams.append('year_start', params.year_start);
+    if (params.year_end) queryParams.append('year_end', params.year_end);
+    if (params.faculty) queryParams.append('faculty', params.faculty);
+    if (params.department) queryParams.append('department', params.department);
+    
+    const url = `${API_BASE_URL}/api/sinta/publikasi/export?${queryParams.toString()}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Export failed');
+    }
+    
+    const blob = await response.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `sinta_publikasi_${new Date().toISOString().split('T')[0]}.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl);
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Export error:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+apiService.exportScholarDosen = async (params = {}) => {
+  try {
+    const token = localStorage.getItem('token');
+    const queryParams = new URLSearchParams();
+    
+    if (params.search) queryParams.append('search', params.search);
+    if (params.faculty) queryParams.append('faculty', params.faculty);
+    if (params.department) queryParams.append('department', params.department);
+    
+    const url = `${API_BASE_URL}/api/scholar/dosen/export?${queryParams.toString()}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Export failed');
+    }
+    
+    const blob = await response.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `scholar_dosen_${new Date().toISOString().split('T')[0]}.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl);
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Export error:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+apiService.exportScholarPublikasi = async (params = {}) => {
+  try {
+    const token = localStorage.getItem('token');
+    const queryParams = new URLSearchParams();
+    
+    if (params.search) queryParams.append('search', params.search);
+    if (params.tipe && params.tipe !== 'all') queryParams.append('tipe', params.tipe);
+    if (params.year_start) queryParams.append('year_start', params.year_start);
+    if (params.year_end) queryParams.append('year_end', params.year_end);
+    if (params.faculty) queryParams.append('faculty', params.faculty);
+    if (params.department) queryParams.append('department', params.department);
+    
+    const url = `${API_BASE_URL}/api/scholar/publikasi/export?${queryParams.toString()}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Export failed');
+    }
+    
+    const blob = await response.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `scholar_publikasi_${new Date().toISOString().split('T')[0]}.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl);
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Export error:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+// ===================================
 // Dashboard API Functions
 // ===================================
 

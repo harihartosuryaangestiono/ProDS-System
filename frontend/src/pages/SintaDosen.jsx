@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, TrendingUp, Award, Calendar, ExternalLink, Building2, GraduationCap, RefreshCw, Search, ArrowUp, ArrowDown } from 'lucide-react';
+import { Users, TrendingUp, Award, Calendar, ExternalLink, Building2, GraduationCap, RefreshCw, Search, ArrowUp, ArrowDown, Download } from 'lucide-react';
 import apiService from '../services/apiService';
 import { toast } from 'react-hot-toast';
 
@@ -188,6 +188,26 @@ const SintaDosen = () => {
     setCurrentPage(1);
   };
 
+  const handleExport = async () => {
+    try {
+      toast.loading('Mengekspor data ke Excel...', { id: 'export' });
+      const params = {};
+      if (searchTerm) params.search = searchTerm;
+      if (selectedFaculty) params.faculty = selectedFaculty;
+      if (selectedDepartment) params.department = selectedDepartment;
+      
+      const result = await apiService.exportSintaDosen(params);
+      if (result.success) {
+        toast.success('Data berhasil diekspor ke Excel', { id: 'export' });
+      } else {
+        toast.error('Gagal mengekspor data', { id: 'export' });
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Terjadi kesalahan saat mengekspor data', { id: 'export' });
+    }
+  };
+
   const handleSort = (key) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -358,14 +378,24 @@ const SintaDosen = () => {
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-900">Daftar Dosen SINTA</h2>
-              <button
-                onClick={fetchDosenData}
-                className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                disabled={loading}
-              >
-                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                Refresh
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleExport}
+                  className="inline-flex items-center px-3 py-2 border border-green-300 rounded-md text-sm font-medium text-green-700 bg-white hover:bg-green-50"
+                  disabled={loading}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Excel
+                </button>
+                <button
+                  onClick={fetchDosenData}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                  disabled={loading}
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </button>
+              </div>
             </div>
 
             {/* Filters Section */}

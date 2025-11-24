@@ -349,6 +349,12 @@ const Dashboard = () => {
     return Array.from(faculties).sort();
   };
 
+  // Remove "Fakultas " prefix from faculty name for display
+  const removeFakultasPrefix = (facultyName) => {
+    if (!facultyName) return facultyName;
+    return facultyName.replace(/^Fakultas\s+/i, '');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -623,7 +629,7 @@ const Dashboard = () => {
                     dataKey={faculty}
                     stackId="a"
                     fill={FACULTY_COLORS[faculty] || '#6B7280'}
-                    name={faculty}
+                    name={removeFakultasPrefix(faculty)}
                   />
                 ))
               ) : (
@@ -748,7 +754,7 @@ const Dashboard = () => {
                       dataKey={faculty}
                       stackId="a"
                       fill={FACULTY_COLORS[faculty] || '#6B7280'}
-                      name={faculty}
+                      name={removeFakultasPrefix(faculty)}
                     />
                   ))
                 ) : (
@@ -782,7 +788,7 @@ const Dashboard = () => {
                       dataKey={faculty}
                       stackId="a"
                       fill={FACULTY_COLORS[faculty] || '#6B7280'}
-                      name={faculty}
+                      name={removeFakultasPrefix(faculty)}
                     />
                   ))
                 ) : (
