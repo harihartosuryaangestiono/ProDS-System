@@ -609,7 +609,9 @@ def dashboard_stats(current_user_id):
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
                 WHERE dm.v_nama_homebase_unpar IS NOT NULL 
-                    AND d.v_nama_dosen IS NOT NULL {faculty_filter}
+                    AND d.v_nama_dosen IS NOT NULL
+                    AND LOWER(COALESCE(a.v_terindeks, '')) LIKE '%sinta%'
+                    {faculty_filter}
                 GROUP BY 1
                 ORDER BY 1
             """
@@ -696,6 +698,7 @@ def dashboard_stats(current_user_id):
                 ) dm_faculty ON TRUE
                 WHERE dm.v_nama_homebase_unpar IS NOT NULL
                     AND d.v_nama_dosen IS NOT NULL
+                    AND LOWER(COALESCE(a.v_terindeks, '')) LIKE '%sinta%'
                 GROUP BY 1, 2
                 ORDER BY 1, 2
             """
@@ -1473,11 +1476,7 @@ def get_sinta_breakdown_per_fakultas(current_user_id):
                 END as faculty_name
             ) dm_faculty ON TRUE
             WHERE dm.v_nama_homebase_unpar IS NOT NULL
-                AND (
-                    -- Filter: Terindeks SINTA or Garuda (case-insensitive, handle comma-separated values)
-                    LOWER(COALESCE(a.v_terindeks, '')) LIKE '%%sinta%%'
-                    OR LOWER(COALESCE(a.v_terindeks, '')) LIKE '%%garuda%%'
-                )
+                AND LOWER(COALESCE(a.v_terindeks, '')) LIKE '%sinta%'
                 -- Ranking filter: Include Sinta 1-6 and Other (handled by CASE statement above)
             GROUP BY 1, 2
             ORDER BY 1, 2

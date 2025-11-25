@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, User, LogOut, Home, Users, FileText, Download, ChevronDown } from 'lucide-react';
+import { Menu, X, User, LogOut, Home, Users, FileText, Download, ChevronDown, Info } from 'lucide-react';
 
 const Navbar = ({ user, onLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -176,6 +176,19 @@ const Navbar = ({ user, onLogout }) => {
               >
                 <LogOut className="h-5 w-5" />
               </button>
+              
+              {/* About dengan animasi - icon + text */}
+              <Link
+                to="/about"
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-300 ${
+                  isActive('/about')
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                }`}
+              >
+                <Info className="h-5 w-5" />
+                <span className="text-sm font-medium">About</span>
+              </Link>
             </div>
           </div>
 
@@ -194,12 +207,134 @@ const Navbar = ({ user, onLogout }) => {
           </div>
         </div>
 
-        {/* Mobile Navigation dengan animasi - tambahkan bagian Google Scholar dan Scraping */}
+        {/* Mobile Navigation dengan animasi */}
         {isMenuOpen && (
-          <div className="md:hidden">
+          <div className="md:hidden border-t border-gray-200">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              {/* Mobile menu items */}
-              {/* ... (similar styling as desktop but adapted for mobile) ... */}
+              <NavLink 
+                to="/dashboard"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center space-x-3 px-4 py-3 rounded-lg"
+              >
+                <Home className="h-5 w-5" />
+                <span>Dashboard</span>
+              </NavLink>
+
+              <div className="px-4 py-2">
+                <button
+                  onClick={() => handleDropdownToggle('sinta')}
+                  className="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-blue-50"
+                >
+                  <span>SINTA</span>
+                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${
+                    isSintaDropdownOpen ? 'rotate-180' : ''
+                  }`} />
+                </button>
+                {isSintaDropdownOpen && (
+                  <div className="pl-4 mt-1 space-y-1">
+                    <DropdownLink 
+                      to="/sinta/dosen"
+                      onClick={() => {
+                        closeDropdowns();
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center space-x-3 px-4 py-2 rounded-lg"
+                    >
+                      <Users className="h-5 w-5 text-blue-500" />
+                      <span>Data Dosen</span>
+                    </DropdownLink>
+                    <DropdownLink 
+                      to="/sinta/publikasi"
+                      onClick={() => {
+                        closeDropdowns();
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center space-x-3 px-4 py-2 rounded-lg"
+                    >
+                      <FileText className="h-5 w-5 text-blue-500" />
+                      <span>Data Publikasi</span>
+                    </DropdownLink>
+                  </div>
+                )}
+              </div>
+
+              <div className="px-4 py-2">
+                <button
+                  onClick={() => handleDropdownToggle('scholar')}
+                  className="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-blue-50"
+                >
+                  <span>Google Scholar</span>
+                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${
+                    isScholarDropdownOpen ? 'rotate-180' : ''
+                  }`} />
+                </button>
+                {isScholarDropdownOpen && (
+                  <div className="pl-4 mt-1 space-y-1">
+                    <DropdownLink 
+                      to="/scholar/dosen"
+                      onClick={() => {
+                        closeDropdowns();
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center space-x-3 px-4 py-2 rounded-lg"
+                    >
+                      <Users className="h-5 w-5 text-blue-500" />
+                      <span>Data Dosen</span>
+                    </DropdownLink>
+                    <DropdownLink 
+                      to="/scholar/publikasi"
+                      onClick={() => {
+                        closeDropdowns();
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center space-x-3 px-4 py-2 rounded-lg"
+                    >
+                      <FileText className="h-5 w-5 text-blue-500" />
+                      <span>Data Publikasi</span>
+                    </DropdownLink>
+                  </div>
+                )}
+              </div>
+
+              <NavLink 
+                to="/scraping"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center space-x-3 px-4 py-3 rounded-lg"
+              >
+                <Download className="h-5 w-5" />
+                <span>Scraping</span>
+              </NavLink>
+
+              <div className="border-t border-gray-200 mt-2 pt-2">
+                <div className="px-4 py-2 flex items-center space-x-3">
+                  <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                    <User className="h-5 w-5 text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">{user.username}</span>
+                </div>
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    onLogout();
+                  }}
+                  className="w-full flex items-center space-x-3 px-4 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-red-50 hover:text-red-600"
+                >
+                  <LogOut className="h-5 w-5" />
+                  <span>Logout</span>
+                </button>
+                <Link
+                  to="/about"
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`w-full flex items-center space-x-3 px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                    isActive('/about')
+                      ? 'bg-blue-50 text-blue-600'
+                      : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                  }`}
+                >
+                  <Info className="h-5 w-5" />
+                  <span>About</span>
+                </Link>
+              </div>
             </div>
           </div>
         )}

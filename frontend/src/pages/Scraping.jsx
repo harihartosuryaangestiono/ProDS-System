@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Play, User, Lock, Database, AlertCircle, CheckCircle, Clock, Target, Globe, FileText, Loader, Square } from 'lucide-react';
+import Layout from '../components/Layout';
 
 const ScrapingDashboard = () => {
   const [activeTab, setActiveTab] = useState('sinta-dosen');
@@ -406,18 +407,16 @@ useEffect(() => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center mb-2">
-            <Database className="w-8 h-8 text-blue-600 mr-3" />
-            <h1 className="text-3xl font-bold text-gray-900">Data Scraping Dashboard</h1>
-          </div>
-          <p className="text-sm text-gray-600">
-            Scraping data akademik dari berbagai sumber (SINTA, Scopus, Google Scholar, Garuda)
-          </p>
+    <Layout
+      title={
+        <div className="flex items-center">
+          <Database className="w-8 h-8 text-blue-600 mr-3" />
+          <span>Data Scraping Dashboard</span>
         </div>
+      }
+      description="Scraping data akademik dari berbagai sumber (SINTA, Scopus, Google Scholar, Garuda)"
+      maxWidth="max-w-6xl"
+    >
 
         {/* Tabs */}
         <div className="mb-6">
@@ -536,7 +535,7 @@ useEffect(() => {
 
         {/* SINTA Credentials (Common for SINTA tabs) */}
         {activeTab !== 'google-scholar' && activeTab !== 'gs-dosen' && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6 hover:shadow-md transition-shadow duration-300">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Kredensial SINTA</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -579,7 +578,7 @@ useEffect(() => {
         )}
 
         {/* Tab Content */}
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-300">
           {activeTab === 'sinta-dosen' && (
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Scraping SINTA Dosen</h3>
@@ -1024,8 +1023,7 @@ useEffect(() => {
             </div>
           )}
         </div>
-      </div>
-    </div>
+    </Layout>
   );
 };
 

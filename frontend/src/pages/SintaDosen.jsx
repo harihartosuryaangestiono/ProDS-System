@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Users, TrendingUp, Award, Calendar, ExternalLink, Building2, GraduationCap, RefreshCw, Search, ArrowUp, ArrowDown, Download } from 'lucide-react';
 import apiService from '../services/apiService';
 import { toast } from 'react-hot-toast';
+import Layout from '../components/Layout';
 
 const SintaDosen = () => {
   const [dosenData, setDosenData] = useState([]);
@@ -310,15 +311,30 @@ const SintaDosen = () => {
   const sortedData = getSortedData();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Data Dosen SINTA</h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Daftar dosen dengan data dari SINTA (Science and Technology Index)
-          </p>
-        </div>
+    <Layout
+      title="Data Dosen SINTA"
+      description="Daftar dosen dengan data dari SINTA (Science and Technology Index)"
+      headerActions={
+        <>
+          <button
+            onClick={handleExport}
+            className="inline-flex items-center px-4 py-2.5 border border-green-300 rounded-lg text-sm font-medium text-green-700 bg-white hover:bg-green-50 hover:border-green-400 shadow-sm hover:shadow transition-all duration-200"
+            disabled={loading}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export Excel
+          </button>
+          <button
+            onClick={fetchDosenData}
+            className="inline-flex items-center px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow transition-all duration-200"
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+        </>
+      }
+    >
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
@@ -373,30 +389,10 @@ const SintaDosen = () => {
         </div>
 
         {/* Data Table with Integrated Filters */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
           {/* Table Header */}
-          <div className="px-6 py-4 border-b border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Daftar Dosen SINTA</h2>
-              <div className="flex gap-2">
-                <button
-                  onClick={handleExport}
-                  className="inline-flex items-center px-3 py-2 border border-green-300 rounded-md text-sm font-medium text-green-700 bg-white hover:bg-green-50"
-                  disabled={loading}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Export Excel
-                </button>
-                <button
-                  onClick={fetchDosenData}
-                  className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                  disabled={loading}
-                >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                  Refresh
-                </button>
-              </div>
-            </div>
+          <div className="px-6 py-5 border-b border-gray-200 bg-gray-50/50">
+            <h2 className="text-xl font-semibold text-gray-900">Daftar Dosen SINTA</h2>
 
             {/* Filters Section */}
             <div className="space-y-4">
@@ -530,7 +526,7 @@ const SintaDosen = () => {
             ) : (
               <>
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-gray-50/80">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('v_nama_dosen')}>
                         Nama Dosen {sortConfig.key === 'v_nama_dosen' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
@@ -709,8 +705,7 @@ const SintaDosen = () => {
             )}
           </div>
         </div>
-      </div>
-    </div>
+    </Layout>
   );
 };
 
