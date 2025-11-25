@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Users, FileText, TrendingUp, Award, Calendar, Search, ArrowUp, ArrowDown, Filter, Building2, GraduationCap, RefreshCw } from 'lucide-react';
 import apiService from '../services/apiService';
+import Layout from '../components/Layout';
 
 // Faculty colors for stacked charts
 const FACULTY_COLORS = {
@@ -400,20 +401,17 @@ const Dashboard = () => {
   const uniqueFacultiesSinta = getUniqueFaculties(stats.sinta_rank_breakdown || []);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Overview sistem publikasi dosen SINTA & Google Scholar
-          </p>
-        </div>
+    <Layout
+      title="Dashboard"
+      description="Overview sistem publikasi dosen SINTA & Google Scholar"
+    >
 
         {/* Global Filters */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Filter className="w-5 h-5 text-blue-600" />
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8 hover:shadow-md transition-shadow duration-300">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="p-2 bg-blue-50 rounded-lg">
+              <Filter className="w-5 h-5 text-blue-600" />
+            </div>
             <h2 className="text-lg font-semibold text-gray-900">Filter Data</h2>
           </div>
           
@@ -593,7 +591,7 @@ const Dashboard = () => {
         </div>
 
         {/* Publikasi by Year Chart */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8 hover:shadow-md transition-shadow duration-300">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <Calendar className="w-5 h-5 text-blue-600 mr-2" />
@@ -643,7 +641,7 @@ const Dashboard = () => {
         {/* Top Authors - Scopus and GS */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Top Dosen by h-index (Scopus) */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-300">
             <div className="flex items-center mb-4">
               <Award className="w-5 h-5 text-green-600 mr-2" />
               <h2 className="text-lg font-semibold text-gray-900">Top 10 Dosen (h-index Scopus)</h2>
@@ -686,7 +684,7 @@ const Dashboard = () => {
           </div>
 
           {/* Top Dosen by h-index (Google Scholar) */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-300">
             <div className="flex items-center mb-4">
               <Award className="w-5 h-5 text-red-600 mr-2" />
               <h2 className="text-lg font-semibold text-gray-900">Top 10 Dosen (h-index Google Scholar)</h2>
@@ -732,7 +730,7 @@ const Dashboard = () => {
         {/* Breakdown Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Scopus Q Breakdown */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-300">
             <div className="flex items-center mb-4">
               <Award className="w-5 h-5 text-emerald-600 mr-2" />
               <h2 className="text-lg font-semibold text-gray-900">
@@ -766,7 +764,7 @@ const Dashboard = () => {
           </div>
           
           {/* Sinta Rank Breakdown */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-300">
             <div className="flex items-center mb-4">
               <Award className="w-5 h-5 text-indigo-600 mr-2" />
               <h2 className="text-lg font-semibold text-gray-900">
@@ -803,7 +801,7 @@ const Dashboard = () => {
         {/* Summary Statistics */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           {/* Summary Card Column */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-300">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Ringkasan Statistik</h2>
             <div className="space-y-4">
               <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
@@ -984,8 +982,7 @@ const Dashboard = () => {
             </table>
           </div>
         </div>
-      </div>
-    </div>
+    </Layout>
   );
 };
 

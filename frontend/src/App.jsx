@@ -11,6 +11,7 @@ import SintaPublikasi from './pages/SintaPublikasi';
 import ScholarDosen from './pages/ScholarDosen';
 import ScholarPublikasi from './pages/ScholarPublikasi';
 import Scraping from './pages/Scraping';
+import About from './pages/About';
 
 // Components
 import Navbar from './components/Navbar';
@@ -147,6 +148,16 @@ function App() {
             element={
               <ProtectedRoute user={user}>
                 <Scraping />
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* About Route */}
+          <Route 
+            path="/about" 
+            element={
+              <ProtectedRoute user={user}>
+                <About />
               </ProtectedRoute>
             } 
           />
