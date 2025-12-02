@@ -190,6 +190,22 @@ const Dashboard = () => {
     } catch (error) {
       console.error('❌ Catch error:', error);
       console.error('❌ Error details:', error.response?.data || error.message);
+      console.error('❌ Error response:', error.response);
+      console.error('❌ Error traceback:', error.response?.data?.traceback);
+      
+      // Show user-friendly error message
+      if (error.response?.data) {
+        console.error('❌ Backend error:', error.response.data.error);
+        console.error('❌ Error type:', error.response.data.error_type);
+        console.error('❌ Error details:', error.response.data.details);
+        console.error('❌ Full error response:', JSON.stringify(error.response.data, null, 2));
+        
+        // Show alert with error details for debugging
+        if (error.response.data.traceback) {
+          console.error('❌ Full traceback:', error.response.data.traceback);
+        }
+      }
+      
       // Don't reset stats on error, keep previous data
     } finally {
       setLoading(false);

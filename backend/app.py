@@ -4,6 +4,7 @@ import pandas as pd
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from werkzeug.security import generate_password_hash, check_password_hash
+from urllib.parse import unquote
 import psycopg2
 import psycopg2.extras
 from datetime import datetime, timedelta
@@ -15,6 +16,7 @@ import importlib.util
 import logging
 from functools import wraps
 import json
+import re
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -130,6 +132,16 @@ def handle_connect():
 def handle_disconnect():
     logger.info('Client disconnected')
 
+# Helper function to count SQL placeholders correctly (excluding %% escaped percents)
+def count_sql_placeholders(query):
+    """
+    Count %s placeholders in SQL query, excluding those that are part of %% (escaped %)
+    Example: 'LIKE %%sinta%%' should not count the %s in the middle
+    """
+    # Count %s that are not part of %% (escaped %)
+    # Pattern: match %s that is not preceded by % and not followed by %
+    return len(re.findall(r'(?<!%)%s(?!%)', query))
+
 # Dashboard faculty-department mapping (must match across all dashboard functions)
 DASHBOARD_FACULTY_DEPARTMENT_MAPPING = {
     'Fakultas Ekonomi': [
@@ -197,13 +209,16 @@ def dashboard_stats(current_user_id):
     """Get dashboard statistics with faculty/department filter - from latest data per dosen and publikasi"""
     try:
         # Support multiple values (comma-separated) for checkbox filters
-        faculty_param = request.args.get('faculty', '').strip()
-        department_param = request.args.get('department', '').strip()
+        # URL decode to handle spaces and special characters (e.g., "Fakultas+Ilmu+Sosial+dan+Ilmu+Politik")
+        faculty_param = unquote(request.args.get('faculty', '')).strip()
+        department_param = unquote(request.args.get('department', '')).strip()
         
         # Parse comma-separated values into lists
-        selected_faculties = [f.strip() for f in faculty_param.split(',') if f.strip()] if faculty_param else []
-        selected_departments = [d.strip() for d in department_param.split(',') if d.strip()] if department_param else []
+        selected_faculties = [unquote(f.strip()) for f in faculty_param.split(',') if f.strip()] if faculty_param else []
+        selected_departments = [unquote(d.strip()) for d in department_param.split(',') if d.strip()] if department_param else []
         
+        print(f"📊 Dashboard Stats - Raw faculty param: {request.args.get('faculty', '')}")
+        print(f"📊 Dashboard Stats - Decoded faculty param: {faculty_param}")
         print(f"📊 Dashboard Stats - faculties: {selected_faculties}, departments: {selected_departments}")
         print(f"📊 Has filter: {bool(selected_departments or selected_faculties)}")
         
@@ -252,10 +267,17 @@ def dashboard_stats(current_user_id):
         elif selected_faculties:
             # Multiple faculties selected - collect all departments from selected faculties
             all_departments = []
+            print(f"🔍 Available faculties in mapping: {list(DASHBOARD_FACULTY_DEPARTMENT_MAPPING.keys())}")
             for faculty in selected_faculties:
-                departments_in_faculty = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+                print(f"🔍 Looking up faculty: '{faculty}'")
+                print(f"🔍 Faculty in mapping: {faculty in DASHBOARD_FACULTY_DEPARTMENT_MAPPING}")
+                departments_in_faculty = DASHBOARD_FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+                if not departments_in_faculty:
+                    print(f"⚠️ Warning: No departments found for faculty: '{faculty}'")
+                    print(f"⚠️ Available faculties: {list(DASHBOARD_FACULTY_DEPARTMENT_MAPPING.keys())}")
+                else:
+                    print(f"✅ Found {len(departments_in_faculty)} departments for '{faculty}': {departments_in_faculty}")
                 all_departments.extend(departments_in_faculty)
-                print(f"🔍 Departments in {faculty}: {departments_in_faculty}")
             
             # Remove duplicates while preserving order
             unique_departments = []
@@ -275,11 +297,25 @@ def dashboard_stats(current_user_id):
                 print(f"🔍 Faculty filter (multiple): {faculty_filter}")
                 print(f"🔍 Faculty params: {faculty_params}")
                 print(f"🔍 Total params: {len(faculty_params)}")
+            else:
+                print(f"⚠️ Warning: No unique departments found for selected faculties: {selected_faculties}")
+                print(f"⚠️ Filter will not be applied - returning all data")
+                has_filter = False
+                faculty_filter = ""
+                faculty_params = []
+        
+        # Ensure has_filter matches actual filter state
+        if not faculty_filter:
+            has_filter = False
+            faculty_params = []
 
-        ORIGINAL_FACULTY_PARAMS = tuple(faculty_params)
+        ORIGINAL_FACULTY_PARAMS = tuple(faculty_params) if faculty_params else tuple()
         print(f"🔍 ORIGINAL_FACULTY_PARAMS: {ORIGINAL_FACULTY_PARAMS}")
         print(f"🔍 Has filter: {has_filter}, Faculty filter: {faculty_filter}")
         print(f"🔍 Will filter data by: {'Departments' if selected_departments else 'Faculties' if selected_faculties else 'None'}")
+        print(f"🔍 Selected Faculties: {selected_faculties}")
+        print(f"🔍 Selected Departments: {selected_departments}")
+        print(f"🔍 Filter will be applied to ALL queries: total_dosen, total_publikasi, sitasi, h-index, breakdowns, top authors, top dosen, publikasi_by_year")
         
         # Debug: Test query to see actual department names in database and test filter
         if has_filter and selected_faculties:
@@ -318,10 +354,23 @@ def dashboard_stats(current_user_id):
                 print(f"🔍 [DEBUG] Testing filter query...")
                 print(f"🔍 [DEBUG] Filter query: {test_filter_query}")
                 print(f"🔍 [DEBUG] Filter params: {list(ORIGINAL_FACULTY_PARAMS)}")
-                cur.execute(test_filter_query, list(ORIGINAL_FACULTY_PARAMS))
-                test_filter_result = cur.fetchone()
-                print(f"🔍 [DEBUG] Filter test result: {test_filter_result['count']} dosen found")
-                print(f"🔍 [DEBUG] Matching departments: {test_filter_result['departments']}")
+                
+                # Validate parameter count
+                placeholder_count = test_filter_query.count('%s')
+                params_list = list(ORIGINAL_FACULTY_PARAMS)
+                if placeholder_count != len(params_list):
+                    print(f"⚠️ [TEST FILTER] Parameter count mismatch: query has {placeholder_count} placeholders but {len(params_list)} params provided")
+                    print(f"⚠️ [TEST FILTER] Skipping test filter query")
+                else:
+                    try:
+                        cur.execute(test_filter_query, params_list)
+                        test_filter_result = cur.fetchone()
+                        print(f"🔍 [DEBUG] Filter test result: {test_filter_result['count']} dosen found")
+                        print(f"🔍 [DEBUG] Matching departments: {test_filter_result['departments']}")
+                    except Exception as test_error:
+                        print(f"⚠️ [TEST FILTER] Error executing test filter query: {test_error}")
+                        import traceback
+                        print(f"⚠️ [TEST FILTER] Traceback: {traceback.format_exc()}")
         
         # CTE for latest dosen (GS and SINTA combined)
         latest_dosen_all_cte = """
@@ -356,20 +405,33 @@ def dashboard_stats(current_user_id):
         
         # Get total dosen (with faculty filter)
         if faculty_filter:
-            query = f"""
-                {latest_dosen_all_cte}
-                SELECT COUNT(DISTINCT d.v_id_dosen) as total
-                FROM latest_dosen_all d
-                INNER JOIN datamaster dm ON (
-                    (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
-                    OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
-                )
-                WHERE dm.v_nama_homebase_unpar IS NOT NULL 
-                    AND TRIM(dm.v_nama_homebase_unpar) != '' {faculty_filter}
-            """
-            print(f"🔍 [DEBUG] Total Dosen Query: {query}")
-            print(f"🔍 [DEBUG] Total Dosen Params: {list(ORIGINAL_FACULTY_PARAMS)}")
-            cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
+            try:
+                query = f"""
+                    {latest_dosen_all_cte}
+                    SELECT COUNT(DISTINCT d.v_id_dosen) as total
+                    FROM latest_dosen_all d
+                    INNER JOIN datamaster dm ON (
+                        (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
+                        OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
+                    )
+                    WHERE dm.v_nama_homebase_unpar IS NOT NULL 
+                        AND TRIM(dm.v_nama_homebase_unpar) != '' {faculty_filter}
+                """
+                print(f"🔍 [DEBUG] Total Dosen Query: {query}")
+                print(f"🔍 [DEBUG] Total Dosen Params: {list(ORIGINAL_FACULTY_PARAMS)}")
+                
+                # Validate parameter count
+                placeholder_count = query.count('%s')
+                params_list = list(ORIGINAL_FACULTY_PARAMS)
+                if placeholder_count != len(params_list):
+                    raise ValueError(f"Total Dosen: Parameter count mismatch: query has {placeholder_count} placeholders but {len(params_list)} params provided")
+                
+                cur.execute(query, params_list)
+            except Exception as e:
+                print(f"❌ Error in Total Dosen query: {e}")
+                import traceback
+                print(f"❌ Traceback: {traceback.format_exc()}")
+                raise
         else:
             cur.execute(f"{latest_dosen_all_cte} SELECT COUNT(*) as total FROM latest_dosen_all")
         
@@ -392,7 +454,14 @@ def dashboard_stats(current_user_id):
             """
             print(f"🔍 [DEBUG] Total Publikasi Query: {query}")
             print(f"🔍 [DEBUG] Total Publikasi Params: {list(ORIGINAL_FACULTY_PARAMS)}")
-            cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
+            
+            # Validate parameter count
+            placeholder_count = query.count('%s')
+            params_list = list(ORIGINAL_FACULTY_PARAMS)
+            if placeholder_count != len(params_list):
+                raise ValueError(f"Total Publikasi: Parameter count mismatch: query has {placeholder_count} placeholders but {len(params_list)} params provided")
+            
+            cur.execute(query, params_list)
         else:
             cur.execute(f"{latest_publikasi_cte} SELECT COUNT(*) as total FROM latest_publikasi")
         
@@ -412,7 +481,14 @@ def dashboard_stats(current_user_id):
             """
             print(f"🔍 [DEBUG] GS Sitasi Query: {query}")
             print(f"🔍 [DEBUG] GS Sitasi Params: {list(ORIGINAL_FACULTY_PARAMS)}")
-            cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
+            
+            # Validate parameter count
+            placeholder_count = query.count('%s')
+            params_list = list(ORIGINAL_FACULTY_PARAMS)
+            if placeholder_count != len(params_list):
+                raise ValueError(f"GS Sitasi: Parameter count mismatch: query has {placeholder_count} placeholders but {len(params_list)} params provided")
+            
+            cur.execute(query, params_list)
             total_sitasi_gs = int(cur.fetchone()['total'])
             
             # GS-SINTA and Scopus sitasi
@@ -431,7 +507,14 @@ def dashboard_stats(current_user_id):
             """
             print(f"🔍 [DEBUG] GS-SINTA & Scopus Sitasi Query: {query}")
             print(f"🔍 [DEBUG] GS-SINTA & Scopus Sitasi Params: {list(ORIGINAL_FACULTY_PARAMS)}")
-            cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
+            
+            # Validate parameter count
+            placeholder_count = query.count('%s')
+            params_list = list(ORIGINAL_FACULTY_PARAMS)
+            if placeholder_count != len(params_list):
+                raise ValueError(f"GS-SINTA & Scopus Sitasi: Parameter count mismatch: query has {placeholder_count} placeholders but {len(params_list)} params provided")
+            
+            cur.execute(query, params_list)
             result = cur.fetchone()
             total_sitasi_gs_sinta = int(result['gs_sinta'])
             total_sitasi_scopus = int(result['scopus'])
@@ -472,7 +555,14 @@ def dashboard_stats(current_user_id):
             """
             print(f"🔍 [DEBUG] H-Index Query: {query}")
             print(f"🔍 [DEBUG] H-Index Params: {list(ORIGINAL_FACULTY_PARAMS)}")
-            cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
+            
+            # Validate parameter count
+            placeholder_count = query.count('%s')
+            params_list = list(ORIGINAL_FACULTY_PARAMS)
+            if placeholder_count != len(params_list):
+                raise ValueError(f"H-Index: Parameter count mismatch: query has {placeholder_count} placeholders but {len(params_list)} params provided")
+            
+            cur.execute(query, params_list)
         else:
             cur.execute(f"""
                 {latest_dosen_all_cte}
@@ -497,7 +587,7 @@ def dashboard_stats(current_user_id):
         # Get publikasi by year (with faculty filter) - separated by source (SINTA vs Google Scholar)
         publikasi_by_year = []
         try:
-            if has_filter:
+            if faculty_filter:
                 # ✅ DENGAN FILTER: Data per tahun dipisahkan per sumber (SINTA vs Google Scholar)
                 # Note: Use %% to escape % in f-string for ILIKE patterns, and use .format() for faculty_filter
                 query = f"""
@@ -543,6 +633,11 @@ def dashboard_stats(current_user_id):
                 print(f"🔍 [DEBUG] Publikasi by Year Query (with filter): {query}")
                 print(f"🔍 Query has {query.count('%s')} placeholders")
                 print(f"🔍 Params has {len(query_params)} values: {query_params}")
+                
+                # Validate parameter count
+                placeholder_count = query.count('%s')
+                if placeholder_count != len(query_params):
+                    raise ValueError(f"Parameter count mismatch: query has {placeholder_count} placeholders but {len(query_params)} params provided")
                 
                 cur.execute(query, query_params)
                 publikasi_by_year = [dict(row) for row in cur.fetchall()]
@@ -612,7 +707,14 @@ def dashboard_stats(current_user_id):
             """
             print(f"🔍 [DEBUG] Top Scopus Query: {query}")
             print(f"🔍 [DEBUG] Top Scopus Params: {list(ORIGINAL_FACULTY_PARAMS)}")
-            cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
+            
+            # Validate parameter count
+            placeholder_count = query.count('%s')
+            params_list = list(ORIGINAL_FACULTY_PARAMS)
+            if placeholder_count != len(params_list):
+                raise ValueError(f"Top Scopus: Parameter count mismatch: query has {placeholder_count} placeholders but {len(params_list)} params provided")
+            
+            cur.execute(query, params_list)
             top_authors_scopus = [dict(row) for row in cur.fetchall()]
             
             # ✅ Top GS - PERBAIKAN: Gabungkan n_h_index_gs dan n_h_index_gs_sinta
@@ -636,7 +738,14 @@ def dashboard_stats(current_user_id):
             """
             print(f"🔍 [DEBUG] Top GS Query: {query}")
             print(f"🔍 [DEBUG] Top GS Params: {list(ORIGINAL_FACULTY_PARAMS)}")
-            cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
+            
+            # Validate parameter count
+            placeholder_count = query.count('%s')
+            params_list = list(ORIGINAL_FACULTY_PARAMS)
+            if placeholder_count != len(params_list):
+                raise ValueError(f"Top GS: Parameter count mismatch: query has {placeholder_count} placeholders but {len(params_list)} params provided")
+            
+            cur.execute(query, params_list)
             top_authors_gs = [dict(row) for row in cur.fetchall()]
         else:
             # ✅ Top Scopus - Tanpa filter
@@ -696,7 +805,14 @@ def dashboard_stats(current_user_id):
             """
             print(f"🔍 [DEBUG] Scopus Q Breakdown Query: {query}")
             print(f"🔍 [DEBUG] Scopus Q Breakdown Params: {list(ORIGINAL_FACULTY_PARAMS)}")
-            cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
+            
+            # Validate parameter count
+            placeholder_count = query.count('%s')
+            params_list = list(ORIGINAL_FACULTY_PARAMS)
+            if placeholder_count != len(params_list):
+                raise ValueError(f"Scopus Q Breakdown: Parameter count mismatch: query has {placeholder_count} placeholders but {len(params_list)} params provided")
+            
+            cur.execute(query, params_list)
             scopus_q_breakdown = [dict(row) for row in cur.fetchall()]
             
             query = f"""
@@ -723,14 +839,25 @@ def dashboard_stats(current_user_id):
                 WHERE dm.v_nama_homebase_unpar IS NOT NULL 
                     AND TRIM(dm.v_nama_homebase_unpar) != ''
                     AND d.v_nama_dosen IS NOT NULL
-                    AND LOWER(COALESCE(a.v_terindeks, '')) LIKE '%sinta%'
+                    AND LOWER(COALESCE(a.v_terindeks, '')) LIKE '%%sinta%%'
                     {faculty_filter}
                 GROUP BY 1
                 ORDER BY 1
             """
             print(f"🔍 [DEBUG] Sinta Rank Breakdown Query: {query}")
             print(f"🔍 [DEBUG] Sinta Rank Breakdown Params: {list(ORIGINAL_FACULTY_PARAMS)}")
-            cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
+            
+            # Validate parameter count - use helper function to count only standalone %s, not %%s
+            placeholder_count = count_sql_placeholders(query)
+            params_list = list(ORIGINAL_FACULTY_PARAMS)
+            if placeholder_count != len(params_list):
+                # Also try simple count for comparison
+                simple_count = query.count('%s')
+                print(f"⚠️ [Sinta Rank] Regex count: {placeholder_count}, Simple count: {simple_count}, Params: {len(params_list)}")
+                print(f"⚠️ [Sinta Rank] Query snippet with LIKE: {query[query.find('LIKE'):query.find('LIKE')+50] if 'LIKE' in query else 'N/A'}")
+                raise ValueError(f"Sinta Rank Breakdown: Parameter count mismatch: query has {placeholder_count} placeholders (corrected) / {simple_count} (simple) but {len(params_list)} params provided")
+            
+            cur.execute(query, params_list)
             sinta_rank_breakdown = [dict(row) for row in cur.fetchall()]
             
         else:
@@ -846,7 +973,14 @@ def dashboard_stats(current_user_id):
             """
             print(f"🔍 [DEBUG] Publikasi Q1-Q2 Query: {query}")
             print(f"🔍 [DEBUG] Publikasi Q1-Q2 Params: {list(ORIGINAL_FACULTY_PARAMS)}")
-            cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
+            
+            # Validate parameter count
+            placeholder_count = query.count('%s')
+            params_list = list(ORIGINAL_FACULTY_PARAMS)
+            if placeholder_count != len(params_list):
+                raise ValueError(f"Publikasi Q1-Q2: Parameter count mismatch: query has {placeholder_count} placeholders but {len(params_list)} params provided")
+            
+            cur.execute(query, params_list)
         else:
             cur.execute(f"""
                 {latest_publikasi_cte}
@@ -879,7 +1013,14 @@ def dashboard_stats(current_user_id):
             """
             print(f"🔍 [DEBUG] Publikasi Q3-Q4/noQ Query: {query}")
             print(f"🔍 [DEBUG] Publikasi Q3-Q4/noQ Params: {list(ORIGINAL_FACULTY_PARAMS)}")
-            cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
+            
+            # Validate parameter count
+            placeholder_count = query.count('%s')
+            params_list = list(ORIGINAL_FACULTY_PARAMS)
+            if placeholder_count != len(params_list):
+                raise ValueError(f"Publikasi Q3-Q4/noQ: Parameter count mismatch: query has {placeholder_count} placeholders but {len(params_list)} params provided")
+            
+            cur.execute(query, params_list)
         else:
             cur.execute(f"""
                 {latest_publikasi_cte}
@@ -911,7 +1052,14 @@ def dashboard_stats(current_user_id):
             """
             print(f"🔍 [DEBUG] Publikasi Sinta 1-2 Query: {query}")
             print(f"🔍 [DEBUG] Publikasi Sinta 1-2 Params: {list(ORIGINAL_FACULTY_PARAMS)}")
-            cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
+            
+            # Validate parameter count
+            placeholder_count = query.count('%s')
+            params_list = list(ORIGINAL_FACULTY_PARAMS)
+            if placeholder_count != len(params_list):
+                raise ValueError(f"Publikasi Sinta 1-2: Parameter count mismatch: query has {placeholder_count} placeholders but {len(params_list)} params provided")
+            
+            cur.execute(query, params_list)
         else:
             cur.execute(f"""
                 {latest_publikasi_cte}
@@ -942,7 +1090,14 @@ def dashboard_stats(current_user_id):
             """
             print(f"🔍 [DEBUG] Publikasi Sinta 3-4 Query: {query}")
             print(f"🔍 [DEBUG] Publikasi Sinta 3-4 Params: {list(ORIGINAL_FACULTY_PARAMS)}")
-            cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
+            
+            # Validate parameter count
+            placeholder_count = query.count('%s')
+            params_list = list(ORIGINAL_FACULTY_PARAMS)
+            if placeholder_count != len(params_list):
+                raise ValueError(f"Publikasi Sinta 3-4: Parameter count mismatch: query has {placeholder_count} placeholders but {len(params_list)} params provided")
+            
+            cur.execute(query, params_list)
         else:
             cur.execute(f"""
                 {latest_publikasi_cte}
@@ -973,7 +1128,14 @@ def dashboard_stats(current_user_id):
             """
             print(f"🔍 [DEBUG] Publikasi Sinta 5 Query: {query}")
             print(f"🔍 [DEBUG] Publikasi Sinta 5 Params: {list(ORIGINAL_FACULTY_PARAMS)}")
-            cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
+            
+            # Validate parameter count
+            placeholder_count = query.count('%s')
+            params_list = list(ORIGINAL_FACULTY_PARAMS)
+            if placeholder_count != len(params_list):
+                raise ValueError(f"Publikasi Sinta 5: Parameter count mismatch: query has {placeholder_count} placeholders but {len(params_list)} params provided")
+            
+            cur.execute(query, params_list)
         else:
             cur.execute(f"""
                 {latest_publikasi_cte}
@@ -1004,7 +1166,14 @@ def dashboard_stats(current_user_id):
             """
             print(f"🔍 [DEBUG] Publikasi Sinta 6 Query: {query}")
             print(f"🔍 [DEBUG] Publikasi Sinta 6 Params: {list(ORIGINAL_FACULTY_PARAMS)}")
-            cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
+            
+            # Validate parameter count
+            placeholder_count = query.count('%s')
+            params_list = list(ORIGINAL_FACULTY_PARAMS)
+            if placeholder_count != len(params_list):
+                raise ValueError(f"Publikasi Sinta 6: Parameter count mismatch: query has {placeholder_count} placeholders but {len(params_list)} params provided")
+            
+            cur.execute(query, params_list)
         else:
             cur.execute(f"""
                 {latest_publikasi_cte}
@@ -1545,11 +1714,18 @@ def dashboard_stats(current_user_id):
         error_details = traceback.format_exc()
         print("❌ Dashboard stats error:\n", error_details)
         logger.error(f"Dashboard stats error: {e}\n{error_details}")
+        
+        # Return more detailed error for debugging
+        error_lines = error_details.split('\n') if error_details else []
+        last_10_lines = error_lines[-10:] if len(error_lines) > 10 else error_lines
+        
         return jsonify({
             'success': False,
             'error': str(e),
             'message': 'Failed to fetch dashboard stats',
-            'details': error_details.split('\n')[-5:] if error_details else None
+            'details': last_10_lines,
+            'error_type': type(e).__name__,
+            'traceback': error_details
         }), 500
     finally:
         if 'cur' in locals():
