@@ -980,8 +980,8 @@ def main():
     # Database configuration - modify these values as needed
     DB_CONFIG = {
         'dbname': 'ProDSGabungan',
-        'user': 'rayhanadjisantoso',
-        'password': 'rayhan123',
+        'user': 'postgres',
+        'password': 'password123',
         'host': 'localhost',
         'port': '5432'
     }

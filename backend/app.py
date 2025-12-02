@@ -78,8 +78,15 @@ logger = logging.getLogger(__name__)
 def get_db_connection():
     """Get database connection"""
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        # Add connection timeout to prevent hanging
+        conn = psycopg2.connect(
+            **DB_CONFIG,
+            connect_timeout=10  # 10 seconds timeout
+        )
         return conn
+    except psycopg2.OperationalError as e:
+        logger.error(f"Database connection error (operational): {e}")
+        return None
     except Exception as e:
         logger.error(f"Database connection error: {e}")
         return None
@@ -123,75 +130,85 @@ def handle_connect():
 def handle_disconnect():
     logger.info('Client disconnected')
 
+# Dashboard faculty-department mapping (must match across all dashboard functions)
+DASHBOARD_FACULTY_DEPARTMENT_MAPPING = {
+    'Fakultas Ekonomi': [
+        'Ekonomi Pembangunan',
+        'Ilmu Ekonomi',
+        'Manajemen',
+        'Akuntansi'
+    ],
+    'Fakultas Hukum': [
+        'Ilmu Hukum',
+        'Hukum'
+    ],
+    'Fakultas Ilmu Sosial dan Ilmu Politik': [
+        'Administrasi Publik',
+        'Administrasi Bisnis',
+        'Hubungan Internasional',
+        'Ilmu Administrasi Publik',
+        'Ilmu Administrasi Bisnis',
+        'Ilmu Hubungan Internasional'
+    ],
+    'Fakultas Teknik': [
+        'Teknik Sipil',
+        'Arsitektur',
+        'Doktor Arsitektur',
+        'Teknik Industri',
+        'Teknik Kimia',
+        'Teknik Mekatronika'
+    ],
+    'Fakultas Filsafat': [
+        'Filsafat',
+        'Ilmu Filsafat',
+        'Studi Humanitas'
+    ],
+    'Fakultas Teknologi Informasi dan Sains': [
+        'Matematika',
+        'Fisika',
+        'Informatika',
+        'Teknik Informatika',
+        'Ilmu Komputer'
+    ],
+    'Fakultas Kedokteran': [
+        'Kedokteran',
+        'Pendidikan Dokter'
+    ],
+    'Fakultas Keguruan dan Ilmu Pendidikan': [
+        'Pendidikan Kimia',
+        'Pendidikan Fisika',
+        'Pendidikan Matematika',
+        'Pendidikan Teknik Informatika dan Komputer',
+        'Pendidikan Bahasa Inggris',
+        'Pendidikan Guru Sekolah Dasar',
+        'PGSD'
+    ],
+    'Fakultas Vokasi': [
+        'Teknologi Rekayasa Pangan',
+        'Bisnis Kreatif',
+        'Agribisnis Pangan'
+    ]
+}
+
 # Dashboard Routes
 @app.route('/api/dashboard/stats', methods=['GET'])
 @token_required
 def dashboard_stats(current_user_id):
     """Get dashboard statistics with faculty/department filter - from latest data per dosen and publikasi"""
     try:
-        faculty = request.args.get('faculty', '').strip()
-        department = request.args.get('department', '').strip()
+        # Support multiple values (comma-separated) for checkbox filters
+        faculty_param = request.args.get('faculty', '').strip()
+        department_param = request.args.get('department', '').strip()
         
-        print(f"📊 Dashboard Stats - faculty: '{faculty}', department: '{department}'")
+        # Parse comma-separated values into lists
+        selected_faculties = [f.strip() for f in faculty_param.split(',') if f.strip()] if faculty_param else []
+        selected_departments = [d.strip() for d in department_param.split(',') if d.strip()] if department_param else []
         
-        FACULTY_DEPARTMENT_MAPPING = {
-            'Fakultas Ekonomi': [
-                'Ekonomi Pembangunan',
-                'Ilmu Ekonomi',
-                'Manajemen',
-                'Akuntansi'
-            ],
-            'Fakultas Hukum': [
-                'Ilmu Hukum',
-                'Hukum'
-            ],
-            'Fakultas Ilmu Sosial dan Ilmu Politik': [
-                'Administrasi Publik',
-                'Administrasi Bisnis',
-                'Hubungan Internasional',
-                'Ilmu Administrasi Publik',
-                'Ilmu Administrasi Bisnis',
-                'Ilmu Hubungan Internasional'
-            ],
-            'Fakultas Teknik': [
-                'Teknik Sipil',
-                'Arsitektur',
-                'Doktor Arsitektur',
-                'Teknik Industri',
-                'Teknik Kimia',
-                'Teknik Mekatronika'
-            ],
-            'Fakultas Filsafat': [
-                'Filsafat',
-                'Ilmu Filsafat',
-                'Studi Humanitas'
-            ],
-            'Fakultas Teknologi Informasi dan Sains': [
-                'Matematika',
-                'Fisika',
-                'Informatika',
-                'Teknik Informatika',
-                'Ilmu Komputer'
-            ],
-            'Fakultas Kedokteran': [
-                'Kedokteran',
-                'Pendidikan Dokter'
-            ],
-            'Fakultas Keguruan dan Ilmu Pendidikan': [
-                'Pendidikan Kimia',
-                'Pendidikan Fisika',
-                'Pendidikan Matematika',
-                'Pendidikan Teknik Informatika dan Komputer',
-                'Pendidikan Bahasa Inggris',
-                'Pendidikan Guru Sekolah Dasar',
-                'PGSD'
-            ],
-            'Fakultas Vokasi': [
-                'Teknologi Rekayasa Pangan',
-                'Bisnis Kreatif',
-                'Agribisnis Pangan'
-            ]
-        }
+        print(f"📊 Dashboard Stats - faculties: {selected_faculties}, departments: {selected_departments}")
+        print(f"📊 Has filter: {bool(selected_departments or selected_faculties)}")
+        
+        # Use the global mapping defined above
+        FACULTY_DEPARTMENT_MAPPING = DASHBOARD_FACULTY_DEPARTMENT_MAPPING
         
         conn = get_db_connection()
         if not conn:
@@ -217,30 +234,94 @@ def dashboard_stats(current_user_id):
         
         print(f"📅 Latest: {latest_date}, Previous: {previous_date}")
         
-        # Build faculty/department filter
+        # Build faculty/department filter - support multiple selections
         faculty_filter = ""
         faculty_params = []
-        has_filter = bool(department or faculty)
+        has_filter = bool(selected_departments or selected_faculties)
 
-        if department:
-            # ✅ FIXED: Remove LOWER() wrapper from placeholder
-            faculty_filter = "AND LOWER(TRIM(dm.v_nama_homebase_unpar)) = %s"
-            faculty_params.append(department.lower())
-        elif faculty:
-            departments_in_faculty = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
-            print(f"🔍 Departments in {faculty}: {departments_in_faculty}")
-            if departments_in_faculty:
+        if selected_departments:
+            # Multiple departments selected - use LIKE for flexible matching
+            dept_conditions = []
+            for dept in selected_departments:
+                dept_conditions.append("LOWER(TRIM(dm.v_nama_homebase_unpar)) LIKE %s")
+                faculty_params.append(f"%{dept.lower()}%")
+            if dept_conditions:
+                faculty_filter = f"AND ({' OR '.join(dept_conditions)})"
+                print(f"🔍 Department filter: {faculty_filter}")
+                print(f"🔍 Department params: {faculty_params}")
+        elif selected_faculties:
+            # Multiple faculties selected - collect all departments from selected faculties
+            all_departments = []
+            for faculty in selected_faculties:
+                departments_in_faculty = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+                all_departments.extend(departments_in_faculty)
+                print(f"🔍 Departments in {faculty}: {departments_in_faculty}")
+            
+            # Remove duplicates while preserving order
+            unique_departments = []
+            seen = set()
+            for dept in all_departments:
+                if dept.lower() not in seen:
+                    unique_departments.append(dept)
+                    seen.add(dept.lower())
+            
+            if unique_departments:
                 like_conditions = []
-                for dept in departments_in_faculty:
-                    # ✅ FIXED: Remove LOWER() wrapper from placeholder
+                for dept in unique_departments:
+                    # Use LIKE for flexible matching (handles variations in department names)
                     like_conditions.append("LOWER(TRIM(dm.v_nama_homebase_unpar)) LIKE %s")
                     faculty_params.append(f"%{dept.lower()}%")
                 faculty_filter = f"AND ({' OR '.join(like_conditions)})"
-                print(f"🔍 Faculty filter: {faculty_filter}")
+                print(f"🔍 Faculty filter (multiple): {faculty_filter}")
                 print(f"🔍 Faculty params: {faculty_params}")
+                print(f"🔍 Total params: {len(faculty_params)}")
 
         ORIGINAL_FACULTY_PARAMS = tuple(faculty_params)
         print(f"🔍 ORIGINAL_FACULTY_PARAMS: {ORIGINAL_FACULTY_PARAMS}")
+        print(f"🔍 Has filter: {has_filter}, Faculty filter: {faculty_filter}")
+        print(f"🔍 Will filter data by: {'Departments' if selected_departments else 'Faculties' if selected_faculties else 'None'}")
+        
+        # Debug: Test query to see actual department names in database and test filter
+        if has_filter and selected_faculties:
+            # Show all departments in database
+            test_query = """
+                SELECT DISTINCT dm.v_nama_homebase_unpar
+                FROM tmp_dosen_dt d
+                INNER JOIN datamaster dm ON (
+                    (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
+                    OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
+                )
+                WHERE dm.v_nama_homebase_unpar IS NOT NULL 
+                    AND TRIM(dm.v_nama_homebase_unpar) != ''
+                ORDER BY dm.v_nama_homebase_unpar
+                LIMIT 50
+            """
+            cur.execute(test_query)
+            test_results = cur.fetchall()
+            print(f"🔍 [DEBUG] Sample department names in database:")
+            for row in test_results[:20]:  # Show first 20
+                print(f"   - {row['v_nama_homebase_unpar']}")
+            
+            # Test filter with actual query
+            if faculty_filter:
+                test_filter_query = f"""
+                    SELECT COUNT(DISTINCT d.v_id_dosen) as count, 
+                           STRING_AGG(DISTINCT dm.v_nama_homebase_unpar, ', ' ORDER BY dm.v_nama_homebase_unpar) as departments
+                    FROM tmp_dosen_dt d
+                    INNER JOIN datamaster dm ON (
+                        (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
+                        OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
+                    )
+                    WHERE dm.v_nama_homebase_unpar IS NOT NULL 
+                        AND TRIM(dm.v_nama_homebase_unpar) != '' {faculty_filter}
+                """
+                print(f"🔍 [DEBUG] Testing filter query...")
+                print(f"🔍 [DEBUG] Filter query: {test_filter_query}")
+                print(f"🔍 [DEBUG] Filter params: {list(ORIGINAL_FACULTY_PARAMS)}")
+                cur.execute(test_filter_query, list(ORIGINAL_FACULTY_PARAMS))
+                test_filter_result = cur.fetchone()
+                print(f"🔍 [DEBUG] Filter test result: {test_filter_result['count']} dosen found")
+                print(f"🔍 [DEBUG] Matching departments: {test_filter_result['departments']}")
         
         # CTE for latest dosen (GS and SINTA combined)
         latest_dosen_all_cte = """
@@ -279,12 +360,15 @@ def dashboard_stats(current_user_id):
                 {latest_dosen_all_cte}
                 SELECT COUNT(DISTINCT d.v_id_dosen) as total
                 FROM latest_dosen_all d
-                LEFT JOIN datamaster dm ON (
+                INNER JOIN datamaster dm ON (
                     (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
-                WHERE 1=1 {faculty_filter}
+                WHERE dm.v_nama_homebase_unpar IS NOT NULL 
+                    AND TRIM(dm.v_nama_homebase_unpar) != '' {faculty_filter}
             """
+            print(f"🔍 [DEBUG] Total Dosen Query: {query}")
+            print(f"🔍 [DEBUG] Total Dosen Params: {list(ORIGINAL_FACULTY_PARAMS)}")
             cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
         else:
             cur.execute(f"{latest_dosen_all_cte} SELECT COUNT(*) as total FROM latest_dosen_all")
@@ -297,16 +381,17 @@ def dashboard_stats(current_user_id):
                 {latest_publikasi_cte}
                 SELECT COUNT(DISTINCT p.v_id_publikasi) as total
                 FROM latest_publikasi p
-                CROSS JOIN LATERAL (
-                    SELECT TRIM(unnest(string_to_array(p.v_authors, ','))) as author_name
-                ) authors
-                LEFT JOIN tmp_dosen_dt d ON LOWER(TRIM(d.v_nama_dosen)) = LOWER(TRIM(authors.author_name))
-                LEFT JOIN datamaster dm ON (
+                INNER JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
+                INNER JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
+                INNER JOIN datamaster dm ON (
                     (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
-                WHERE dm.v_nama_homebase_unpar IS NOT NULL {faculty_filter}
+                WHERE dm.v_nama_homebase_unpar IS NOT NULL 
+                    AND TRIM(dm.v_nama_homebase_unpar) != '' {faculty_filter}
             """
+            print(f"🔍 [DEBUG] Total Publikasi Query: {query}")
+            print(f"🔍 [DEBUG] Total Publikasi Params: {list(ORIGINAL_FACULTY_PARAMS)}")
             cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
         else:
             cur.execute(f"{latest_publikasi_cte} SELECT COUNT(*) as total FROM latest_publikasi")
@@ -320,10 +405,13 @@ def dashboard_stats(current_user_id):
                 {latest_dosen_gs_cte}
                 SELECT COALESCE(SUM(d.n_total_sitasi_gs), 0) as total
                 FROM latest_dosen_gs d
-                LEFT JOIN datamaster dm ON d.v_id_googlescholar IS NOT NULL 
+                INNER JOIN datamaster dm ON d.v_id_googlescholar IS NOT NULL 
                     AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs)
-                WHERE 1=1 {faculty_filter}
+                WHERE dm.v_nama_homebase_unpar IS NOT NULL 
+                    AND TRIM(dm.v_nama_homebase_unpar) != '' {faculty_filter}
             """
+            print(f"🔍 [DEBUG] GS Sitasi Query: {query}")
+            print(f"🔍 [DEBUG] GS Sitasi Params: {list(ORIGINAL_FACULTY_PARAMS)}")
             cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
             total_sitasi_gs = int(cur.fetchone()['total'])
             
@@ -334,12 +422,15 @@ def dashboard_stats(current_user_id):
                     COALESCE(SUM(d.n_sitasi_gs), 0) as gs_sinta,
                     COALESCE(SUM(d.n_sitasi_scopus), 0) as scopus
                 FROM latest_dosen_all d
-                LEFT JOIN datamaster dm ON (
+                INNER JOIN datamaster dm ON (
                     (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
-                WHERE 1=1 {faculty_filter}
+                WHERE dm.v_nama_homebase_unpar IS NOT NULL 
+                    AND TRIM(dm.v_nama_homebase_unpar) != '' {faculty_filter}
             """
+            print(f"🔍 [DEBUG] GS-SINTA & Scopus Sitasi Query: {query}")
+            print(f"🔍 [DEBUG] GS-SINTA & Scopus Sitasi Params: {list(ORIGINAL_FACULTY_PARAMS)}")
             cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
             result = cur.fetchone()
             total_sitasi_gs_sinta = int(result['gs_sinta'])
@@ -372,12 +463,15 @@ def dashboard_stats(current_user_id):
                     COALESCE(AVG(d.n_h_index_gs), 0) as avg_h,
                     COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY d.n_h_index_gs), 0) as median_h
                 FROM latest_dosen_all d
-                LEFT JOIN datamaster dm ON (
+                INNER JOIN datamaster dm ON (
                     (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
-                WHERE 1=1 {faculty_filter}
+                WHERE dm.v_nama_homebase_unpar IS NOT NULL 
+                    AND TRIM(dm.v_nama_homebase_unpar) != '' {faculty_filter}
             """
+            print(f"🔍 [DEBUG] H-Index Query: {query}")
+            print(f"🔍 [DEBUG] H-Index Params: {list(ORIGINAL_FACULTY_PARAMS)}")
             cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
         else:
             cur.execute(f"""
@@ -400,97 +494,105 @@ def dashboard_stats(current_user_id):
         current_year = datetime.now().year
         start_year = current_year - 15
 
-        if has_filter:
-            # ✅ DENGAN FILTER: Data per tahun saja (tidak digrupkan per fakultas)
-            query = f"""
-                {latest_publikasi_cte},
-                year_range AS (
-                    SELECT generate_series(%s, %s) as year_num
-                )
-                SELECT 
-                    yr.year_num::TEXT as v_tahun_publikasi,
-                    COALESCE(COUNT(DISTINCT CASE 
-                        WHEN p.v_id_publikasi IS NOT NULL 
-                            AND d.v_nama_dosen IS NOT NULL 
-                            AND (
-                                (dm.v_nama_homebase_unpar IS NOT NULL {faculty_filter})
-                                OR (dm.v_nama_homebase_unpar IS NULL AND p.v_sumber = 'Google Scholar')
-                            )
-                        THEN p.v_id_publikasi 
-                    END), 0) as count
-                FROM year_range yr
-                LEFT JOIN latest_publikasi p ON CAST(p.v_tahun_publikasi AS TEXT) = CAST(yr.year_num AS TEXT)
-                LEFT JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
-                LEFT JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-                LEFT JOIN datamaster dm ON (
-                    (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
-                    OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
-                )
-                GROUP BY yr.year_num
-                ORDER BY yr.year_num
-            """
-            query_params = [start_year, current_year] + list(ORIGINAL_FACULTY_PARAMS)
-            
-            print(f"🔍 Query has {query.count('%s')} placeholders")
-            print(f"🔍 Params has {len(query_params)} values: {query_params}")
-            
-            cur.execute(query, query_params)
-        else:
-            # ✅ TANPA FILTER: Data digrupkan per fakultas (stacked)
-            # PERBAIKAN: Gunakan relasi ID
-            query = f"""
-                {latest_publikasi_cte},
-                year_range AS (
-                    SELECT generate_series(%s, %s) as year_num
-                ),
-                publikasi_with_faculty AS (
+        # Get publikasi by year (with faculty filter) - separated by source (SINTA vs Google Scholar)
+        publikasi_by_year = []
+        try:
+            if has_filter:
+                # ✅ DENGAN FILTER: Data per tahun dipisahkan per sumber (SINTA vs Google Scholar)
+                # Note: Use %% to escape % in f-string for ILIKE patterns, and use .format() for faculty_filter
+                query = f"""
+                    WITH latest_publikasi AS (
+                        SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
+                            p.*
+                        FROM stg_publikasi_tr p
+                        ORDER BY LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi, p.t_tanggal_unduh DESC NULLS LAST
+                    ),
+                    year_range AS (
+                        SELECT generate_series(%s, %s) as year_num
+                    ),
+                    filtered_publikasi AS (
+                        SELECT DISTINCT p.v_id_publikasi, p.v_tahun_publikasi, p.v_sumber
+                        FROM latest_publikasi p
+                        INNER JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
+                        INNER JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
+                        INNER JOIN datamaster dm ON (
+                            (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
+                            OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
+                        )
+                        WHERE dm.v_nama_homebase_unpar IS NOT NULL
+                            AND TRIM(dm.v_nama_homebase_unpar) != ''
+                            AND d.v_nama_dosen IS NOT NULL {faculty_filter}
+                    )
                     SELECT 
-                        p.v_tahun_publikasi,
-                        p.v_id_publikasi,
-                        dm.v_nama_homebase_unpar,
-                        CASE
-                            WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%ekonomi%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%manajemen%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%akuntansi%%' THEN 'Fakultas Ekonomi'
-                            WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%hukum%%' THEN 'Fakultas Hukum'
-                            WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%teknik%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%sipil%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%arsitektur%%' THEN 'Fakultas Teknik'
-                            WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%matematika%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%fisika%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%informatika%%' THEN 'Fakultas Teknologi Informasi dan Sains'
-                            WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%filsafat%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%humanitas%%' THEN 'Fakultas Filsafat'
-                            WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%kedokteran%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%dokter%%' THEN 'Fakultas Kedokteran'
-                            WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%pendidikan%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%pgsd%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%keguruan%%' THEN 'Fakultas Keguruan dan Ilmu Pendidikan'
-                            WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%vokasi%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%agribisnis%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%bisnis kreatif%%' THEN 'Fakultas Vokasi'
-                            WHEN LOWER(dm.v_nama_homebase_unpar) LIKE '%%administrasi%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%hubungan internasional%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%ilmu sosial%%' OR LOWER(dm.v_nama_homebase_unpar) LIKE '%%politik%%' THEN 'Fakultas Ilmu Sosial dan Ilmu Politik'
-                            ELSE 'Lainnya'
-                        END as faculty_name
-                    FROM latest_publikasi p
-                    INNER JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
-                    INNER JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-                    LEFT JOIN datamaster dm ON (
-                        (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
-                        OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
+                        yr.year_num::TEXT as v_tahun_publikasi,
+                        COALESCE(COUNT(DISTINCT CASE 
+                            WHEN (fp.v_sumber ILIKE '%%SINTA%%' OR fp.v_sumber ILIKE '%%Sinta%%' OR fp.v_sumber IS NULL OR fp.v_sumber = '')
+                            THEN fp.v_id_publikasi 
+                        END), 0) as count_sinta,
+                        COALESCE(COUNT(DISTINCT CASE 
+                            WHEN (fp.v_sumber ILIKE '%%Scholar%%' OR fp.v_sumber ILIKE '%%Google Scholar%%' OR fp.v_sumber ILIKE '%%GoogleScholar%%')
+                            THEN fp.v_id_publikasi 
+                        END), 0) as count_gs
+                    FROM year_range yr
+                    LEFT JOIN filtered_publikasi fp ON CAST(fp.v_tahun_publikasi AS TEXT) = CAST(yr.year_num AS TEXT)
+                    GROUP BY yr.year_num
+                    ORDER BY yr.year_num
+                """
+                query_params = [start_year, current_year] + list(ORIGINAL_FACULTY_PARAMS)
+                
+                print(f"🔍 [DEBUG] Publikasi by Year Query (with filter): {query}")
+                print(f"🔍 Query has {query.count('%s')} placeholders")
+                print(f"🔍 Params has {len(query_params)} values: {query_params}")
+                
+                cur.execute(query, query_params)
+                publikasi_by_year = [dict(row) for row in cur.fetchall()]
+            else:
+                # ✅ TANPA FILTER: Data per tahun dipisahkan per sumber (SINTA vs Google Scholar)
+                # Note: Use %% to escape % in f-string for ILIKE patterns
+                query = """
+                    WITH latest_publikasi AS (
+                        SELECT DISTINCT ON (LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi)
+                            p.*
+                        FROM stg_publikasi_tr p
+                        ORDER BY LOWER(TRIM(p.v_judul)), p.v_tahun_publikasi, p.t_tanggal_unduh DESC NULLS LAST
+                    ),
+                    year_range AS (
+                        SELECT generate_series(%s, %s) as year_num
                     )
-                    WHERE (
-                        dm.v_nama_homebase_unpar IS NOT NULL 
-                        OR p.v_sumber = 'Google Scholar'  -- ✅ Tambahkan ini
-                    )
-                    AND d.v_nama_dosen IS NOT NULL
-                )
-                SELECT 
-                    yr.year_num::TEXT as v_tahun_publikasi,
-                    COALESCE(pf.faculty_name, 'Lainnya') as faculty,
-                    COUNT(DISTINCT pf.v_id_publikasi) as count
-                FROM year_range yr
-                LEFT JOIN publikasi_with_faculty pf ON CAST(pf.v_tahun_publikasi AS TEXT) = CAST(yr.year_num AS TEXT)
-                GROUP BY yr.year_num, pf.faculty_name
-                ORDER BY yr.year_num, pf.faculty_name
-            """
+                    SELECT 
+                        yr.year_num::TEXT as v_tahun_publikasi,
+                        COALESCE(COUNT(DISTINCT CASE 
+                            WHEN (p.v_sumber ILIKE '%%SINTA%%' OR p.v_sumber ILIKE '%%Sinta%%' OR p.v_sumber IS NULL OR p.v_sumber = '')
+                            THEN p.v_id_publikasi 
+                        END), 0) as count_sinta,
+                        COALESCE(COUNT(DISTINCT CASE 
+                            WHEN (p.v_sumber ILIKE '%%Scholar%%' OR p.v_sumber ILIKE '%%Google Scholar%%' OR p.v_sumber ILIKE '%%GoogleScholar%%')
+                            THEN p.v_id_publikasi 
+                        END), 0) as count_gs
+                    FROM year_range yr
+                    LEFT JOIN latest_publikasi p ON CAST(p.v_tahun_publikasi AS TEXT) = CAST(yr.year_num AS TEXT)
+                    GROUP BY yr.year_num
+                    ORDER BY yr.year_num
+                """
+                
+                print(f"🔍 [DEBUG] Publikasi by Year Query (no filter): {query}")
+                print(f"🔍 Query has {query.count('%s')} placeholders")
+                print(f"🔍 Params: start_year={start_year}, current_year={current_year}")
+                
+                cur.execute(query, (start_year, current_year))
+                publikasi_by_year = [dict(row) for row in cur.fetchall()]
             
-            # Debug
-            print(f"🔍 Query (no filter) has {query.count('%s')} placeholders")
-            print(f"🔍 Params: start_year={start_year}, current_year={current_year}")
-            
-            cur.execute(query, (start_year, current_year))
-
-        publikasi_by_year = [dict(row) for row in cur.fetchall()]
-        print(f"✅ publikasi_by_year fetched: {len(publikasi_by_year)} rows")
+            print(f"✅ publikasi_by_year fetched: {len(publikasi_by_year)} rows")
+            if len(publikasi_by_year) > 0:
+                print(f"📊 Sample data: {publikasi_by_year[0]}")
+        except Exception as e:
+            print(f"❌ Error executing publikasi by year query: {e}")
+            import traceback
+            error_details = traceback.format_exc()
+            print(f"❌ Traceback: {error_details}")
+            # Set empty list on error instead of raising
+            publikasi_by_year = []
+            print(f"⚠️ Using empty publikasi_by_year due to error")
         
         # Get top authors (with faculty filter)
         if faculty_filter:
@@ -499,13 +601,17 @@ def dashboard_stats(current_user_id):
                 {latest_dosen_all_cte}
                 SELECT d.v_nama_dosen, COALESCE(d.n_h_index_scopus, 0) as n_h_index_scopus
                 FROM latest_dosen_all d
-                LEFT JOIN datamaster dm ON (
+                INNER JOIN datamaster dm ON (
                     (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
-                WHERE COALESCE(d.n_h_index_scopus, 0) > 0 {faculty_filter}
+                WHERE dm.v_nama_homebase_unpar IS NOT NULL 
+                    AND TRIM(dm.v_nama_homebase_unpar) != ''
+                    AND COALESCE(d.n_h_index_scopus, 0) > 0 {faculty_filter}
                 ORDER BY n_h_index_scopus DESC LIMIT 10
             """
+            print(f"🔍 [DEBUG] Top Scopus Query: {query}")
+            print(f"🔍 [DEBUG] Top Scopus Params: {list(ORIGINAL_FACULTY_PARAMS)}")
             cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
             top_authors_scopus = [dict(row) for row in cur.fetchall()]
             
@@ -519,14 +625,17 @@ def dashboard_stats(current_user_id):
                         COALESCE(d.n_h_index_gs_sinta, 0)
                     ) as n_h_index_gs
                 FROM latest_dosen_all d
-                LEFT JOIN datamaster dm ON (
+                INNER JOIN datamaster dm ON (
                     (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
-                WHERE 1=1 {faculty_filter}
+                WHERE dm.v_nama_homebase_unpar IS NOT NULL 
+                    AND TRIM(dm.v_nama_homebase_unpar) != '' {faculty_filter}
                 ORDER BY n_h_index_gs DESC 
                 LIMIT 10
             """
+            print(f"🔍 [DEBUG] Top GS Query: {query}")
+            print(f"🔍 [DEBUG] Top GS Params: {list(ORIGINAL_FACULTY_PARAMS)}")
             cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
             top_authors_gs = [dict(row) for row in cur.fetchall()]
         else:
@@ -574,16 +683,19 @@ def dashboard_stats(current_user_id):
                 LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
                 INNER JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
                 INNER JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-                LEFT JOIN datamaster dm ON (
+                INNER JOIN datamaster dm ON (
                     (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
                 WHERE LOWER(COALESCE(a.v_terindeks, '')) = 'scopus'
                     AND dm.v_nama_homebase_unpar IS NOT NULL 
+                    AND TRIM(dm.v_nama_homebase_unpar) != ''
                     AND d.v_nama_dosen IS NOT NULL {faculty_filter}
                 GROUP BY 1
                 ORDER BY 1
             """
+            print(f"🔍 [DEBUG] Scopus Q Breakdown Query: {query}")
+            print(f"🔍 [DEBUG] Scopus Q Breakdown Params: {list(ORIGINAL_FACULTY_PARAMS)}")
             cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
             scopus_q_breakdown = [dict(row) for row in cur.fetchall()]
             
@@ -604,17 +716,20 @@ def dashboard_stats(current_user_id):
                 LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
                 INNER JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
                 INNER JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-                LEFT JOIN datamaster dm ON (
+                INNER JOIN datamaster dm ON (
                     (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
                 WHERE dm.v_nama_homebase_unpar IS NOT NULL 
+                    AND TRIM(dm.v_nama_homebase_unpar) != ''
                     AND d.v_nama_dosen IS NOT NULL
                     AND LOWER(COALESCE(a.v_terindeks, '')) LIKE '%sinta%'
                     {faculty_filter}
                 GROUP BY 1
                 ORDER BY 1
             """
+            print(f"🔍 [DEBUG] Sinta Rank Breakdown Query: {query}")
+            print(f"🔍 [DEBUG] Sinta Rank Breakdown Params: {list(ORIGINAL_FACULTY_PARAMS)}")
             cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
             sinta_rank_breakdown = [dict(row) for row in cur.fetchall()]
             
@@ -719,15 +834,18 @@ def dashboard_stats(current_user_id):
                 LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
                 INNER JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
                 INNER JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-                LEFT JOIN datamaster dm ON (
+                INNER JOIN datamaster dm ON (
                     (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
                 WHERE LOWER(COALESCE(a.v_terindeks, '')) = 'scopus'
                     AND UPPER(COALESCE(a.v_ranking, '')) IN ('Q1', 'Q2')
                     AND dm.v_nama_homebase_unpar IS NOT NULL 
+                    AND TRIM(dm.v_nama_homebase_unpar) != ''
                     AND d.v_nama_dosen IS NOT NULL {faculty_filter}
             """
+            print(f"🔍 [DEBUG] Publikasi Q1-Q2 Query: {query}")
+            print(f"🔍 [DEBUG] Publikasi Q1-Q2 Params: {list(ORIGINAL_FACULTY_PARAMS)}")
             cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
         else:
             cur.execute(f"""
@@ -749,15 +867,18 @@ def dashboard_stats(current_user_id):
                 LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
                 INNER JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
                 INNER JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-                LEFT JOIN datamaster dm ON (
+                INNER JOIN datamaster dm ON (
                     (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
                 WHERE LOWER(COALESCE(a.v_terindeks, '')) = 'scopus'
                     AND (UPPER(COALESCE(a.v_ranking, '')) IN ('Q3', 'Q4') OR COALESCE(a.v_ranking, '') = '')
                     AND dm.v_nama_homebase_unpar IS NOT NULL 
+                    AND TRIM(dm.v_nama_homebase_unpar) != ''
                     AND d.v_nama_dosen IS NOT NULL {faculty_filter}
             """
+            print(f"🔍 [DEBUG] Publikasi Q3-Q4/noQ Query: {query}")
+            print(f"🔍 [DEBUG] Publikasi Q3-Q4/noQ Params: {list(ORIGINAL_FACULTY_PARAMS)}")
             cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
         else:
             cur.execute(f"""
@@ -779,14 +900,17 @@ def dashboard_stats(current_user_id):
                 LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
                 INNER JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
                 INNER JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-                LEFT JOIN datamaster dm ON (
+                INNER JOIN datamaster dm ON (
                     (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
                 WHERE LOWER(COALESCE(a.v_ranking, '')) IN ('sinta 1', 'sinta 2')
                     AND dm.v_nama_homebase_unpar IS NOT NULL 
+                    AND TRIM(dm.v_nama_homebase_unpar) != ''
                     AND d.v_nama_dosen IS NOT NULL {faculty_filter}
             """
+            print(f"🔍 [DEBUG] Publikasi Sinta 1-2 Query: {query}")
+            print(f"🔍 [DEBUG] Publikasi Sinta 1-2 Params: {list(ORIGINAL_FACULTY_PARAMS)}")
             cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
         else:
             cur.execute(f"""
@@ -807,14 +931,17 @@ def dashboard_stats(current_user_id):
                 LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
                 INNER JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
                 INNER JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-                LEFT JOIN datamaster dm ON (
+                INNER JOIN datamaster dm ON (
                     (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
                 WHERE LOWER(COALESCE(a.v_ranking, '')) IN ('sinta 3', 'sinta 4')
                     AND dm.v_nama_homebase_unpar IS NOT NULL 
+                    AND TRIM(dm.v_nama_homebase_unpar) != ''
                     AND d.v_nama_dosen IS NOT NULL {faculty_filter}
             """
+            print(f"🔍 [DEBUG] Publikasi Sinta 3-4 Query: {query}")
+            print(f"🔍 [DEBUG] Publikasi Sinta 3-4 Params: {list(ORIGINAL_FACULTY_PARAMS)}")
             cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
         else:
             cur.execute(f"""
@@ -835,14 +962,17 @@ def dashboard_stats(current_user_id):
                 LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
                 INNER JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
                 INNER JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-                LEFT JOIN datamaster dm ON (
+                INNER JOIN datamaster dm ON (
                     (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
                 WHERE LOWER(COALESCE(a.v_ranking, '')) = 'sinta 5'
                     AND dm.v_nama_homebase_unpar IS NOT NULL 
+                    AND TRIM(dm.v_nama_homebase_unpar) != ''
                     AND d.v_nama_dosen IS NOT NULL {faculty_filter}
             """
+            print(f"🔍 [DEBUG] Publikasi Sinta 5 Query: {query}")
+            print(f"🔍 [DEBUG] Publikasi Sinta 5 Params: {list(ORIGINAL_FACULTY_PARAMS)}")
             cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
         else:
             cur.execute(f"""
@@ -863,14 +993,17 @@ def dashboard_stats(current_user_id):
                 LEFT JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
                 INNER JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
                 INNER JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
-                LEFT JOIN datamaster dm ON (
+                INNER JOIN datamaster dm ON (
                     (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
                 WHERE LOWER(COALESCE(a.v_ranking, '')) = 'sinta 6'
                     AND dm.v_nama_homebase_unpar IS NOT NULL 
+                    AND TRIM(dm.v_nama_homebase_unpar) != ''
                     AND d.v_nama_dosen IS NOT NULL {faculty_filter}
             """
+            print(f"🔍 [DEBUG] Publikasi Sinta 6 Query: {query}")
+            print(f"🔍 [DEBUG] Publikasi Sinta 6 Params: {list(ORIGINAL_FACULTY_PARAMS)}")
             cur.execute(query, list(ORIGINAL_FACULTY_PARAMS))
         else:
             cur.execute(f"""
@@ -897,7 +1030,7 @@ def dashboard_stats(current_user_id):
                 INNER JOIN stg_publikasi_dosen_dt pd ON d.v_id_dosen = pd.v_id_dosen
                 INNER JOIN latest_publikasi p ON pd.v_id_publikasi = p.v_id_publikasi
                 INNER JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
-                LEFT JOIN datamaster dm ON (
+                INNER JOIN datamaster dm ON (
                     (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
@@ -908,11 +1041,14 @@ def dashboard_stats(current_user_id):
                     OR LOWER(TRIM(COALESCE(a.v_terindeks, ''))) LIKE '%%,scopus'
                 )
                     AND d.v_nama_dosen IS NOT NULL
-                    AND dm.v_nama_homebase_unpar IS NOT NULL {faculty_filter}
+                    AND dm.v_nama_homebase_unpar IS NOT NULL
+                    AND TRIM(dm.v_nama_homebase_unpar) != '' {faculty_filter}
                 GROUP BY d.v_nama_dosen
                 ORDER BY count_international DESC
                 LIMIT 10
             """
+            print(f"🔍 [DEBUG] Top Dosen International Query: {query}")
+            print(f"🔍 [DEBUG] Top Dosen International Params: {list(ORIGINAL_FACULTY_PARAMS)}")
             # ✅ PENTING: Buat list baru dari tuple
             params_for_query = list(ORIGINAL_FACULTY_PARAMS)
             
@@ -964,17 +1100,20 @@ def dashboard_stats(current_user_id):
                 INNER JOIN stg_publikasi_dosen_dt pd ON d.v_id_dosen = pd.v_id_dosen
                 INNER JOIN latest_publikasi p ON pd.v_id_publikasi = p.v_id_publikasi
                 INNER JOIN stg_artikel_dr a ON p.v_id_publikasi = a.v_id_publikasi
-                LEFT JOIN datamaster dm ON (
+                INNER JOIN datamaster dm ON (
                     (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                     OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                 )
                 WHERE LOWER(TRIM(COALESCE(a.v_ranking, ''))) IN ('sinta 1', 'sinta 2', 'sinta 3', 'sinta 4', 'sinta 5', 'sinta 6')
                     AND d.v_nama_dosen IS NOT NULL
-                    AND dm.v_nama_homebase_unpar IS NOT NULL {faculty_filter}
+                    AND dm.v_nama_homebase_unpar IS NOT NULL
+                    AND TRIM(dm.v_nama_homebase_unpar) != '' {faculty_filter}
                 GROUP BY d.v_nama_dosen
                 ORDER BY count_national DESC
                 LIMIT 10
             """
+            print(f"🔍 [DEBUG] Top Dosen National Query: {query}")
+            print(f"🔍 [DEBUG] Top Dosen National Params: {list(ORIGINAL_FACULTY_PARAMS)}")
             # ✅ PENTING: Buat list baru dari tuple
             params_for_query = list(ORIGINAL_FACULTY_PARAMS)
             
@@ -1056,7 +1195,7 @@ def dashboard_stats(current_user_id):
                             (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                             OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                         )
-                        WHERE 1=1 {faculty_filter}
+                        WHERE dm.v_nama_homebase_unpar IS NOT NULL {faculty_filter}
                     """
                     cur.execute(query, [previous_date] + list(ORIGINAL_FACULTY_PARAMS))
                 else:
@@ -1094,7 +1233,7 @@ def dashboard_stats(current_user_id):
                         FROM previous_dosen_gs d
                         LEFT JOIN datamaster dm ON d.v_id_googlescholar IS NOT NULL 
                             AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs)
-                        WHERE 1=1 {faculty_filter}
+                        WHERE dm.v_nama_homebase_unpar IS NOT NULL {faculty_filter}
                     """
                     cur.execute(query, [previous_date] + list(ORIGINAL_FACULTY_PARAMS))
                     prev_total_sitasi_gs = int(cur.fetchone()['total'])
@@ -1110,7 +1249,7 @@ def dashboard_stats(current_user_id):
                             (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                             OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                         )
-                        WHERE 1=1 {faculty_filter}
+                        WHERE dm.v_nama_homebase_unpar IS NOT NULL {faculty_filter}
                     """
                     cur.execute(query, [previous_date] + list(ORIGINAL_FACULTY_PARAMS))
                     result = cur.fetchone()
@@ -1148,7 +1287,7 @@ def dashboard_stats(current_user_id):
                             (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                             OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                         )
-                        WHERE 1=1 {faculty_filter}
+                        WHERE dm.v_nama_homebase_unpar IS NOT NULL {faculty_filter}
                     """
                     cur.execute(query, [previous_date] + list(ORIGINAL_FACULTY_PARAMS))
                 else:
@@ -1174,13 +1313,14 @@ def dashboard_stats(current_user_id):
                         INNER JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
                         INNER JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
                             AND DATE(d.t_tanggal_unduh) = %s
-                        LEFT JOIN datamaster dm ON (
+                        INNER JOIN datamaster dm ON (
                             (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                             OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                         )
                         WHERE LOWER(COALESCE(a.v_terindeks, '')) = 'scopus'
                             AND UPPER(COALESCE(a.v_ranking, '')) IN ('Q1', 'Q2')
                             AND dm.v_nama_homebase_unpar IS NOT NULL 
+                            AND TRIM(dm.v_nama_homebase_unpar) != ''
                             AND d.v_nama_dosen IS NOT NULL {faculty_filter}
                     """
                     cur.execute(query, [previous_date] + [previous_date] + list(ORIGINAL_FACULTY_PARAMS))
@@ -1205,13 +1345,14 @@ def dashboard_stats(current_user_id):
                         INNER JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
                         INNER JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
                             AND DATE(d.t_tanggal_unduh) = %s
-                        LEFT JOIN datamaster dm ON (
+                        INNER JOIN datamaster dm ON (
                             (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                             OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                         )
                         WHERE LOWER(COALESCE(a.v_terindeks, '')) = 'scopus'
                             AND (UPPER(COALESCE(a.v_ranking, '')) IN ('Q3', 'Q4') OR COALESCE(a.v_ranking, '') = '')
                             AND dm.v_nama_homebase_unpar IS NOT NULL 
+                            AND TRIM(dm.v_nama_homebase_unpar) != ''
                             AND d.v_nama_dosen IS NOT NULL {faculty_filter}
                     """
                     cur.execute(query, [previous_date] + [previous_date] + list(ORIGINAL_FACULTY_PARAMS))
@@ -1236,12 +1377,13 @@ def dashboard_stats(current_user_id):
                         INNER JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
                         INNER JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
                             AND DATE(d.t_tanggal_unduh) = %s
-                        LEFT JOIN datamaster dm ON (
+                        INNER JOIN datamaster dm ON (
                             (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                             OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                         )
                         WHERE LOWER(COALESCE(a.v_ranking, '')) IN ('sinta 1', 'sinta 2')
                             AND dm.v_nama_homebase_unpar IS NOT NULL 
+                            AND TRIM(dm.v_nama_homebase_unpar) != ''
                             AND d.v_nama_dosen IS NOT NULL {faculty_filter}
                     """
                     cur.execute(query, [previous_date] + [previous_date] + list(ORIGINAL_FACULTY_PARAMS))
@@ -1265,12 +1407,13 @@ def dashboard_stats(current_user_id):
                         INNER JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
                         INNER JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
                             AND DATE(d.t_tanggal_unduh) = %s
-                        LEFT JOIN datamaster dm ON (
+                        INNER JOIN datamaster dm ON (
                             (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                             OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                         )
                         WHERE LOWER(COALESCE(a.v_ranking, '')) IN ('sinta 3', 'sinta 4')
                             AND dm.v_nama_homebase_unpar IS NOT NULL 
+                            AND TRIM(dm.v_nama_homebase_unpar) != ''
                             AND d.v_nama_dosen IS NOT NULL {faculty_filter}
                     """
                     cur.execute(query, [previous_date] + [previous_date] + list(ORIGINAL_FACULTY_PARAMS))
@@ -1300,6 +1443,7 @@ def dashboard_stats(current_user_id):
                         )
                         WHERE LOWER(COALESCE(a.v_ranking, '')) = 'sinta 5'
                             AND dm.v_nama_homebase_unpar IS NOT NULL 
+                            AND TRIM(dm.v_nama_homebase_unpar) != ''
                             AND d.v_nama_dosen IS NOT NULL {faculty_filter}
                     """
                     cur.execute(query, [previous_date] + [previous_date] + list(ORIGINAL_FACULTY_PARAMS))
@@ -1323,12 +1467,13 @@ def dashboard_stats(current_user_id):
                         INNER JOIN stg_publikasi_dosen_dt pd ON p.v_id_publikasi = pd.v_id_publikasi
                         INNER JOIN tmp_dosen_dt d ON pd.v_id_dosen = d.v_id_dosen
                             AND DATE(d.t_tanggal_unduh) = %s
-                        LEFT JOIN datamaster dm ON (
+                        INNER JOIN datamaster dm ON (
                             (d.v_id_sinta IS NOT NULL AND TRIM(d.v_id_sinta) = TRIM(dm.id_sinta))
                             OR (d.v_id_googlescholar IS NOT NULL AND TRIM(d.v_id_googlescholar) = TRIM(dm.id_gs))
                         )
                         WHERE LOWER(COALESCE(a.v_ranking, '')) = 'sinta 6'
                             AND dm.v_nama_homebase_unpar IS NOT NULL 
+                            AND TRIM(dm.v_nama_homebase_unpar) != ''
                             AND d.v_nama_dosen IS NOT NULL {faculty_filter}
                     """
                     cur.execute(query, [previous_date] + [previous_date] + list(ORIGINAL_FACULTY_PARAMS))
@@ -1368,29 +1513,29 @@ def dashboard_stats(current_user_id):
         return jsonify({
             'success': True,
             'data': {
-                'total_dosen': total_dosen,
-                'total_publikasi': total_publikasi,
-                'total_sitasi': total_sitasi,
-                'total_sitasi_gs': total_sitasi_gs,
-                'total_sitasi_gs_sinta': total_sitasi_gs_sinta,
-                'total_sitasi_scopus': total_sitasi_scopus,
-                'avg_h_index': float(avg_h_index),
-                'median_h_index': float(median_h_index),
-                'publikasi_by_year': publikasi_by_year,
-                'top_authors_scopus': top_authors_scopus,
-                'top_authors_gs': top_authors_gs,
-                'publikasi_internasional_q12': publikasi_internasional_q12,
-                'publikasi_internasional_q34_noq': publikasi_internasional_q34_noq,
-                'publikasi_nasional_sinta12': publikasi_nasional_sinta12,
-                'publikasi_nasional_sinta34': publikasi_nasional_sinta34,
-                'publikasi_nasional_sinta5': publikasi_nasional_sinta5,
-                'publikasi_nasional_sinta6': publikasi_nasional_sinta6,
-                'scopus_q_breakdown': scopus_q_breakdown,
-                'sinta_rank_breakdown': sinta_rank_breakdown,
-                'top_dosen_international': top_dosen_international,
-                'top_dosen_national': top_dosen_national,
+                'total_dosen': total_dosen or 0,
+                'total_publikasi': total_publikasi or 0,
+                'total_sitasi': total_sitasi or 0,
+                'total_sitasi_gs': total_sitasi_gs or 0,
+                'total_sitasi_gs_sinta': total_sitasi_gs_sinta or 0,
+                'total_sitasi_scopus': total_sitasi_scopus or 0,
+                'avg_h_index': float(avg_h_index) if avg_h_index else 0.0,
+                'median_h_index': float(median_h_index) if median_h_index else 0.0,
+                'publikasi_by_year': publikasi_by_year or [],
+                'top_authors_scopus': top_authors_scopus or [],
+                'top_authors_gs': top_authors_gs or [],
+                'publikasi_internasional_q12': publikasi_internasional_q12 or 0,
+                'publikasi_internasional_q34_noq': publikasi_internasional_q34_noq or 0,
+                'publikasi_nasional_sinta12': publikasi_nasional_sinta12 or 0,
+                'publikasi_nasional_sinta34': publikasi_nasional_sinta34 or 0,
+                'publikasi_nasional_sinta5': publikasi_nasional_sinta5 or 0,
+                'publikasi_nasional_sinta6': publikasi_nasional_sinta6 or 0,
+                'scopus_q_breakdown': scopus_q_breakdown or [],
+                'sinta_rank_breakdown': sinta_rank_breakdown or [],
+                'top_dosen_international': top_dosen_international or [],
+                'top_dosen_national': top_dosen_national or [],
                 'previous_date': previous_date.strftime('%d/%m/%Y') if previous_date else None,
-                'previous_values': previous_values,
+                'previous_values': previous_values or {},
                 'has_filter': has_filter  # ✅ TAMBAHKAN FLAG INI untuk frontend
             }
         }), 200
@@ -1400,7 +1545,12 @@ def dashboard_stats(current_user_id):
         error_details = traceback.format_exc()
         print("❌ Dashboard stats error:\n", error_details)
         logger.error(f"Dashboard stats error: {e}\n{error_details}")
-        return jsonify({'error': 'Failed to fetch dashboard stats'}), 500
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': 'Failed to fetch dashboard stats',
+            'details': error_details.split('\n')[-5:] if error_details else None
+        }), 500
     finally:
         if 'cur' in locals():
             cur.close()
@@ -1752,7 +1902,7 @@ def get_top_dosen_national(current_user_id):
 def get_dashboard_faculties(current_user_id):
     """Get list of faculties for dashboard filter"""
     try:
-        faculties = sorted(list(FACULTY_DEPARTMENT_MAPPING.keys()))
+        faculties = sorted(list(DASHBOARD_FACULTY_DEPARTMENT_MAPPING.keys()))
         return jsonify({
             'success': True,
             'data': faculties
@@ -1773,7 +1923,7 @@ def get_dashboard_departments(current_user_id):
         if not faculty:
             return jsonify({'error': 'Faculty parameter is required'}), 400
         
-        departments = FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
+        departments = DASHBOARD_FACULTY_DEPARTMENT_MAPPING.get(faculty, [])
         
         return jsonify({
             'success': True,
@@ -5459,6 +5609,6 @@ if __name__ == '__main__':
         app,
         debug=debug_mode,
         host='0.0.0.0',
-        port=int(os.environ.get('PORT', 0)),
+        port=int(os.environ.get('PORT', 5002)),
         allow_unsafe_werkzeug=True
     )

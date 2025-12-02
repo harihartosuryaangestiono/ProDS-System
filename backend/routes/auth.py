@@ -15,8 +15,15 @@ auth_bp = Blueprint('auth', __name__)
 def get_db_connection():
     """Get database connection"""
     try:
-        conn = psycopg2.connect(**current_app.config['DB_CONFIG'])
+        # Add connection timeout to prevent hanging
+        conn = psycopg2.connect(
+            **current_app.config['DB_CONFIG'],
+            connect_timeout=10  # 10 seconds timeout
+        )
         return conn
+    except psycopg2.OperationalError as e:
+        logger.error(f"Database connection error in auth_bp (operational): {e}")
+        return None
     except Exception as e:
         logger.error(f"Database connection error in auth_bp: {e}")
         return None
@@ -105,18 +112,25 @@ def register():
 @auth_bp.route('/login', methods=['POST'])
 def login():
     """User login"""
+    conn = None
+    cur = None
     try:
+        logger.info("Login request received")
         data = request.get_json()
         
         if not data or not data.get('v_email') or not data.get('v_password_hash'):
+            logger.warning("Login attempt with missing credentials")
             return jsonify({'error': 'Missing email or password'}), 400
         
         email = data['v_email'].strip().lower()
         password = data['v_password_hash']  # Raw password from frontend
         
+        logger.info(f"Attempting login for email: {email}")
+        
         conn = get_db_connection()
         if not conn:
-            return jsonify({'error': 'Database connection failed'}), 500
+            logger.error("Database connection failed during login")
+            return jsonify({'error': 'Database connection failed', 'success': False}), 500
         
         cur = conn.cursor()
         
@@ -128,7 +142,14 @@ def login():
         
         user = cur.fetchone()
         
-        if not user or not check_password_hash(user[2], password):
+        if not user:
+            logger.warning(f"Login attempt with non-existent email: {email}")
+            cur.close()
+            conn.close()
+            return jsonify({'error': 'Invalid credentials', 'success': False}), 401
+        
+        if not check_password_hash(user[2], password):
+            logger.warning(f"Login attempt with incorrect password for email: {email}")
             cur.close()
             conn.close()
             return jsonify({'error': 'Invalid credentials', 'success': False}), 401
@@ -142,7 +163,7 @@ def login():
         
         token = jwt.encode(token_payload, current_app.config['JWT_SECRET_KEY'], algorithm='HS256')
         
-        logger.info(f"User logged in: {user[1]} (ID: {user[0]})")
+        logger.info(f"User logged in successfully: {user[1]} (ID: {user[0]})")
         
         cur.close()
         conn.close()
@@ -157,6 +178,17 @@ def login():
             'success': True
         }), 200
         
+    except psycopg2.Error as e:
+        logger.error(f"Database error during login: {e}")
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+        return jsonify({'error': 'Database error occurred', 'success': False}), 500
     except Exception as e:
-        logger.error(f"Login error: {e}")
+        logger.error(f"Login error: {e}", exc_info=True)
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
         return jsonify({'error': 'Login failed', 'success': False}), 500

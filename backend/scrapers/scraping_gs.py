@@ -31,7 +31,7 @@ import os
 DB_PARAMS = {
     'dbname': 'ProDSGabungan',
     'user': 'postgres',
-    'password': 'hari123',
+    'password': 'password123',
     'host': 'localhost',
     'port': '5432'
 }

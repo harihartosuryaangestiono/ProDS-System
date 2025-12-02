@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Users, FileText, TrendingUp, Award, Calendar, Search, ArrowUp, ArrowDown, Filter, Building2, GraduationCap, RefreshCw } from 'lucide-react';
 import apiService from '../services/apiService';
 import Layout from '../components/Layout';
@@ -49,25 +49,36 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [yearRange, setYearRange] = useState(10);
   
-  // Filter states
-  const [selectedFaculty, setSelectedFaculty] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState('');
+  // Filter states - changed to arrays for checkbox support
+  const [selectedFaculties, setSelectedFaculties] = useState([]);
+  const [selectedDepartments, setSelectedDepartments] = useState([]);
   const [faculties, setFaculties] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loadingDepartments, setLoadingDepartments] = useState(false);
+  const [showFacultyFilter, setShowFacultyFilter] = useState(true);
+  const [showDepartmentFilter, setShowDepartmentFilter] = useState(true);
 
   useEffect(() => {
+    console.log('🎯 Component mounted, fetching faculties...');
     fetchFaculties();
   }, []);
 
   useEffect(() => {
-    if (selectedFaculty) {
-      fetchDepartments(selectedFaculty);
+    console.log('🔍 SelectedFaculties changed:', selectedFaculties);
+    // Fetch departments for all selected faculties
+    if (selectedFaculties.length > 0) {
+      fetchDepartmentsForFaculties(selectedFaculties);
     } else {
       setDepartments([]);
-      setSelectedDepartment('');
+      setSelectedDepartments([]);
     }
-  }, [selectedFaculty]);
+  }, [selectedFaculties]);
+
+  useEffect(() => {
+    console.log('🔍 Filter changed, fetching dashboard stats...');
+    console.log('🔍 Current filters:', { selectedFaculties, selectedDepartments });
+    fetchDashboardStats();
+  }, [selectedFaculties, selectedDepartments]);
 
   const fetchFaculties = async () => {
     try {
@@ -90,21 +101,24 @@ const Dashboard = () => {
     }
   };
 
-  const fetchDepartments = async (faculty) => {
+  const fetchDepartmentsForFaculties = async (facultiesList) => {
     try {
       setLoadingDepartments(true);
-      const response = await apiService.getDashboardDepartments(faculty);
-      console.log('📍 Departments Response:', response); // Debug
-      console.log('📍 Response Data:', response.data); // Debug
+      // Fetch departments for each faculty and combine unique ones
+      const allDepartments = new Set();
       
-      if (response.success && response.data) {
-        const departmentsData = Array.isArray(response.data) ? response.data : [];
-        console.log('📍 Departments Array:', departmentsData); // Debug
-        setDepartments(departmentsData);
-      } else {
-        console.error('❌ Invalid response:', response);
-        setDepartments([]);
+      for (const faculty of facultiesList) {
+        try {
+          const response = await apiService.getDashboardDepartments(faculty);
+          if (response.success && response.data && Array.isArray(response.data)) {
+            response.data.forEach(dept => allDepartments.add(dept));
+          }
+        } catch (error) {
+          console.error(`Error fetching departments for ${faculty}:`, error);
+        }
       }
+      
+      setDepartments(Array.from(allDepartments).sort());
     } catch (error) {
       console.error('Error fetching departments:', error);
       setDepartments([]);
@@ -113,23 +127,29 @@ const Dashboard = () => {
     }
   };
 
-  useEffect(() => {
-  console.log('🎯 Component mounted, fetching stats...');
-    fetchDashboardStats();
-  }, [selectedFaculty, selectedDepartment]);
-
-    const fetchDashboardStats = async () => {
+  const fetchDashboardStats = async () => {
     console.log('🚀 fetchDashboardStats STARTED');
+    console.log('🔍 Current filter state:', { selectedFaculties, selectedDepartments });
     
     try {
       setLoading(true);
-      console.log('🔍 Fetching stats with:', { selectedFaculty, selectedDepartment });
+      // Convert arrays to comma-separated strings for API
+      const facultyParam = selectedFaculties.length > 0 ? selectedFaculties.join(',') : '';
+      const departmentParam = selectedDepartments.length > 0 ? selectedDepartments.join(',') : '';
+      console.log('🔍 Fetching stats with:', { 
+        selectedFaculties, 
+        selectedDepartments, 
+        facultyParam, 
+        departmentParam,
+        hasFacultyFilter: facultyParam.length > 0,
+        hasDepartmentFilter: departmentParam.length > 0
+      });
       
-      const response = await apiService.getDashboardStats(selectedFaculty, selectedDepartment);
+      const response = await apiService.getDashboardStats(facultyParam, departmentParam);
       
       console.log('📦 Response received:', response);
       
-      if (response.success && response.data) {
+      if (response && response.success && response.data) {
         console.log('✅ Setting stats with data');
         
         const mergedStats = {
@@ -162,76 +182,109 @@ const Dashboard = () => {
         setStats(mergedStats);
       } else {
         console.error('❌ Invalid response:', response);
-        setStats({
-          total_dosen: 0,
-          total_publikasi: 0,
-          total_sitasi: 0,
-          total_sitasi_gs: 0,
-          total_sitasi_gs_sinta: 0,
-          total_sitasi_scopus: 0,
-          avg_h_index: 0,
-          median_h_index: 0,
-          publikasi_by_year: [],
-          top_authors_scopus: [],
-          top_authors_gs: [],
-          publikasi_internasional_q12: 0,
-          publikasi_internasional_q34_noq: 0,
-          publikasi_nasional_sinta12: 0,
-          publikasi_nasional_sinta34: 0,
-          publikasi_nasional_sinta5: 0,
-          publikasi_nasional_sinta6: 0,
-          scopus_q_breakdown: [],
-          sinta_rank_breakdown: [],
-          top_dosen_international: [],
-          top_dosen_national: [],
-          previous_date: null,
-          previous_values: {}
-        });
+        if (response && response.error) {
+          console.error('❌ API Error:', response.error);
+        }
+        // Don't reset stats completely, keep previous data
       }
     } catch (error) {
       console.error('❌ Catch error:', error);
-      setStats({
-        total_dosen: 0,
-        total_publikasi: 0,
-        total_sitasi: 0,
-        total_sitasi_gs: 0,
-        total_sitasi_gs_sinta: 0,
-        total_sitasi_scopus: 0,
-        avg_h_index: 0,
-        median_h_index: 0,
-        publikasi_by_year: [],
-        top_authors_scopus: [],
-        top_authors_gs: [],
-        publikasi_internasional_q12: 0,
-        publikasi_internasional_q34_noq: 0,
-        publikasi_nasional_sinta12: 0,
-        publikasi_nasional_sinta34: 0,
-        publikasi_nasional_sinta5: 0,
-        publikasi_nasional_sinta6: 0,
-        scopus_q_breakdown: [],
-        sinta_rank_breakdown: [],
-        top_dosen_international: [],
-        top_dosen_national: [],
-        previous_date: null,
-        previous_values: {}
-      });
+      console.error('❌ Error details:', error.response?.data || error.message);
+      // Don't reset stats on error, keep previous data
     } finally {
       setLoading(false);
     }
   };
 
-  const handleFacultyChange = (e) => {
-    setSelectedFaculty(e.target.value);
-    setSelectedDepartment('');
+  // Faculty to Department mapping (should match backend)
+  const FACULTY_DEPT_MAP = {
+    'Fakultas Ekonomi': ['Ekonomi Pembangunan', 'Ilmu Ekonomi', 'Manajemen', 'Akuntansi'],
+    'Fakultas Hukum': ['Ilmu Hukum', 'Hukum'],
+    'Fakultas Ilmu Sosial dan Ilmu Politik': ['Administrasi Publik', 'Administrasi Bisnis', 'Hubungan Internasional', 'Ilmu Administrasi Publik', 'Ilmu Administrasi Bisnis', 'Ilmu Hubungan Internasional'],
+    'Fakultas Teknik': ['Teknik Sipil', 'Arsitektur', 'Doktor Arsitektur', 'Teknik Industri', 'Teknik Kimia', 'Teknik Mekatronika'],
+    'Fakultas Filsafat': ['Filsafat', 'Ilmu Filsafat', 'Studi Humanitas'],
+    'Fakultas Teknologi Informasi dan Sains': ['Matematika', 'Fisika', 'Informatika', 'Teknik Informatika', 'Ilmu Komputer'],
+    'Fakultas Kedokteran': ['Kedokteran', 'Pendidikan Dokter'],
+    'Fakultas Keguruan dan Ilmu Pendidikan': ['Pendidikan Kimia', 'Pendidikan Fisika', 'Pendidikan Matematika', 'Pendidikan Teknik Informatika dan Komputer', 'Pendidikan Bahasa Inggris', 'Pendidikan Guru Sekolah Dasar', 'PGSD'],
+    'Fakultas Vokasi': ['Teknologi Rekayasa Pangan', 'Bisnis Kreatif', 'Agribisnis Pangan']
   };
 
-  const handleDepartmentChange = (e) => {
-    setSelectedDepartment(e.target.value);
+  const handleFacultyCheckboxChange = (faculty, isChecked) => {
+    console.log('🔍 Faculty checkbox changed:', { faculty, isChecked });
+    if (isChecked) {
+      setSelectedFaculties(prev => {
+        const newFaculties = [...prev, faculty];
+        console.log('✅ Added faculty, new list:', newFaculties);
+        return newFaculties;
+      });
+    } else {
+      setSelectedFaculties(prev => {
+        const newFaculties = prev.filter(f => f !== faculty);
+        console.log('❌ Removed faculty, new list:', newFaculties);
+        
+        // Remove departments that belong only to the unchecked faculty
+        if (newFaculties.length > 0) {
+          // Get all departments from remaining faculties
+          const remainingDepts = new Set();
+          newFaculties.forEach(f => {
+            const depts = FACULTY_DEPT_MAP[f] || [];
+            depts.forEach(d => remainingDepts.add(d));
+          });
+          
+          // Remove departments that are not in any remaining faculty
+          setSelectedDepartments(prevDepts => {
+            const filtered = prevDepts.filter(dept => remainingDepts.has(dept));
+            console.log('🔍 Filtered departments:', filtered);
+            return filtered;
+          });
+        } else {
+          // No faculties selected, clear all departments
+          console.log('🔍 No faculties selected, clearing departments');
+          setSelectedDepartments([]);
+        }
+        
+        return newFaculties;
+      });
+    }
+  };
+
+  const handleDepartmentCheckboxChange = (department, isChecked) => {
+    console.log('🔍 Department checkbox changed:', { department, isChecked });
+    if (isChecked) {
+      setSelectedDepartments(prev => {
+        const newDepts = [...prev, department];
+        console.log('✅ Added department, new list:', newDepts);
+        return newDepts;
+      });
+    } else {
+      setSelectedDepartments(prev => {
+        const newDepts = prev.filter(d => d !== department);
+        console.log('❌ Removed department, new list:', newDepts);
+        return newDepts;
+      });
+    }
+  };
+
+  const handleSelectAllFaculties = () => {
+    if (selectedFaculties.length === faculties.length) {
+      setSelectedFaculties([]);
+      setSelectedDepartments([]);
+    } else {
+      setSelectedFaculties([...faculties]);
+    }
+  };
+
+  const handleSelectAllDepartments = () => {
+    if (selectedDepartments.length === departments.length) {
+      setSelectedDepartments([]);
+    } else {
+      setSelectedDepartments([...departments]);
+    }
   };
 
   const handleResetFilters = () => {
-    setSelectedFaculty('');
-    setSelectedDepartment('');
+    setSelectedFaculties([]);
+    setSelectedDepartments([]);
   };
 
   const StatCard = ({ title, value, icon: Icon, color, subtitle, previousValue, previousDate }) => {
@@ -358,47 +411,126 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (!stats || typeof stats.total_dosen === 'undefined') {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600">Gagal memuat data dashboard</p>
-          <button 
-            onClick={fetchDashboardStats}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Coba Lagi
-          </button>
+      <Layout
+        title="Dashboard"
+        description="Overview sistem publikasi dosen SINTA & Google Scholar"
+      >
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Memuat data dashboard...</p>
+          </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
-  const hasFilter = stats.has_filter !== undefined 
-    ? stats.has_filter 
-    : (selectedFaculty || selectedDepartment);
+  // Initialize stats with default values if not available
+  const safeStats = {
+    total_dosen: stats?.total_dosen || 0,
+    total_publikasi: stats?.total_publikasi || 0,
+    total_sitasi: stats?.total_sitasi || 0,
+    total_sitasi_gs: stats?.total_sitasi_gs || 0,
+    total_sitasi_gs_sinta: stats?.total_sitasi_gs_sinta || 0,
+    total_sitasi_scopus: stats?.total_sitasi_scopus || 0,
+    avg_h_index: stats?.avg_h_index || 0,
+    median_h_index: stats?.median_h_index || 0,
+    publikasi_by_year: stats?.publikasi_by_year || [],
+    top_authors_scopus: stats?.top_authors_scopus || [],
+    top_authors_gs: stats?.top_authors_gs || [],
+    publikasi_internasional_q12: stats?.publikasi_internasional_q12 || 0,
+    publikasi_internasional_q34_noq: stats?.publikasi_internasional_q34_noq || 0,
+    publikasi_nasional_sinta12: stats?.publikasi_nasional_sinta12 || 0,
+    publikasi_nasional_sinta34: stats?.publikasi_nasional_sinta34 || 0,
+    publikasi_nasional_sinta5: stats?.publikasi_nasional_sinta5 || 0,
+    publikasi_nasional_sinta6: stats?.publikasi_nasional_sinta6 || 0,
+    scopus_q_breakdown: stats?.scopus_q_breakdown || [],
+    sinta_rank_breakdown: stats?.sinta_rank_breakdown || [],
+    top_dosen_international: stats?.top_dosen_international || [],
+    top_dosen_national: stats?.top_dosen_national || [],
+    previous_date: stats?.previous_date || null,
+    previous_values: stats?.previous_values || {},
+    has_filter: stats?.has_filter !== undefined ? stats.has_filter : (selectedFaculties.length > 0 || selectedDepartments.length > 0)
+  };
+
+  // Determine if filter is active based on frontend state (more reliable)
+  const hasFilter = selectedFaculties.length > 0 || selectedDepartments.length > 0;
+  
+  console.log('🔍 Filter status:', {
+    hasFilter,
+    selectedFaculties,
+    selectedDepartments,
+    backendHasFilter: safeStats.has_filter
+  });
+
+  // Transform data for line chart (SINTA vs Google Scholar)
+  const transformForLineChart = (data) => {
+    if (!data || data.length === 0) {
+      console.log('⚠️ No data for line chart');
+      return [];
+    }
+    
+    console.log('📊 Raw data for line chart:', data);
+    
+    const transformed = data.map(item => ({
+      name: item.v_tahun_publikasi || item.name || '',
+      SINTA: Number(item.count_sinta) || 0,
+      'Google Scholar': Number(item.count_gs) || 0
+    })).sort((a, b) => {
+      const aYear = parseInt(a.name);
+      const bYear = parseInt(b.name);
+      if (!isNaN(aYear) && !isNaN(bYear)) {
+        return aYear - bYear;
+      }
+      return a.name.localeCompare(b.name);
+    });
+    
+    console.log('📊 Transformed data for line chart:', transformed);
+    return transformed;
+  };
 
   const filteredYearData = (() => {
     const currentYear = new Date().getFullYear();
-    const yearData = stats.publikasi_by_year || [];
+    const yearData = safeStats.publikasi_by_year || [];
+    console.log('📊 Raw publikasi_by_year data:', yearData);
+    console.log('📊 Year range:', currentYear - yearRange, 'to', currentYear);
+    
+    if (!yearData || yearData.length === 0) {
+      console.log('⚠️ No year data available');
+      return [];
+    }
+    
     const filtered = yearData.filter(item => {
-      const year = parseInt(item.v_tahun_publikasi || item.name);
-      return year >= currentYear - yearRange && year <= currentYear;
+      const yearStr = item.v_tahun_publikasi || item.name || '';
+      const year = parseInt(yearStr);
+      const isValid = !isNaN(year) && year >= currentYear - yearRange && year <= currentYear;
+      if (!isValid) {
+        console.log(`⚠️ Filtered out year: ${yearStr} (parsed: ${year})`);
+      }
+      return isValid;
     });
-    return transformForStackedChart(filtered, hasFilter);
+    
+    console.log('📊 Filtered year data:', filtered);
+    console.log('📊 Filtered count:', filtered.length);
+    
+    // Use line chart transform for publikasi by year
+    const transformed = transformForLineChart(filtered);
+    console.log('📊 Final transformed data for chart:', transformed);
+    console.log('📊 Transformed count:', transformed.length);
+    
+    if (transformed.length > 0) {
+      console.log('📊 First item:', transformed[0]);
+      console.log('📊 Last item:', transformed[transformed.length - 1]);
+    }
+    
+    return transformed;
   })();
 
-  const uniqueFacultiesYear = getUniqueFaculties(stats.publikasi_by_year || []);
-  const scopusData = transformForStackedChart(stats.scopus_q_breakdown || [], hasFilter);
-  const uniqueFacultiesScopus = getUniqueFaculties(stats.scopus_q_breakdown || []);
-  const sintaData = transformForStackedChart(stats.sinta_rank_breakdown || [], hasFilter);
-  const uniqueFacultiesSinta = getUniqueFaculties(stats.sinta_rank_breakdown || []);
+  const uniqueFacultiesYear = getUniqueFaculties(safeStats.publikasi_by_year || []);
+  const scopusData = transformForStackedChart(safeStats.scopus_q_breakdown || [], hasFilter);
+  const uniqueFacultiesScopus = getUniqueFaculties(safeStats.scopus_q_breakdown || []);
+  const sintaData = transformForStackedChart(safeStats.sinta_rank_breakdown || [], hasFilter);
+  const uniqueFacultiesSinta = getUniqueFaculties(safeStats.sinta_rank_breakdown || []);
 
   return (
     <Layout
@@ -415,130 +547,221 @@ const Dashboard = () => {
             <h2 className="text-lg font-semibold text-gray-900">Filter Data</h2>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Faculty Filter */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Faculty Filter - Checkbox */}
             <div className="relative">
-              <label htmlFor="faculty" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                <Building2 className="w-4 h-4 mr-1.5 text-red-600" />
-                Fakultas
-              </label>
-              <div className="relative">
-                <select
-                  id="faculty"
-                  value={selectedFaculty}
-                  onChange={handleFacultyChange}
-                  className="w-full pl-4 pr-10 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white hover:border-gray-400 transition-all duration-200 appearance-none cursor-pointer shadow-sm"
-                >
-                  <option value="">✨ Semua Fakultas</option>
-                  {Array.isArray(faculties) && faculties.map((faculty) => (
-                    <option key={faculty} value={faculty}>
-                      {faculty}
-                    </option>
-                  ))}
-                </select>
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-semibold text-gray-700 flex items-center">
+                  <Building2 className="w-4 h-4 mr-1.5 text-red-600" />
+                  Fakultas ({selectedFaculties.length}/{faculties.length})
+                </label>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleSelectAllFaculties}
+                    className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    {selectedFaculties.length === faculties.length ? 'Batal Semua' : 'Pilih Semua'}
+                  </button>
+                  <button
+                    onClick={() => setShowFacultyFilter(!showFacultyFilter)}
+                    className="text-xs text-gray-600 hover:text-gray-800"
+                  >
+                    {showFacultyFilter ? 'Sembunyikan' : 'Tampilkan'}
+                  </button>
+                </div>
               </div>
-            </div>
-
-            {/* Department Filter */}
-            <div className="relative">
-              <label htmlFor="department" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                <GraduationCap className="w-4 h-4 mr-1.5 text-blue-600" />
-                Jurusan
-              </label>
-              <div className="relative">
-                <select
-                  id="department"
-                  value={selectedDepartment}
-                  onChange={handleDepartmentChange}
-                  disabled={!selectedFaculty || loadingDepartments}
-                  className="w-full pl-4 pr-10 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white hover:border-gray-400 transition-all duration-200 appearance-none cursor-pointer shadow-sm disabled:bg-gray-50 disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-500"
-                >
-                  <option value="">
-                    {!selectedFaculty ? '🔒 Pilih fakultas terlebih dahulu' : loadingDepartments ? '⏳ Memuat...' : '✨ Semua Jurusan'}
-                  </option>
-                  {Array.isArray(departments) && departments.map((dept) => (
-                    <option key={dept} value={dept}>
-                      {dept}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {loadingDepartments && (
-                <div className="flex items-center mt-2">
-                  <RefreshCw className="w-3 h-3 text-blue-500 animate-spin mr-1" />
-                  <p className="text-xs text-blue-600 font-medium">Memuat jurusan...</p>
+              {showFacultyFilter && (
+                <div className="border-2 border-gray-300 rounded-lg p-4 max-h-64 overflow-y-auto bg-white">
+                  {loadingDepartments && faculties.length === 0 ? (
+                    <div className="flex items-center justify-center py-4">
+                      <RefreshCw className="w-4 h-4 text-blue-500 animate-spin mr-2" />
+                      <p className="text-sm text-gray-600">Memuat fakultas...</p>
+                    </div>
+                  ) : Array.isArray(faculties) && faculties.length > 0 ? (
+                    <div className="space-y-2">
+                      {faculties.map((faculty) => (
+                        <label
+                          key={faculty}
+                          className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer group"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedFaculties.includes(faculty)}
+                            onChange={(e) => handleFacultyCheckboxChange(faculty, e.target.checked)}
+                            className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500 focus:ring-2 cursor-pointer"
+                          />
+                          <span className="ml-3 text-sm text-gray-700 group-hover:text-gray-900">
+                            {faculty}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500 text-center py-4">Tidak ada fakultas tersedia</p>
+                  )}
                 </div>
               )}
             </div>
 
-            {/* Reset Button */}
-            <div className="flex items-end">
-              <button
-                onClick={handleResetFilters}
-                disabled={!selectedFaculty && !selectedDepartment}
-                className="w-full px-4 py-2.5 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 rounded-lg hover:from-gray-200 hover:to-gray-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-sm flex items-center justify-center group"
-              >
-                <RefreshCw className="w-4 h-4 mr-2 group-hover:rotate-180 transition-transform duration-300" />
-                Reset Filter
-              </button>
+            {/* Department Filter - Checkbox */}
+            <div className="relative">
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-semibold text-gray-700 flex items-center">
+                  <GraduationCap className="w-4 h-4 mr-1.5 text-blue-600" />
+                  Prodi ({selectedDepartments.length}/{departments.length})
+                </label>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleSelectAllDepartments}
+                    disabled={departments.length === 0 || selectedFaculties.length === 0}
+                    className="text-xs text-blue-600 hover:text-blue-800 font-medium disabled:text-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {selectedDepartments.length === departments.length ? 'Batal Semua' : 'Pilih Semua'}
+                  </button>
+                  <button
+                    onClick={() => setShowDepartmentFilter(!showDepartmentFilter)}
+                    disabled={departments.length === 0 || selectedFaculties.length === 0}
+                    className="text-xs text-gray-600 hover:text-gray-800 disabled:text-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {showDepartmentFilter ? 'Sembunyikan' : 'Tampilkan'}
+                  </button>
+                </div>
+              </div>
+              {showDepartmentFilter && (
+                <div className="border-2 border-gray-300 rounded-lg p-4 max-h-64 overflow-y-auto bg-white">
+                  {loadingDepartments ? (
+                    <div className="flex items-center justify-center py-4">
+                      <RefreshCw className="w-4 h-4 text-blue-500 animate-spin mr-2" />
+                      <p className="text-sm text-blue-600 font-medium">Memuat prodi...</p>
+                    </div>
+                  ) : selectedFaculties.length === 0 ? (
+                    <p className="text-sm text-gray-500 text-center py-4">🔒 Pilih fakultas terlebih dahulu</p>
+                  ) : Array.isArray(departments) && departments.length > 0 ? (
+                    <div className="space-y-2">
+                      {departments.map((dept) => (
+                        <label
+                          key={dept}
+                          className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer group"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedDepartments.includes(dept)}
+                            onChange={(e) => handleDepartmentCheckboxChange(dept, e.target.checked)}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                          />
+                          <span className="ml-3 text-sm text-gray-700 group-hover:text-gray-900">
+                            {dept}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500 text-center py-4">Tidak ada prodi tersedia</p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Active Filters Display */}
-          {(selectedFaculty || selectedDepartment) && (
-            <div className="flex items-center flex-wrap gap-2 mt-4">
-              <span className="text-sm text-gray-600">Filter aktif:</span>
-              {selectedFaculty && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                  <Building2 className="w-4 h-4 mr-1" />
-                  {selectedFaculty}
+          {/* Reset Button and Active Filters Display */}
+          <div className="mt-4 flex items-center justify-between flex-wrap gap-4">
+            <button
+              onClick={handleResetFilters}
+              disabled={selectedFaculties.length === 0 && selectedDepartments.length === 0}
+              className="px-4 py-2.5 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 rounded-lg hover:from-gray-200 hover:to-gray-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-sm flex items-center justify-center group"
+            >
+              <RefreshCw className="w-4 h-4 mr-2 group-hover:rotate-180 transition-transform duration-300" />
+              Reset Filter
+            </button>
+
+            {/* Active Filters Display */}
+            {(selectedFaculties.length > 0 || selectedDepartments.length > 0) && (
+              <div className="flex items-center flex-wrap gap-2">
+                <span className="text-sm text-gray-600 font-medium flex items-center">
+                  <Filter className="w-4 h-4 mr-1 text-blue-600" />
+                  Filter aktif:
                 </span>
-              )}
-              {selectedDepartment && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                  <GraduationCap className="w-4 h-4 mr-1" />
-                  {selectedDepartment}
-                </span>
-              )}
-            </div>
-          )}
+                {selectedFaculties.map((faculty) => (
+                  <span
+                    key={faculty}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800"
+                  >
+                    <Building2 className="w-4 h-4 mr-1" />
+                    {faculty}
+                  </span>
+                ))}
+                {selectedDepartments.map((dept) => (
+                  <span
+                    key={dept}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
+                  >
+                    <GraduationCap className="w-4 h-4 mr-1" />
+                    {dept}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Filter Status Banner */}
+        {hasFilter && (
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-r-lg">
+            <div className="flex items-center">
+              <Filter className="w-5 h-5 text-blue-600 mr-2" />
+              <p className="text-sm font-medium text-blue-900">
+                Data yang ditampilkan sudah difilter berdasarkan:
+                {selectedFaculties.length > 0 && (
+                  <span className="ml-2">
+                    {selectedFaculties.length} Fakultas
+                    {selectedFaculties.length > 0 && selectedDepartments.length > 0 && ' dan '}
+                  </span>
+                )}
+                {selectedDepartments.length > 0 && (
+                  <span className="ml-2">
+                    {selectedDepartments.length} Prodi
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Dosen"
-            value={stats.total_dosen.toLocaleString()}
+            value={safeStats.total_dosen.toLocaleString()}
             icon={Users}
             color="#3B82F6"
-            previousValue={stats.previous_values?.total_dosen}
-            previousDate={stats.previous_date}
+            previousValue={safeStats.previous_values?.total_dosen}
+            previousDate={safeStats.previous_date}
           />
           <StatCard
             title="Total Publikasi"
-            value={stats.total_publikasi.toLocaleString()}
+            value={safeStats.total_publikasi.toLocaleString()}
             icon={FileText}
             color="#10B981"
-            previousValue={stats.previous_values?.total_publikasi}
-            previousDate={stats.previous_date}
+            previousValue={safeStats.previous_values?.total_publikasi}
+            previousDate={safeStats.previous_date}
           />
           <StatCard
             title="Total Sitasi"
-            value={stats.total_sitasi.toLocaleString()}
-            subtitle={`GS: ${stats.total_sitasi_gs?.toLocaleString() || 0} | GS-SINTA: ${stats.total_sitasi_gs_sinta?.toLocaleString() || 0} | Scopus: ${stats.total_sitasi_scopus?.toLocaleString() || 0}`}
+            value={safeStats.total_sitasi.toLocaleString()}
+            subtitle={`GS: ${safeStats.total_sitasi_gs?.toLocaleString() || 0} | GS-SINTA: ${safeStats.total_sitasi_gs_sinta?.toLocaleString() || 0} | Scopus: ${safeStats.total_sitasi_scopus?.toLocaleString() || 0}`}
             icon={Award}
             color="#F59E0B"
-            previousValue={stats.previous_values?.total_sitasi}
-            previousDate={stats.previous_date}
+            previousValue={safeStats.previous_values?.total_sitasi}
+            previousDate={safeStats.previous_date}
           />
           <StatCard
             title="H-Index Rata-rata"
-            value={stats.avg_h_index ? stats.avg_h_index.toFixed(1) : '0.0'}
-            subtitle={`Median: ${stats.median_h_index ? stats.median_h_index.toFixed(1) : '0.0'}`}
+            value={safeStats.avg_h_index ? safeStats.avg_h_index.toFixed(1) : '0.0'}
+            subtitle={`Median: ${safeStats.median_h_index ? safeStats.median_h_index.toFixed(1) : '0.0'}`}
             icon={TrendingUp}
             color="#EF4444"
-            previousValue={stats.previous_values?.avg_h_index}
-            previousDate={stats.previous_date}
+            previousValue={safeStats.previous_values?.avg_h_index}
+            previousDate={safeStats.previous_date}
           />
         </div>
 
@@ -546,7 +769,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Internasional (Scopus Q1-Q2)"
-            value={stats.publikasi_internasional_q12.toLocaleString()}
+            value={safeStats.publikasi_internasional_q12.toLocaleString()}
             icon={Award}
             color="#059669"
             previousValue={stats.previous_values?.publikasi_internasional_q12}
@@ -554,7 +777,7 @@ const Dashboard = () => {
           />
           <StatCard
             title="Internasional (Q3-Q4/noQ)"
-            value={stats.publikasi_internasional_q34_noq.toLocaleString()}
+            value={safeStats.publikasi_internasional_q34_noq.toLocaleString()}
             icon={Award}
             color="#10B981"
             previousValue={stats.previous_values?.publikasi_internasional_q34_noq}
@@ -562,7 +785,7 @@ const Dashboard = () => {
           />
           <StatCard
             title="Nasional (Sinta 1-2)"
-            value={stats.publikasi_nasional_sinta12.toLocaleString()}
+            value={safeStats.publikasi_nasional_sinta12.toLocaleString()}
             icon={Award}
             color="#7C3AED"
             previousValue={stats.previous_values?.publikasi_nasional_sinta12}
@@ -570,7 +793,7 @@ const Dashboard = () => {
           />
           <StatCard
             title="Nasional (Sinta 3-4)"
-            value={stats.publikasi_nasional_sinta34.toLocaleString()}
+            value={safeStats.publikasi_nasional_sinta34.toLocaleString()}
             icon={Award}
             color="#8B5CF6"
             previousValue={stats.previous_values?.publikasi_nasional_sinta34}
@@ -582,60 +805,158 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Nasional (Sinta 5-6)"
-            value={(stats.publikasi_nasional_sinta5 + stats.publikasi_nasional_sinta6).toLocaleString()}
+            value={(safeStats.publikasi_nasional_sinta5 + safeStats.publikasi_nasional_sinta6).toLocaleString()}
             icon={Award}
             color="#A78BFA"
-            previousValue={(stats.previous_values?.publikasi_nasional_sinta5 || 0) + (stats.previous_values?.publikasi_nasional_sinta6 || 0)}
-            previousDate={stats.previous_date}
+            previousValue={(safeStats.previous_values?.publikasi_nasional_sinta5 || 0) + (safeStats.previous_values?.publikasi_nasional_sinta6 || 0)}
+            previousDate={safeStats.previous_date}
           />
         </div>
 
-        {/* Publikasi by Year Chart */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8 hover:shadow-md transition-shadow duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
-              <Calendar className="w-5 h-5 text-blue-600 mr-2" />
-              <h2 className="text-lg font-semibold text-gray-900">
-                Publikasi per Tahun ({yearRange} Tahun Terakhir)
-                {!hasFilter && ' - Per Fakultas'}
-              </h2>
+        {/* Publikasi by Year Charts - Separated by Source */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Chart SINTA */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <Calendar className="w-5 h-5 text-blue-600 mr-2" />
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Publikasi SINTA per Tahun ({yearRange} Tahun Terakhir)
+                </h2>
+              </div>
+              <div className="relative">
+                <select
+                  className="pl-10 pr-10 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white hover:border-gray-400 transition-all duration-200 appearance-none cursor-pointer shadow-sm text-sm font-medium text-gray-700"
+                  value={yearRange}
+                  onChange={(e) => setYearRange(parseInt(e.target.value))}
+                >
+                  <option value={5}>5 Tahun</option>
+                  <option value={10}>10 Tahun</option>
+                  <option value={15}>15 Tahun</option>
+                </select>
+              </div>
             </div>
-            <div className="relative">
-              <select
-                className="pl-10 pr-10 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white hover:border-gray-400 transition-all duration-200 appearance-none cursor-pointer shadow-sm text-sm font-medium text-gray-700"
-                value={yearRange}
-                onChange={(e) => setYearRange(parseInt(e.target.value))}
-              >
-                <option value={5}>5 Tahun</option>
-                <option value={10}>10 Tahun</option>
-                <option value={15}>15 Tahun</option>
-              </select>
-            </div>
+            {(() => {
+              const sintaData = filteredYearData.map(item => ({
+                name: item.name,
+                'Publikasi SINTA': item.SINTA || 0
+              }));
+              
+              if (!sintaData || sintaData.length === 0 || sintaData.every(item => item['Publikasi SINTA'] === 0)) {
+                return (
+                  <div className="flex items-center justify-center h-64 text-gray-400">
+                    <div className="text-center">
+                      <p className="text-lg mb-2">Tidak ada data SINTA</p>
+                      <p className="text-sm">Data publikasi SINTA per tahun belum tersedia</p>
+                    </div>
+                  </div>
+                );
+              }
+              
+              return (
+                <div style={{ width: '100%', height: '350px' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart 
+                      data={sintaData}
+                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="name" 
+                        label={{ value: 'Tahun', position: 'insideBottom', offset: -5 }}
+                        tick={{ fontSize: 12 }}
+                      />
+                      <YAxis 
+                        label={{ value: 'Jumlah Publikasi', angle: -90, position: 'insideLeft' }}
+                        tick={{ fontSize: 12 }}
+                      />
+                      <Tooltip 
+                        formatter={(value, name) => [value, name]}
+                        labelFormatter={(label) => `Tahun: ${label}`}
+                      />
+                      <Legend />
+                      <Line 
+                        type="monotone" 
+                        dataKey="Publikasi SINTA" 
+                        stroke="#3B82F6" 
+                        strokeWidth={3}
+                        dot={{ r: 5, fill: '#3B82F6' }}
+                        activeDot={{ r: 7 }}
+                        name="Publikasi SINTA"
+                        connectNulls={false}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              );
+            })()}
           </div>
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={filteredYearData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              {!hasFilter && uniqueFacultiesYear.length > 0 ? (
-                // Stacked bars - no filter
-                uniqueFacultiesYear.map((faculty) => (
-                  <Bar 
-                    key={faculty}
-                    dataKey={faculty}
-                    stackId="a"
-                    fill={FACULTY_COLORS[faculty] || '#6B7280'}
-                    name={removeFakultasPrefix(faculty)}
-                  />
-                ))
-              ) : (
-                // Simple bar - with filter
-                <Bar dataKey="count" fill="#3B82F6" name="Jumlah Publikasi" />
-              )}
-            </BarChart>
-          </ResponsiveContainer>
+
+          {/* Chart Google Scholar */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <Calendar className="w-5 h-5 text-green-600 mr-2" />
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Publikasi Google Scholar per Tahun ({yearRange} Tahun Terakhir)
+                </h2>
+              </div>
+            </div>
+            {(() => {
+              const gsData = filteredYearData.map(item => ({
+                name: item.name,
+                'Publikasi Google Scholar': item['Google Scholar'] || 0
+              }));
+              
+              if (!gsData || gsData.length === 0 || gsData.every(item => item['Publikasi Google Scholar'] === 0)) {
+                return (
+                  <div className="flex items-center justify-center h-64 text-gray-400">
+                    <div className="text-center">
+                      <p className="text-lg mb-2">Tidak ada data Google Scholar</p>
+                      <p className="text-sm">Data publikasi Google Scholar per tahun belum tersedia</p>
+                    </div>
+                  </div>
+                );
+              }
+              
+              return (
+                <div style={{ width: '100%', height: '350px' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart 
+                      data={gsData}
+                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="name" 
+                        label={{ value: 'Tahun', position: 'insideBottom', offset: -5 }}
+                        tick={{ fontSize: 12 }}
+                      />
+                      <YAxis 
+                        label={{ value: 'Jumlah Publikasi', angle: -90, position: 'insideLeft' }}
+                        tick={{ fontSize: 12 }}
+                      />
+                      <Tooltip 
+                        formatter={(value, name) => [value, name]}
+                        labelFormatter={(label) => `Tahun: ${label}`}
+                      />
+                      <Legend />
+                      <Line 
+                        type="monotone" 
+                        dataKey="Publikasi Google Scholar" 
+                        stroke="#10B981" 
+                        strokeWidth={3}
+                        dot={{ r: 5, fill: '#10B981' }}
+                        activeDot={{ r: 7 }}
+                        name="Publikasi Google Scholar"
+                        connectNulls={false}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              );
+            })()}
+          </div>
         </div>
 
         {/* Top Authors - Scopus and GS */}
@@ -646,10 +967,10 @@ const Dashboard = () => {
               <Award className="w-5 h-5 text-green-600 mr-2" />
               <h2 className="text-lg font-semibold text-gray-900">Top 10 Dosen (h-index Scopus)</h2>
             </div>
-            {stats.top_authors_scopus && stats.top_authors_scopus.length > 0 ? (
+            {safeStats.top_authors_scopus && safeStats.top_authors_scopus.length > 0 ? (
               <ResponsiveContainer width="100%" height={400}>
                 <BarChart
-                  data={stats.top_authors_scopus.slice(0, 10)}
+                  data={safeStats.top_authors_scopus.slice(0, 10)}
                   layout="vertical"
                   margin={{ top: 5, right: 30, left: -50, bottom: 5 }}
                 >
@@ -689,10 +1010,10 @@ const Dashboard = () => {
               <Award className="w-5 h-5 text-red-600 mr-2" />
               <h2 className="text-lg font-semibold text-gray-900">Top 10 Dosen (h-index Google Scholar)</h2>
             </div>
-            {stats.top_authors_gs && stats.top_authors_gs.length > 0 ? (
+            {safeStats.top_authors_gs && safeStats.top_authors_gs.length > 0 ? (
               <ResponsiveContainer width="100%" height={400}>
                 <BarChart
-                  data={stats.top_authors_gs.slice(0, 10)}
+                  data={safeStats.top_authors_gs.slice(0, 10)}
                   layout="vertical"
                   margin={{ top: 5, right: 30, left: -50, bottom: 5 }}
                 >
@@ -807,21 +1128,21 @@ const Dashboard = () => {
               <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
                 <span className="text-sm font-medium text-gray-600">Rata-rata Publikasi/Dosen</span>
                 <span className="text-lg font-bold text-blue-600">
-                  {stats.total_dosen > 0 ? Math.round(stats.total_publikasi / stats.total_dosen) : 0}
+                  {safeStats.total_dosen > 0 ? Math.round(safeStats.total_publikasi / safeStats.total_dosen) : 0}
                 </span>
               </div>
               
               <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
                 <span className="text-sm font-medium text-gray-600">Rata-rata Sitasi/Publikasi</span>
                 <span className="text-lg font-bold text-green-600">
-                  {stats.total_publikasi > 0 ? Math.round(stats.total_sitasi / stats.total_publikasi) : 0}
+                  {safeStats.total_publikasi > 0 ? Math.round(safeStats.total_sitasi / safeStats.total_publikasi) : 0}
                 </span>
               </div>
               
               <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
                 <span className="text-sm font-medium text-gray-600">Top h-index (GS)</span>
                 <span className="text-sm font-bold text-yellow-600">
-                  {stats.top_authors_gs?.[0]?.v_nama_dosen?.substring(0, 15)}...
+                  {safeStats.top_authors_gs?.[0]?.v_nama_dosen?.substring(0, 15)}...
                 </span>
               </div>
 
@@ -830,12 +1151,12 @@ const Dashboard = () => {
                 <div className="text-right">
                   <span className="text-sm font-bold text-red-600 block">
                     {(() => {
-                      if (!stats.publikasi_by_year || stats.publikasi_by_year.length === 0) return '-';
+                      if (!safeStats.publikasi_by_year || safeStats.publikasi_by_year.length === 0) return '-';
                       
-                      const maxCount = Math.max(...stats.publikasi_by_year.map(item => item.count));
+                      const maxCount = Math.max(...safeStats.publikasi_by_year.map(item => item.count));
                       if (maxCount === 0) return '-';
                       
-                      const topYears = stats.publikasi_by_year
+                      const topYears = safeStats.publikasi_by_year
                         .filter(item => item.count === maxCount)
                         .map(item => item.v_tahun_publikasi)
                         .sort();
@@ -845,7 +1166,7 @@ const Dashboard = () => {
                   </span>
                   <span className="text-xs text-red-500">
                     {(() => {
-                      const maxCount = Math.max(...stats.publikasi_by_year.map(item => item.count));
+                      const maxCount = Math.max(...safeStats.publikasi_by_year.map(item => item.count));
                       return maxCount > 0 ? `(${maxCount} publikasi)` : '';
                     })()}
                   </span>
@@ -880,7 +1201,7 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {stats.top_authors_gs.slice(0, 10).map((author, index) => (
+                {(safeStats.top_authors_gs || []).slice(0, 10).map((author, index) => (
                   <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -923,7 +1244,7 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {stats.top_dosen_international.slice(0, 10).map((author, index) => (
+                {(safeStats.top_dosen_international || []).slice(0, 10).map((author, index) => (
                   <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -962,7 +1283,7 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {stats.top_dosen_national.slice(0, 10).map((author, index) => (
+                {(safeStats.top_dosen_national || []).slice(0, 10).map((author, index) => (
                   <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
