@@ -270,7 +270,7 @@ useEffect(() => {
     });
 
     try {
-      const response = await fetch('http://localhost:5002/api/scraping/googlescholar/scrape', {
+      const response = await fetch('http://10.211.1.188:5000/api/scraping/googlescholar/scrape', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,31 +1,57 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { Eye, EyeOff, LogIn, User, Lock } from 'lucide-react';
+import { Eye, EyeOff, X, Mail, Lock } from 'lucide-react';
 import authService from '../services/authService';
+import ColorBends from '../components/ColorBends';
+import LoadingOverlay from '../components/LoadingOverlay';
+import unparLogo from '../assets/image copy.png';
 
 const Login = ({ onLogin }) => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+  const location = useLocation();
+  // Check if coming from register route or has signup query param
+  const [activeTab, setActiveTab] = useState(
+    location.pathname === '/register' || location.search === '?signup' ? 'signup' : 'signin'
+  );
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData(prev => ({
+  // Sign in form data
+  const [signInData, setSignInData] = useState({
+    email: '',
+    password: ''
+  });
+
+  // Sign up form data
+  const [signUpData, setSignUpData] = useState({
+    email: '',
+    username: '',
+    password: '',
+    confirmPassword: ''
+  });
+
+  const handleSignInChange = (e) => {
+    setSignInData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSignUpChange = (e) => {
+    setSignUpData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
+  const handleSignInSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const response = await authService.login(formData.email, formData.password);
+      const response = await authService.login(signInData.email, signInData.password);
       
       if (response.success) {
         onLogin(response.data.user);
@@ -42,131 +68,296 @@ const Login = ({ onLogin }) => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center p-4">
-      <div className="max-w-md w-full space-y-8">
-        {/* Header dengan animasi */}
-        <div className="text-center transform hover:scale-105 transition-transform duration-300">
-          <div className="mx-auto h-20 w-20 bg-white rounded-full flex items-center justify-center shadow-lg">
-            <User className="h-10 w-10 text-blue-600" />
-          </div>
-          <h2 className="mt-6 text-4xl font-extrabold text-white">
-            Masuk ke ProDS
-          </h2>
-          <p className="mt-2 text-lg text-blue-100">
-            Sistem Publikasi Dosen SINTA & Google Scholar
-          </p>
-        </div>
+  const validateSignUpForm = () => {
+    if (!signUpData.email || !signUpData.username || !signUpData.password || !signUpData.confirmPassword) {
+      toast.error('Semua field harus diisi');
+      return false;
+    }
 
-        {/* Form dengan efek hover dan animasi */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="bg-white/95 backdrop-blur-sm p-8 rounded-xl shadow-2xl space-y-6 transform hover:translate-y-[-2px] transition-all duration-300">
-            <div className="space-y-5">
-              {/* Email Field dengan animasi focus */}
-              <div className="group">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+    if (signUpData.email && !/\S+@\S+\.\S+/.test(signUpData.email)) {
+      toast.error('Format email tidak valid');
+      return false;
+    }
+
+    if (signUpData.username.length < 3) {
+      toast.error('Username minimal 3 karakter');
+      return false;
+    }
+
+    if (signUpData.password.length < 6) {
+      toast.error('Password minimal 6 karakter');
+      return false;
+    }
+
+    if (signUpData.password !== signUpData.confirmPassword) {
+      toast.error('Password dan konfirmasi password tidak sama');
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSignUpSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateSignUpForm()) return;
+
+    setLoading(true);
+
+    try {
+      const response = await authService.register(
+        signUpData.username,
+        signUpData.email,
+        signUpData.password
+      );
+      
+      if (response.success) {
+        toast.success('Registrasi berhasil! Silakan login');
+        setActiveTab('signin');
+        setSignInData({ email: signUpData.email, password: '' });
+        navigate('/login');
+      } else {
+        toast.error(response.error || 'Registrasi gagal');
+      }
+    } catch (error) {
+      toast.error('Terjadi kesalahan saat registrasi');
+      console.error('Registration error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    navigate('/');
+  };
+
+  return (
+    <>
+      <LoadingOverlay 
+        isLoading={loading} 
+        message={activeTab === 'signin' ? 'Masuk ke akun...' : 'Mendaftar akun baru...'}
+        subMessage="Mohon tunggu sebentar"
+      />
+      <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* ColorBends Background */}
+      <div className="absolute inset-0">
+        <ColorBends
+          colors={["#ff5c7a", "#8a5cff", "#00ffd1"]}
+          rotation={30}
+          speed={0.3}
+          scale={1.2}
+          frequency={1.4}
+          warpStrength={1.2}
+          mouseInfluence={0.8}
+          parallax={0.6}
+          noise={0.08}
+          transparent
+        />
+      </div>
+      
+      {/* Dark Modal Card */}
+      <div className="max-w-md w-full relative z-10">
+        <div 
+          className="bg-[#2A2A2A] rounded-2xl shadow-2xl overflow-hidden"
+          style={{
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
+          }}
+        >
+          {/* Top Bar with Tabs and Close Button */}
+          <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#3A3A3A]">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setActiveTab('signup')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  activeTab === 'signup'
+                    ? 'bg-[#3A3A3A] text-white'
+                    : 'text-[#A0A0A0] hover:text-white'
+                }`}
+              >
+                Sign up
+              </button>
+              <button
+                onClick={() => setActiveTab('signin')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  activeTab === 'signin'
+                    ? 'bg-[#3A3A3A] text-white'
+                    : 'text-[#A0A0A0] hover:text-white'
+                }`}
+              >
+                Sign in
+              </button>
+            </div>
+            <button
+              onClick={handleClose}
+              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#3A3A3A] transition-colors duration-200 text-white"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="px-6 py-6">
+            {/* Logo UNPAR */}
+            <div className="flex justify-center mb-6">
+              <img 
+                src={unparLogo} 
+                alt="Universitas Parahyangan" 
+                className="h-20 w-auto object-contain"
+              />
+            </div>
+            
+            {/* Title */}
+            <h2 className="text-3xl font-bold text-white mb-6 text-center">
+              {activeTab === 'signup' ? 'Create an account' : 'Sign in to your account'}
+            </h2>
+
+            {/* Sign Up Form */}
+            {activeTab === 'signup' && (
+              <form onSubmit={handleSignUpSubmit} className="space-y-4">
+                {/* Email */}
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-[#6E6E73]" />
                   </div>
                   <input
-                    id="email"
-                    name="email"
                     type="email"
-                    autoComplete="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    value={signUpData.email}
+                    onChange={handleSignUpChange}
+                    className="w-full pl-12 pr-4 py-3 bg-[#1F1F1F] border border-[#3A3A3A] rounded-lg text-white placeholder-[#6E6E73] focus:outline-none focus:border-[#4A4A4A] transition-colors"
                     required
-                    className="appearance-none relative block w-full px-3 py-3 pl-10 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900"
-                    placeholder="Alamat Email"
-                    value={formData.email}
-                    onChange={handleChange}
                   />
                 </div>
-              </div>
 
-              {/* Password Field dengan animasi focus */}
-              <div className="group">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                {/* Username */}
+                <div>
+                  <input
+                    type="text"
+                    name="username"
+                    placeholder="Username"
+                    value={signUpData.username}
+                    onChange={handleSignUpChange}
+                    className="w-full px-4 py-3 bg-[#1F1F1F] border border-[#3A3A3A] rounded-lg text-white placeholder-[#6E6E73] focus:outline-none focus:border-[#4A4A4A] transition-colors"
+                    required
+                  />
+                </div>
+
+                {/* Password */}
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-[#6E6E73]" />
                   </div>
                   <input
-                    id="password"
-                    name="password"
                     type={showPassword ? 'text' : 'password'}
-                    autoComplete="current-password"
+                    name="password"
+                    placeholder="Password"
+                    value={signUpData.password}
+                    onChange={handleSignUpChange}
+                    className="w-full pl-12 pr-12 py-3 bg-[#1F1F1F] border border-[#3A3A3A] rounded-lg text-white placeholder-[#6E6E73] focus:outline-none focus:border-[#4A4A4A] transition-colors"
                     required
-                    className="appearance-none relative block w-full px-3 py-3 pl-10 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900"
-                    placeholder="Kata Sandi"
-                    value={formData.password}
-                    onChange={handleChange}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-blue-500 transition-colors duration-200"
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#6E6E73] hover:text-white transition-colors"
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5" />
-                    ) : (
-                      <Eye className="h-5 w-5" />
-                    )}
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
-              </div>
-            </div>
 
-            {/* Remember Me dengan style baru */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-colors duration-200"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                  Ingat saya
-                </label>
-              </div>
-            </div>
+                {/* Confirm Password */}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-[#6E6E73]" />
+                  </div>
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    name="confirmPassword"
+                    placeholder="Confirm password"
+                    value={signUpData.confirmPassword}
+                    onChange={handleSignUpChange}
+                    className="w-full pl-12 pr-12 py-3 bg-[#1F1F1F] border border-[#3A3A3A] rounded-lg text-white placeholder-[#6E6E73] focus:outline-none focus:border-[#4A4A4A] transition-colors"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#6E6E73] hover:text-white transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
 
-            {/* Submit Button dengan animasi */}
-            <div>
-              <button
-                type="submit"
-                className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:translate-y-[-1px] transition-all duration-200 ${
-                  loading ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-                disabled={loading}
-              >
-                {loading ? (
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                ) : (
-                  <LogIn className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform duration-200" />
-                )}
-                {loading ? 'Memuat...' : 'Masuk'}
-              </button>
-            </div>
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 bg-[#E5E5E5] text-[#1F1F1F] font-semibold rounded-lg hover:bg-[#D0D0D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Creating...' : 'Create an account'}
+                </button>
+              </form>
+            )}
+
+            {/* Sign In Form */}
+            {activeTab === 'signin' && (
+              <form onSubmit={handleSignInSubmit} className="space-y-4">
+                {/* Email */}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-[#6E6E73]" />
+                  </div>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    value={signInData.email}
+                    onChange={handleSignInChange}
+                    className="w-full pl-12 pr-4 py-3 bg-[#1F1F1F] border border-[#3A3A3A] rounded-lg text-white placeholder-[#6E6E73] focus:outline-none focus:border-[#4A4A4A] transition-colors"
+                    required
+                  />
+                </div>
+
+                {/* Password */}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-[#6E6E73]" />
+                  </div>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    placeholder="Password"
+                    value={signInData.password}
+                    onChange={handleSignInChange}
+                    className="w-full pl-12 pr-12 py-3 bg-[#1F1F1F] border border-[#3A3A3A] rounded-lg text-white placeholder-[#6E6E73] focus:outline-none focus:border-[#4A4A4A] transition-colors"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#6E6E73] hover:text-white transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 bg-[#E5E5E5] text-[#1F1F1F] font-semibold rounded-lg hover:bg-[#D0D0D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Signing in...' : 'Sign in'}
+                </button>
+              </form>
+            )}
           </div>
-        </form>
-
-        {/* Register Link dengan animasi */}
-        <div className="text-center">
-          <p className="text-sm text-blue-100">
-            Belum punya akun?{' '}
-            <Link to="/register" className="font-medium text-white hover:text-blue-200 underline decoration-2 decoration-blue-400 hover:decoration-blue-200 transition-all duration-200">
-              Daftar sekarang
-            </Link>
-          </p>
         </div>
       </div>
     </div>
+    </>
   );
 }
-
 
 export default Login;

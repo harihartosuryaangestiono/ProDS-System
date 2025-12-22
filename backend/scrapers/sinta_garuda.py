@@ -327,9 +327,7 @@ class SintaGarudaScraper:
         
         # Try multiple login URLs (SINTA has different domains)
         login_urls = [
-            "https://sinta.kemdikbud.go.id/logins",
-            "https://sinta.kemdiktisaintek.go.id/logins",
-            "https://sinta.ristekdikti.go.id/logins"
+            "https://sinta.kemdiktisaintek.go.id/logins"
         ]
         
         for url in login_urls:
@@ -417,7 +415,7 @@ class SintaGarudaScraper:
 
             login_headers = self.headers.copy()
             login_headers['Referer'] = login_url
-            login_headers['Origin'] = 'https://sinta.kemdikbud.go.id'
+            login_headers['Origin'] = 'https://sinta.kemdiktisaintek.go.id'
             login_headers['Content-Type'] = 'application/x-www-form-urlencoded'
 
             logger.info(f"Posting to: {post_url}")
@@ -489,11 +487,11 @@ class SintaGarudaScraper:
                 if link_elem and link_elem.has_attr('href'):
                     href = link_elem['href']
                     if href.startswith('/'):
-                        return f"https://sinta.kemdikbud.go.id{href}"
+                        return f"https://sinta.kemdiktisaintek.go.id{href}"
                     elif href.startswith('http'):
                         return href
                     else:
-                        return f"https://sinta.kemdikbud.go.id/{href}"
+                        return f"https://sinta.kemdiktisaintek.go.id/{href}"
             
             # If no specific link found, try any link in the publication item
             links = item.find_all('a', href=True)
@@ -501,11 +499,11 @@ class SintaGarudaScraper:
                 href = link['href']
                 if any(keyword in href for keyword in ['garuda', 'article', 'pub', 'detail']):
                     if href.startswith('/'):
-                        return f"https://sinta.kemdikbud.go.id{href}"
+                        return f"https://sinta.kemdiktisaintek.go.id{href}"
                     elif href.startswith('http'):
                         return href
                     else:
-                        return f"https://sinta.kemdikbud.go.id/{href}"
+                        return f"https://sinta.kemdiktisaintek.go.id/{href}"
             
             return None
             
@@ -517,7 +515,7 @@ class SintaGarudaScraper:
         """Scrape Garuda publications for an author and save to database"""
         logger.info(f"Scraping publications for {dosen_data['nama']} (SINTA: {dosen_data['sinta_id']})")
         
-        base_url = f"https://sinta.kemdikbud.go.id/authors/profile/{dosen_data['sinta_id']}"
+        base_url = f"https://sinta.kemdiktisaintek.go.id/authors/profile/{dosen_data['sinta_id']}"
         
         # Try different URL patterns for Garuda publications
         possible_urls = [
@@ -909,10 +907,10 @@ def main():
     
     # Database configuration
     print("Database Configuration:")
-    dbname = input("Database name (default: ProDSGabungan): ").strip() or "ProDSGabungan"
-    user = input("Database user (default: postgres): ").strip() or "postgres"
-    password = input("Database password: ").strip() or "password123"
-    host = input("Database host (default: localhost): ").strip() or "localhost"
+    dbname = input("Database name (default: skm_scraper): ").strip() or "skm_scraper"
+    user = input("Database user (default: skm_scraper): ").strip() or "skm_scraper"
+    password = input("Database password: ").strip() or "unparScr4per"
+    host = input("Database host (default: 10.211.1.188): ").strip() or "10.211.1.188"
     port = input("Database port (default: 5432): ").strip() or "5432"
     
     # Initialize database

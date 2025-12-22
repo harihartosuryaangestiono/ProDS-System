@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, User, LogOut, Home, Users, FileText, Download, ChevronDown, Info } from 'lucide-react';
+import { Menu, X, User, LogOut, Home, Users, FileText, Download, ChevronDown, Info, BarChart3, TrendingUp, Sparkles, Database } from 'lucide-react';
+import sintaLogo from '../assets/image.png';
+import googleScholarLogo from '../assets/Google_Scholar_logo.png';
 
 const Navbar = ({ user, onLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,11 +16,12 @@ const Navbar = ({ user, onLogout }) => {
     <Link
       to={to}
       onClick={onClick}
-      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+      className={`px-4 py-2.5 rounded-[12px] text-sm font-semibold transition-all duration-300 ${
         isActive(to)
-          ? 'bg-blue-100 text-blue-700'
-          : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+          ? 'bg-[#0A84FF] text-white shadow-sm'
+          : 'text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F5F5F7]'
       } ${className}`}
+      style={{ transition: 'all 0.3s cubic-bezier(0.2, 0.9, 0.2, 1)' }}
     >
       {children}
     </Link>
@@ -28,11 +31,12 @@ const Navbar = ({ user, onLogout }) => {
     <Link
       to={to}
       onClick={onClick}
-      className={`block px-4 py-2 text-sm transition-colors duration-200 ${
+      className={`block px-4 py-2.5 text-sm font-medium rounded-[12px] transition-all duration-300 ${
         isActive(to)
-          ? 'bg-blue-100 text-blue-700'
-          : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+          ? 'bg-[#0A84FF]/10 text-[#0A84FF] font-semibold'
+          : 'text-[#6E6E73] hover:bg-[#F5F5F7] hover:text-[#1D1D1F]'
       }`}
+      style={{ transition: 'all 0.3s cubic-bezier(0.2, 0.9, 0.2, 1)' }}
     >
       {children}
     </Link>
@@ -54,193 +58,180 @@ const Navbar = ({ user, onLogout }) => {
   };
 
   return (
-    <nav className="bg-white/95 backdrop-blur-sm shadow-lg sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          {/* Logo and Brand dengan animasi */}
+    <>
+      {/* Backdrop Overlay - Fixed position untuk menutupi seluruh layar */}
+      {isMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 cursor-pointer"
+          onClick={() => setIsMenuOpen(false)}
+          style={{
+            animation: 'fadeIn 0.2s ease-out',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            pointerEvents: 'auto'
+          }}
+        />
+      )}
+      
+      <nav className="sticky top-0 z-50 py-4" style={{ 
+        background: 'transparent',
+        backgroundImage: `radial-gradient(circle, rgba(210, 210, 215, 0.3) 1px, transparent 1px)`,
+        backgroundSize: '20px 20px',
+        backgroundPosition: '0 0'
+      }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Pill-shaped Navigation Bar */}
+        <div 
+          className="bg-white rounded-full shadow-lg flex items-center justify-between px-4 py-3"
+          style={{
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+          }}
+        >
+          {/* Hamburger Menu - Left */}
           <div className="flex items-center">
-            <Link to="/dashboard" className="flex-shrink-0 flex items-center group">
-              <div className="h-10 w-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center transform group-hover:scale-110 transition-all duration-300 shadow-lg">
-                <FileText className="h-6 w-6 text-white" />
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300 focus:outline-none group"
+              style={{ transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}
+            >
+              {isMenuOpen ? (
+                <X 
+                  className="h-5 w-5 text-black transition-all duration-300"
+                  style={{ 
+                    animation: 'rotateIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                    transform: 'rotate(0deg)'
+                  }}
+                />
+              ) : (
+                <div 
+                  className="flex flex-col gap-1.5 transition-all duration-300 group-hover:gap-2"
+                  style={{ transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}
+                >
+                  <div 
+                    className="w-5 h-0.5 bg-black rounded-full transition-all duration-300"
+                    style={{ transform: 'translateY(0)' }}
+                  ></div>
+                  <div 
+                    className="w-5 h-0.5 bg-black rounded-full transition-all duration-300"
+                    style={{ transform: 'translateY(0)' }}
+                  ></div>
+                </div>
+              )}
+            </button>
+          </div>
+
+          {/* Logo - Center */}
+          <div className="flex-1 flex justify-center">
+            <Link 
+              to="/dashboard" 
+              className="flex items-center group"
+              style={{ transition: 'all 0.3s cubic-bezier(0.2, 0.9, 0.2, 1)' }}
+            >
+              <div className="relative mr-2">
+                <div 
+                  className="relative h-8 w-8 bg-gradient-to-br from-[#0A84FF] via-[#5856D6] to-[#AF52DE] rounded-lg flex items-center justify-center transform group-hover:scale-110 transition-all duration-300"
+                  style={{ 
+                    boxShadow: '0 2px 8px rgba(10, 132, 255, 0.25)'
+                  }}
+                >
+                  <Database className="h-4 w-4 text-white" />
+                </div>
               </div>
-              <span className="ml-3 text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                ProDS System
+              <span className="text-lg font-semibold text-black" style={{ letterSpacing: '-0.022em' }}>
+                UNPAR Scraper
               </span>
             </Link>
           </div>
 
-          {/* Desktop Navigation dengan animasi */}
-          <div className="hidden md:flex items-center space-x-6">
-            <NavLink 
-              to="/dashboard"
-              className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-blue-50 hover:text-blue-600 flex items-center space-x-2 group"
-            >
-              <Home className="h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
-              <span>Dashboard</span>
-            </NavLink>
-
-            {/* SINTA Dropdown dengan animasi */}
-            <div className="relative group">
-              <button
-                onClick={() => handleDropdownToggle('sinta')}
-                className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-blue-50 hover:text-blue-600 flex items-center space-x-2"
-              >
-                <span>SINTA</span>
-                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${
-                  isSintaDropdownOpen ? 'rotate-180' : ''
-                }`} />
-              </button>
-              
-              {isSintaDropdownOpen && (
-                <div className="absolute left-0 mt-2 w-56 rounded-xl shadow-xl bg-white/95 backdrop-blur-sm ring-1 ring-black ring-opacity-5 z-50 transform transition-all duration-200 origin-top-right">
-                  <div className="py-2 px-2">
-                    <DropdownLink 
-                      to="/sinta/dosen" 
-                      className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200"
-                      onClick={closeDropdowns}
-                    >
-                      <Users className="h-5 w-5 text-blue-500" />
-                      <span>Data Dosen</span>
-                    </DropdownLink>
-                    <DropdownLink 
-                      to="/sinta/publikasi"
-                      className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200"
-                      onClick={closeDropdowns}
-                    >
-                      <FileText className="h-5 w-5 text-blue-500" />
-                      <span>Data Publikasi</span>
-                    </DropdownLink>
-                  </div>
+          {/* User Button - Right */}
+          <div className="flex items-center">
+            <div className="flex items-center space-x-2">
+              <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-all duration-200">
+                <div className="h-7 w-7 bg-[#0A84FF] rounded-full flex items-center justify-center" style={{ boxShadow: '0 2px 6px rgba(10, 132, 255, 0.25)' }}>
+                  <User className="h-4 w-4 text-white" />
                 </div>
-              )}
-            </div>
-
-            {/* Google Scholar Dropdown dengan animasi */}
-            <div className="relative group">
-              <button
-                onClick={() => handleDropdownToggle('scholar')}
-                className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-blue-50 hover:text-blue-600 flex items-center space-x-2"
-              >
-                <span>Google Scholar</span>
-                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${
-                  isScholarDropdownOpen ? 'rotate-180' : ''
-                }`} />
-              </button>
-              
-              {isScholarDropdownOpen && (
-                <div className="absolute left-0 mt-2 w-56 rounded-xl shadow-xl bg-white/95 backdrop-blur-sm ring-1 ring-black ring-opacity-5 z-50 transform transition-all duration-200 origin-top-right">
-                  <div className="py-2 px-2">
-                    <DropdownLink 
-                      to="/scholar/dosen" 
-                      className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200"
-                      onClick={closeDropdowns}
-                    >
-                      <Users className="h-5 w-5 text-blue-500" />
-                      <span>Data Dosen</span>
-                    </DropdownLink>
-                    <DropdownLink 
-                      to="/scholar/publikasi"
-                      className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200"
-                      onClick={closeDropdowns}
-                    >
-                      <FileText className="h-5 w-5 text-blue-500" />
-                      <span>Data Publikasi</span>
-                    </DropdownLink>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Scraping dengan animasi */}
-            <NavLink 
-              to="/scraping"
-              className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-blue-50 hover:text-blue-600 flex items-center space-x-2 group"
-            >
-              <Download className="h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
-              <span>Scraping</span>
-            </NavLink>
-
-            {/* User Menu dengan animasi */}
-            <div className="flex items-center space-x-4 border-l border-gray-200 pl-6">
-              <div className="flex items-center space-x-3 group">
-                <div className="h-10 w-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center transform group-hover:scale-105 transition-all duration-300 shadow-md">
-                  <User className="h-6 w-6 text-white" />
-                </div>
-                <span className="text-sm font-medium text-gray-700">{user.username}</span>
+                <span className="text-sm font-semibold text-black">{user.username}</span>
               </div>
-              
-              <button
-                onClick={onLogout}
-                className="p-2 rounded-full hover:bg-red-50 text-gray-500 hover:text-red-600 transition-all duration-300"
-                title="Logout"
-              >
-                <LogOut className="h-5 w-5" />
-              </button>
-              
-              {/* About dengan animasi - icon + text */}
               <Link
                 to="/about"
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-300 ${
+                className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 focus:outline-none ${
                   isActive('/about')
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                    ? 'bg-gradient-to-r from-[#0A84FF] to-[#5856D6] text-white shadow-lg shadow-[#0A84FF]/30'
+                    : 'bg-white text-gray-700 hover:bg-gradient-to-r hover:from-[#0A84FF]/10 hover:to-[#5856D6]/10 hover:text-[#0A84FF] border border-gray-200 hover:border-[#0A84FF]/30 shadow-sm'
                 }`}
+                style={{ 
+                  letterSpacing: '-0.011em',
+                  transition: 'all 0.3s cubic-bezier(0.2, 0.9, 0.2, 1)'
+                }}
               >
-                <Info className="h-5 w-5" />
-                <span className="text-sm font-medium">About</span>
+                <Info className={`h-4 w-4 ${isActive('/about') ? 'text-white' : 'text-[#0A84FF]'}`} />
+                <span>About</span>
               </Link>
             </div>
           </div>
-
-          {/* Mobile menu button dengan animasi */}
-          <div className="md:hidden flex items-center">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-lg text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 focus:outline-none"
-            >
-              {isMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </button>
-          </div>
         </div>
 
-        {/* Mobile Navigation dengan animasi */}
+        {/* Dropdown Menu - Appears below navbar when menu is open */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-gray-200">
-            <div className="px-2 pt-2 pb-3 space-y-1">
+          <div 
+            className="relative mt-4 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
+            style={{
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+              animation: 'menuSlideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+              zIndex: 50
+            }}
+          >
+            <div className="p-4 space-y-1">
               <NavLink 
                 to="/dashboard"
                 onClick={() => setIsMenuOpen(false)}
-                className="flex items-center space-x-3 px-4 py-3 rounded-lg"
+                className="flex items-center space-x-3 px-4 py-3 rounded-xl menu-item hover:bg-gray-50 transition-all duration-200 group"
+                style={{ animationDelay: '0.05s' }}
               >
-                <Home className="h-5 w-5" />
+                <Home className="h-5 w-5 transition-transform duration-200 group-hover:scale-110" />
                 <span>Dashboard</span>
               </NavLink>
 
-              <div className="px-4 py-2">
+              {/* SINTA Dropdown */}
+              <div className="menu-item" style={{ animationDelay: '0.1s' }}>
                 <button
                   onClick={() => handleDropdownToggle('sinta')}
-                  className="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-blue-50"
+                  className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200"
                 >
-                  <span>SINTA</span>
-                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${
-                    isSintaDropdownOpen ? 'rotate-180' : ''
-                  }`} />
+                  <div className="flex items-center space-x-3">
+                    <img 
+                      src={sintaLogo} 
+                      alt="SINTA Logo" 
+                      className="h-5 w-5 object-contain"
+                    />
+                    <span>SINTA</span>
+                  </div>
+                  <ChevronDown 
+                    className={`h-4 w-4 transition-all duration-300 ease-out ${
+                      isSintaDropdownOpen ? 'rotate-180' : ''
+                    }`}
+                    style={{ transformOrigin: 'center' }}
+                  />
                 </button>
                 {isSintaDropdownOpen && (
-                  <div className="pl-4 mt-1 space-y-1">
+                  <div 
+                    className="pl-12 mt-1 space-y-1 overflow-hidden"
+                    style={{
+                      animation: 'submenuSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                    }}
+                  >
                     <DropdownLink 
                       to="/sinta/dosen"
                       onClick={() => {
                         closeDropdowns();
                         setIsMenuOpen(false);
                       }}
-                      className="flex items-center space-x-3 px-4 py-2 rounded-lg"
+                      className="flex items-center space-x-3 px-4 py-2 rounded-lg submenu-item"
+                      style={{ animationDelay: '0.05s' }}
                     >
-                      <Users className="h-5 w-5 text-blue-500" />
+                      <Users className="h-4 w-4 text-[#0A84FF]" />
                       <span>Data Dosen</span>
                     </DropdownLink>
                     <DropdownLink 
@@ -249,36 +240,54 @@ const Navbar = ({ user, onLogout }) => {
                         closeDropdowns();
                         setIsMenuOpen(false);
                       }}
-                      className="flex items-center space-x-3 px-4 py-2 rounded-lg"
+                      className="flex items-center space-x-3 px-4 py-2 rounded-lg submenu-item"
+                      style={{ animationDelay: '0.1s' }}
                     >
-                      <FileText className="h-5 w-5 text-blue-500" />
+                      <FileText className="h-4 w-4 text-[#0A84FF]" />
                       <span>Data Publikasi</span>
                     </DropdownLink>
                   </div>
                 )}
               </div>
 
-              <div className="px-4 py-2">
+              {/* Google Scholar Dropdown */}
+              <div className="menu-item" style={{ animationDelay: '0.15s' }}>
                 <button
                   onClick={() => handleDropdownToggle('scholar')}
-                  className="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-blue-50"
+                  className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200"
                 >
-                  <span>Google Scholar</span>
-                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${
-                    isScholarDropdownOpen ? 'rotate-180' : ''
-                  }`} />
+                  <div className="flex items-center space-x-3">
+                    <img 
+                      src={googleScholarLogo} 
+                      alt="Google Scholar Logo" 
+                      className="h-5 w-5 object-contain"
+                    />
+                    <span>Google Scholar</span>
+                  </div>
+                  <ChevronDown 
+                    className={`h-4 w-4 transition-all duration-300 ease-out ${
+                      isScholarDropdownOpen ? 'rotate-180' : ''
+                    }`}
+                    style={{ transformOrigin: 'center' }}
+                  />
                 </button>
                 {isScholarDropdownOpen && (
-                  <div className="pl-4 mt-1 space-y-1">
+                  <div 
+                    className="pl-12 mt-1 space-y-1 overflow-hidden"
+                    style={{
+                      animation: 'submenuSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                    }}
+                  >
                     <DropdownLink 
                       to="/scholar/dosen"
                       onClick={() => {
                         closeDropdowns();
                         setIsMenuOpen(false);
                       }}
-                      className="flex items-center space-x-3 px-4 py-2 rounded-lg"
+                      className="flex items-center space-x-3 px-4 py-2 rounded-lg submenu-item"
+                      style={{ animationDelay: '0.05s' }}
                     >
-                      <Users className="h-5 w-5 text-blue-500" />
+                      <Users className="h-4 w-4 text-[#0A84FF]" />
                       <span>Data Dosen</span>
                     </DropdownLink>
                     <DropdownLink 
@@ -287,9 +296,10 @@ const Navbar = ({ user, onLogout }) => {
                         closeDropdowns();
                         setIsMenuOpen(false);
                       }}
-                      className="flex items-center space-x-3 px-4 py-2 rounded-lg"
+                      className="flex items-center space-x-3 px-4 py-2 rounded-lg submenu-item"
+                      style={{ animationDelay: '0.1s' }}
                     >
-                      <FileText className="h-5 w-5 text-blue-500" />
+                      <FileText className="h-4 w-4 text-[#0A84FF]" />
                       <span>Data Publikasi</span>
                     </DropdownLink>
                   </div>
@@ -299,25 +309,26 @@ const Navbar = ({ user, onLogout }) => {
               <NavLink 
                 to="/scraping"
                 onClick={() => setIsMenuOpen(false)}
-                className="flex items-center space-x-3 px-4 py-3 rounded-lg"
+                className="flex items-center space-x-3 px-4 py-3 rounded-xl menu-item"
+                style={{ animationDelay: '0.2s' }}
               >
                 <Download className="h-5 w-5" />
                 <span>Scraping</span>
               </NavLink>
 
-              <div className="border-t border-gray-200 mt-2 pt-2">
-                <div className="px-4 py-2 flex items-center space-x-3">
-                  <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
-                    <User className="h-5 w-5 text-white" />
+              <div className="border-t border-gray-100 mt-2 pt-2 menu-item" style={{ animationDelay: '0.25s' }}>
+                <div className="px-4 py-3 flex items-center space-x-3">
+                  <div className="h-8 w-8 bg-[#0A84FF] rounded-full flex items-center justify-center" style={{ boxShadow: '0 2px 8px rgba(10, 132, 255, 0.25)' }}>
+                    <User className="h-4.5 w-4.5 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-gray-700">{user.username}</span>
+                  <span className="text-sm font-semibold text-gray-900">{user.username}</span>
                 </div>
                 <button
                   onClick={() => {
                     setIsMenuOpen(false);
                     onLogout();
                   }}
-                  className="w-full flex items-center space-x-3 px-4 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-red-50 hover:text-red-600"
+                  className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-gray-700 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all duration-200"
                 >
                   <LogOut className="h-5 w-5" />
                   <span>Logout</span>
@@ -325,10 +336,10 @@ const Navbar = ({ user, onLogout }) => {
                 <Link
                   to="/about"
                   onClick={() => setIsMenuOpen(false)}
-                  className={`w-full flex items-center space-x-3 px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                  className={`w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 ${
                     isActive('/about')
-                      ? 'bg-blue-50 text-blue-600'
-                      : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                      ? 'bg-[#0A84FF]/10 text-[#0A84FF]'
+                      : 'text-gray-700 hover:bg-gray-50'
                   }`}
                 >
                   <Info className="h-5 w-5" />
@@ -340,6 +351,7 @@ const Navbar = ({ user, onLogout }) => {
         )}
       </div>
     </nav>
+    </>
   );
 };
 

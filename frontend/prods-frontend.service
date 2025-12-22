@@ -1,0 +1,20 @@
+[Unit]
+Description=UNPAR Scraper Frontend Service
+After=network.target prods-backend.service
+Wants=prods-backend.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/app/ProDS-System/frontend
+Environment="PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/node/bin"
+Environment="NODE_ENV=production"
+ExecStart=/bin/bash /app/ProDS-System/frontend/start-frontend.sh
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+

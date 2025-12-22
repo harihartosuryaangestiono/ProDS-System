@@ -4,6 +4,7 @@ import { Users, TrendingUp, Award, Calendar, ExternalLink, Building2, Graduation
 import apiService from '../services/apiService';
 import { toast } from 'react-hot-toast';
 import Layout from '../components/Layout';
+import LoadingOverlay from '../components/LoadingOverlay';
 
 const ScholarPublikasi = () => {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ const ScholarPublikasi = () => {
   const [selectedFaculty, setSelectedFaculty] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('');
   const [loadingDepartments, setLoadingDepartments] = useState(false);
+  const [facultyDeptMap, setFacultyDeptMap] = useState({});
   
   const [aggregateStats, setAggregateStats] = useState({
     totalPublikasi: 0,
@@ -51,20 +53,42 @@ const ScholarPublikasi = () => {
     yearOptions.push(year);
   }
 
-  // Fetch faculties on component mount
+  // Fetch mapping on component mount (like dashboard)
   useEffect(() => {
-    fetchFaculties();
+    const fetchMapping = async () => {
+      try {
+        setLoadingDepartments(true);
+        const response = await apiService.getDashboardMapping();
+        
+        if (response.success && response.data) {
+          console.log("✅ Mapping loaded from DB:", response.data);
+          setFacultyDeptMap(response.data);
+          // Set daftar Fakultas berdasarkan keys dari response
+          setFaculties(Object.keys(response.data).sort());
+        } else {
+          console.error('❌ Invalid mapping response:', response);
+        }
+      } catch (error) {
+        console.error("❌ Failed to load mapping:", error);
+      } finally {
+        setLoadingDepartments(false);
+      }
+    };
+
+    fetchMapping();
   }, []);
 
-  // Fetch departments when faculty changes
+  // Update departments when faculty changes (using mapping from state)
   useEffect(() => {
     if (selectedFaculty) {
-      fetchDepartments(selectedFaculty);
+      // Ambil data dari State facultyDeptMap, bukan dari API
+      const depts = facultyDeptMap[selectedFaculty] || [];
+      setDepartments(depts.sort());
     } else {
       setDepartments([]);
       setSelectedDepartment('');
     }
-  }, [selectedFaculty]);
+  }, [selectedFaculty, facultyDeptMap]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -79,36 +103,6 @@ const ScholarPublikasi = () => {
     fetchAggregateStats();
   }, [searchTerm, filterTipe, yearStart, yearEnd, selectedFaculty, selectedDepartment]);
 
-  const fetchFaculties = async () => {
-    try {
-      const response = await apiService.getScholarFaculties();
-      if (response.success) {
-        setFaculties(response.data.faculties || []);
-      } else {
-        console.error('Error fetching faculties:', response.error);
-      }
-    } catch (error) {
-      console.error('Error fetching faculties:', error);
-    }
-  };
-
-  const fetchDepartments = async (faculty) => {
-    try {
-      setLoadingDepartments(true);
-      const response = await apiService.getScholarDepartments(faculty);
-      if (response.success) {
-        setDepartments(response.data.departments || []);
-      } else {
-        console.error('Error fetching departments:', response.error);
-        setDepartments([]);
-      }
-    } catch (error) {
-      console.error('Error fetching departments:', error);
-      setDepartments([]);
-    } finally {
-      setLoadingDepartments(false);
-    }
-  };
 
   const fetchAggregateStats = async () => {
     try {
@@ -379,52 +373,72 @@ const ScholarPublikasi = () => {
     };
     
     return (
-      <div className="bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 p-6 transition-all duration-300 hover:-translate-y-1 group">
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-500 mb-1">{title}</p>
+      <div className="bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-200 p-6 transition-all duration-300 group">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">{title}</p>
             {loading ? (
-              <div className="mt-2 h-8 w-24 bg-gray-200 animate-pulse rounded-lg"></div>
+              <div className="h-10 w-32 bg-gray-200 animate-pulse rounded"></div>
             ) : (
-              <>
-                <div className="flex items-center gap-2 mt-2">
-                  <p className="text-3xl font-bold text-gray-900">
-                    {typeof value === 'string' ? value : value.toLocaleString()}
-                  </p>
-                  {previousDate && !isEqual && (
-                    <div className="flex items-center">
-                      {isIncreased ? (
-                        <ArrowUp className="w-5 h-5 text-green-600" />
-                      ) : isDecreased ? (
-                        <ArrowDown className="w-5 h-5 text-red-600" />
-                      ) : null}
-                    </div>
-                  )}
-                </div>
-                {subtitle && (
-                  <p className="text-xs text-gray-500 mt-2 font-medium">{subtitle}</p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-3xl font-bold text-gray-900 leading-tight">
+                  {typeof value === 'string' ? value : value.toLocaleString('id-ID')}
+                </p>
+                {previousDate && !isEqual && (
+                  <div className="flex items-center pb-1">
+                    {isIncreased ? (
+                      <ArrowUp className="w-4 h-4 text-green-600" />
+                    ) : isDecreased ? (
+                      <ArrowDown className="w-4 h-4 text-red-600" />
+                    ) : null}
+                  </div>
                 )}
-                {previousDate && (
-                  <p className="text-xs text-gray-400 mt-3">
-                    sebelumnya {previousDate}: {formatPrevValue(prevValue)}
-                  </p>
-                )}
-              </>
+              </div>
             )}
           </div>
-          <div className="p-4 rounded-xl transition-all duration-300 group-hover:scale-110" style={{ backgroundColor: `${color}15` }}>
-            <Icon className="w-8 h-8 transition-colors duration-300" style={{ color }} />
+          <div className="flex-shrink-0 ml-4">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110" style={{ backgroundColor: `${color}15` }}>
+              <Icon className="w-6 h-6" style={{ color }} />
+            </div>
           </div>
         </div>
+        
+        {!loading && (
+          <div className="space-y-1.5 pt-3 border-t border-gray-100">
+            {subtitle && (
+              <p className="text-xs font-medium text-gray-600">{subtitle}</p>
+            )}
+            {previousDate && (
+              <p className="text-xs text-gray-500">
+                sebelumnya {previousDate}: {formatPrevValue(prevValue)}
+              </p>
+            )}
+          </div>
+        )}
       </div>
     );
+  };
+
+  const formatPages = (pages) => {
+    const p = pages ? String(pages).trim() : '';
+    // Jika ada isinya dan bukan "N/A", tambahkan prefix "pp."
+    if (p && p.toLowerCase() !== 'n/a') {
+      return `pp. ${p}`;
+    }
+    return '-';
   };
 
   const sortedData = getSortedData();
 
   return (
-    <Layout
-      title="Data Publikasi Google Scholar"
+    <>
+      <LoadingOverlay 
+        isLoading={loading} 
+        message="Memuat data publikasi Google Scholar..."
+        subMessage="Mohon tunggu sebentar"
+      />
+      <Layout
+        title="Data Publikasi Google Scholar"
       description="Daftar publikasi dengan data dari Google Scholar"
       headerActions={
         <>
@@ -623,24 +637,24 @@ const ScholarPublikasi = () => {
                 <div className="relative">
                   <label htmlFor="department" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
                     <GraduationCap className="w-4 h-4 mr-1.5 text-emerald-600" />
-                    Jurusan
+                    Prodi
                   </label>
                   <div className="relative">
                     <select
                       id="department"
                       value={selectedDepartment}
                       onChange={handleDepartmentChange}
-                      disabled={!selectedFaculty || loadingDepartments}
+                      disabled={!selectedFaculty}
                       className="w-full pl-4 pr-10 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white hover:border-gray-400 transition-all duration-200 appearance-none cursor-pointer shadow-sm disabled:bg-gray-50 disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-500"
                       style={{
-                        backgroundImage: !selectedFaculty || loadingDepartments ? 'none' : `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                        backgroundImage: !selectedFaculty ? 'none' : `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
                         backgroundPosition: 'right 0.5rem center',
                         backgroundRepeat: 'no-repeat',
                         backgroundSize: '1.5em 1.5em'
                       }}
                     >
                       <option value="">
-                        {!selectedFaculty ? '🔒 Pilih fakultas terlebih dahulu' : loadingDepartments ? '⏳ Memuat...' : '✨ Semua Jurusan'}
+                        {!selectedFaculty ? '🔒 Pilih fakultas terlebih dahulu' : '✨ Semua Prodi'}
                       </option>
                       {departments.map((dept) => (
                         <option key={dept} value={dept}>
@@ -649,12 +663,6 @@ const ScholarPublikasi = () => {
                       ))}
                     </select>
                   </div>
-                  {loadingDepartments && (
-                    <div className="flex items-center mt-2">
-                      <RefreshCw className="w-3 h-3 text-emerald-500 animate-spin mr-1" />
-                      <p className="text-xs text-emerald-600 font-medium">Memuat jurusan...</p>
-                    </div>
-                  )}
                 </div>
 
                 {/* Reset Button */}
@@ -720,71 +728,82 @@ const ScholarPublikasi = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('authors')}>
-                        Author {sortConfig.key === 'authors' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 min-w-[180px]" onClick={() => handleSort('authors')}>
+                        <div className="flex items-center gap-2">
+                          <span>Author</span>
+                          {sortConfig.key === 'authors' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </div>
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Jurusan
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">
+                        Prodi
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('v_judul')}>
-                        Judul Publikasi {sortConfig.key === 'v_judul' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 min-w-[300px]" onClick={() => handleSort('v_judul')}>
+                        <div className="flex items-center gap-2">
+                          <span>Judul Publikasi</span>
+                          {sortConfig.key === 'v_judul' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </div>
                       </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
                         Tipe
                       </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('v_tahun_publikasi')}>
-                        Tahun {sortConfig.key === 'v_tahun_publikasi' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 min-w-[80px]" onClick={() => handleSort('v_tahun_publikasi')}>
+                        <div className="flex items-center justify-center gap-2">
+                          <span>Tahun</span>
+                          {sortConfig.key === 'v_tahun_publikasi' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </div>
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px]">
                         Venue/Jurnal
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]">
                         Publisher
                       </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
                         Vol/Issue
                       </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[80px]">
                         Pages
                       </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('n_total_sitasi')}>
-                        Sitasi {sortConfig.key === 'n_total_sitasi' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 min-w-[80px]" onClick={() => handleSort('n_total_sitasi')}>
+                        <div className="flex items-center justify-center gap-2">
+                          <span>Sitasi</span>
+                          {sortConfig.key === 'n_total_sitasi' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </div>
                       </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">
                         Last Updated
                       </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
                         Aksi
                       </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {sortedData.map((row, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="max-w-xs">
-                            <p className="text-sm text-gray-900 truncate" title={row.authors}>
+                      <tr key={index} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="max-w-[180px]">
+                            <p className="text-sm text-gray-900 line-clamp-2" title={row.authors || 'N/A'}>
                               {row.authors || 'N/A'}
                             </p>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="max-w-xs">
-                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800">
-                              <Building2 className="w-3 h-3 mr-1" />
+                        <td className="px-6 py-4">
+                          <div className="max-w-[120px]">
+                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800 truncate max-w-full" title={row.v_nama_jurusan || 'N/A'}>
                               {row.v_nama_jurusan || 'N/A'}
                             </span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="max-w-lg">
-                            <p className="font-medium text-gray-900 line-clamp-2" title={row.v_judul}>
+                          <div className="max-w-[300px]">
+                            <p className="text-sm font-medium text-gray-900 line-clamp-2" title={row.v_judul || 'N/A'}>
                               {row.v_judul || 'N/A'}
                             </p>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        <td className="px-6 py-4 text-center">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
                             row.tipe === 'Artikel' ? 'bg-green-100 text-green-800' :
                             row.tipe === 'Prosiding' ? 'bg-yellow-100 text-yellow-800' :
                             row.tipe === 'Buku' ? 'bg-purple-100 text-purple-800' :
@@ -795,37 +814,37 @@ const ScholarPublikasi = () => {
                             {row.tipe || 'N/A'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                        <td className="px-6 py-4 text-center">
+                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800 whitespace-nowrap">
                             {row.v_tahun_publikasi || 'N/A'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="max-w-xs">
-                            <p className="text-sm text-gray-900 truncate" title={row.venue}>
+                        <td className="px-6 py-4">
+                          <div className="max-w-[200px]">
+                            <p className="text-sm text-gray-900 truncate" title={row.venue || 'N/A'}>
                               {row.venue || 'N/A'}
                             </p>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="max-w-xs">
-                            <p className="text-sm text-gray-700 truncate" title={row.publisher}>
+                        <td className="px-6 py-4">
+                          <div className="max-w-[150px]">
+                            <p className="text-sm text-gray-700 truncate" title={row.publisher || '-'}>
                               {row.publisher || '-'}
                             </p>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                          <span className="text-sm text-gray-600">
+                        <td className="px-6 py-4 text-center">
+                          <span className="text-xs text-gray-600 whitespace-nowrap">
                             {row.vol_issue || '-'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                          <span className="text-sm text-gray-600">
-                            {row.pages ? `pp. ${row.pages}` : '-'}
+                        <td className="px-6 py-4 text-center">
+                          <span className="text-xs text-gray-600 whitespace-nowrap">
+                            {formatPages(row.pages)}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                          <span className={`font-semibold ${
+                        <td className="px-6 py-4 text-center">
+                          <span className={`text-sm font-semibold whitespace-nowrap ${
                             (row.n_total_sitasi || 0) > 100 ? 'text-red-600' :
                             (row.n_total_sitasi || 0) > 50 ? 'text-orange-600' :
                             (row.n_total_sitasi || 0) > 10 ? 'text-yellow-600' :
@@ -834,20 +853,22 @@ const ScholarPublikasi = () => {
                             {(row.n_total_sitasi || 0).toLocaleString()}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
-                          {row.t_tanggal_unduh ? new Date(row.t_tanggal_unduh).toLocaleDateString('id-ID') : 'N/A'}
+                        <td className="px-6 py-4 text-center">
+                          <span className="text-xs text-gray-500 whitespace-nowrap">
+                            {row.t_tanggal_unduh ? new Date(row.t_tanggal_unduh).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}
+                          </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                          <div className="flex items-center justify-center space-x-2">
+                        <td className="px-6 py-4 text-center">
+                          <div className="flex items-center justify-center">
                             {row.v_link_url && (
                               <a
                                 href={row.v_link_url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-red-600 hover:text-red-900 inline-flex items-center text-sm"
+                                className="text-red-600 hover:text-red-900 inline-flex items-center text-xs whitespace-nowrap"
                                 title="Lihat di Google Scholar"
                               >
-                                <ExternalLink className="w-4 h-4 mr-1" />
+                                <ExternalLink className="w-3.5 h-3.5 mr-1" />
                                 Scholar
                               </a>
                             )}
@@ -917,6 +938,7 @@ const ScholarPublikasi = () => {
           </div>
         </div>
     </Layout>
+    </>
   );
 };
 

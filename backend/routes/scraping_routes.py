@@ -111,7 +111,7 @@ def run_scraping_task(job_id, task_func, task_kwargs):
 # ============================================================================
 
 @scraping_bp.route('/api/scraping/sinta/dosen', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=['http://localhost:5173'], supports_credentials=True)
+@cross_origin(origins=['http://10.211.1.188:3000'], supports_credentials=True)
 def scrape_sinta_dosen():
     """Endpoint untuk scraping SINTA Dosen"""
     print("\n" + "="*60)

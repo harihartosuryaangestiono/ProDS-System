@@ -3,6 +3,7 @@ import { Users, TrendingUp, Award, Calendar, ExternalLink, Building2, Graduation
 import apiService from '../services/apiService';
 import { toast } from 'react-hot-toast';
 import Layout from '../components/Layout';
+import LoadingOverlay from '../components/LoadingOverlay';
 
 const SintaDosen = () => {
   const [dosenData, setDosenData] = useState([]);
@@ -19,6 +20,7 @@ const SintaDosen = () => {
   const [selectedFaculty, setSelectedFaculty] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('');
   const [loadingDepartments, setLoadingDepartments] = useState(false);
+  const [facultyDeptMap, setFacultyDeptMap] = useState({});
   
   const [stats, setStats] = useState({
     totalDosen: 0,
@@ -33,20 +35,42 @@ const SintaDosen = () => {
 
   const perPage = 20;
 
-  // Fetch faculties on component mount
+  // Fetch mapping on component mount (like dashboard)
   useEffect(() => {
-    fetchFaculties();
+    const fetchMapping = async () => {
+      try {
+        setLoadingDepartments(true);
+        const response = await apiService.getDashboardMapping();
+        
+        if (response.success && response.data) {
+          console.log("✅ Mapping loaded from DB:", response.data);
+          setFacultyDeptMap(response.data);
+          // Set daftar Fakultas berdasarkan keys dari response
+          setFaculties(Object.keys(response.data).sort());
+        } else {
+          console.error('❌ Invalid mapping response:', response);
+        }
+      } catch (error) {
+        console.error("❌ Failed to load mapping:", error);
+      } finally {
+        setLoadingDepartments(false);
+      }
+    };
+
+    fetchMapping();
   }, []);
 
-  // Fetch departments when faculty changes
+  // Update departments when faculty changes (using mapping from state)
   useEffect(() => {
     if (selectedFaculty) {
-      fetchDepartments(selectedFaculty);
+      // Ambil data dari State facultyDeptMap, bukan dari API
+      const depts = facultyDeptMap[selectedFaculty] || [];
+      setDepartments(depts.sort());
     } else {
       setDepartments([]);
       setSelectedDepartment('');
     }
-  }, [selectedFaculty]);
+  }, [selectedFaculty, facultyDeptMap]);
 
   // Fetch data when filters change
   useEffect(() => {
@@ -58,36 +82,6 @@ const SintaDosen = () => {
     fetchStats();
   }, [searchTerm, selectedFaculty, selectedDepartment]);
 
-  const fetchFaculties = async () => {
-    try {
-      const response = await apiService.getSintaFaculties();
-      if (response.success) {
-        setFaculties(response.data.faculties || []);
-      } else {
-        console.error('Error fetching faculties:', response.error);
-      }
-    } catch (error) {
-      console.error('Error fetching faculties:', error);
-    }
-  };
-
-  const fetchDepartments = async (faculty) => {
-    try {
-      setLoadingDepartments(true);
-      const response = await apiService.getSintaDepartments(faculty);
-      if (response.success) {
-        setDepartments(response.data.departments || []);
-      } else {
-        console.error('Error fetching departments:', response.error);
-        setDepartments([]);
-      }
-    } catch (error) {
-      console.error('Error fetching departments:', error);
-      setDepartments([]);
-    } finally {
-      setLoadingDepartments(false);
-    }
-  };
 
   const fetchDosenData = async () => {
     try {
@@ -267,43 +261,48 @@ const SintaDosen = () => {
     };
     
     return (
-      <div className="bg-white rounded-lg shadow-md p-6 border-l-4" style={{ borderColor: color }}>
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-600">{title}</p>
+      <div className="bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-200 p-6 transition-all duration-300 group">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">{title}</p>
             {loading ? (
-              <div className="mt-2 h-8 w-24 bg-gray-200 animate-pulse rounded"></div>
+              <div className="h-10 w-32 bg-gray-200 animate-pulse rounded"></div>
             ) : (
-              <>
-                <div className="flex items-center gap-2 mt-1">
-                  <p className="text-2xl font-bold text-gray-900">
-                    {typeof value === 'string' ? value : value.toLocaleString()}
-                  </p>
-                  {previousDate && !isEqual && (
-                    <div className="flex items-center">
-                      {isIncreased ? (
-                        <ArrowUp className="w-5 h-5 text-green-600" />
-                      ) : isDecreased ? (
-                        <ArrowDown className="w-5 h-5 text-red-600" />
-                      ) : null}
-                    </div>
-                  )}
-                </div>
-                {subtitle && (
-                  <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-3xl font-bold text-gray-900 leading-tight">
+                  {typeof value === 'string' ? value : value.toLocaleString('id-ID')}
+                </p>
+                {previousDate && !isEqual && (
+                  <div className="flex items-center pb-1">
+                    {isIncreased ? (
+                      <ArrowUp className="w-4 h-4 text-green-600" />
+                    ) : isDecreased ? (
+                      <ArrowDown className="w-4 h-4 text-red-600" />
+                    ) : null}
+                  </div>
                 )}
-                {previousDate && (
-                  <p className="text-xs text-gray-500 mt-2">
-                    sebelumnya {previousDate}: {formatPrevValue(prevValue)}
-                  </p>
-                )}
-              </>
+              </div>
             )}
           </div>
-          <div className="p-3 rounded-full" style={{ backgroundColor: `${color}20` }}>
-            <Icon className="w-8 h-8" style={{ color }} />
+          <div className="flex-shrink-0 ml-4">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110" style={{ backgroundColor: `${color}15` }}>
+              <Icon className="w-6 h-6" style={{ color }} />
+            </div>
           </div>
         </div>
+        
+        {!loading && (
+          <div className="space-y-1.5 pt-3 border-t border-gray-100">
+            {subtitle && (
+              <p className="text-xs font-medium text-gray-600">{subtitle}</p>
+            )}
+            {previousDate && (
+              <p className="text-xs text-gray-500">
+                sebelumnya {previousDate}: {formatPrevValue(prevValue)}
+              </p>
+            )}
+          </div>
+        )}
       </div>
     );
   };
@@ -311,14 +310,20 @@ const SintaDosen = () => {
   const sortedData = getSortedData();
 
   return (
-    <Layout
-      title="Data Dosen SINTA"
-      description="Daftar dosen dengan data dari SINTA (Science and Technology Index)"
+    <>
+      <LoadingOverlay 
+        isLoading={loading} 
+        message="Memuat data dosen SINTA..."
+        subMessage="Mohon tunggu sebentar"
+      />
+      <Layout
+        title="Data Dosen SINTA"
+        description="Daftar dosen dengan data dari SINTA (Science and Technology Index)"
       headerActions={
         <>
           <button
             onClick={handleExport}
-            className="inline-flex items-center px-4 py-2.5 border border-green-300 rounded-lg text-sm font-medium text-green-700 bg-white hover:bg-green-50 hover:border-green-400 shadow-sm hover:shadow transition-all duration-200"
+            className="btn-apple-success"
             disabled={loading}
           >
             <Download className="h-4 w-4 mr-2" />
@@ -326,7 +331,7 @@ const SintaDosen = () => {
           </button>
           <button
             onClick={fetchDosenData}
-            className="inline-flex items-center px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow transition-all duration-200"
+            className="btn-apple-secondary"
             disabled={loading}
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
@@ -388,32 +393,41 @@ const SintaDosen = () => {
           />
         </div>
 
-        {/* Data Table with Integrated Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
+        {/* Data Table with Integrated Filters - Apple Style */}
+        <div className="apple-card overflow-hidden animate-slide-up-apple">
           {/* Table Header */}
-          <div className="px-6 py-5 border-b border-gray-200 bg-gray-50/50">
-            <h2 className="text-xl font-semibold text-gray-900">Daftar Dosen SINTA</h2>
+          <div className="px-8 py-6 border-b border-[#E5E5EA] bg-[#F5F5F7]">
+            <h2 
+              className="text-2xl font-semibold text-[#1D1D1F] mb-2"
+              style={{ letterSpacing: '-0.022em' }}
+            >
+              Daftar Dosen SINTA
+            </h2>
 
             {/* Filters Section */}
             <div className="space-y-4">
-              {/* Search Bar */}
+              {/* Search Bar - Apple Style */}
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#86868B]" />
                 <input
                   type="text"
                   placeholder="Cari nama dosen..."
                   value={searchTerm}
                   onChange={handleSearchChange}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-apple pl-12 search-expand-apple"
                 />
               </div>
 
               {/* Faculty and Department Filters */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Faculty Filter */}
+                {/* Faculty Filter - Apple Style */}
                 <div className="relative">
-                  <label htmlFor="faculty" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                    <Building2 className="w-4 h-4 mr-1.5 text-blue-600" />
+                  <label 
+                    htmlFor="faculty" 
+                    className="block text-sm font-semibold text-[#1D1D1F] mb-2 flex items-center"
+                    style={{ letterSpacing: '-0.011em' }}
+                  >
+                    <Building2 className="w-4 h-4 mr-2 text-[#0A84FF]" />
                     Fakultas
                   </label>
                   <div className="relative">
@@ -421,7 +435,7 @@ const SintaDosen = () => {
                       id="faculty"
                       value={selectedFaculty}
                       onChange={handleFacultyChange}
-                      className="w-full pl-4 pr-10 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white hover:border-gray-400 transition-all duration-200 appearance-none cursor-pointer shadow-sm"
+                      className="input-apple pr-12 cursor-pointer"
                       style={{
                         backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
                         backgroundPosition: 'right 0.5rem center',
@@ -439,28 +453,32 @@ const SintaDosen = () => {
                   </div>
                 </div>
 
-                {/* Department Filter */}
+                {/* Department Filter - Apple Style */}
                 <div className="relative">
-                  <label htmlFor="department" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                    <GraduationCap className="w-4 h-4 mr-1.5 text-indigo-600" />
-                    Jurusan
+                  <label 
+                    htmlFor="department" 
+                    className="block text-sm font-semibold text-[#1D1D1F] mb-2 flex items-center"
+                    style={{ letterSpacing: '-0.011em' }}
+                  >
+                    <GraduationCap className="w-4 h-4 mr-2 text-[#0A84FF]" />
+                    Prodi
                   </label>
                   <div className="relative">
                     <select
                       id="department"
                       value={selectedDepartment}
                       onChange={handleDepartmentChange}
-                      disabled={!selectedFaculty || loadingDepartments}
-                      className="w-full pl-4 pr-10 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white hover:border-gray-400 transition-all duration-200 appearance-none cursor-pointer shadow-sm disabled:bg-gray-50 disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-500"
+                      disabled={!selectedFaculty}
+                      className="input-apple pr-12 cursor-pointer disabled:bg-[#F5F5F7] disabled:cursor-not-allowed disabled:border-[#D2D2D7] disabled:text-[#86868B]"
                       style={{
-                        backgroundImage: !selectedFaculty || loadingDepartments ? 'none' : `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                        backgroundImage: !selectedFaculty ? 'none' : `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
                         backgroundPosition: 'right 0.5rem center',
                         backgroundRepeat: 'no-repeat',
                         backgroundSize: '1.5em 1.5em'
                       }}
                     >
                       <option value="">
-                        {!selectedFaculty ? '🔒 Pilih fakultas terlebih dahulu' : loadingDepartments ? '⏳ Memuat...' : '✨ Semua Jurusan'}
+                        {!selectedFaculty ? '🔒 Pilih fakultas terlebih dahulu' : '✨ Semua Prodi'}
                       </option>
                       {departments.map((dept) => (
                         <option key={dept} value={dept}>
@@ -469,12 +487,6 @@ const SintaDosen = () => {
                       ))}
                     </select>
                   </div>
-                  {loadingDepartments && (
-                    <div className="flex items-center mt-2">
-                      <RefreshCw className="w-3 h-3 text-indigo-500 animate-spin mr-1" />
-                      <p className="text-xs text-indigo-600 font-medium">Memuat jurusan...</p>
-                    </div>
-                  )}
                 </div>
 
                 {/* Reset Button */}
@@ -525,122 +537,200 @@ const SintaDosen = () => {
               </div>
             ) : (
               <>
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50/80">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('v_nama_dosen')}>
-                        Nama Dosen {sortConfig.key === 'v_nama_dosen' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-[#F5F5F7] border-b-2 border-[#E5E5EA]">
+                      {/* Kolom 1: Nama Dosen */}
+                      <th 
+                        className="px-4 py-3 text-left text-xs font-semibold text-[#1D1D1F] uppercase tracking-wider cursor-pointer hover:bg-[#E5E5EA] transition-colors"
+                        onClick={() => handleSort('v_nama_dosen')}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span>Nama Dosen</span>
+                          {sortConfig.key === 'v_nama_dosen' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </div>
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Fakultas
+                      {/* Kolom 2: Fakultas */}
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-[#1D1D1F] uppercase tracking-wider min-w-[140px]">Fakultas</th>
+                      {/* Kolom 3: Prodi */}
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-[#1D1D1F] uppercase tracking-wider min-w-[160px]">Prodi</th>
+                      {/* Kolom 4: Publikasi */}
+                      <th 
+                        className="px-4 py-3 text-center text-xs font-semibold text-[#1D1D1F] uppercase tracking-wider cursor-pointer hover:bg-[#E5E5EA] transition-colors min-w-[100px]"
+                        onClick={() => handleSort('n_total_publikasi')}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <span>Publikasi</span>
+                          {sortConfig.key === 'n_total_publikasi' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </div>
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Jurusan
+                      {/* Kolom 5: Sitasi GS */}
+                      <th 
+                        className="px-4 py-3 text-center text-xs font-semibold text-[#1D1D1F] uppercase tracking-wider cursor-pointer hover:bg-[#E5E5EA] transition-colors min-w-[100px]"
+                        onClick={() => handleSort('n_sitasi_gs')}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <span>Sitasi GS</span>
+                          {sortConfig.key === 'n_sitasi_gs' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </div>
                       </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('n_total_publikasi')}>
-                        Publikasi {sortConfig.key === 'n_total_publikasi' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      {/* Kolom 6: Sitasi Scopus */}
+                      <th 
+                        className="px-4 py-3 text-center text-xs font-semibold text-[#1D1D1F] uppercase tracking-wider cursor-pointer hover:bg-[#E5E5EA] transition-colors min-w-[120px]"
+                        onClick={() => handleSort('n_sitasi_scopus')}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <span>Sitasi Scopus</span>
+                          {sortConfig.key === 'n_sitasi_scopus' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </div>
                       </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('n_sitasi_gs')}>
-                        Sitasi GS {sortConfig.key === 'n_sitasi_gs' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      {/* Kolom 7: H-Index GS */}
+                      <th 
+                        className="px-4 py-3 text-center text-xs font-semibold text-[#1D1D1F] uppercase tracking-wider cursor-pointer hover:bg-[#E5E5EA] transition-colors min-w-[100px]"
+                        onClick={() => handleSort('n_h_index_gs_sinta')}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <span>H-Index GS</span>
+                          {sortConfig.key === 'n_h_index_gs_sinta' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </div>
                       </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('n_sitasi_scopus')}>
-                        Sitasi Scopus {sortConfig.key === 'n_sitasi_scopus' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      {/* Kolom 8: H-Index Scopus */}
+                      <th 
+                        className="px-4 py-3 text-center text-xs font-semibold text-[#1D1D1F] uppercase tracking-wider cursor-pointer hover:bg-[#E5E5EA] transition-colors min-w-[120px]"
+                        onClick={() => handleSort('n_h_index_scopus')}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <span>H-Index Scopus</span>
+                          {sortConfig.key === 'n_h_index_scopus' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </div>
                       </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('n_h_index_gs_sinta')}>
-                        H-Index GS {sortConfig.key === 'n_h_index_gs_sinta' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      {/* Kolom 9: Skor SINTA */}
+                      <th 
+                        className="px-4 py-3 text-center text-xs font-semibold text-[#1D1D1F] uppercase tracking-wider cursor-pointer hover:bg-[#E5E5EA] transition-colors min-w-[100px]"
+                        onClick={() => handleSort('n_skor_sinta')}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <span>Skor SINTA</span>
+                          {sortConfig.key === 'n_skor_sinta' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </div>
                       </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('n_h_index_scopus')}>
-                        H-Index Scopus {sortConfig.key === 'n_h_index_scopus' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      {/* Kolom 10: Skor SINTA 3 Thn */}
+                      <th 
+                        className="px-4 py-3 text-center text-xs font-semibold text-[#1D1D1F] uppercase tracking-wider cursor-pointer hover:bg-[#E5E5EA] transition-colors min-w-[120px]"
+                        onClick={() => handleSort('n_skor_sinta_3yr')}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <span>Skor SINTA 3 Thn</span>
+                          {sortConfig.key === 'n_skor_sinta_3yr' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                        </div>
                       </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('n_skor_sinta')}>
-                        Skor SINTA {sortConfig.key === 'n_skor_sinta' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('n_skor_sinta_3yr')}>
-                        Skor SINTA 3 Thn {sortConfig.key === 'n_skor_sinta_3yr' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Last Updated
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Aksi
-                      </th>
+                      {/* Kolom 11: Last Updated */}
+                      <th className="px-4 py-3 text-center text-xs font-semibold text-[#1D1D1F] uppercase tracking-wider min-w-[120px]">Last Updated</th>
+                      {/* Kolom 12: Aksi */}
+                      <th className="px-4 py-3 text-center text-xs font-semibold text-[#1D1D1F] uppercase tracking-wider min-w-[100px]">Aksi</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="divide-y divide-[#E5E5EA]">
                     {sortedData.map((row, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
+                      <tr 
+                        key={index} 
+                        className="hover:bg-[#F5F5F7] transition-colors border-b border-[#E5E5EA]"
+                      >
+                        {/* Kolom 1: Nama Dosen */}
+                        <td className="px-4 py-3">
                           <div className="flex items-center">
-                            <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                              <Users className="h-5 w-5 text-blue-600" />
+                            <div className="h-9 w-9 bg-[#0A84FF]/10 rounded-full flex items-center justify-center flex-shrink-0 mr-3">
+                              <Users className="h-4 w-4 text-[#0A84FF]" />
                             </div>
-                            <div className="ml-3">
-                              <p className="text-sm font-medium text-gray-900">{row.v_nama_dosen || 'N/A'}</p>
+                            <div className="flex-1 min-w-0">
+                              <p 
+                                className="text-sm font-semibold text-[#1D1D1F] truncate"
+                                title={row.v_nama_dosen || 'N/A'}
+                              >
+                                {row.v_nama_dosen || 'N/A'}
+                              </p>
                               {row.v_id_sinta && (
-                                <p className="text-xs text-gray-500">SINTA ID: {row.v_id_sinta}</p>
+                                <p className="text-xs text-[#6E6E73] mt-0.5">
+                                  ID: {row.v_id_sinta}
+                                </p>
                               )}
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                          {row.v_nama_fakultas || 'N/A'}
+                        {/* Kolom 2: Fakultas */}
+                        <td className="px-4 py-3">
+                          <p className="text-sm text-[#1D1D1F] truncate" title={row.v_nama_fakultas || 'N/A'}>
+                            {row.v_nama_fakultas || '-'}
+                          </p>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {row.v_nama_jurusan || 'N/A'}
+                        {/* Kolom 3: Prodi */}
+                        <td className="px-4 py-3">
+                          <p className="text-sm text-[#1D1D1F] truncate" title={row.v_nama_jurusan || 'N/A'}>
+                            {row.v_nama_jurusan || 'N/A'}
+                          </p>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {/* Kolom 4: Publikasi */}
+                        <td className="px-4 py-3 text-center">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
                             {(row.n_total_publikasi || 0).toLocaleString()}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                          <span className="text-sm font-semibold text-red-600">
+                        {/* Kolom 5: Sitasi GS */}
+                        <td className="px-4 py-3 text-center">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
                             {(row.n_sitasi_gs || 0).toLocaleString()}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                          <span className="text-sm font-semibold text-orange-600">
+                        {/* Kolom 6: Sitasi Scopus */}
+                        <td className="px-4 py-3 text-center">
+                          <span className="text-sm font-semibold text-[#FF7A59]">
                             {(row.n_sitasi_scopus || 0).toLocaleString()}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                          <span className="inline-flex items-center px-2 py-1 rounded text-sm font-medium bg-red-100 text-red-800">
+                        {/* Kolom 7: H-Index GS */}
+                        <td className="px-4 py-3 text-center">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">
                             {row.n_h_index_gs_sinta || 0}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                          <span className="inline-flex items-center px-2 py-1 rounded text-sm font-medium bg-orange-100 text-orange-800">
+                        {/* Kolom 8: H-Index Scopus */}
+                        <td className="px-4 py-3 text-center">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
                             {row.n_h_index_scopus || 0}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                          <span className="text-sm font-medium text-purple-600">
+                        {/* Kolom 9: Skor SINTA */}
+                        <td className="px-4 py-3 text-center">
+                          <span className="text-sm font-semibold text-[#0A84FF]">
                             {(Number(row.n_skor_sinta) || 0).toFixed(2)}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                          <span className="text-sm font-medium text-indigo-600">
+                        {/* Kolom 10: Skor SINTA 3 Thn */}
+                        <td className="px-4 py-3 text-center">
+                          <span className="text-sm font-semibold text-[#0A84FF]">
                             {(Number(row.n_skor_sinta_3yr) || 0).toFixed(2)}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
-                          {row.t_tanggal_unduh ? new Date(row.t_tanggal_unduh).toLocaleDateString('id-ID') : 'N/A'}
+                        {/* Kolom 11: Last Updated */}
+                        <td className="px-4 py-3 text-center">
+                          <span className="text-xs text-[#6E6E73] whitespace-nowrap">
+                            {row.t_tanggal_unduh ? new Date(row.t_tanggal_unduh).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}
+                          </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                          <div className="flex items-center justify-center space-x-2">
-                            {row.v_id_sinta && (
-                              <a
-                                href={`https://sinta.kemdikbud.go.id/authors/profile/${row.v_id_sinta}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-indigo-600 hover:text-indigo-900 inline-flex items-center text-sm"
-                                title="Lihat profil SINTA"
-                              >
-                                <ExternalLink className="w-4 h-4 mr-1" />
-                                SINTA
-                              </a>
-                            )}
-                          </div>
+                        {/* Kolom 12: Aksi */}
+                        <td className="px-4 py-3 text-center">
+                          {(row.v_link_url || row.v_id_sinta) && (
+                            <a
+                              href={row.v_link_url || `https://sinta.kemdiktisaintek.go.id/authors/profile/${row.v_id_sinta}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-[#1D1D1F] bg-[#F5F5F7] rounded-lg hover:bg-[#E5E5EA] transition-colors"
+                              title="Lihat profil SINTA"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5 mr-1" />
+                              SINTA
+                            </a>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -706,6 +796,7 @@ const SintaDosen = () => {
           </div>
         </div>
     </Layout>
+    </>
   );
 };
 

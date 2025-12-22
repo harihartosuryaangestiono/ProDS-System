@@ -2,7 +2,13 @@
 
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5002';
+// Use environment variable or default to server IP
+// Always use server IP for deployment
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://10.211.1.188:5000';
+
+// Debug: Log the API base URL to ensure it's correct
+console.log('🔧 API_BASE_URL configured as:', API_BASE_URL);
+console.log('🔧 VITE_API_BASE_URL from env:', import.meta.env.VITE_API_BASE_URL);
 
 // Create axios instance
 const apiService = axios.create({
@@ -11,7 +17,7 @@ const apiService = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true,
-  timeout: 30000,
+  timeout: 300000,
 });
 
 // Request interceptor
@@ -449,6 +455,13 @@ apiService.getDashboardStats = async (faculty = '', department = '') => {
       error: error.message
     };
   }
+};
+
+apiService.getDashboardMapping = async () => {
+  return handleResponse(
+    () => apiService.get('/api/dashboard/mapping'),
+    'Error fetching dashboard mapping'
+  );
 };
 
 apiService.getDashboardFaculties = async () => {

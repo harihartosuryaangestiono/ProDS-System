@@ -887,7 +887,7 @@ class SintaDosenScraper:
 
     def scrape_and_store_dosen(self, affiliation_id, max_pages=100, cycle=1, cancel_check=None):
         """Scraping data dosen dari SINTA dan simpan ke database (per cycle)"""
-        base_url = f"https://sinta.kemdikbud.go.id/affiliations/authors/{affiliation_id}"
+        base_url = f"https://sinta.kemdiktisaintek.go.id/affiliations/authors/{affiliation_id}"
         logger.info(f"📖 Cycle {cycle} - Scraping hingga {max_pages} halaman")
 
         new_dosen_count = 0
@@ -973,7 +973,7 @@ class SintaDosenScraper:
                         
                         # Pastikan URL lengkap
                         if profile_url and not profile_url.startswith("http"):
-                            profile_url = "https://sinta.kemdikbud.go.id" + profile_url
+                            profile_url = "https://sinta.kemdiktisaintek.go.id" + profile_url
                         
                         # Ekstrak SINTA ID
                         sinta_id = None
@@ -1113,10 +1113,10 @@ class SintaDosenScraper:
 if __name__ == '__main__':
     # Konfigurasi database PostgreSQL - sesuai dengan database baru
     db_config = {
-        'dbname': 'ProDSGabungan',  # Nama database baru
-        'user': 'postgres',        
-        'password': 'password123',    
-        'host': 'localhost',            
+        'dbname': 'skm_scraper',  # Nama database baru
+        'user': 'skm_scraper',        
+        'password': 'unparScr4per',    
+        'host': '10.211.1.188',            
         'port': '5432'                  
     }
     

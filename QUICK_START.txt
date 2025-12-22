@@ -1,0 +1,38 @@
+==========================================
+🚀 QUICK START - Setup Otomatis ProDS System
+==========================================
+
+Langkah 1: Install Dependencies (jika belum)
+---------------------------------------------
+cd /app/ProDS-System/backend
+pip3 install -r requirements.txt
+
+cd /app/ProDS-System/frontend
+npm install
+
+Langkah 2: Jalankan Setup Script
+----------------------------------
+cd /app/ProDS-System
+sudo bash setup-auto-start.sh
+
+Selesai! Aplikasi akan otomatis berjalan.
+
+==========================================
+Perintah Berguna:
+==========================================
+
+Cek Status:
+  sudo systemctl status prods-backend.service
+  sudo systemctl status prods-frontend.service
+
+Start/Stop/Restart:
+  sudo systemctl start prods-backend.service prods-frontend.service
+  sudo systemctl stop prods-backend.service prods-frontend.service
+  sudo systemctl restart prods-backend.service prods-frontend.service
+
+Lihat Logs:
+  sudo journalctl -u prods-backend.service -f
+  sudo journalctl -u prods-frontend.service -f
+
+==========================================
+

@@ -9,10 +9,10 @@ load_dotenv()
 
 # Database configuration
 DB_CONFIG = {
-    'dbname': os.environ.get('DB_NAME', 'ProDSGabungan'),
-    'user': os.environ.get('DB_USER', 'postgres'), 
-    'password': os.environ.get('DB_PASSWORD', 'password123'),
-    'host': os.environ.get('DB_HOST', 'localhost'),
+    'dbname': os.environ.get('DB_NAME', 'skm_scraper'),
+    'user': os.environ.get('DB_USER', 'skm_scraper'), 
+    'password': os.environ.get('DB_PASSWORD', 'unparScr4per'),
+    'host': os.environ.get('DB_HOST', '10.211.1.188'),
     'port': os.environ.get('DB_PORT', '5432')
 }
 

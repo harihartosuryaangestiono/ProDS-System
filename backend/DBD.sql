@@ -41,7 +41,7 @@ CREATE TABLE datamaster (
     v_ket_kategori_status_peg VARCHAR(50),
     id_sinta VARCHAR(20),
     id_gs VARCHAR(50),
-    id_scopus VARCHAR(50)
+    fakultas VARCHAR(50)
 );
 
 -- ========================

@@ -422,9 +422,7 @@ class SintaScraper:
         
         # Try multiple login URLs (SINTA has different domains)
         login_urls = [
-            "https://sinta.kemdikbud.go.id/logins",
-            "https://sinta.kemdiktisaintek.go.id/logins",
-            "https://sinta.ristekdikti.go.id/logins"
+            "https://sinta.kemdiktisaintek.go.id/logins"
         ]
         
         for url in login_urls:
@@ -519,7 +517,7 @@ class SintaScraper:
             # Set additional headers that might be expected by the server
             login_headers = self.headers.copy()
             login_headers['Referer'] = login_url
-            login_headers['Origin'] = 'https://sinta.kemdikbud.go.id'
+            login_headers['Origin'] = 'https://sinta.kemdiktisaintek.go.id'
             login_headers['Content-Type'] = 'application/x-www-form-urlencoded'
             
             logger.info(f"Login data prepared: {login_data}")
@@ -562,7 +560,7 @@ class SintaScraper:
         """Check if still logged in by visiting dashboard page"""
         try:
             logger.info("Checking login status...")
-            response = self.session.get("https://sinta.kemdikbud.go.id/dashboard", headers=self.headers)
+            response = self.session.get("https://sinta.kemdiktisaintek.go.id/dashboard", headers=self.headers)
             is_logged_in = "dashboard" in response.url or "authors/profile" in response.url
             logger.info(f"Login status check: {'Logged in' if is_logged_in else 'Not logged in'}")
             return is_logged_in
@@ -642,7 +640,7 @@ class SintaScraper:
             for link in pub_links:
                 href = link['href']
                 # Skip internal SINTA links
-                if href.startswith('http') and 'sinta.kemdikbud.go.id' not in href:
+                if href.startswith('http') and 'sinta.kemdiktisaintek.go.id' not in href:
                     return href
                     
             return None
@@ -687,7 +685,7 @@ class SintaScraper:
             # Try to check login status and relogin if needed
             self.relogin_if_needed()
         
-        base_url = f"https://sinta.kemdikbud.go.id/authors/profile/{author_id}/"
+        base_url = f"https://sinta.kemdiktisaintek.go.id/authors/profile/{author_id}/"
         initial_url = base_url + "?view=scopus"
         all_publications = []
         
@@ -1041,10 +1039,10 @@ def main():
     """Main function with command line options"""
     # Database configuration - modify these values as needed
     DB_CONFIG = {
-        'dbname': 'ProDSGabungan',  # Changed to match your schema
-        'user': 'postgres',
-        'password': 'password123',
-        'host': 'localhost',
+        'dbname': 'skm_scraper',  # Changed to match your schema
+        'user': 'skm_scraper',
+        'password': 'unparScr4per',
+        'host': '10.211.1.188',
         'port': '5432'
     }
     

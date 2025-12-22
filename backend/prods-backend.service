@@ -1,0 +1,21 @@
+[Unit]
+Description=ProDS System Backend Service
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/app/ProDS-System/backend
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+Environment="FLASK_ENV=production"
+Environment="PORT=5000"
+ExecStart=/app/ProDS-System/backend/start-backend.sh
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+

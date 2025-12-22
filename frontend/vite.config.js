@@ -4,10 +4,11 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5173,
+    port: 3000,
+    host: '0.0.0.0',
     proxy: {
       '/api': {
-        target: 'http://localhost:5002',  // Port Flask default
+        target: 'http://10.211.1.188:5000',  // Port Flask default
         changeOrigin: true,
         secure: false,
         ws: true,
@@ -24,7 +25,7 @@ export default defineConfig({
         },
       },
       '/auth': {
-        target: 'http://localhost:5002',
+        target: 'http://10.211.1.188:5000',
         changeOrigin: true,
         secure: false,
       }

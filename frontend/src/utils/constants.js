@@ -1,10 +1,10 @@
 // API Configuration
 export const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://your-production-api.com' 
-  : 'http://localhost:5005';
+  ? 'http://10.211.1.188:5000' 
+  : 'http://10.211.1.188:5000';
 
 // Application constants
-export const APP_NAME = 'ProDS System';
+export const APP_NAME = 'UNPAR Scraper';
 export const APP_DESCRIPTION = 'Sistem Publikasi Dosen SINTA & Google Scholar';
 
 // Pagination
