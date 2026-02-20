@@ -22,6 +22,7 @@ from roman import fromRoman
 import psycopg2
 from psycopg2 import sql
 import os
+import tempfile
 
 
 class GoogleScholarScraper:
@@ -30,7 +31,7 @@ class GoogleScholarScraper:
     # Multi-account pool
     ACCOUNT_POOL = [
         {"email": "6182101017@student.unpar.ac.id", "password": "618017SH"},
-        {"email": "6182101045@student.unpar.ac.id", "password": "6180145CD"},
+        {"email": "6182101045@student.unpar.ac.id", "password": "hariharto123"},
         {"email": "6182101059@student.unpar.ac.id", "password": "618059SJ"},
         {"email": "6182101063@student.unpar.ac.id", "password": "618063XJ"},
     ]
@@ -105,6 +106,7 @@ class GoogleScholarScraper:
         chrome_options = Options()
         
         # Basic configuration
+        chrome_options.add_argument("--headless=new")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--disable-gpu")
@@ -132,7 +134,16 @@ class GoogleScholarScraper:
         }
         chrome_options.add_experimental_option("prefs", prefs)
         
+        # Use unique user-data-dir per session to avoid "already in use" conflict
+        # when multiple Chrome instances or previous run didn't release the lock
+        import uuid
+        user_data_dir = f"/tmp/chrome_profile_{uuid.uuid4().hex}"
+        os.makedirs(user_data_dir, exist_ok=True)
+        self._chrome_user_data_dir = user_data_dir
+        chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
+        
         try:
+
             driver_path = ChromeDriverManager().install()
 
             if os.path.basename(driver_path) != 'chromedriver':
@@ -169,7 +180,7 @@ class GoogleScholarScraper:
                 
                 try:
                     import shutil
-                    chromedriver_path = shutil.which('chromedriver')
+                    chromedriver_path = shutil.which('chromedriver') or '/usr/local/bin/chromedriver'
                     if chromedriver_path:
                         service = Service(chromedriver_path)
                         driver = webdriver.Chrome(service=service, options=chrome_options)
@@ -289,15 +300,21 @@ class GoogleScholarScraper:
                     time.sleep(random.uniform(21, 23))
                     
                     # Step 4: Click Next button (Google)
-                    self.emit_progress({
-                        'message': 'Step 4: Clicking Next...',
-                        'status': 'login_in_progress'
-                    })
+                    self.emit_progress({'message': 'Step 4: Clicking Next...', 'status': 'login_in_progress'})
                     print("Step 4: Clicking Next button")
-                    
-                    next_button = WebDriverWait(self.driver, 10).until(
-                        EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Selanjutnya')]"))
-                    )
+                    # Screenshot untuk debug
+                    self.driver.save_screenshot('/tmp/debug_step4.png')
+                    print(f"Current URL at step 4: {self.driver.current_url}")
+                    print(f"Page title: {self.driver.title}")
+                    try:
+                        next_button = WebDriverWait(self.driver, 10).until(
+                            EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Selanjutnya')]"))
+                        )
+                    except:
+                        # Coba tombol bahasa Inggris
+                        next_button = WebDriverWait(self.driver, 10).until(
+                            EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Next')]"))
+                        )
                     next_button.click()
                     time.sleep(random.uniform(13, 28))
                     
@@ -1373,6 +1390,9 @@ class GoogleScholarScraper:
             finally:
                 if self.driver:
                     self.driver.quit()
+                if hasattr(self, '_chrome_user_data_dir') and os.path.exists(self._chrome_user_data_dir):
+                    import shutil
+                    shutil.rmtree(self._chrome_user_data_dir, ignore_errors=True)
             
             return {
                 'success': True,
@@ -1411,17 +1431,17 @@ def normalize_publication_type(pub_type):
 # Example usage
 if __name__ == "__main__":
     DB_CONFIG = {
-        'dbname': 'ProDSGabungan',
-        'user': 'postgres',
-        'password': 'hari123',
-        'host': 'localhost',
+        'dbname': 'skm_scraper',
+        'user': 'skm_scraper',
+        'password': 'unparScr4per',
+        'host': '10.211.1.188',
         'port': '5432'
     } 
     
     scraper = GoogleScholarScraper(
         db_config=DB_CONFIG,
         email="6182101045@student.unpar.ac.id",
-        password="618045CD"
+        password="hariharto123"
     )
     
     result = scraper.run(max_authors=5, scrape_from_beginning=False)

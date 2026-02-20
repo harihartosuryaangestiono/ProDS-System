@@ -1,0 +1,2 @@
+[990923:990923:0206/131043.801398:ERROR:ui/ozone/platform/x11/ozone_platform_x11.cc:249] Missing X server or $DISPLAY
+[990923:990923:0206/131043.801470:ERROR:ui/aura/env.cc:257] The platform failed to initialize.  Exiting.

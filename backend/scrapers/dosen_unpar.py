@@ -20,6 +20,7 @@ import time
 import random
 import urllib.parse
 import os
+import tempfile
 
 # Multi-account pool for login rotation
 ACCOUNT_POOL = [
@@ -107,6 +108,10 @@ def setup_driver():
         "profile.block_third_party_cookies": False
     }
     chrome_options.add_experimental_option("prefs", prefs)
+    
+    # Use unique user-data-dir per session to avoid "already in use" conflict
+    user_data_dir = tempfile.mkdtemp(prefix='chrome_profile_')
+    chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
     
     # Gunakan ChromeDriverManager
     try:
