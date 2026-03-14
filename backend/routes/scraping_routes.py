@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 import threading
 import traceback
+import logging
 
 # Add scrapers directory to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'scrapers'))
@@ -19,10 +20,61 @@ from task.scraping_tasks import (
 )
 from flask_cors import cross_origin
 
+logger = logging.getLogger(__name__)
+
 scraping_bp = Blueprint('scraping', __name__)
 
 # Store active jobs
 active_jobs = {}
+
+# ============================================================================
+# GS SCRAPING LOCK — hanya 1 GS job boleh berjalan sekaligus
+# (mencegah multiple Chrome instance yang menghabiskan RAM 3.5GB)
+# ============================================================================
+_gs_lock = threading.Lock()
+_gs_running = False
+_gs_running_job_id = None
+_gs_started_at = None
+GS_JOB_TIMEOUT = 7200  # 2 jam maksimum
+
+
+def _gs_acquire(job_id):
+    """
+    Coba acquire GS lock.
+    Return True jika berhasil (job boleh jalan), False jika sudah ada job lain.
+    Auto-release jika job lama sudah melewati timeout.
+    """
+    global _gs_running, _gs_running_job_id, _gs_started_at
+    with _gs_lock:
+        # Auto-release jika job lama sudah timeout
+        if _gs_running and _gs_started_at:
+            elapsed = (datetime.now() - _gs_started_at).total_seconds()
+            if elapsed > GS_JOB_TIMEOUT:
+                print(f"⚠️ GS job '{_gs_running_job_id}' timeout ({elapsed:.0f}s), auto-releasing lock")
+                _gs_running = False
+                _gs_running_job_id = None
+                _gs_started_at = None
+
+        if _gs_running:
+            return False
+        _gs_running = True
+        _gs_running_job_id = job_id
+        _gs_started_at = datetime.now()
+        return True
+
+
+def _gs_release():
+    """Lepaskan GS lock setelah job selesai/gagal."""
+    global _gs_running, _gs_running_job_id, _gs_started_at
+    with _gs_lock:
+        _gs_running = False
+        _gs_running_job_id = None
+        _gs_started_at = None
+
+
+# ============================================================================
+# PROGRESS EMIT
+# ============================================================================
 
 def emit_progress(job_id, progress_data):
     """Emit progress update via SocketIO"""
@@ -35,6 +87,11 @@ def emit_progress(job_id, progress_data):
         print(f"✅ Progress emitted for job {job_id}: {progress_data.get('message', 'N/A')}")
     except Exception as e:
         print(f"⚠️ Error emitting progress: {e}")
+
+
+# ============================================================================
+# GENERIC SINTA TASK RUNNER
+# ============================================================================
 
 def run_scraping_task(job_id, task_func, task_kwargs):
     """Run scraping task in background thread"""
@@ -94,6 +151,7 @@ def run_scraping_task(job_id, task_func, task_kwargs):
             'error': error_msg,
             'message': f'Scraping failed: {error_msg}'
         })
+
 
 # ============================================================================
 # SINTA ROUTES
@@ -170,9 +228,19 @@ def scrape_sinta_scopus():
                 return jsonify({'success': False, 'error': f'Field {field} is required'}), 400
 
         job_id = f"sinta_scopus_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        active_jobs[job_id] = {'status': 'starting', 'message': 'Initializing Scopus scraping...', 'started_at': datetime.now().isoformat()}
+        active_jobs[job_id] = {
+            'status': 'starting',
+            'message': 'Initializing Scopus scraping...',
+            'started_at': datetime.now().isoformat()
+        }
 
-        thread = threading.Thread(target=run_scraping_task, args=(job_id, scrape_sinta_scopus_task, {'username': data['username'], 'password': data['password']}))
+        thread = threading.Thread(
+            target=run_scraping_task,
+            args=(job_id, scrape_sinta_scopus_task, {
+                'username': data['username'],
+                'password': data['password']
+            })
+        )
         thread.daemon = True
         thread.start()
 
@@ -190,9 +258,19 @@ def scrape_sinta_googlescholar():
                 return jsonify({'success': False, 'error': f'Field {field} is required'}), 400
 
         job_id = f"sinta_gs_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        active_jobs[job_id] = {'status': 'starting', 'message': 'Initializing Google Scholar scraping...', 'started_at': datetime.now().isoformat()}
+        active_jobs[job_id] = {
+            'status': 'starting',
+            'message': 'Initializing Google Scholar scraping...',
+            'started_at': datetime.now().isoformat()
+        }
 
-        thread = threading.Thread(target=run_scraping_task, args=(job_id, scrape_sinta_googlescholar_task, {'username': data['username'], 'password': data['password']}))
+        thread = threading.Thread(
+            target=run_scraping_task,
+            args=(job_id, scrape_sinta_googlescholar_task, {
+                'username': data['username'],
+                'password': data['password']
+            })
+        )
         thread.daemon = True
         thread.start()
 
@@ -210,9 +288,19 @@ def scrape_sinta_garuda():
                 return jsonify({'success': False, 'error': f'Field {field} is required'}), 400
 
         job_id = f"sinta_garuda_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        active_jobs[job_id] = {'status': 'starting', 'message': 'Initializing Garuda scraping...', 'started_at': datetime.now().isoformat()}
+        active_jobs[job_id] = {
+            'status': 'starting',
+            'message': 'Initializing Garuda scraping...',
+            'started_at': datetime.now().isoformat()
+        }
 
-        thread = threading.Thread(target=run_scraping_task, args=(job_id, scrape_sinta_garuda_task, {'username': data['username'], 'password': data['password']}))
+        thread = threading.Thread(
+            target=run_scraping_task,
+            args=(job_id, scrape_sinta_garuda_task, {
+                'username': data['username'],
+                'password': data['password']
+            })
+        )
         thread.daemon = True
         thread.start()
 
@@ -224,6 +312,7 @@ def scrape_sinta_garuda():
 # ============================================================================
 # CANCEL ENDPOINT
 # ============================================================================
+
 @scraping_bp.route('/api/scraping/jobs/<job_id>/cancel', methods=['POST'])
 def cancel_job(job_id):
     try:
@@ -231,61 +320,147 @@ def cancel_job(job_id):
         if not job:
             return jsonify({'success': False, 'error': 'Job not found'}), 404
 
+        # Set cancel flag — dibaca oleh gs_scraper.is_cancelled()
         job['cancel_requested'] = True
         job['status'] = 'cancelling'
-        job['message'] = 'Cancellation requested by user'
+        job['message'] = 'Menghentikan scraping, mohon tunggu...'
 
         emit_progress(job_id, job)
+
+        # ── Fallback: force release lock + set cancelled setelah 60 detik ──
+        # Jika scraper tidak merespons cancel flag dalam 60 detik,
+        # paksa ubah status jadi cancelled dan lepas lock.
+        if job_id.startswith('gs_'):
+            def delayed_force_cancel():
+                import time as _time
+                _time.sleep(60)
+                current_job = active_jobs.get(job_id, {})
+                # Hanya paksa jika masih dalam status cancelling (belum selesai sendiri)
+                if current_job.get('status') == 'cancelling':
+                    print(f"⚠️ Force cancelling job {job_id} after 60s timeout")
+                    active_jobs[job_id].update({
+                        'status': 'cancelled',
+                        'message': 'Scraping dihentikan paksa.',
+                        'cancelled_at': datetime.now().isoformat()
+                    })
+                    emit_progress(job_id, active_jobs[job_id])
+                    # Lepas GS lock jika masih dipegang job ini
+                    if _gs_running and _gs_running_job_id == job_id:
+                        _gs_release()
+                        print(f"🔓 GS lock force-released for cancelled job {job_id}")
+
+            threading.Thread(target=delayed_force_cancel, daemon=True).start()
+
         return jsonify({'success': True, 'message': 'Cancellation requested', 'job_id': job_id})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
 # ============================================================================
-# GOOGLE SCHOLAR - GS PUBLIKASI (menggunakan GoogleScholarScraper dari gs_scraper.py)
+# GOOGLE SCHOLAR — GS PUBLIKASI
 # ============================================================================
 
 def run_google_scholar_scraping(job_id, max_authors, scrape_from_beginning):
-    """Run Google Scholar scraping in background thread"""
+    """
+    Run Google Scholar publikasi scraping in background thread.
+    Dilindungi oleh _gs_lock agar hanya 1 instance Chrome berjalan.
+    """
+    if not _gs_acquire(job_id):
+        msg = (f"Tidak dapat memulai: GS scraping job '{_gs_running_job_id}' "
+               f"sedang berjalan. Tunggu hingga selesai lalu coba lagi.")
+        print(f"⚠️  {msg}")
+        active_jobs[job_id].update({
+            'status': 'failed',
+            'error': msg,
+            'message': msg,
+            'failed_at': datetime.now().isoformat()
+        })
+        emit_progress(job_id, active_jobs[job_id])
+        return
+
     try:
         from gs_scraper import GoogleScholarScraper
 
-        active_jobs[job_id] = {
+        active_jobs[job_id].update({
             'status': 'running',
             'current': 0,
             'total': max_authors,
             'message': 'Initializing scraper...',
             'started_at': datetime.now().isoformat()
-        }
-
+        })
         emit_progress(job_id, active_jobs[job_id])
+
+        def progress_callback(data):
+            active_jobs[job_id].update(data)
+            emit_progress(job_id, data)
 
         scraper = GoogleScholarScraper(
             db_config=DB_CONFIG,
             job_id=job_id,
-            progress_callback=lambda data: emit_progress(job_id, data)
+            progress_callback=progress_callback
         )
 
-        result = scraper.run(max_authors=max_authors, scrape_from_beginning=scrape_from_beginning)
+        result = scraper.run(
+            max_authors=max_authors,
+            scrape_from_beginning=scrape_from_beginning
+        )
 
-        active_jobs[job_id].update({
-            'status': 'completed',
-            'message': 'Scraping completed successfully!',
-            'completed_at': datetime.now().isoformat(),
-            'result': result
-        })
+        if result is None:
+            result = {
+                'success': False,
+                'message': 'Scraper returned no result. Check logs for details.',
+                'summary': {}
+            }
 
-        emit_progress(job_id, {
-            'status': 'completed',
-            'message': result.get('message', 'Scraping completed'),
-            'summary': result.get('summary', {})
-        })
+        # ── Cek apakah job dibatalkan ──────────────────────────────────────
+        job_cancelled = active_jobs.get(job_id, {}).get('cancel_requested', False)
+        summary = result.get('summary', {})
+        is_cancelled = job_cancelled or summary.get('cancelled', False)
+
+        if is_cancelled:
+            active_jobs[job_id].update({
+                'status': 'cancelled',
+                'message': result.get('message', 'Scraping dibatalkan oleh user.'),
+                'cancelled_at': datetime.now().isoformat(),
+                'result': result
+            })
+            emit_progress(job_id, {
+                'status': 'cancelled',
+                'message': result.get('message', 'Scraping dibatalkan oleh user.'),
+                'summary': summary
+            })
+        elif result.get('success') is False:
+            active_jobs[job_id].update({
+                'status': 'failed',
+                'message': result.get('error') or result.get('message', 'Scraping gagal'),
+                'error': result.get('error', ''),
+                'traceback': result.get('traceback', ''),
+                'failed_at': datetime.now().isoformat(),
+                'result': result
+            })
+            emit_progress(job_id, {
+                'status': 'failed',
+                'error': result.get('error', ''),
+                'message': result.get('message', 'Scraping gagal')
+            })
+        else:
+            active_jobs[job_id].update({
+                'status': 'completed',
+                'message': result.get('message', 'Scraping selesai!'),
+                'completed_at': datetime.now().isoformat(),
+                'result': result
+            })
+            emit_progress(job_id, {
+                'status': 'completed',
+                'message': result.get('message', 'Scraping completed'),
+                'summary': summary
+            })
 
     except Exception as e:
         error_msg = str(e)
         traceback_msg = traceback.format_exc()
 
-        print(f"\n❌ ERROR: {error_msg}")
+        print(f"\n❌ GS Publikasi ERROR: {error_msg}")
         print(f"Traceback:\n{traceback_msg}")
 
         active_jobs[job_id].update({
@@ -295,17 +470,20 @@ def run_google_scholar_scraping(job_id, max_authors, scrape_from_beginning):
             'traceback': traceback_msg,
             'failed_at': datetime.now().isoformat()
         })
-
         emit_progress(job_id, {
             'status': 'failed',
             'error': error_msg,
             'traceback': traceback_msg
         })
 
+    finally:
+        _gs_release()
+        print(f"🔓 GS lock released by job {job_id}")
+
 
 @scraping_bp.route('/api/scraping/googlescholar/scrape', methods=['POST'])
 def scrape_google_scholar():
-    """Endpoint untuk scraping publikasi Google Scholar langsung (GS Publikasi)"""
+    """Endpoint untuk scraping publikasi Google Scholar (GS Publikasi)"""
     try:
         data = request.get_json() or {}
         max_authors = data.get('max_authors', 10)
@@ -314,8 +492,14 @@ def scrape_google_scholar():
         if not isinstance(max_authors, int) or max_authors <= 0:
             return jsonify({'success': False, 'error': 'max_authors must be a positive integer'}), 400
 
-        job_id = f"gs_scrape_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        if _gs_running:
+            return jsonify({
+                'success': False,
+                'error': (f"GS scraping job '{_gs_running_job_id}' sedang berjalan. "
+                          f"Tunggu hingga selesai lalu coba lagi.")
+            }), 409
 
+        job_id = f"gs_scrape_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         active_jobs[job_id] = {
             'status': 'starting',
             'current': 0,
@@ -333,7 +517,7 @@ def scrape_google_scholar():
 
         return jsonify({
             'success': True,
-            'message': 'Google Scholar scraping started with auto-login.',
+            'message': 'Google Scholar scraping started.',
             'job_id': job_id
         }), 200
 
@@ -346,40 +530,42 @@ def scrape_google_scholar():
 
 
 # ============================================================================
-# GOOGLE SCHOLAR - GS DOSEN
-# FIX: Sebelumnya memakai dosen_unpar.get_all_unpar_scholars yang tidak ada.
-#      Sekarang menggunakan GoogleScholarScraper yang sudah ada di gs_scraper.py
-#      dengan mode khusus untuk scraping profil dosen dari halaman pencarian GS.
+# GOOGLE SCHOLAR — GS DOSEN
 # ============================================================================
 
 def run_google_scholar_dosen_scraping(job_id, max_pages, search_query):
     """
     Run Google Scholar dosen profile scraping in background thread.
-
-    Pendekatan:
-    - Gunakan GoogleScholarScraper (gs_scraper.py) yang sudah punya auto-login.
-    - Ambil daftar dosen dari temp_dosenGS_scraping (query ke DB).
-    - max_pages dikonversi menjadi max_authors (estimasi 1 dosen per baris di DB).
+    Dilindungi oleh _gs_lock agar hanya 1 instance Chrome berjalan.
     """
+    if not _gs_acquire(job_id):
+        msg = (f"Tidak dapat memulai: GS scraping job '{_gs_running_job_id}' "
+               f"sedang berjalan. Tunggu hingga selesai lalu coba lagi.")
+        print(f"⚠️  {msg}")
+        active_jobs[job_id].update({
+            'status': 'failed',
+            'error': msg,
+            'message': msg,
+            'failed_at': datetime.now().isoformat()
+        })
+        emit_progress(job_id, active_jobs[job_id])
+        return
+
     try:
         from gs_scraper import GoogleScholarScraper
 
-        # Update status awal
         active_jobs[job_id].update({
             'status': 'running',
-            'message': 'Initializing Google Scholar Dosen scraper with auto-login...'
+            'message': 'Initializing Google Scholar Dosen scraper...'
         })
         emit_progress(job_id, active_jobs[job_id])
 
-        # Konversi max_pages ke max_authors
-        # Jika user memberi max_pages, kita gunakan itu sebagai batas jumlah dosen
-        max_authors = max_pages  # 1 halaman ≈ 1 dosen dalam konteks DB kita
+        max_authors = max_pages
 
         print(f"\n🔍 GS Dosen scraping started")
         print(f"   max_authors (from max_pages): {max_authors}")
         print(f"   search_query (not used for DB mode): {search_query}")
 
-        # Progress callback yang update active_jobs sekaligus
         def progress_callback(data):
             active_jobs[job_id].update(data)
             emit_progress(job_id, data)
@@ -390,13 +576,11 @@ def run_google_scholar_dosen_scraping(job_id, max_pages, search_query):
             progress_callback=progress_callback
         )
 
-        # Jalankan scraping (ambil daftar dosen dari DB, bukan dari pencarian GS)
         result = scraper.run(
             max_authors=max_authors,
-            scrape_from_beginning=False  # Lanjutkan dari yang belum selesai
+            scrape_from_beginning=False
         )
 
-        # Pastikan result tidak None
         if result is None:
             result = {
                 'success': False,
@@ -404,18 +588,50 @@ def run_google_scholar_dosen_scraping(job_id, max_pages, search_query):
                 'summary': {}
             }
 
-        active_jobs[job_id].update({
-            'status': 'completed',
-            'message': result.get('message', 'Scraping selesai!'),
-            'completed_at': datetime.now().isoformat(),
-            'result': result
-        })
+        # ── Cek apakah job dibatalkan ──────────────────────────────────────
+        job_cancelled = active_jobs.get(job_id, {}).get('cancel_requested', False)
+        summary = result.get('summary', {})
+        is_cancelled = job_cancelled or summary.get('cancelled', False)
 
-        emit_progress(job_id, {
-            'status': 'completed',
-            'message': result.get('message', 'Scraping selesai!'),
-            'summary': result.get('summary', {})
-        })
+        if is_cancelled:
+            active_jobs[job_id].update({
+                'status': 'cancelled',
+                'message': result.get('message', 'Scraping dibatalkan oleh user.'),
+                'cancelled_at': datetime.now().isoformat(),
+                'result': result
+            })
+            emit_progress(job_id, {
+                'status': 'cancelled',
+                'message': result.get('message', 'Scraping dibatalkan oleh user.'),
+                'summary': summary
+            })
+        elif result.get('success') is False:
+            active_jobs[job_id].update({
+                'status': 'failed',
+                'message': result.get('error') or result.get('message', 'Scraping gagal'),
+                'error': result.get('error', ''),
+                'traceback': result.get('traceback', ''),
+                'failed_at': datetime.now().isoformat(),
+                'result': result
+            })
+            emit_progress(job_id, {
+                'status': 'failed',
+                'error': result.get('error', ''),
+                'traceback': result.get('traceback', ''),
+                'message': result.get('message', 'Scraping gagal')
+            })
+        else:
+            active_jobs[job_id].update({
+                'status': 'completed',
+                'message': result.get('message', 'Scraping selesai!'),
+                'completed_at': datetime.now().isoformat(),
+                'result': result
+            })
+            emit_progress(job_id, {
+                'status': 'completed',
+                'message': result.get('message', 'Scraping selesai!'),
+                'summary': summary
+            })
 
         print(f"✅ GS Dosen scraping completed: {result}")
 
@@ -433,7 +649,6 @@ def run_google_scholar_dosen_scraping(job_id, max_pages, search_query):
             'traceback': traceback_msg,
             'failed_at': datetime.now().isoformat()
         })
-
         emit_progress(job_id, {
             'status': 'failed',
             'error': error_msg,
@@ -441,18 +656,13 @@ def run_google_scholar_dosen_scraping(job_id, max_pages, search_query):
             'message': f'Scraping gagal: {error_msg}'
         })
 
+    finally:
+        _gs_release()
+        print(f"🔓 GS lock released by job {job_id}")
+
 
 @scraping_bp.route('/api/scraping/googlescholar/dosen', methods=['POST'])
 def scrape_google_scholar_dosen():
-    """
-    Endpoint untuk scraping profil dosen dari Google Scholar dengan auto-login.
-
-    Request Body:
-    {
-        "max_pages": 20,        // jumlah dosen yang akan di-scrape (default: 20)
-        "search_query": "..."   // tidak digunakan dalam mode DB, disimpan untuk kompatibilitas
-    }
-    """
     try:
         data = request.get_json() or {}
         max_pages = data.get('max_pages', 20)
@@ -467,13 +677,19 @@ def scrape_google_scholar_dosen():
         if max_pages > 500:
             return jsonify({'success': False, 'error': 'max_pages cannot exceed 500'}), 400
 
-        job_id = f"gs_dosen_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        if _gs_running:
+            return jsonify({
+                'success': False,
+                'error': (f"GS scraping job '{_gs_running_job_id}' sedang berjalan. "
+                          f"Tunggu hingga selesai lalu coba lagi.")
+            }), 409
 
+        job_id = f"gs_dosen_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         active_jobs[job_id] = {
             'status': 'starting',
             'current': 0,
             'total': max_pages,
-            'message': 'Initializing Google Scholar dosen scraping with auto-login...',
+            'message': 'Initializing Google Scholar dosen scraping...',
             'started_at': datetime.now().isoformat()
         }
 
@@ -486,9 +702,8 @@ def scrape_google_scholar_dosen():
 
         return jsonify({
             'success': True,
-            'message': 'Google Scholar dosen scraping started with auto-login.',
+            'message': 'Google Scholar dosen scraping started.',
             'job_id': job_id,
-            'instructions': 'The scraper will automatically login using the configured accounts. No manual action required.',
             'max_pages': max_pages,
             'search_query': search_query
         }), 200
@@ -554,5 +769,25 @@ def scraping_health():
         'status': 'healthy',
         'active_jobs_count': running_jobs,
         'total_jobs': len(active_jobs),
-        'jobs': list(active_jobs.keys())
+        'jobs': list(active_jobs.keys()),
+        'gs_scraping_running': _gs_running,
+        'gs_running_job_id': _gs_running_job_id
+    }), 200
+
+
+@scraping_bp.route('/api/scraping/googlescholar/reset-lock', methods=['POST'])
+def reset_gs_lock():
+    """Force-reset GS lock jika job sebelumnya hang/zombie"""
+    old_job_id = _gs_running_job_id
+    _gs_release()
+    if old_job_id and old_job_id in active_jobs:
+        active_jobs[old_job_id].update({
+            'status': 'cancelled',
+            'message': 'Job dihentikan paksa via reset-lock',
+            'cancelled_at': datetime.now().isoformat()
+        })
+        emit_progress(old_job_id, active_jobs[old_job_id])
+    return jsonify({
+        'success': True,
+        'message': f'GS lock reset. Job lama: {old_job_id}'
     }), 200
