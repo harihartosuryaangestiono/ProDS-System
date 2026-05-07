@@ -698,16 +698,23 @@ class GoogleScholarScraper:
         finally:
             if new_tab_created:
                 try:
-                    if self.driver and hasattr(self.driver, 'session_id') and self.driver.session_id:
-                        handles = self.driver.window_handles
-                        if len(handles) > 1:
-                            cur = self.driver.current_window_handle
-                            if cur != original_window and cur in handles:
+                    handles = self.driver.window_handles
+                    if len(handles) > 1:
+                        # Always keep the original, close everything else
+                        for handle in handles:
+                            if handle != original_window:
+                                self.driver.switch_to.window(handle)
                                 self.driver.close()
-                                time.sleep(0.5)
-                            if original_window in self.driver.window_handles:
-                                self.driver.switch_to.window(original_window)
-                                time.sleep(0.5)
+                        self.driver.switch_to.window(original_window)
+                    # handles = self.driver.window_handles
+                    # if len(handles) > 1:
+                    #     cur = self.driver.current_window_handle
+                    #     if cur != original_window and cur in handles:
+                    #         self.driver.close()
+                    #         time.sleep(0.5)
+                    #     if original_window in self.driver.window_handles:
+                    #         self.driver.switch_to.window(original_window)
+                    #         time.sleep(0.5)
                 except Exception as e:
                     logger.error(f"Error in finally block (details): {e}")
                     try:
@@ -770,7 +777,8 @@ class GoogleScholarScraper:
                 return None
             try:
                 affiliation = self.driver.find_element(By.CSS_SELECTOR, '.gsc_prf_il').text
-            except Exception:
+            except Exception as e:
+                logger.error(f"affiliation not found")
                 affiliation = ""
             citation_data = {'Citations_all': '0', 'Citations_since2020': '0', 'h-index_all': '0', 'h-index_since2020': '0', 'i10-index_all': '0', 'i10-index_since2020': '0'}
             try:
@@ -792,7 +800,8 @@ class GoogleScholarScraper:
                         style = ve.get_attribute('style')
                         c = style.split(':')[-1].strip('%') if style else '0'
                         citations_per_year[y] = int(c) if c.isdigit() else 0
-            except Exception:
+            except Exception as e:
+                logger.error(f"citation per year error : {e}")
                 pass
             self.raise_if_cancelled()
             while True:
@@ -804,7 +813,8 @@ class GoogleScholarScraper:
                         break
                     btn.click()
                     time.sleep(random.uniform(2, 3))
-                except Exception:
+                except Exception as e:
+                    logger.error(f"click button failed : {e}")
                     break
             self.raise_if_cancelled()
             publications = []
@@ -1165,7 +1175,7 @@ class GoogleScholarScraper:
                     finally:
                         signal.alarm(0)
                     if index < max_authors - 1 and not self.is_cancelled():
-                        delay = random.uniform(60, 120)
+                        delay = random.uniform(5, 20)
                         self.emit_progress({'message': f'Waiting {delay:.1f}s before next scrape... ({successful} berhasil, {failed} gagal)', 'current': index + 1, 'total': max_authors})
                         elapsed = 0
                         while elapsed < delay:
