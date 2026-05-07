@@ -32,8 +32,7 @@ from psycopg2 import sql
 import os
 import logging
 import sys
-# import signal
-import threading
+import signal
 
 logging.basicConfig(
     level=logging.INFO,
@@ -1091,7 +1090,8 @@ class GoogleScholarScraper:
     # =========================================================================
 
     def run(self, max_authors=10, scrape_from_beginning=False):
-        # Hapus _timeout_handler di sini, tidak perlu lagi
+        def _timeout_handler(signum, frame):
+            raise TimeoutError("Scraping author timeout! Melebihi 30 menit.")
 
         try:
             if not self.connect_to_db():
@@ -1116,22 +1116,12 @@ class GoogleScholarScraper:
                         break
                     self.emit_progress({'message': f'Scraping {author_name} ({index + 1}/{max_authors})...', 'current': index + 1, 'total': max_authors, 'status': 'running'})
                     self.update_scraping_status(author_name, 'processing')
-
-                    # ── Timeout via threading.Timer (works in any thread) ──
-                    timeout_triggered = threading.Event()
-                    def _trigger_timeout():
-                        timeout_triggered.set()
-                    timer = threading.Timer(1800, _trigger_timeout)
-                    timer.start()
-
+                    signal.signal(signal.SIGALRM, _timeout_handler)
+                    signal.alarm(1800)
                     try:
                         profile_data = self.scrape_profile(profile_url, author_name)
-
-                        if timeout_triggered.is_set():
-                            raise TimeoutError("Scraping author timeout! Melebihi 30 menit.")
-
                         if self.is_cancelled():
-                            timer.cancel()
+                            signal.alarm(0)
                             self.emit_progress({'message': 'Scraping dibatalkan oleh user.', 'status': 'cancelled'})
                             break
                         if profile_data and profile_data.get('publications'):
@@ -1144,7 +1134,7 @@ class GoogleScholarScraper:
                             self.update_scraping_status(author_name, 'error', 'No publications found')
                             failed += 1
                     except InterruptedError:
-                        timer.cancel()
+                        signal.alarm(0)
                         self.emit_progress({'message': 'Scraping dibatalkan oleh user.', 'status': 'cancelled'})
                         self.update_scraping_status(author_name, 'pending', 'Dibatalkan oleh user')
                         break
@@ -1173,10 +1163,9 @@ class GoogleScholarScraper:
                         self.update_scraping_status(author_name, 'error', str(e))
                         failed += 1
                     finally:
-                        timer.cancel()
-
+                        signal.alarm(0)
                     if index < max_authors - 1 and not self.is_cancelled():
-                        delay = random.uniform(5,20)
+                        delay = random.uniform(60, 120)
                         self.emit_progress({'message': f'Waiting {delay:.1f}s before next scrape... ({successful} berhasil, {failed} gagal)', 'current': index + 1, 'total': max_authors})
                         elapsed = 0
                         while elapsed < delay:
@@ -1185,6 +1174,7 @@ class GoogleScholarScraper:
                             time.sleep(min(5, delay - elapsed))
                             elapsed += 5
             finally:
+                signal.alarm(0)
                 if self.driver:
                     try:
                         self.driver.quit()
@@ -1193,7 +1183,6 @@ class GoogleScholarScraper:
                 if hasattr(self, '_chrome_user_data_dir') and os.path.exists(self._chrome_user_data_dir):
                     import shutil
                     shutil.rmtree(self._chrome_user_data_dir, ignore_errors=True)
-
             if self.is_cancelled():
                 return {'success': True, 'message': f'Scraping dibatalkan. {successful} berhasil, {failed} gagal sebelum dibatalkan.', 'summary': {'total_attempted': successful + failed, 'successful': successful, 'failed': failed, 'cancelled': True}}
             return {'success': True, 'message': f'Selesai scraping {successful + failed} author: {successful} berhasil, {failed} gagal', 'summary': {'total_attempted': successful + failed, 'successful': successful, 'failed': failed, 'cancelled': False}}
