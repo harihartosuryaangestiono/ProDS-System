@@ -1176,7 +1176,7 @@ class GoogleScholarScraper:
                         timer.cancel()
 
                     if index < max_authors - 1 and not self.is_cancelled():
-                        delay = random.uniform(60, 120)
+                        delay = random.uniform(5,20)
                         self.emit_progress({'message': f'Waiting {delay:.1f}s before next scrape... ({successful} berhasil, {failed} gagal)', 'current': index + 1, 'total': max_authors})
                         elapsed = 0
                         while elapsed < delay:
